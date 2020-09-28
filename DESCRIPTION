@@ -1,0 +1,28 @@
+Package: venndir
+Title: Directional Venn diagrams
+Version: 0.0.1.9000
+Authors@R: c(
+    person(given="James M.",
+       family="Ward",
+       email="jmw86069@gmail.com",
+       comment=c(ORCID="0000-0002-9510-2848"),
+       role=c("aut", "cre")))
+Maintainer: James M. Ward <jmw86069@gmail.com>
+Description: Directional Venn diagrams and set overlaps.
+Depends: R (>= 3.0.0)
+biocViews:
+Imports: jamba(>= 0.0.56.900),
+    colorjam(>= 0.0.16.900),
+    sp,
+    rgeos,
+    polylabelr
+Suggests:
+    eulerr
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Remotes: github::jmw86069/jamba,
+    github::jmw86069/colorjam
+URL: http://github.com/jmw86069/venndir
+BugReports: http://github.com/jmw86069/venndir/issues
+RoxygenNote: 7.0.2

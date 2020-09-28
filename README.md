@@ -1,2 +1,5 @@
 # venndir
-directional Venn diagrams
+
+directional Venn diagrams in R
+
+
