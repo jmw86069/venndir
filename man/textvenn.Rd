@@ -7,15 +7,53 @@
 textvenn(
   setlist,
   sets = seq_along(setlist),
+  overlap_type = c("overlap", "each", "concordance", "concordant"),
   set_colors = NULL,
   spacing = 5,
   padding = 2,
-  useBgColor = TRUE,
-  countsUseBgColor = FALSE,
+  inverse_title = TRUE,
+  inverse_counts = FALSE,
+  color_by_counts = TRUE,
   return_items = FALSE,
+  unicode = TRUE,
   verbose = FALSE,
   ...
 )
+}
+\arguments{
+\item{setlist}{`list` of item vectors; `list` of vectors named by item;
+incidence `matrix` with values `c(0, 1)` or `c(FALSE, TRUE)`, or
+`c(-1, 0, 1)`.}
+
+\item{sets}{`integer` `vector` as index to `setlist`, used to
+pull out a subset of the list elements. This subset is useful
+because the set colors are defined for the full `setlist`,
+which allows the subset of colors to be consistent for each set.}
+
+\item{set_colors}{`NULL` or `character` `vector` that contains
+R-compatible colors. When `set_colors` is `NULL`, categorical
+colors are defined using `colorjam::rainbowJam()`. When
+`set_colors` is defined, the values are recycled to the total
+number of sets represented by `setlist`.}
+
+\item{spacing, padding}{`integer` values indicating the character
+spacing and padding around labels printed to the console output.}
+
+\item{inverse_title, inverse_counts}{`logical` indicating whether
+to inverse the color, when `inverse_title=TRUE` then each Venn
+set is printed on colored background, when `inverse_title=FALSE`,
+each set is printed with colored text with no background color.}
+
+\item{return_items}{`logical` passed to `signed_overlaps()` to
+indicate whether to include items with each Venn set. This data
+is returned using `invisible()`, and is relevant only when
+storing the return value.}
+
+\item{verbose}{`logical` indicating whether to print verbose output.}
+}
+\value{
+`data.frame` returned using `invisible()`, from the
+   output of `signed_overlaps()`.
 }
 \description{
 Text Venn diagram
@@ -24,4 +62,13 @@ Text Venn diagram
 This function is a very simple method to print a Venn diagram
 using text, intended to be displayed using mono-spaced font
 on an R console.
+}
+\examples{
+setlist <- make_venn_test(n_items=100, do_signed=TRUE)
+textvenn(setlist, sets=c(1,2))
+
+setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
+textvenn(setlist, sets=c(1,2,3))
+signed_overlaps(setlist, "each")
+
 }
