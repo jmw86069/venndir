@@ -7,10 +7,10 @@
 textvenn(
   setlist,
   sets = seq_along(setlist),
-  overlap_type = c("overlap", "each", "concordance", "concordant"),
+  overlap_type = c("concordance", "overlap", "each", "agreement"),
   set_colors = NULL,
   spacing = 5,
-  padding = 2,
+  padding = 1,
   inverse_title = TRUE,
   inverse_counts = FALSE,
   color_by_counts = TRUE,
@@ -67,6 +67,7 @@ on an R console.
 setlist <- make_venn_test(n_items=100, do_signed=TRUE)
 # basic text Venn without directionality
 textvenn(setlist, sets=c(1,2))
+textvenn(setlist, sets=c(1,2), overlap_type="each")
 
 setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
 # basic text Venn without directionality

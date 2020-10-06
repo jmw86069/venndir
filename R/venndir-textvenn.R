@@ -40,6 +40,7 @@
 #' setlist <- make_venn_test(n_items=100, do_signed=TRUE)
 #' # basic text Venn without directionality
 #' textvenn(setlist, sets=c(1,2))
+#' textvenn(setlist, sets=c(1,2), overlap_type="each")
 #' 
 #' setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
 #' # basic text Venn without directionality
@@ -52,10 +53,10 @@
 textvenn <- function
 (setlist,
  sets=seq_along(setlist),
- overlap_type=c("overlap", "each", "concordance", "concordant"),
+ overlap_type=c("concordance", "overlap", "each", "agreement"),
  set_colors=NULL,
  spacing=5,
- padding=2,
+ padding=1,
  inverse_title=TRUE,
  inverse_counts=FALSE,
  color_by_counts=TRUE,
@@ -149,9 +150,9 @@ textvenn <- function
       venn_m <- matrix(ncol=10,
          nrow=venn_nrow,
          data=" ");
-      venn_m[set_rownums, set_colnums] <- names(fCounts);
-      venn_m[set_rownums + 1, set_colnums] <- fCounts;
-      
+      venn_m[cbind(set_rownums, set_colnums)] <- names(fCounts);
+      venn_m[cbind(set_rownums + 1, set_colnums)] <- fCounts;
+
       # matrix for label colors
       header_colors <- c(vCol, vCol12);
       if (color_by_counts) {
@@ -219,7 +220,7 @@ textvenn <- function
                   unlist(gCounts)[i]));
          });
          ## order labels again?
-         gdf <- mixedSortDF(data.frame(
+         gdf <- jamba::mixedSortDF(data.frame(
             group=rep(seq_along(gCounts), lengths(gCounts)),
             label=gbase_labels,
             index=seq_along(gbase_labels)), byCols=c(1, 2))
@@ -230,7 +231,7 @@ textvenn <- function
             venn_m[seq_rownums[i],seq_colnums[i]] <- gcount_labels[[i]];
             venn_c[seq_rownums[i],seq_colnums[i]] <- gbase_colors[[i]];
             if (inverse_counts) {
-               venn_i[row_seq[j],set_colnum] <- TRUE;
+               venn_i[seq_rownums[i],seq_colnums[i]] <- TRUE;
             }
          }
       }
@@ -253,8 +254,10 @@ textvenn <- function
 
       ## Create matrix for labels
       set_colnums <- c(1,5,3, 3,2,4, 3) * 2 - 1;
+      set_colnums <- c(1, 10, 5, 5, 3, 8, 5);
+      venn_ncol <- 11;
       set_rownums <- c(3,3,12, 1,8,8, 6);
-      venn_m <- matrix(ncol=10, nrow=13, data=" ");
+      venn_m <- matrix(ncol=venn_ncol, nrow=13, data=" ");
       venn_m[cbind(set_rownums, set_colnums)] <- names(fCounts);
       venn_m[cbind(set_rownums + 1, set_colnums)] <- fCounts;
 
@@ -274,12 +277,12 @@ textvenn <- function
             count_colors <- "darkorange3";
          }
       }
-      venn_c <- matrix(ncol=10, nrow=13, data=NA);
+      venn_c <- matrix(ncol=venn_ncol, nrow=13, data=NA);
       venn_c[cbind(set_rownums, set_colnums)] <- header_colors;
       venn_c[cbind(set_rownums + 1, set_colnums)] <- count_colors;
 
       # matrix indicating what colors to invert
-      venn_i <- matrix(ncol=10, nrow=13, data=FALSE);
+      venn_i <- matrix(ncol=venn_ncol, nrow=13, data=FALSE);
       if (inverse_title) {
          venn_i[cbind(set_rownums, set_colnums)] <- TRUE;
       }
@@ -303,9 +306,17 @@ textvenn <- function
                gcount_colors <- "darkorange3";
             }
          }
-         seq_colnums <- rep(set_colnums + 1, lengths(gCounts));
+         seq_colnums <- rep(set_colnums + 1, lengths(gCounts)) +
+            unlist(lapply(gCounts, function(a){
+               floor((seq_along(a) - 1) / 4)
+            }));
+         #seq_colnums <- rep(set_colnums + 1, lengths(gCounts));
          seq_rownums <- rep(set_rownums + 1, lengths(gCounts)) +
-            unlist(lapply(gCounts, seq_along)) - 2;
+            unlist(lapply(gCounts, function(a){
+               (seq_along(a) - 1) %% 4
+            })) - 1;
+         #seq_rownums <- rep(set_rownums + 1, lengths(gCounts)) +
+         #2   unlist(lapply(gCounts, seq_along)) - 2;
          gbase_labels <- curate_venn_labels(
             names(unlist(unname(gCounts))),
             "sign");
@@ -321,7 +332,7 @@ textvenn <- function
                   unlist(gCounts)[i]));
          });
          ## order labels again?
-         gdf <- mixedSortDF(data.frame(
+         gdf <- jamba::mixedSortDF(data.frame(
             group=rep(seq_along(gCounts), lengths(gCounts)),
             label=gbase_labels,
             index=seq_along(gbase_labels)), byCols=c(1, 2))

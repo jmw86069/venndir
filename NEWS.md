@@ -6,6 +6,9 @@
 `render_venndir()` in order to offer more customized
 options. It also allows editing the source data as
 needed, like adjusting individual overlap settings.
+* `textvenn()` now supports directional Venn counts,
+even with `"each"` it uses two columns for all possible
+directions for the central 3-way overlaps.
 
 ## new functions
 

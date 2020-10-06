@@ -17,28 +17,28 @@ curate_venn_labels <- function
    if (length(curate_df) == 0) {
       if (unicode) {
          curate_list <- list(
-            c("[ ]*-1", "\u2193", "dodgerblue4"),
+            c("[ ]*-1", "\u2193", "dodgerblue3"),
             c("[ ]*1", "\u2191", "firebrick"),
-            c("[ ]*concordant", "\u21F6", "dodgerblue4"),
+            c("[ ]*concordant|agreement", "\u21F6", "dodgerblue3"),
             c("[ ]*mixed", "\u2193\u2191", "grey45"));
             #c("[ ]*mixed", "\u21C6", "grey45"));
          curate_list <- list(
-            c("-1", "\u2193", "dodgerblue4"),
+            c("-1", "\u2193", "dodgerblue3"),
             c("1", "\u2191", "firebrick"),
-            c("concordant", "||", "dodgerblue4"),
-            c("mixed", "\u03A7", "grey45"));
+            c("concordant|agreement", "\u21F6", "dodgerblue3"),
+            c("mixed", "X", "grey45"));
             #c("mixed", "\u2193\u2191", "grey45"));
             #c("mixed", "\u21C6", "grey45"));
       } else {
          curate_list <- list(
-            c("[ ]*-1", "v", "dodgerblue4"),
+            c("[ ]*-1", "v", "dodgerblue3"),
             c("[ ]*1", "^", "firebrick"), # somehow ^ is not supported
-            c("[ ]*concordant", ">>>", "dodgerblue4"),
+            c("[ ]*concordant|agreement", ">>>", "dodgerblue3"),
             c("[ ]*mixed", ">|<", "grey45"));
          curate_list <- list(
-            c("-1", "v", "dodgerblue4"),
+            c("-1", "v", "dodgerblue3"),
             c("1", "^", "firebrick"),
-            c("concordant", ">>>", "dodgerblue4"),
+            c("concordant|agreement", ">>>", "dodgerblue3"),
             c("mixed", "X", "grey45"));
       }
       curate_df <- jamba::rbindList(curate_list)
