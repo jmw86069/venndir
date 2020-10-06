@@ -3,21 +3,58 @@
 #' 
 #' Signed overlaps
 #' 
+#' This function is the core function to summarize overlaps
+#' including directionality (signed).
+#' 
+#' The directional counts can be summarized in slightly different
+#' ways, defined by the argument `overlap_type`:
+#' 
+#' * `overlap_type="each"` - this option returns all possible
+#' directions individually counted.
+#' * `overlap_type="concordance"` - this option returns the counts
+#' for each consistent direction, for example `"up-up-up"` would
+#' be counted, and `"down-down-down"` would be counted, but any
+#' mixture of `"up"` and `"down"` would be summarized and counted
+#' as `"mixed"`. For 3-way overlaps, there are 8 possible directions,
+#' the labels are difficult to place in the Venn diagram, and are not
+#' altogether meaningful. Note that this option is the default
+#' for `venndir()`.
+#' * `overlap_type="overlap"` - this option only summarizes overlaps
+#' without regard to direction. This option returns standard Venn
+#' overlap counts.
+#' * `overlap_type="agreement"` - this option groups all directions
+#' that agree and returns them as `"concordant"`, all others are
+#' returned as `"mixed"`.
+#' 
+#' @family venndir overlaps
+#' 
 #' @param setlist `list` of named vectors, whose names represent
 #'    set items, and whose values represent direction using 
 #'    values `c(-1, 0, 1)`.
 #' @param overlap_type `character` value indicating the type of
 #'    overlap logic: `"each"` records each combination of
 #'    signs; `"overlap"` disregards the sign and returns any match
-#'    item overlap; `"concordance"` represents agreement in sign
-#'    for overlap, or `"mixed"` for any inconsistent overlapping
-#'    sign; `"concordant"` represents agreement in sign as
-#'    `"concordant"` which combines agree-up, and agree-down,
-#'    and any inconsistency in sign as `"mixed"`.
+#'    item overlap; `"concordance"` represents counts for full
+#'    agreement, or `"mixed"` for any inconsistent overlapping
+#'    direction; `"agreement"` represents full agreement in direction
+#'    as `"agreement"`, and `"mixed"` for any inconsistent
+#'    direction.
 #' @param return_items `logical` indicating whether to return
 #'    the items within each overlap set.
+#' @param return_item_labels `logical` indicating whether to return
+#'    the directional label associated with each item. A directional
+#'    label combines the direction from `setlist` by item.
 #' @param sep `character` used as a delimiter between set names,
 #'    the default is `"&"`.
+#' @param trim_label `logical` indicating whether to trim the
+#'    directional label, for example instead of returning `"0 1 -1"`
+#'    it will return `"1 -1"` because the overlap name already
+#'    indicates the sets involved.
+#' @param include_blanks `logical` indicating whether each set overlap
+#'    should be represented at least once even when no items are
+#'    present in the overlap. When `include_blanks=TRUE` is useful
+#'    in that it guarantees all possible combinations of overlaps
+#'    are represented consistently in the output.
 #' @param ... additional arguments are passed to `list2imsigned()`.
 #' 
 #' @export
@@ -26,10 +63,11 @@ signed_overlaps <- function
  overlap_type=c("each",
     "overlap",
     "concordance",
-    "concordant"),
+    "agreement"),
  return_items=FALSE,
+ return_item_labels=return_items,
  sep="&",
- trim_zero=TRUE,
+ trim_label=TRUE,
  include_blanks=TRUE,
  ...)
 {
@@ -104,10 +142,10 @@ signed_overlaps <- function
       svimsv_olt <- paste(svims_split_names[svimsv],
          sep="|",
          ifelse(svimssu_concordance[svimss], svimss, "mixed"));
-   } else if ("concordant" %in% overlap_type) {
+   } else if ("agreement" %in% overlap_type) {
       svimsv_olt <- paste(svims_split_names[svimsv],
          sep="|",
-         ifelse(svimssu_concordance[svimss], "concordant", "mixed"));
+         ifelse(svimssu_concordance[svimss], "agreement", "mixed"));
    } else {
       svimsv_olt <- paste(svims_split_names[svimsv],
          sep="|",
@@ -141,7 +179,7 @@ signed_overlaps <- function
       blank_df$overlap <- jamba::pasteByRow(blank_df[,colnames(svims),drop=FALSE], sep=" ");
       blank_df$num_sets <- blank_df_num;
       rownames(blank_df) <- paste0(blank_df$sets, "|", blank_df$overlap);
-      if ("concordant" %in% overlap_type) {
+      if ("agreement" %in% overlap_type) {
          blank_df[[overlap_type]] <- "concordant";
       } else {
          blank_df[[overlap_type]] <- blank_df$overlap;
@@ -159,7 +197,7 @@ signed_overlaps <- function
    svims_split_names3 <- jamba::nameVector(svims_df2[,c("overlap", "sets")]);
    
    # optionally clean up the label
-   if (trim_zero) {
+   if (trim_label) {
       svims_df2[,"overlap_label"] <- gsub("^[ ]+|[ ]+$", "",
          gsub("[ ]+", " ",
          gsub("0", "",
@@ -182,7 +220,7 @@ signed_overlaps <- function
       idf <- data.frame(count=as(table(i), "matrix"), check.names=FALSE);
       idf$each <- rownames(idf);
       idf$concordance <- ifelse(svimssu_concordance[idf$each], idf$each, "mixed");
-      idf$concordant <- ifelse(svimssu_concordance[idf$each], "concordant", "mixed");
+      idf$agreement <- ifelse(svimssu_concordance[idf$each], "concordant", "mixed");
       idf$overlap <- olname;
       idf$overlap_set <- iname;
       idf;
@@ -217,7 +255,7 @@ signed_overlaps <- function
             ifelse(svimssu_concordance[svimss],
                svimss,
                "mixed"));
-      } else if ("concordant" %in% overlap_type) {
+      } else if ("agreement" %in% overlap_type) {
          svims_split <- paste(svims_split_names2[svimsv],
             ifelse(svimssu_concordance[svimss],
                "concordant",

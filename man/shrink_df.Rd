@@ -26,3 +26,13 @@ configurable tool for the majority of scenarios.
 
 This function uses `data.table` for overall speed.
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{eulerr2polys}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{make_venn_test}()},
+\code{\link{nudge_sp}()},
+\code{\link{print_color_df}()}
+}
+\concept{venndir utility}

@@ -1,0 +1,13 @@
+destination: docs
+template:
+  params:
+    bootswatch: cosmo
+reference:
+- title: Overlap functions
+  desc: Functions that handle set overlaps
+  contents:
+  - has_concept("venndir overlaps")
+- title: Utility functions
+  desc: Helpful utility functions
+  contents:
+  - has_concept("venndir utility")

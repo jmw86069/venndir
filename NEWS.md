@@ -1,3 +1,10 @@
+# venndir version 0.0.3.900
+
+## new functions
+
+* `venndir()` the core visual function that displays either
+Venn diagram or a Euler diagram for proportional diagrams.
+
 # venndir version 0.0.2.900
 
 The `venndir` package is intended for analyses where direction

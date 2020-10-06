@@ -65,10 +65,20 @@ on an R console.
 }
 \examples{
 setlist <- make_venn_test(n_items=100, do_signed=TRUE)
+# basic text Venn without directionality
 textvenn(setlist, sets=c(1,2))
 
 setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
+# basic text Venn without directionality
 textvenn(setlist, sets=c(1,2,3))
-signed_overlaps(setlist, "each")
+
+# basic text Venn with directionality
+textvenn(setlist, sets=c(1,2,3), "concordance")
 
 }
+\seealso{
+Other venndir overlaps: 
+\code{\link{signed_overlaps}()},
+\code{\link{venndir}()}
+}
+\concept{venndir overlaps}

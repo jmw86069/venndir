@@ -134,3 +134,13 @@ jamba::ssdim(sv_concordant)
 sv_concordant$Venn_Counts
 
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{eulerr2polys}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{nudge_sp}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()}
+}
+\concept{venndir utility}

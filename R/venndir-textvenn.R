@@ -10,6 +10,8 @@
 #' @return `data.frame` returned using `invisible()`, from the
 #'    output of `signed_overlaps()`.
 #' 
+#' @family venndir overlaps
+#' 
 #' @param setlist `list` of item vectors; `list` of vectors named by item;
 #'    incidence `matrix` with values `c(0, 1)` or `c(FALSE, TRUE)`, or
 #'    `c(-1, 0, 1)`.
@@ -36,11 +38,15 @@
 #' 
 #' @examples
 #' setlist <- make_venn_test(n_items=100, do_signed=TRUE)
+#' # basic text Venn without directionality
 #' textvenn(setlist, sets=c(1,2))
 #' 
 #' setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
+#' # basic text Venn without directionality
 #' textvenn(setlist, sets=c(1,2,3))
-#' signed_overlaps(setlist, "each")
+#' 
+#' # basic text Venn with directionality
+#' textvenn(setlist, sets=c(1,2,3), "concordance")
 #' 
 #' @export
 textvenn <- function
@@ -77,25 +83,35 @@ textvenn <- function
    #c("^(-1.* 1.*|1.* -1.*)$", "\u21C6"),
    if (unicode) {
       curate_list <- list(
-         c("[ ]*-1", "\u2193"),
-         c("[ ]*1", "\u2191"),
-         c("[ ]*concordant", "\u21F6"),
-         c("[ ]*mixed", "\u21C6"));
+         c("[ ]*-1", "\u2193", "dodgerblue"),
+         c("[ ]*1", "\u2191", "firebrick"),
+         c("[ ]*concordant", "\u21F6", "dodgerblue"),
+         c("[ ]*mixed", "\u21C6", "firebrick"));
    } else {
       curate_list <- list(
-         c("[ ]*-1", "v"),
-         c("[ ]*1", "^"),
-         c("[ ]*concordant", ">>>"),
-         c("[ ]*mixed", ">|<"));
+         c("[ ]*-1", "v", "dodgerblue"),
+         c("[ ]*1", "^", "firebrick"),
+         c("[ ]*concordant", ">>>", "dodgerblue"),
+         c("[ ]*mixed", ">|<", "grey45"));
    }
    curate_df <- jamba::rbindList(curate_list)
    curate_labels <- function(x, curate_df){
       for (i in seq_len(nrow(curate_df))) {
-         x <- gsub(curate_df[i,1], curate_df[i,2], x)
+         x <- gsub(curate_df[i,1],
+            curate_df[i,2],
+            x);
       }
       x;
    }
-
+   curate_colors <- function(x, curate_df){
+      for (i in seq_len(nrow(curate_df))) {
+         x <- gsub(curate_df[i,1],
+            curate_df[i,3],
+            x);
+      }
+      x;
+   }
+   
    # get overlap data
    sv <- signed_overlaps(setlist[sets],
       overlap_type=overlap_type,
@@ -128,9 +144,13 @@ textvenn <- function
       
       ## Create matrix for labels
       set_colnums <- c(1,5,3)*2 - 1;
-      venn_m <- matrix(ncol=10, nrow=2, data=" ");
-      venn_m[1,set_colnums] <- sv$sets;
-      venn_m[2,set_colnums] <- nCounts;
+      set_rownums <- c(1, 1, 1);
+      venn_nrow <- max(c(2, lengths(gCounts)));
+      venn_m <- matrix(ncol=10,
+         nrow=venn_nrow,
+         data=" ");
+      venn_m[set_rownums, set_colnums] <- names(fCounts);
+      venn_m[set_rownums + 1, set_colnums] <- fCounts;
       
       # matrix for label colors
       header_colors <- c(vCol, vCol12);
@@ -148,24 +168,79 @@ textvenn <- function
             count_colors <- c("darkorange3");
          }
       }
-      venn_c <- matrix(ncol=10, nrow=2, data=NA);
+      venn_c <- matrix(ncol=10,
+         nrow=venn_nrow,
+         data=NA);
       venn_c[1,set_colnums] <- header_colors;
       venn_c[2,set_colnums] <- count_colors;
 
       # matrix indicating what colors to invert
-      venn_i <- matrix(ncol=10, nrow=2, data=FALSE);
+      venn_i <- matrix(ncol=10,
+         nrow=venn_nrow,
+         data=FALSE);
       if (inverse_title) {
          venn_i[1,set_colnums] <- TRUE;
       }
       if (inverse_counts) {
          venn_i[2,set_colnums] <- TRUE;
       }
+
+      ## signed counts
+      if (any(lengths(gCounts) > 1)) {
+         if (color_by_counts) {
+            gcount_colors <- colorjam::vals2colorLevels(sqrt(unlist(gCounts)),
+               divergent=FALSE,
+               col="Reds",
+               trimRamp=c(8, 1),
+               lens=2,
+               baseline=0);
+         } else {
+            if (inverse_counts) {
+               gcount_colors <- rep(header_colors, lengths(gCounts));
+            } else {
+               gcount_colors <- "darkorange3";
+            }
+         }
+         seq_colnums <- rep(set_colnums + 1, lengths(gCounts));
+         seq_rownums <- rep(set_rownums + 1, lengths(gCounts)) +
+            unlist(lapply(gCounts, seq_along)) - 2;
+         gbase_labels <- curate_venn_labels(
+            names(unlist(unname(gCounts))),
+            "sign");
+         gbase_colors <- curate_venn_labels(
+            names(unlist(unname(gCounts))),
+            "color");
+         gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
+            ilabel <- paste0(
+               gbase_labels[i],
+               ": ",
+               format(trim=TRUE,
+                  big.mark=",",
+                  unlist(gCounts)[i]));
+         });
+         ## order labels again?
+         gdf <- mixedSortDF(data.frame(
+            group=rep(seq_along(gCounts), lengths(gCounts)),
+            label=gbase_labels,
+            index=seq_along(gbase_labels)), byCols=c(1, 2))
+         gbase_labels <- gbase_labels[gdf$index];
+         gbase_colors <- gbase_colors[gdf$index];
+         gcount_labels <- gcount_labels[gdf$index];
+         for (i in seq_along(gcount_labels)) {
+            venn_m[seq_rownums[i],seq_colnums[i]] <- gcount_labels[[i]];
+            venn_c[seq_rownums[i],seq_colnums[i]] <- gbase_colors[[i]];
+            if (inverse_counts) {
+               venn_i[row_seq[j],set_colnum] <- TRUE;
+            }
+         }
+      }
       
       # print this colorized text table
       print_color_df(df=venn_m,
          dfcolor=venn_c,
          dfinvert=venn_i,
-         padding=padding);
+         padding=padding,
+         ...);
       return(invisible(sv));
 
    } else if (n == 3) {
@@ -231,9 +306,12 @@ textvenn <- function
          seq_colnums <- rep(set_colnums + 1, lengths(gCounts));
          seq_rownums <- rep(set_rownums + 1, lengths(gCounts)) +
             unlist(lapply(gCounts, seq_along)) - 2;
-         gbase_labels <- curate_labels(
+         gbase_labels <- curate_venn_labels(
             names(unlist(unname(gCounts))),
-            curate_df);
+            "sign");
+         gbase_colors <- curate_venn_labels(
+            names(unlist(unname(gCounts))),
+            "color");
          gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
             ilabel <- paste0(
                gbase_labels[i],
@@ -248,10 +326,11 @@ textvenn <- function
             label=gbase_labels,
             index=seq_along(gbase_labels)), byCols=c(1, 2))
          gbase_labels <- gbase_labels[gdf$index];
+         gbase_colors <- gbase_colors[gdf$index];
          gcount_labels <- gcount_labels[gdf$index];
          for (i in seq_along(gcount_labels)) {
             venn_m[seq_rownums[i],seq_colnums[i]] <- gcount_labels[[i]];
-            venn_c[seq_rownums[i],seq_colnums[i]] <- gcount_colors[[i]];
+            venn_c[seq_rownums[i],seq_colnums[i]] <- gbase_colors[[i]];
             if (inverse_counts) {
                venn_i[row_seq[j],set_colnum] <- TRUE;
             }
@@ -262,7 +341,8 @@ textvenn <- function
       print_color_df(venn_m,
          venn_c,
          venn_i,
-         padding=padding);
+         padding=padding,
+         ...);
       return(invisible(sv));
    }
    invisible(sv);

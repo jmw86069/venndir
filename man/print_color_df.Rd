@@ -8,11 +8,79 @@ print_color_df(
   df,
   dfcolor = NULL,
   dfinvert = NULL,
-  colnames = FALSE,
+  dfjustify = "centre",
+  header = FALSE,
   padding = 2,
+  pad_type = 1,
+  comment = FALSE,
+  timeStamp = FALSE,
   ...
 )
+}
+\arguments{
+\item{df}{`data.frame` with content to be printed to the R console.}
+
+\item{dfcolor}{`data.frame` with R compatible colors in each cell.}
+
+\item{dfinvert}{`data.frame` with `logical` values indicating whether
+each color should be inverted `TRUE` so the cell color is applied
+as a background color. In this case the foreground text color is
+determined using `jamba::setTextContrastColor()`.}
+
+\item{dfjustify}{`character` or `data.frame` passed to `format()`
+to determine the text alignment in each cell. When supplied as
+a vector, it describes each column of output; when supplied as
+a `data.frame` it describes each cell.}
+
+\item{header}{`logical` indicating whether to print column names
+at the top of the output.}
+
+\item{padding}{`integer` value that defines the number of characters
+added before and after each text term to add visual space between
+adjacent cells.}
+
+\item{comment, timeStamp}{`logical` arguments passed to
+`jamba::printDebug()`, which indicate whether to print output
+as a comment (with `"#"` at the start of each line), and whether
+to include a time stamp. The default `FALSE` turn these options
+off.}
+
+\item{...}{additional arguments are ignored.}
 }
 \description{
 Print colorized text table
 }
+\details{
+This utility function takes `df` as a `data.frame` input,
+and prints colorized text output.
+
+Colors are defined using `dfcolor` provided as a `data.frame`.
+
+Colors can be inverted using `dfinvert` that contains logical
+`TRUE` or `FALSE` values, provided as a `data.frame`.
+}
+\examples{
+set.seed(2);
+df <- matrix(sample(head(colors(), 151), 12), ncol=3);
+dfinvert <- matrix(sample(c(FALSE, FALSE, TRUE), 12, replace=TRUE), ncol=3);
+print_color_df(df, df, dfinvert);
+
+print_color_df(df, df, dfinvert, padding=1);
+
+colnames(df) <- c("left", "centre", "right");
+print_color_df(df, df, dfinvert,
+   header=TRUE,
+   padding=4,
+   dfjustify=c("left", "centre", "right"));
+
+}
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{eulerr2polys}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{make_venn_test}()},
+\code{\link{nudge_sp}()},
+\code{\link{shrink_df}()}
+}
+\concept{venndir utility}

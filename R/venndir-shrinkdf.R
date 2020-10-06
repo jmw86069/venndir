@@ -10,6 +10,8 @@
 #' 
 #' This function uses `data.table` for overall speed.
 #' 
+#' @family venndir utility
+#' 
 #' @import data.table
 #' 
 #' @export

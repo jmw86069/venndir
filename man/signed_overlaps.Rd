@@ -6,10 +6,11 @@
 \usage{
 signed_overlaps(
   setlist,
-  overlap_type = c("each", "overlap", "concordance", "concordant"),
+  overlap_type = c("each", "overlap", "concordance", "agreement"),
   return_items = FALSE,
+  return_item_labels = return_items,
   sep = "&",
-  trim_zero = TRUE,
+  trim_label = TRUE,
   include_blanks = TRUE,
   ...
 )
@@ -22,20 +23,65 @@ values `c(-1, 0, 1)`.}
 \item{overlap_type}{`character` value indicating the type of
 overlap logic: `"each"` records each combination of
 signs; `"overlap"` disregards the sign and returns any match
-item overlap; `"concordance"` represents agreement in sign
-for overlap, or `"mixed"` for any inconsistent overlapping
-sign; `"concordant"` represents agreement in sign as
-`"concordant"` which combines agree-up, and agree-down,
-and any inconsistency in sign as `"mixed"`.}
+item overlap; `"concordance"` represents counts for full
+agreement, or `"mixed"` for any inconsistent overlapping
+direction; `"agreement"` represents full agreement in direction
+as `"agreement"`, and `"mixed"` for any inconsistent
+direction.}
 
 \item{return_items}{`logical` indicating whether to return
 the items within each overlap set.}
 
+\item{return_item_labels}{`logical` indicating whether to return
+the directional label associated with each item. A directional
+label combines the direction from `setlist` by item.}
+
 \item{sep}{`character` used as a delimiter between set names,
 the default is `"&"`.}
+
+\item{trim_label}{`logical` indicating whether to trim the
+directional label, for example instead of returning `"0 1 -1"`
+it will return `"1 -1"` because the overlap name already
+indicates the sets involved.}
+
+\item{include_blanks}{`logical` indicating whether each set overlap
+should be represented at least once even when no items are
+present in the overlap. When `include_blanks=TRUE` is useful
+in that it guarantees all possible combinations of overlaps
+are represented consistently in the output.}
 
 \item{...}{additional arguments are passed to `list2imsigned()`.}
 }
 \description{
 Signed overlaps
 }
+\details{
+This function is the core function to summarize overlaps
+including directionality (signed).
+
+The directional counts can be summarized in slightly different
+ways, defined by the argument `overlap_type`:
+
+* `overlap_type="each"` - this option returns all possible
+directions individually counted.
+* `overlap_type="concordance"` - this option returns the counts
+for each consistent direction, for example `"up-up-up"` would
+be counted, and `"down-down-down"` would be counted, but any
+mixture of `"up"` and `"down"` would be summarized and counted
+as `"mixed"`. For 3-way overlaps, there are 8 possible directions,
+the labels are difficult to place in the Venn diagram, and are not
+altogether meaningful. Note that this option is the default
+for `venndir()`.
+* `overlap_type="overlap"` - this option only summarizes overlaps
+without regard to direction. This option returns standard Venn
+overlap counts.
+* `overlap_type="agreement"` - this option groups all directions
+that agree and returns them as `"concordant"`, all others are
+returned as `"mixed"`.
+}
+\seealso{
+Other venndir overlaps: 
+\code{\link{textvenn}()},
+\code{\link{venndir}()}
+}
+\concept{venndir overlaps}

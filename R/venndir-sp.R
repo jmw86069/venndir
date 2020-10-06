@@ -3,6 +3,8 @@
 #' 
 #' # @import sp
 #' 
+#' @family venndir utility
+#' 
 #' @examples
 #' if (require(eulerr)) {
 #' }
@@ -26,7 +28,7 @@ eulerr2polys <- function
    ellipses_P <- lapply(ellipses, function(i){
       sp::Polygon(i)
    })
-   sdim(ellipses_P);
+   #jamba::sdim(ellipses_P);
    
    ## sp::SpatialPolygon object (numbered)
    ellipses_SP1 <- sp::SpatialPolygons(
@@ -88,6 +90,10 @@ find_vennpoly_overlaps <- function
       venn_colors <- colorjam::group2colors(names(sp),
          preset=preset);
    }
+   if (length(names(venn_colors)) == 0) {
+      names(venn_colors) <- names(sp);
+   }
+   
    ## define incidence matrix of overlaps
    el1 <- expand.grid(rep(list(c(0,1)), numSets));
    colnames(el1) <- names(sp);
@@ -133,7 +139,8 @@ find_vennpoly_overlaps <- function
    }
    
    ## calculate venn overlap polygons
-   vennCoords <- lapply(1:nrow(el1), function(j){
+   #vennCoords <- lapply(1:nrow(el1), function(j){
+   venn_poly_coords <- lapply(1:nrow(el1), function(j){
       i <- el1[j,];
       if (verbose) {
          jamba::printDebug("find_vennpoly_overlaps(): ",
@@ -157,7 +164,7 @@ find_vennpoly_overlaps <- function
       } else {
          venn_poly_count <- 0;
       }
-      if (length(venn_counts) > 0) {
+      if (length(venn_items) > 0) {
          match_list(list(i_names), venn_counts_names)
          venn_match <- match_list(list(i_names), venn_items_names);
          if (is.na(venn_match)) {
@@ -366,4 +373,129 @@ get_largest_polygon <- function
       sp_out <- sp;
    }
    return(sp_out);
+}
+
+#' Make SpatialPolygons circles
+#' 
+#' @export
+sp_circles <- function
+(xcenter,
+ ycenter,
+ setnames=NULL,
+ radius=1,
+ n=60,
+ ...)
+{
+   angle_seq <- head(
+      seq(from=0,
+         to=pi*2,
+         length.out=n+1),
+      n);
+   if (length(setnames) == 0) {
+      setnames <- seq_along(x);
+   }
+   xvals <- sin(angle_seq);
+   yvals <- cos(angle_seq);
+   if (length(radius) == 0) {
+      radius <- 1;
+   }
+   radius <- rep(radius,
+      length.out=length(xcenter));
+   
+   ell_sp <- sp::SpatialPolygons(lapply(seq_along(xcenter), function(i){
+      sp::Polygons(list(
+         sp::Polygon(cbind(xvals * radius[i] + xcenter[i],
+            yvals * radius[i] + ycenter[i]))),
+         setnames[i])
+   }), pO=seq_along(xcenter));
+   invisible(ell_sp);
+}
+
+#' Make SpatialPolygons ellipses
+#' 
+#' @export
+sp_ellipses <- function
+(xcenter,
+ ycenter,
+ setnames=NULL,
+ xradius=1,
+ yradius=2,
+ rotation_degrees=c(0),
+ n=60,
+ ...)
+{
+   angle_seq <- head(
+      seq(from=0,
+         to=pi*2,
+         length.out=n+1),
+      n);
+   if (length(setnames) == 0) {
+      setnames <- seq_along(x);
+   }
+   
+   xvals <- sin(angle_seq);
+   yvals <- cos(angle_seq);
+
+   #ellipse <- cbind(radius[1] * cos(angles), radius[2] * sin(angles));
+   #ellipse <- cbind(ellipse[,1]*cos(rotate) + ellipse[,2]*sin(rotate), ellipse[,2]*cos(rotate) - ellipse[,1]*sin(rotate) );
+   #ellipse <- cbind(center[1]+ellipse[,1], center[2]+ellipse[,2]);
+   
+   xvals <- sin(angle_seq);
+   yvals <- cos(angle_seq);
+   if (length(radius) == 0) {
+      radius <- 1;
+   }
+   radius <- rep(radius,
+      length.out=length(xcenter));
+   if (length(rotation_degrees) == 0) {
+      rotation_degrees <- 0;
+   }
+   rotation_degrees <- rep(rotation_degrees,
+      length.out=length(xcenter));
+   rotation_rad <- jamba::deg2rad(rotation_degrees);
+   
+   ell_sp <- sp::SpatialPolygons(lapply(seq_along(xcenter), function(i){
+      i_xvals <- (xvals * xradius[i]);
+      i_yvals <- (yvals * yradius[i]);
+      e_xvals <- (i_xvals * cos(rotation_rad[i]) + i_yvals * sin(rotation_rad[i]));
+      e_yvals <- (i_yvals * cos(rotation_rad[i]) - i_xvals * sin(rotation_rad[i]));
+      sp::Polygons(list(
+         sp::Polygon(cbind(e_xvals + xcenter[i],
+            e_yvals + ycenter[i]))),
+         setnames[i])
+   }), pO=seq_along(xcenter));
+   invisible(ell_sp);
+}
+
+#' Nudge SpatialPolygons
+#' 
+#' @family venndir utility
+#' 
+#' @export
+nudge_sp <- function
+(sp,
+ x_nudge=NULL,
+ y_nudge=NULL,
+ rotate_degrees=0,
+ ...)
+{
+   ## Optionally nudge the polygon coordinates
+   if (length(x_nudge) > 0 && all(names(x_nudge) %in% names(sp))) {
+      for (i in names(x_nudge)) {
+         j <- match(i, names(sp));
+         ixy <- sp@polygons[[j]]@Polygons[[1]]@coords;
+         ixy[,1] <- ixy[,1] + x_nudge[i];
+         sp@polygons[[j]]@Polygons[[1]]@coords <- ixy;
+      }
+   }
+   if (length(y_nudge) > 0 && all(names(y_nudge) %in% names(sp))) {
+      for (i in names(y_nudge)) {
+         jamba::printDebug("y_nudge on ", i, ", for ", y_nudge[i]);
+         j <- match(i, names(sp));
+         ixy <- sp@polygons[[j]]@Polygons[[1]]@coords;
+         ixy[,2] <- ixy[,2] + y_nudge[i];
+         sp@polygons[[j]]@Polygons[[1]]@coords <- ixy;
+      }
+   }
+   return(invisible(sp));
 }

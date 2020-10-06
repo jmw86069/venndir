@@ -25,6 +25,8 @@
 #' argument `sizes`, which takes priority over `min_size`, and
 #' `max_size`.
 #' 
+#' @family venndir utility
+#' 
 #' @return `list` of items, either as a list of item vectors,
 #' or when `do_signed=TRUE` the list of vectors, where vector
 #' names contain the items, and vector values are signed values
