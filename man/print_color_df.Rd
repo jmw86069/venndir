@@ -18,31 +18,31 @@ print_color_df(
 )
 }
 \arguments{
-\item{df}{`data.frame` with content to be printed to the R console.}
+\item{df}{\code{data.frame} with content to be printed to the R console.}
 
-\item{dfcolor}{`data.frame` with R compatible colors in each cell.}
+\item{dfcolor}{\code{data.frame} with R compatible colors in each cell.}
 
-\item{dfinvert}{`data.frame` with `logical` values indicating whether
-each color should be inverted `TRUE` so the cell color is applied
+\item{dfinvert}{\code{data.frame} with \code{logical} values indicating whether
+each color should be inverted \code{TRUE} so the cell color is applied
 as a background color. In this case the foreground text color is
-determined using `jamba::setTextContrastColor()`.}
+determined using \code{jamba::setTextContrastColor()}.}
 
-\item{dfjustify}{`character` or `data.frame` passed to `format()`
+\item{dfjustify}{\code{character} or \code{data.frame} passed to \code{format()}
 to determine the text alignment in each cell. When supplied as
 a vector, it describes each column of output; when supplied as
-a `data.frame` it describes each cell.}
+a \code{data.frame} it describes each cell.}
 
-\item{header}{`logical` indicating whether to print column names
+\item{header}{\code{logical} indicating whether to print column names
 at the top of the output.}
 
-\item{padding}{`integer` value that defines the number of characters
+\item{padding}{\code{integer} value that defines the number of characters
 added before and after each text term to add visual space between
 adjacent cells.}
 
-\item{comment, timeStamp}{`logical` arguments passed to
-`jamba::printDebug()`, which indicate whether to print output
-as a comment (with `"#"` at the start of each line), and whether
-to include a time stamp. The default `FALSE` turn these options
+\item{comment, timeStamp}{\code{logical} arguments passed to
+\code{jamba::printDebug()}, which indicate whether to print output
+as a comment (with \code{"#"} at the start of each line), and whether
+to include a time stamp. The default \code{FALSE} turn these options
 off.}
 
 \item{...}{additional arguments are ignored.}
@@ -51,13 +51,13 @@ off.}
 Print colorized text table
 }
 \details{
-This utility function takes `df` as a `data.frame` input,
+This utility function takes \code{df} as a \code{data.frame} input,
 and prints colorized text output.
 
-Colors are defined using `dfcolor` provided as a `data.frame`.
+Colors are defined using \code{dfcolor} provided as a \code{data.frame}.
 
-Colors can be inverted using `dfinvert` that contains logical
-`TRUE` or `FALSE` values, provided as a `data.frame`.
+Colors can be inverted using \code{dfinvert} that contains logical
+\code{TRUE} or \code{FALSE} values, provided as a \code{data.frame}.
 }
 \examples{
 set.seed(2);

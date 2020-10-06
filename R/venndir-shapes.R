@@ -13,9 +13,8 @@ get_venn_shapes <- function
  proportional=FALSE,
  sep="&",
  circles_only=FALSE,
- x_nudge=NULL,
- y_nudge=NULL,
  circle_nudge=NULL,
+ rotate_degrees=rotate_degrees,
  ...)
 {
    # 
@@ -71,10 +70,10 @@ get_venn_shapes <- function
    } else {
       stop("Proportional diagrams require the eulerr package.");
    }
-   if (length(x_nudge) > 0 || length(y_nudge) > 0) {
+   if (length(circle_nudge) > 0) {
       venn_sp <- nudge_sp(venn_sp,
-         x_nudge=x_nudge,
-         y_nudge=y_nudge);
+         sp_nudge=circle_nudge,
+         rotate_degrees=rotate_degrees);
    }
    return(invisible(venn_sp));
 }

@@ -48,6 +48,7 @@
 #'    `"shaded"` displays text on partially transparent colored background,
 #'    `"lite"` displays text on partially transparent lite background,
 #'    `"lite_box"` displays text on lite background with border.
+#' @param ... additional arguments are passed to `render_venndir()`.
 #' 
 #' @family venndir overlaps
 #' 
@@ -74,8 +75,15 @@
 #' venndir(setlist,
 #'    proportional=TRUE,
 #'    display_zero=FALSE,
-#'    x_nudge=c(set_C=-0.4),
-#'    y_nudge=c(set_C=0.1))
+#'    circle_nudge=list(set_C=c(-0.5, 0.1))
+#' )
+#' 
+#' # nudge circles so one overlap is no longer shown
+#' venndir(setlist,
+#'    proportional=TRUE,
+#'    display_zero=FALSE,
+#'    circle_nudge=list(set_C=c(-1.4, 0.1))
+#' )
 #' 
 #' setlist2k <- make_venn_test(2000, 3, 80, do_signed=TRUE);
 #' venndir(setlist2k)
@@ -102,6 +110,7 @@ venndir <- function
  y_nudge=NULL,
  circle_nudge=NULL,
  unicode=TRUE,
+ do_plot=TRUE,
  ...)
 {
    # basic workflow:
@@ -153,11 +162,10 @@ venndir <- function
       });
    }
    
-   # get Venn circles   
+   # get Venn circles
    venn_sp <- get_venn_shapes(counts=nCounts,
       proportional=proportional,
-      x_nudge=x_nudge,
-      y_nudge=y_nudge,
+      circle_nudge=circle_nudge,
       ...);
 
    # convert to venn overlap polygons
@@ -165,15 +173,28 @@ venndir <- function
       venn_counts=nCounts,
       venn_colors=set_color);
    
+   # generate labels from nCounts and gCounts
+   nlabel_df <- data.frame(label=names(nCounts),
+      venn_counts=nCounts);
+   nlabel_df <- jamba::mergeAllXY(as.data.frame(venn_spdf), nlabel_df);
+   nlabel_df <- nlabel_df[match(names(nCounts), nlabel_df$label),,drop=FALSE];
+   nlabel_df$color <- jamba::rmNA(nlabel_df$color,
+      naValue="#FFFFFFFF");
+   nlabel_df$venn_color <- jamba::rmNA(nlabel_df$venn_color,
+      naValue="#FFFFFFFF");
+   # repair x_label and y_label stored as list
+   nlabel_df$x_label <- unlist(jamba::rmNULL(nlabel_df$x_label, nullValue=NA))
+   nlabel_df$y_label <- unlist(jamba::rmNULL(nlabel_df$y_label, nullValue=NA))
+   
    # Now add the main count labels
-   venn_text <- ifelse(grepl("&", venn_spdf$label),
-      jamba::formatInt(jamba::rmNA(naValue=0, venn_spdf$venn_counts)),
+   venn_text <- ifelse(grepl("&", nlabel_df$label),
+      jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts)),
       paste0("**",
-         venn_spdf$label,
+         nlabel_df$label,
          "**<br>\n",
-         jamba::formatInt(jamba::rmNA(naValue=0, venn_spdf$venn_counts))));
-   x_main <- venn_spdf$x_label;
-   y_main <- venn_spdf$y_label;
+         jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))));
+   x_main <- nlabel_df$x_label;
+   y_main <- nlabel_df$y_label;
    vjust_main <- rep(0.5, length(x_main));
    halign_main <- rep(0.5, length(x_main));
    #hjust_main <- ifelse(nchar(up_text) == 0 & nchar(dn_text) == 0, 0.5, 1);
@@ -182,12 +203,6 @@ venndir <- function
       hjust_main <- rep(0.5, length(x_main));
    }
    
-   ## Hide zero if display_zero=FALSE
-   show_main <- rep(TRUE, length(x_main));
-   if (!display_zero && any(venn_spdf$venn_counts == 0)) {
-      show_main <- !(venn_spdf$venn_counts == 0);
-   }
-
    ## Labels for each overlap
    gbase_labels <- curate_venn_labels(
       names(unlist(unname(gCounts))),
@@ -213,104 +228,124 @@ venndir <- function
    gbase_labels <- gbase_labels[gdf$index];
    gbase_colors <- gbase_colors[gdf$index];
    gcount_labels <- gcount_labels[gdf$index];
+   gcount_sorted <- unlist(gCounts)[gdf$index];
+   #jamba::printDebug("gbase_labels:", gbase_labels);
+   #jamba::printDebug("gcount_labels:", gcount_labels);
+   #jamba::printDebug("gcount_sorted:", gcount_sorted);
    
-   x_signed <- rep(x_main, lengths(gCounts));
-   y_signed <- rep(y_main, lengths(gCounts));
-   vjust_signed <- unname(unlist(lapply(lengths(gCounts), function(i){
-      iseq <- seq(from=0, by=1, length.out=i);
+   if (1 == 2) {
+      jamba::printDebug("x_main:");
+      print(x_main);
+      jamba::printDebug("lengths(gCounts):");
+      print(lengths(gCounts));
+      counts_in_sp <- (names(gCounts) %in% names(x_main));
+      jamba::printDebug("counts_in_sp:", counts_in_sp);
+      
+      ## Allow for gCounts to have missing polygons
+      g_match <- match(names(x_main), names(gCounts));
+      gCounts_len <- lengths(gCounts)[g_match];
+      g_use <- rep(g_match, lengths(gCounts)[g_match]);
+   }
+   gCounts_len <- lengths(gCounts);
+
+   x_signed <- rep(x_main, gCounts_len);
+   y_signed <- rep(y_main, gCounts_len);
+   vjust_signed <- unname(unlist(lapply(gCounts_len, function(i){
+      iseq <- seq_len(i) - 1;
       iseq - mean(iseq);
    }))) + 0.5;
-   #vjust_signed + ifelse(grepl("&", venn_spdf$label), 0.5, 0)
    hjust_signed <- rep(0, length(x_signed));
    halign_signed <- rep(0, length(x_signed));
    
    ## label_style
    label_fill_main <- rep(NA, length(x_main));
    label_border_main <- rep(NA, length(x_main));
-   label_color_main <- jamba::setTextContrastColor(jamba::alpha2col(venn_spdf$color,
+   label_color_main <- jamba::setTextContrastColor(
+      jamba::alpha2col(nlabel_df$color,
       alpha=poly_alpha));
    label_fill_signed <- rep(NA, length(x_signed));
    label_border_signed <- rep(NA, length(x_signed));
    label_color_signed <- jamba::setTextContrastColor(
-      jamba::alpha2col(rep(venn_spdf$color, lengths(gCounts)),
+      jamba::alpha2col(rep(nlabel_df$color, gCounts_len),
          alpha=poly_alpha));
    if ("fill" %in% label_style) {
-      label_fill_main <- venn_spdf$color;
-      label_border_main <- jamba::makeColorDarker(venn_spdf$color,
+      label_fill_main <- nlabel_df$color;
+      label_border_main <- jamba::makeColorDarker(nlabel_df$color,
          darkFactor=1.2);
-      label_color_main <- jamba::setTextContrastColor(venn_spdf$color);
+      label_color_main <- jamba::setTextContrastColor(nlabel_df$color);
       label_fill_signed <- rep(label_fill_main,
-         lengths(gCounts));
+         gCounts_len);
       label_border_signed <- rep(label_border_main,
-         lengths(gCounts));
+         gCounts_len);
       label_color_signed <- rep(label_color_main,
-         lengths(gCounts));
+         gCounts_len);
    } else if ("shaded" %in% label_style) {
-      label_fill_main <- jamba::alpha2col(venn_spdf$color,
+      label_fill_main <- jamba::alpha2col(nlabel_df$color,
          alpha=0.5);
       label_border_main <- rep(NA, length(x_main));
       label_color_main <- jamba::setTextContrastColor(
-         jamba::alpha2col(venn_spdf$color,
+         jamba::alpha2col(nlabel_df$color,
             alpha=mean(c(poly_alpha, 0.9))));
       label_fill_signed <- rep(label_fill_main,
-         lengths(gCounts));
+         gCounts_len);
       label_border_signed <- rep(label_border_main,
-         lengths(gCounts));
+         gCounts_len);
       label_color_signed <- rep(label_color_main,
-         lengths(gCounts));
+         gCounts_len);
    } else if ("shaded_box" %in% label_style) {
-      label_fill_main <- jamba::alpha2col(venn_spdf$color,
+      label_fill_main <- jamba::alpha2col(nlabel_df$color,
          alpha=0.5);
       label_border_main <- jamba::alpha2col(alpha=0.8,
-         jamba::makeColorDarker(venn_spdf$color,
+         jamba::makeColorDarker(nlabel_df$color,
             darkFactor=1.2));
       label_color_main <- jamba::setTextContrastColor(
-         jamba::alpha2col(venn_spdf$color,
+         jamba::alpha2col(nlabel_df$color,
             alpha=mean(c(poly_alpha, 0.9))));
       label_fill_signed <- rep(label_fill_main,
-         lengths(gCounts));
+         gCounts_len);
       label_border_signed <- rep(label_border_main,
-         lengths(gCounts));
+         gCounts_len);
       label_color_signed <- rep(label_color_main,
-         lengths(gCounts));
+         gCounts_len);
    } else if ("lite_box" %in% label_style) {
       label_fill_main <- rep("#FFEEAA", length(x_main));
       label_border_main <- jamba::alpha2col(alpha=0.8,
-         jamba::makeColorDarker(venn_spdf$color,
+         jamba::makeColorDarker(nlabel_df$color,
             darkFactor=1.2));
       label_color_main <- rep("#000000", length(x_main));
       label_fill_signed <- rep(label_fill_main,
-         lengths(gCounts));
+         gCounts_len);
       label_border_signed <- rep(label_border_main,
-         lengths(gCounts));
+         gCounts_len);
       label_color_signed <- rep(label_color_main,
-         lengths(gCounts));
+         gCounts_len);
    } else if ("lite" %in% label_style) {
       label_fill_main <- rep("#FFEEAABB", length(x_main));
       label_border_main <- rep(NA, length(x_main));
       label_color_main <- rep("#000000", length(x_main));
       label_fill_signed <- rep(label_fill_main,
-         lengths(gCounts));
+         gCounts_len);
       label_border_signed <- rep(label_border_main,
-         lengths(gCounts));
+         gCounts_len);
       label_color_signed <- rep(label_color_main,
-         lengths(gCounts));
+         gCounts_len);
    }
    ## Adjust signed labels for contrast
    gx <- jamba::unalpha(gbase_colors)
    gy <- ifelse(is.na(label_fill_signed),
       rep(
-         jamba::alpha2col(venn_spdf$color,
+         jamba::alpha2col(nlabel_df$color,
             alpha=poly_alpha),
-         lengths(gCounts)),
+         gCounts_len),
       label_fill_signed);
    gbase_colors1 <- gbase_colors;
-   gbase_colors <- make_color_contrast(x=jamba::unalpha(gbase_colors),
+   gbase_colors[names(x_main)] <- make_color_contrast(
+      x=jamba::unalpha(gbase_colors[names(x_main)]),
       y=ifelse(is.na(label_fill_signed),
          rep(
-            jamba::alpha2col(venn_spdf$color,
+            jamba::alpha2col(nlabel_df$color,
                alpha=poly_alpha),
-            lengths(gCounts)),
+            gCounts_len),
          label_fill_signed),
       ...);
    
@@ -324,60 +359,111 @@ venndir <- function
    #   gbase_labels=gbase_labels));
    
    ## Hide zero if display_zero=FALSE
-   show_main <- rep(TRUE, length(x_main));
-   show_signed <- rep(TRUE, length(x_signed));
-   if (!display_zero && any(venn_spdf$venn_counts == 0)) {
-      show_main <- !(venn_spdf$venn_counts == 0);
-      show_signed <- !(unlist(unname(gCounts)) == 0);
+   show_main <- (!is.na(nlabel_df$x_label));
+   show_signed <- rep(show_main, gCounts_len);
+   if (!display_zero && any(nlabel_df$venn_counts == 0)) {
+      show_main <- (show_main & nlabel_df$venn_counts != 0);
+   }
+   show_signed <- (show_signed & unlist(gCounts) != 0)
+
+   ## Update other polygon display attributes
+   venn_spdf$alpha <- poly_alpha;
+   venn_spdf$lwd <- rep(2, nrow(venn_spdf));
+   venn_spdf$lty <- rep(1, nrow(venn_spdf));
+   venn_spdf$border <- jamba::makeColorDarker(
+      venn_spdf$color,
+      darkFactor=1.2,
+      sFactor=1.2);
+   
+   
+   ## Prepare label data.frame
+   label_n <- length(c(x_main, x_signed));
+   label_df <- data.frame(
+      x=c(x_main, x_signed),
+      y=c(y_main, y_signed),
+      text=c(venn_text, gcount_labels),
+      venn_counts=c(nCounts, gcount_sorted),
+      overlap_set=c(nlabel_df$label,
+         rep(nlabel_df$label, gCounts_len)),
+      type=rep(c("main", "signed"),
+         c(length(x_main), length(x_signed))),
+      show_label=c(show_main, show_signed),
+      vjust=c(vjust_main, vjust_signed),
+      hjust=c(hjust_main, hjust_signed),
+      halign=c(halign_main, halign_signed),
+      rot=rep(0, label_n),
+      col=c(label_color_main, gbase_colors),
+      fontsize=rep(c(14, 14) * font_cex,
+         c(length(x_main), length(x_signed))),
+      border=c(label_border_main, label_border_signed),
+      lty=rep(1, label_n),
+      lwd=rep(1, label_n),
+      fill=c(label_fill_main, label_fill_signed),
+      padding=rep(2, label_n),
+      padding_unit=rep("pt", label_n),
+      r=rep(2, label_n),
+      r_unit=rep("pt", label_n)
+   );
+   
+   ## Call render_venndir()
+   if (do_plot) {
+      render_venndir(venn_spdf=venn_spdf,
+         label_df=label_df,
+         ...);
    }
    
-   g_labels <- gridtext::richtext_grob(
-      text=c(venn_text[show_main],
-         gcount_labels[show_signed]),
-      x=c(x_main[show_main],
-         x_signed[show_signed]),
-      y=c(y_main[show_main],
-         y_signed[show_signed]),
-      default.units="native",
-      vjust=c(vjust_main[show_main],
-         vjust_signed[show_signed]),
-      hjust=c(hjust_main[show_main],
-         hjust_signed[show_signed]),
-      halign=c(halign_main[show_main],
-         halign_signed[show_signed]),
-      rot=0,
-      padding=grid::unit(c(2), "pt"),
-      r=grid::unit(c(2), "pt"),
-      gp=grid::gpar(
-         col=c(label_color_main[show_main],
-            gbase_colors[show_signed]),
-         fontsize=rep(c(14, 14) * font_cex,
-            c(sum(show_main), sum(show_signed)))
-      ),
-      box_gp=grid::gpar(
-         col=c(label_border_main[show_main],
-            label_border_signed[show_signed]),
-         fill=c(label_fill_main[show_main],
-            label_fill_signed[show_signed]),
-         lty=1)
-   )
-
-   # Now plot the polygons
-   plot(venn_spdf,
-      asp=1,
-      col=jamba::alpha2col(venn_spdf$color,
-         alpha=poly_alpha),
-      lwd=2,
-      border=jamba::makeColorDarker(
-         venn_spdf$color,
-         darkFactor=1.2,
-         sFactor=1.2));
+   if (1 == 2) {
+      g_labels <- gridtext::richtext_grob(
+         text=c(venn_text[show_main],
+            gcount_labels[show_signed]),
+         x=c(x_main[show_main],
+            x_signed[show_signed]),
+         y=c(y_main[show_main],
+            y_signed[show_signed]),
+         default.units="native",
+         vjust=c(vjust_main[show_main],
+            vjust_signed[show_signed]),
+         hjust=c(hjust_main[show_main],
+            hjust_signed[show_signed]),
+         halign=c(halign_main[show_main],
+            halign_signed[show_signed]),
+         rot=0,
+         padding=grid::unit(c(2), "pt"),
+         r=grid::unit(c(2), "pt"),
+         gp=grid::gpar(
+            col=c(label_color_main[show_main],
+               gbase_colors[show_signed]),
+            fontsize=rep(c(14, 14) * font_cex,
+               c(sum(show_main), sum(show_signed)))
+         ),
+         box_gp=grid::gpar(
+            col=c(label_border_main[show_main],
+               label_border_signed[show_signed]),
+            fill=c(label_fill_main[show_main],
+               label_fill_signed[show_signed]),
+            lty=1)
+      )
    
-   # to draw using grid we have to use a custom viewport
-   vps <- gridBase::baseViewports();
-   grid::pushViewport(vps$inner, vps$figure, vps$plot);
-   grid::grid.draw(g_labels);
-   grid::popViewport(3);
+      # Now plot the polygons
+      plot(venn_spdf,
+         asp=1,
+         col=jamba::alpha2col(venn_spdf$color,
+            alpha=poly_alpha),
+         lwd=2,
+         border=jamba::makeColorDarker(
+            venn_spdf$color,
+            darkFactor=1.2,
+            sFactor=1.2));
+      
+      # to draw using grid we have to use a custom viewport
+      vps <- gridBase::baseViewports();
+      grid::pushViewport(vps$inner, vps$figure, vps$plot);
+      grid::grid.draw(g_labels);
+      grid::popViewport(3);
+   }
 
-   return(invisible(venn_spdf));   
+   return(invisible(
+      list(
+         venn_spdf=venn_spdf,
+         label_df=label_df)));
 }

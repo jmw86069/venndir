@@ -7,14 +7,14 @@
 list2im_opt(setlist, empty = 0, do_sparse = TRUE, ...)
 }
 \arguments{
-\item{setlist}{`list` of vectors}
+\item{setlist}{\code{list} of vectors}
 
 \item{empty}{default single value used for empty/missing entries,
-the default `empty=0` uses zero for entries not present.
-Another alternative is `NA`.}
+the default \code{empty=0} uses zero for entries not present.
+Another alternative is \code{NA}.}
 
-\item{do_sparse}{`logical` indicating whether to coerce the output
-to sparse matrix class `"ngCMatrix"` from the Matrix package.}
+\item{do_sparse}{\code{logical} indicating whether to coerce the output
+to sparse matrix class \code{"ngCMatrix"} from the Matrix package.}
 
 \item{...}{additional arguments are ignored.}
 }
@@ -23,7 +23,7 @@ Optimized list to incidence matrix
 }
 \details{
 This function rapidly converts a list of vectors into
-an incidence matrix with value of `1` for each entry
+an incidence matrix with value of \code{1} for each entry
 (row) present in each input list (column).
 
 Note that the rows in the output matrix are not sorted,

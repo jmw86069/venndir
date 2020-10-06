@@ -18,13 +18,15 @@ find_vennpoly_overlaps(
 )
 }
 \value{
-`sp::SpatialPolygonsDataFrame` object, with
-   additional columns:
-   * `"label"`
-   * `"venn_counts"`
-   * `"venn_color"`
-   * `"x_label"`
-   * `"y_label"`
+\code{sp::SpatialPolygonsDataFrame} object, with
+additional columns:
+\itemize{
+\item \code{"label"}
+\item \code{"venn_counts"}
+\item \code{"venn_color"}
+\item \code{"x_label"}
+\item \code{"y_label"}
+}
 }
 \description{
 Find Venn polygon overlaps
@@ -37,5 +39,5 @@ as used in a Venn diagram.
 When a vector of Venn counts is supplied, the
 counts are associated with the respective polygon,
 and any counts not represented by a polygon
-are returned as an attribute `"venn_missing"`.
+are returned as an attribute \code{"venn_missing"}.
 }

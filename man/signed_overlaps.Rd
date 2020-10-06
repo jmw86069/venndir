@@ -16,41 +16,41 @@ signed_overlaps(
 )
 }
 \arguments{
-\item{setlist}{`list` of named vectors, whose names represent
-set items, and whose values represent direction using 
-values `c(-1, 0, 1)`.}
+\item{setlist}{\code{list} of named vectors, whose names represent
+set items, and whose values represent direction using
+values \code{c(-1, 0, 1)}.}
 
-\item{overlap_type}{`character` value indicating the type of
-overlap logic: `"each"` records each combination of
-signs; `"overlap"` disregards the sign and returns any match
-item overlap; `"concordance"` represents counts for full
-agreement, or `"mixed"` for any inconsistent overlapping
-direction; `"agreement"` represents full agreement in direction
-as `"agreement"`, and `"mixed"` for any inconsistent
+\item{overlap_type}{\code{character} value indicating the type of
+overlap logic: \code{"each"} records each combination of
+signs; \code{"overlap"} disregards the sign and returns any match
+item overlap; \code{"concordance"} represents counts for full
+agreement, or \code{"mixed"} for any inconsistent overlapping
+direction; \code{"agreement"} represents full agreement in direction
+as \code{"agreement"}, and \code{"mixed"} for any inconsistent
 direction.}
 
-\item{return_items}{`logical` indicating whether to return
+\item{return_items}{\code{logical} indicating whether to return
 the items within each overlap set.}
 
-\item{return_item_labels}{`logical` indicating whether to return
+\item{return_item_labels}{\code{logical} indicating whether to return
 the directional label associated with each item. A directional
-label combines the direction from `setlist` by item.}
+label combines the direction from \code{setlist} by item.}
 
-\item{sep}{`character` used as a delimiter between set names,
-the default is `"&"`.}
+\item{sep}{\code{character} used as a delimiter between set names,
+the default is \code{"&"}.}
 
-\item{trim_label}{`logical` indicating whether to trim the
-directional label, for example instead of returning `"0 1 -1"`
-it will return `"1 -1"` because the overlap name already
+\item{trim_label}{\code{logical} indicating whether to trim the
+directional label, for example instead of returning \code{"0 1 -1"}
+it will return \code{"1 -1"} because the overlap name already
 indicates the sets involved.}
 
-\item{include_blanks}{`logical` indicating whether each set overlap
+\item{include_blanks}{\code{logical} indicating whether each set overlap
 should be represented at least once even when no items are
-present in the overlap. When `include_blanks=TRUE` is useful
+present in the overlap. When \code{include_blanks=TRUE} is useful
 in that it guarantees all possible combinations of overlaps
 are represented consistently in the output.}
 
-\item{...}{additional arguments are passed to `list2imsigned()`.}
+\item{...}{additional arguments are passed to \code{list2imsigned()}.}
 }
 \description{
 Signed overlaps
@@ -60,24 +60,25 @@ This function is the core function to summarize overlaps
 including directionality (signed).
 
 The directional counts can be summarized in slightly different
-ways, defined by the argument `overlap_type`:
-
-* `overlap_type="each"` - this option returns all possible
+ways, defined by the argument \code{overlap_type}:
+\itemize{
+\item \code{overlap_type="each"} - this option returns all possible
 directions individually counted.
-* `overlap_type="concordance"` - this option returns the counts
-for each consistent direction, for example `"up-up-up"` would
-be counted, and `"down-down-down"` would be counted, but any
-mixture of `"up"` and `"down"` would be summarized and counted
-as `"mixed"`. For 3-way overlaps, there are 8 possible directions,
+\item \code{overlap_type="concordance"} - this option returns the counts
+for each consistent direction, for example \code{"up-up-up"} would
+be counted, and \code{"down-down-down"} would be counted, but any
+mixture of \code{"up"} and \code{"down"} would be summarized and counted
+as \code{"mixed"}. For 3-way overlaps, there are 8 possible directions,
 the labels are difficult to place in the Venn diagram, and are not
 altogether meaningful. Note that this option is the default
-for `venndir()`.
-* `overlap_type="overlap"` - this option only summarizes overlaps
+for \code{venndir()}.
+\item \code{overlap_type="overlap"} - this option only summarizes overlaps
 without regard to direction. This option returns standard Venn
 overlap counts.
-* `overlap_type="agreement"` - this option groups all directions
-that agree and returns them as `"concordant"`, all others are
-returned as `"mixed"`.
+\item \code{overlap_type="agreement"} - this option groups all directions
+that agree and returns them as \code{"concordant"}, all others are
+returned as \code{"mixed"}.
+}
 }
 \seealso{
 Other venndir overlaps: 

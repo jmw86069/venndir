@@ -1,3 +1,23 @@
+# venndir version 0.0.4.900
+
+## changes to existing functions
+
+* `venndir()` no longer renders the plot, but calls
+`render_venndir()` in order to offer more customized
+options. It also allows editing the source data as
+needed, like adjusting individual overlap settings.
+
+## new functions
+
+* `render_venndir()` renders a Venn or Euler diagram using
+the output format from `venndir()`. It displays a warning
+at the bottom of the plot whenever a Venn overlap cannot
+be displayed, for example with proportional Venn (Euler)
+diagrams when an overlap cannot be represented. This label
+can be hidden, but by default is displayed so the information
+is not lost.
+
+
 # venndir version 0.0.3.900
 
 ## new functions

@@ -17,39 +17,39 @@ make_venn_test(
 )
 }
 \arguments{
-\item{n_items}{`integer` total number of items available
+\item{n_items}{\code{integer} total number of items available
 to all sets, also known as the universe size.}
 
-\item{n_sets}{`integer` number of sets that contain items.}
+\item{n_sets}{\code{integer} number of sets that contain items.}
 
-\item{min_size}{`integer` minimum range of items that may
+\item{min_size}{\code{integer} minimum range of items that may
 be contained in each set.}
 
-\item{max_size}{`integer` maximum range of items that may
+\item{max_size}{\code{integer} maximum range of items that may
 be contained in each set.}
 
-\item{do_signed}{`logical` indicating whether to return signed
-sets, which indicate directionality with `-1` or `1` values,
+\item{do_signed}{\code{logical} indicating whether to return signed
+sets, which indicate directionality with \code{-1} or \code{1} values,
 named by the items.}
 
-\item{items}{`vector` or `NULL` that contains the universe
-of items. When `items` is defined, `n_items` is ignored.}
+\item{items}{\code{vector} or \code{NULL} that contains the universe
+of items. When \code{items} is defined, \code{n_items} is ignored.}
 
-\item{sizes}{`vector` of `integer` values, or `NULL`, indicating
-the size of each set. When `sizes` is defined, `min_size` and
-`max_size` is ignored. When `sizes` is defined, `names(sizes)`
+\item{sizes}{\code{vector} of \code{integer} values, or \code{NULL}, indicating
+the size of each set. When \code{sizes} is defined, \code{min_size} and
+\code{max_size} is ignored. When \code{sizes} is defined, \code{names(sizes)}
 are used as names for each set.}
 
-\item{seed}{`numeric` or `NULL` used with `set.seed()` for data
-reproducibility. When `seed=NULL` then `set.seed()` is not called.}
+\item{seed}{\code{numeric} or \code{NULL} used with \code{set.seed()} for data
+reproducibility. When \code{seed=NULL} then \code{set.seed()} is not called.}
 
 \item{...}{additional arguments are ignored.}
 }
 \value{
-`list` of items, either as a list of item vectors,
-or when `do_signed=TRUE` the list of vectors, where vector
+\code{list} of items, either as a list of item vectors,
+or when \code{do_signed=TRUE} the list of vectors, where vector
 names contain the items, and vector values are signed values
-from `c(-1, 1)`.
+from \code{c(-1, 1)}.
 }
 \description{
 Generate test sets for venndir
@@ -57,25 +57,25 @@ Generate test sets for venndir
 \details{
 This function generates data to use as test input to
 Venn diagram functions. It can generate sets of items,
-or signed sets (integer values `-1`, `1`) named by
+or signed sets (integer values \code{-1}, \code{1}) named by
 item.
 
-This function defines a range of set sizes, using `min_size`
-and `max_size`, with roughly square-root sequence of sizes
+This function defines a range of set sizes, using \code{min_size}
+and \code{max_size}, with roughly square-root sequence of sizes
 between these two extremes.
 
 Note that the universe size represents the total available
 items, but not necessarily the total number of items
-represented by the sets. For example, if `n_items=1000000`,
-`max_size=500` and `n_sets=3` then the maximum number of
-items actually represented is `1500`.
+represented by the sets. For example, if \code{n_items=1000000},
+\code{max_size=500} and \code{n_sets=3} then the maximum number of
+items actually represented is \code{1500}.
 
-The universe can be defined using optional argument `items`,
-which takes priority over `n_items`.
+The universe can be defined using optional argument \code{items},
+which takes priority over \code{n_items}.
 
 The specific size of each set can be defined with optional
-argument `sizes`, which takes priority over `min_size`, and
-`max_size`.
+argument \code{sizes}, which takes priority over \code{min_size}, and
+\code{max_size}.
 }
 \examples{
 set_list <- make_venn_test(n_items=100,

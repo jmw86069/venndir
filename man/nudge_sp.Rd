@@ -4,7 +4,19 @@
 \alias{nudge_sp}
 \title{Nudge SpatialPolygons}
 \usage{
-nudge_sp(sp, x_nudge = NULL, y_nudge = NULL, rotate_degrees = 0, ...)
+nudge_sp(sp, sp_nudge = NULL, rotate_degrees = 0, ...)
+}
+\arguments{
+\item{sp}{\code{sp::SpatialPolygons} object}
+
+\item{sp_nudge}{\code{list} whose names are found in \code{names(sp)},
+and whose values are \code{x} and \code{y} coordinates to be moved.}
+
+\item{rotate_degrees}{\code{numeric} value in degrees (0, 360) to
+rotate the \code{sp} object and all contained polygons. (Not yet
+implemented.)}
+
+\item{...}{additional arguments are ignored.}
 }
 \description{
 Nudge SpatialPolygons

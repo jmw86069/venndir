@@ -17,82 +17,84 @@ venndir(
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   x_nudge = NULL,
   y_nudge = NULL,
+  circle_nudge = NULL,
   unicode = TRUE,
+  do_plot = TRUE,
   ...
 )
 }
 \arguments{
-\item{setlist}{`list` of named vectors, whose names represent
-set items, and whose values represent direction using 
-values `c(-1, 0, 1)`.}
+\item{setlist}{\code{list} of named vectors, whose names represent
+set items, and whose values represent direction using
+values \code{c(-1, 0, 1)}.}
 
-\item{sets}{`integer` index of sets in `setlist` to display in
+\item{sets}{\code{integer} index of sets in \code{setlist} to display in
 the Venn diagram. This subset is useful when creating a Venn
 diagram for a subset of a list, because it defines consistent
 colors across all sets, and uses the appropriate subset of
 colors in the Venn diagram.}
 
-\item{set_colors}{`character` vector of R colors, or `NULL` to
-use default colors defined by `colorjam::rainbowJam()`.}
+\item{set_colors}{\code{character} vector of R colors, or \code{NULL} to
+use default colors defined by \code{colorjam::rainbowJam()}.}
 
-\item{overlap_type}{`character` value indicating the type of
-overlap logic: `"each"` records each combination of
-signs; `"overlap"` disregards the sign and returns any match
-item overlap; `"concordance"` represents counts for full
-agreement, or `"mixed"` for any inconsistent overlapping
-direction; `"agreement"` represents full agreement in direction
-as `"agreement"`, and `"mixed"` for any inconsistent
+\item{overlap_type}{\code{character} value indicating the type of
+overlap logic: \code{"each"} records each combination of
+signs; \code{"overlap"} disregards the sign and returns any match
+item overlap; \code{"concordance"} represents counts for full
+agreement, or \code{"mixed"} for any inconsistent overlapping
+direction; \code{"agreement"} represents full agreement in direction
+as \code{"agreement"}, and \code{"mixed"} for any inconsistent
 direction.}
 
-\item{proportional}{`logical` indicating whether the Venn circles
+\item{proportional}{\code{logical} indicating whether the Venn circles
 are proportionally sized, also known as a Euler diagram. Note
 that proportionally sized circles are not guaranteed to represent
 every possible overlap.}
 
-\item{return_items}{`logical` indicating whether to return
+\item{return_items}{\code{logical} indicating whether to return
 the items within each overlap set.}
 
-\item{display_zero}{`logical` indicating whether empty overlaps
-are labeled with zero `0` when `display_zero=TRUE`, or are
-blank when `display_zero=FALSE`.}
+\item{display_zero}{\code{logical} indicating whether empty overlaps
+are labeled with zero \code{0} when \code{display_zero=TRUE}, or are
+blank when \code{display_zero=FALSE}.}
 
-\item{font_cex}{`numeric` `vector` length 2, indicating relative
+\item{font_cex}{\code{numeric} \code{vector} length 2, indicating relative
 font size for the main label, and directional label, respectively.
-The default `c(1, 0.8)` defines the main label with 1x size,
-and the directional labels with 80% that size.}
+The default \code{c(1, 0.8)} defines the main label with 1x size,
+and the directional labels with 80\% that size.}
 
-\item{poly_alpha}{`numeric` value between 0 and 1, indicating the
+\item{poly_alpha}{\code{numeric} value between 0 and 1, indicating the
 alpha transparency of the polygon backgroun color, where
-`poly_alpha=1` is completely 100% opaque (no transparency), and
-`poly_alpha=0.4` is 40% opaque, therefore 60% transparency.}
+\code{poly_alpha=1} is completely 100\% opaque (no transparency), and
+\code{poly_alpha=0.4} is 40\% opaque, therefore 60\% transparency.}
 
-\item{label_style}{`character` string indicating the style of label
+\item{label_style}{\code{character} string indicating the style of label
 to display:
-`"basic"` displays text with no background shading or border,
-`"fill"` displays text on opaque colored background,
-`"shaded"` displays text on partially transparent colored background,
-`"lite"` displays text on partially transparent lite background,
-`"lite_box"` displays text on lite background with border.}
+\code{"basic"} displays text with no background shading or border,
+\code{"fill"} displays text on opaque colored background,
+\code{"shaded"} displays text on partially transparent colored background,
+\code{"lite"} displays text on partially transparent lite background,
+\code{"lite_box"} displays text on lite background with border.}
 
-\item{...}{additional arguments are passed to `list2imsigned()`.}
+\item{...}{additional arguments are passed to \code{render_venndir()}.}
 }
 \description{
 Directional Venn diagram
 }
 \details{
-This function displays a Venn diagram, or when `proportional=TRUE`
+This function displays a Venn diagram, or when \code{proportional=TRUE}
 it displays a Euler diagram, representing counts in each overlap
 set.
 
-Input data is supplied either as a `list` or `incidence matrix`,
-or `signed incidence matrix` (whose values indicate direction),
-and is passed to `signed_overlaps()` to summarize counts by
+Input data is supplied either as a \code{list} or \verb{incidence matrix},
+or \verb{signed incidence matrix} (whose values indicate direction),
+and is passed to \code{signed_overlaps()} to summarize counts by
 Venn overlaps.
 
 By default, when input data contains signed direction, the
 counts include summary counts for the different forms of
-agreement in direction. See `signed_overlaps()` for description
-of each `overlap_type`, for different methods of summarizing
+agreement in direction. See \code{signed_overlaps()} for description
+of each \code{overlap_type}, for different methods of summarizing
 the overlapping directions.
 }
 \examples{
@@ -118,8 +120,19 @@ venndir(setlist,
 venndir(setlist,
    proportional=TRUE,
    display_zero=FALSE,
-   x_nudge=c(set_C=-0.4),
-   y_nudge=c(set_C=0.1))
+   circle_nudge=list(set_C=c(-0.5, 0.1))
+)
+
+# nudge circles so one overlap is no longer shown
+venndir(setlist,
+   proportional=TRUE,
+   display_zero=FALSE,
+   circle_nudge=list(set_C=c(-1.4, 0.1))
+)
+
+setlist2k <- make_venn_test(2000, 3, 80, do_signed=TRUE);
+venndir(setlist2k)
+venndir(setlist2k, proportional=TRUE)
 
 }
 \seealso{

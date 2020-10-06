@@ -7,7 +7,7 @@
 eulerr2polys(x)
 }
 \description{
-# @import sp
+Convert eulerr() output to polygons
 }
 \examples{
 if (require(eulerr)) {
@@ -24,3 +24,5 @@ Other venndir utility:
 \code{\link{shrink_df}()}
 }
 \concept{venndir utility}
+\section{@import sp}{
+}

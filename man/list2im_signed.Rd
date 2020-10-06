@@ -7,20 +7,20 @@
 list2im_signed(setlist, empty = 0, do_sparse = TRUE, force_sign = FALSE, ...)
 }
 \arguments{
-\item{setlist}{`list` of vectors}
+\item{setlist}{\code{list} of vectors}
 
 \item{empty}{default single value used for empty/missing entries,
-the default `empty=0` uses zero for entries not present.
-Another alternative is `NA`.}
+the default \code{empty=0} uses zero for entries not present.
+Another alternative is \code{NA}.}
 
-\item{do_sparse}{`logical` indicating whether to coerce the output
-to sparse matrix class `"ngCMatrix"` from the Matrix package.}
+\item{do_sparse}{\code{logical} indicating whether to coerce the output
+to sparse matrix class \code{"ngCMatrix"} from the Matrix package.}
 
 \item{...}{additional arguments are ignored.}
 
-\item{coerce_sign}{`logical` indicating whether to coerce numeric
-vector values to the sign. When `coerce_sign=FALSE` the vector
-values are stored directly. When `coerce_sign=TRUE` the signs of
+\item{coerce_sign}{\code{logical} indicating whether to coerce numeric
+vector values to the sign. When \code{coerce_sign=FALSE} the vector
+values are stored directly. When \code{coerce_sign=TRUE} the signs of
 the vector values are stored.}
 }
 \description{
@@ -33,15 +33,15 @@ an incidence matrix with value for each entry
 are defined by the vector names, and values are
 defined by the vector values.
 
-Note that this function will store zero `0` when the input
+Note that this function will store zero \code{0} when the input
 vector value is zero. When this is not the desired behavior,
-the argument `empty` can be used to distinguish missing data
-from data that is zero, for example by setting `empty=NA`.
-In this way a value of zero `0` indicates "present but zero",
-and a value `NA` indicates "not present at all". This
+the argument \code{empty} can be used to distinguish missing data
+from data that is zero, for example by setting \code{empty=NA}.
+In this way a value of zero \code{0} indicates "present but zero",
+and a value \code{NA} indicates "not present at all". This
 distinction is helpful when comparing entities which are not
 tested in each scenario. For example if "geneA" is present
-and the value is `1` in one list; "geneA" is not tested in
+and the value is \code{1} in one list; "geneA" is not tested in
 the second list; therefore the absence of "geneA" of a non-zero
 value in the second list is not counted as "non-overlapping"
 because it was not possible for it to have a non-zero value.

@@ -11,10 +11,10 @@ Largest polygon in a SpatialPolygons object
 }
 \details{
 This function returns the largest polygon in a
-`sp::SpatialPolygons` object, notably when there
+\code{sp::SpatialPolygons} object, notably when there
 are multiple polygons contained in one object.
 The function calculates the largest area using
-`rgeos:gArea()`.
+\code{rgeos:gArea()}.
 
 If two polygons have identical area, the first
 polygon is returned.

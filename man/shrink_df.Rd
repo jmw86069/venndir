@@ -19,12 +19,12 @@ shrink_df(
 Shrink data.frame by group
 }
 \details{
-This function condenses a `data.frame` by groups of rows,
-applying an appropriate function to `character` columns,
-and `numeric` columns. It is intended to be a simple but
+This function condenses a \code{data.frame} by groups of rows,
+applying an appropriate function to \code{character} columns,
+and \code{numeric} columns. It is intended to be a simple but
 configurable tool for the majority of scenarios.
 
-This function uses `data.table` for overall speed.
+This function uses \code{data.table} for overall speed.
 }
 \seealso{
 Other venndir utility: 

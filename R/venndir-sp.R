@@ -228,8 +228,11 @@ find_vennpoly_overlaps <- function
       data.frame(color=venn_poly_colors[vennUse],
          label=names(venn_SP)));
    
-   venn_spdf$venn_counts <- venn_poly_counts;
-   venn_spdf$venn_color <- venn_poly_colors;
+   #jamba::printDebug("names(venn_SP):", names(venn_SP));
+   #jamba::printDebug("names(venn_poly_counts):", names(venn_poly_counts));
+   #jamba::printDebug("vennUse:", vennUse);
+   venn_spdf$venn_counts <- venn_poly_counts[vennUse];
+   venn_spdf$venn_color <- venn_poly_colors[vennUse];
    
    if (do_plot) {
       plot(venn_SP,
@@ -471,31 +474,47 @@ sp_ellipses <- function
 #' 
 #' @family venndir utility
 #' 
+#' @param sp `sp::SpatialPolygons` object
+#' @param sp_nudge `list` whose names are found in `names(sp)`,
+#'    and whose values are `x` and `y` coordinates to be moved.
+#' @param rotate_degrees `numeric` value in degrees (0, 360) to
+#'    rotate the `sp` object and all contained polygons. (Not yet
+#'    implemented.)
+#' @param ... additional arguments are ignored.
+#' 
 #' @export
 nudge_sp <- function
 (sp,
- x_nudge=NULL,
- y_nudge=NULL,
+ sp_nudge=NULL,
  rotate_degrees=0,
  ...)
 {
    ## Optionally nudge the polygon coordinates
-   if (length(x_nudge) > 0 && all(names(x_nudge) %in% names(sp))) {
-      for (i in names(x_nudge)) {
-         j <- match(i, names(sp));
+   if (!inherits(sp, "SpatialPolygons")) {
+      stop("sp must inherit from 'SpatialPolygons'");
+   }
+   if (inherits(sp, "SpatialPolygonsDataFrame")) {
+      sp_names <- rownames(as.data.frame(sp));
+   } else {
+      sp_names <- names(sp);
+   }
+   if (length(sp_nudge) > 0 &&
+         is.list(sp_nudge) &&
+         any(names(sp_nudge) %in% sp_names)) {
+      for (i in names(sp_nudge)[names(sp_nudge) %in% sp_names]) {
+         i_nudge <- sp_nudge[[i]];
+         if (is.atomic(i_nudge)) {
+            i_nudge <- matrix(ncol=length(i_nudge), i_nudge);
+         }
+         j <- match(i, sp_names);
          ixy <- sp@polygons[[j]]@Polygons[[1]]@coords;
-         ixy[,1] <- ixy[,1] + x_nudge[i];
+         i_seq <- rep(seq_len(nrow(i_nudge)), length.out=nrow(ixy));
+         ixy <- ixy + i_nudge[i_seq,,drop=FALSE];
          sp@polygons[[j]]@Polygons[[1]]@coords <- ixy;
       }
    }
-   if (length(y_nudge) > 0 && all(names(y_nudge) %in% names(sp))) {
-      for (i in names(y_nudge)) {
-         jamba::printDebug("y_nudge on ", i, ", for ", y_nudge[i]);
-         j <- match(i, names(sp));
-         ixy <- sp@polygons[[j]]@Polygons[[1]]@coords;
-         ixy[,2] <- ixy[,2] + y_nudge[i];
-         sp@polygons[[j]]@Polygons[[1]]@coords <- ixy;
-      }
-   }
+   
+   ## Rotation still to-do
+   
    return(invisible(sp));
 }

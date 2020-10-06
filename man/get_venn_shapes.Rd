@@ -9,8 +9,8 @@ get_venn_shapes(
   proportional = FALSE,
   sep = "&",
   circles_only = FALSE,
-  x_nudge = NULL,
-  y_nudge = NULL,
+  circle_nudge = NULL,
+  rotate_degrees = rotate_degrees,
   ...
 )
 }

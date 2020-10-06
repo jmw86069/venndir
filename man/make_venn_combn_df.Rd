@@ -23,7 +23,7 @@ a single label.}
 Make full Venn combination data.frame
 }
 \details{
-This function returns a `data.frame` with all possible
+This function returns a \code{data.frame} with all possible
 combinations of set overlaps for the number of sets
 provided.
 }
