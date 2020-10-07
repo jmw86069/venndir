@@ -18,6 +18,11 @@ to sparse matrix class \code{"ngCMatrix"} from the Matrix package.}
 
 \item{...}{additional arguments are ignored.}
 }
+\value{
+\code{Matrix} object with class \code{"ngCMatrix"} that contains
+contains \code{logical} values. When \code{do_sparse=FALSE} the returned
+object is \code{matrix} with values \code{c(0, 1)}.
+}
 \description{
 Optimized list to incidence matrix
 }
@@ -30,3 +35,9 @@ Note that the rows in the output matrix are not sorted,
 since this step can take several seconds when working with
 a list whose vectors contain millions of rows.
 }
+\seealso{
+Other venndir sets: 
+\code{\link{list2im_signed}()},
+\code{\link{signed_overlaps}()}
+}
+\concept{venndir sets}

@@ -16,6 +16,7 @@ textvenn(
   color_by_counts = TRUE,
   return_items = FALSE,
   unicode = TRUE,
+  big.mark = ",",
   verbose = FALSE,
   ...
 )
@@ -49,6 +50,12 @@ indicate whether to include items with each Venn set. This data
 is returned using \code{invisible()}, and is relevant only when
 storing the return value.}
 
+\item{unicode}{\code{logical} passed to \code{curate_venn_labels()}
+indicating whether the directional label can include special
+Unicode characters.}
+
+\item{big.mark}{\code{character} passed to \code{format()} for numeric labels.}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \value{
@@ -65,21 +72,27 @@ on an R console.
 }
 \examples{
 setlist <- make_venn_test(n_items=100, do_signed=TRUE)
-# basic text Venn without directionality
-textvenn(setlist, sets=c(1,2))
-textvenn(setlist, sets=c(1,2), overlap_type="each")
 
-setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
-# basic text Venn without directionality
-textvenn(setlist, sets=c(1,2,3))
+# two-way Venn by default shows concordance
+textvenn(setlist, sets=c(1,2))
+
+# without signed directionality use overlap_type="overlap"
+textvenn(setlist, sets=c(1,2), overlap_type="overlap")
+
+# three-way Venn showing each signed directionality
+textvenn(setlist, sets=c(1,2,3), overlap_type="each")
+
+# larger number of items
+setlist <- make_venn_test(n_items=1000000, sizes=200000, do_signed=TRUE)
+# text Venn with directionality
+textvenn(setlist, sets=c(1,2,3), "agreement")
 
 # basic text Venn with directionality
-textvenn(setlist, sets=c(1,2,3), "concordance")
+textvenn(setlist, sets=c(1,2,3), "each")
 
 }
 \seealso{
-Other venndir overlaps: 
-\code{\link{signed_overlaps}()},
+Other venndir core: 
 \code{\link{venndir}()}
 }
-\concept{venndir overlaps}
+\concept{venndir core}

@@ -72,15 +72,63 @@ eulerr2polys <- function
 #'    * `"x_label"`
 #'    * `"y_label"`
 #' 
+#' @family venndir utility
+#' 
+#' @param sp `sp::SpatialPolygons` object that contains one polygon
+#'    per set. Therefore for a three-way Venn diagram, the
+#'    `sp` will contain three polygons. The `sp` object is expected
+#'    to be named using set names.
+#' @param venn_counts `vector` with `integer` values, whose names
+#'    represent each Venn overlap set combination, using
+#'    `sep` as delimiter between set names.
+#' @param venn_items `list` or `NULL` that contains items in each
+#'    overlap set.
+#' @param sep `character` string used as a delimiter between set names.
+#' @param preset,blend_preset `character` string passed to
+#'    `colorjam::rainbowJam()` and `colorjam::blend_colors()`,
+#'    respectively, to define the color hue wheel used for categorical
+#'    colors, and for color blending. The default `preset="dichromat"`
+#'    chooses color-blindness-friendly categorical colors, and
+#'    `blend_preset="ryb"` blends multiple colors using a red-yellow-blue
+#'    color wheel, consistent with paint-type color combinations.
+#' @param sp_nudge,rotate_degrees passed to `nudge_sp()` to allow manual
+#'    adjustment of `sp` objects.
+#' @param do_plot `logical` indicating whether to plot the output
+#'    `SpatialPolygonsDataFrame` object.
+#' @param verbose `logical` indicating whether to print verbose output.
+#' @param ... additional arguments are passed to supporting functions
+#'    `colorjam::group2colors()`, `colorjam::blend_colors()`, `nudge_sp()`.
+#' 
+#' @examples
+#' # simple Venn circles
+#' test_counts <- c(A=5, B=10, C=3, `B&C`=2)
+#' sp <- get_venn_shapes(counts=test_counts, proportional=TRUE)
+#' 
+#' # Venn overlap polygons
+#' spdf <- find_vennpoly_overlaps(sp, venn_counts=test_counts)
+#' 
+#' # behold the data.frame annotations
+#' data.frame(spdf)
+#' 
+#' # simple Venn plot
+#' plot(spdf, col=spdf$color)
+#' text(x=spdf$x_label,
+#'    y=spdf$y_label,
+#'    labels=paste0(spdf$label,
+#'       "\n",
+#'       spdf$venn_counts))
+#' 
 #' @export
 find_vennpoly_overlaps <- function
 (sp,
  venn_counts=NULL,
  venn_items=NULL,
  venn_colors=NULL,
+ sep="&",
  preset="dichromat",
- x_nudge=NULL,
- y_nudge=NULL,
+ blend_preset="ryb",
+ sp_nudge=NULL,
+ rotate_degrees=NULL,
  do_plot=FALSE,
  verbose=FALSE,
  ...)
@@ -88,24 +136,16 @@ find_vennpoly_overlaps <- function
    numSets <- length(sp);
    if (length(venn_colors) == 0) {
       venn_colors <- colorjam::group2colors(names(sp),
-         preset=preset);
+         preset=preset,
+         ...);
    }
    if (length(names(venn_colors)) == 0) {
       names(venn_colors) <- names(sp);
    }
    
    ## define incidence matrix of overlaps
-   el1 <- expand.grid(rep(list(c(0,1)), numSets));
-   colnames(el1) <- names(sp);
-   ## remove blank row
-   el1 <- el1[!rowSums(el1) == 0,];
-   rownames(el1) <- jamba::cPaste(sep="&", multienrichjam::im2list(t(el1)));
-   svims_df <- data.frame(check.names=FALSE,
-      el1);
-   svims_df$sum <- rowSums(svims_df[,colnames(el1),drop=FALSE]);
-   svims_df <- jamba::mixedSortDF(svims_df, byCols=c("sum", paste0("-", colnames(el1))));
-   el1 <- el1[rownames(svims_df),,drop=FALSE];
-   
+   el1 <- make_venn_combn_df(names(sp),
+      sep=sep);
    if (verbose) {
       jamba::printDebug("find_vennpoly_overlaps(): ",
          "head(el1):");
@@ -113,24 +153,13 @@ find_vennpoly_overlaps <- function
    }
    
    ## Optionally nudge the polygon coordinates
-   if (length(x_nudge) > 0 && all(names(x_nudge) %in% names(sp))) {
-      for (i in names(x_nudge)) {
-         j <- match(i, names(sp));
-         ixy <- sp@polygons[[j]]@Polygons[[1]]@coords;
-         ixy[,1] <- ixy[,1] + x_nudge[i];
-         sp@polygons[[j]]@Polygons[[1]]@coords <- ixy;
-      }
+   if (length(sp_nudge) > 0 || (length(rotate_degrees) > 0 && any(rotate_degrees != 0))) {
+      sp <- nudge_sp(sp,
+         sp_nudge=sp_nudge,
+         rotate_degrees=rotate_degrees,
+         ...);
    }
-   if (length(y_nudge) > 0 && all(names(y_nudge) %in% names(sp))) {
-      for (i in names(y_nudge)) {
-         jamba::printDebug("y_nudge on ", i, ", for ", y_nudge[i]);
-         j <- match(i, names(sp));
-         ixy <- sp@polygons[[j]]@Polygons[[1]]@coords;
-         ixy[,2] <- ixy[,2] + y_nudge[i];
-         sp@polygons[[j]]@Polygons[[1]]@coords <- ixy;
-      }
-   }
-   
+
    if (length(venn_counts) > 0) {
       venn_counts_names <- strsplit(names(venn_counts), "&");
    }
@@ -150,7 +179,8 @@ find_vennpoly_overlaps <- function
       whichNo <- which(i %in% 0);
       i_names <- colnames(el1)[whichYes];
       venn_color <- colorjam::blend_colors(venn_colors[i_names],
-         preset=preset);
+         preset=blend_preset,
+         ...);
       poly_name <- paste(
          jamba::mixedSort(colnames(el1)[whichYes]),
          collapse="&");
@@ -268,6 +298,8 @@ find_vennpoly_overlaps <- function
 }
 
 #' Intersect one or more polygons
+#' 
+#' @family venndir utility
 #' 
 #' @export
 intersect_polygons <- function

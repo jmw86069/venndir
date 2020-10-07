@@ -17,7 +17,9 @@ if (require(eulerr)) {
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
+\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
+\code{\link{intersect_polygons}()},
 \code{\link{make_venn_test}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},

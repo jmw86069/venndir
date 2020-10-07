@@ -11,6 +11,12 @@
 #' since this step can take several seconds when working with
 #' a list whose vectors contain millions of rows.
 #' 
+#' @family venndir sets
+#' 
+#' @return `Matrix` object with class `"ngCMatrix"` that contains
+#'    contains `logical` values. When `do_sparse=FALSE` the returned
+#'    object is `matrix` with values `c(0, 1)`.
+#' 
 #' @param setlist `list` of vectors
 #' @param empty default single value used for empty/missing entries,
 #'    the default `empty=0` uses zero for entries not present.
@@ -69,6 +75,11 @@ list2im_opt <- function
 #' the second list; therefore the absence of "geneA" of a non-zero
 #' value in the second list is not counted as "non-overlapping"
 #' because it was not possible for it to have a non-zero value.
+#' 
+#' @family venndir sets
+#' 
+#' @return `Matrix` object that contains signed direction encoded
+#'    as `c(-1, 0, 1)` values.
 #' 
 #' @param setlist `list` of vectors
 #' @param empty default single value used for empty/missing entries,

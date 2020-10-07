@@ -7,9 +7,10 @@
 make_venn_test(
   n_items = 1e+06,
   n_sets = 4,
-  min_size = ceiling(n_items/1000),
-  max_size = ceiling(n_items/2),
   do_signed = FALSE,
+  concordance = 0.5,
+  min_size = ceiling(n_items/50),
+  max_size = ceiling(n_items/2),
   items = NULL,
   sizes = NULL,
   seed = 123,
@@ -22,15 +23,23 @@ to all sets, also known as the universe size.}
 
 \item{n_sets}{\code{integer} number of sets that contain items.}
 
+\item{do_signed}{\code{logical} indicating whether to return signed
+sets, which indicate directionality with \code{-1} or \code{1} values,
+named by the items.}
+
+\item{concordance}{\code{numeric} between -1 and 1, used when \code{do_signed=TRUE}.
+This value imposes an approximate amount of concordance between
+random pairs of sets, using the concordance equation:
+\code{concordance = (agree - disagree) / (agree + disgree)} where
+\code{(agree + disagree) = n}. This equation approximates
+the number of items that agree as:
+\code{agree = ceiling((concordance * n + n) / 2)}.}
+
 \item{min_size}{\code{integer} minimum range of items that may
 be contained in each set.}
 
 \item{max_size}{\code{integer} maximum range of items that may
 be contained in each set.}
-
-\item{do_signed}{\code{logical} indicating whether to return signed
-sets, which indicate directionality with \code{-1} or \code{1} values,
-named by the items.}
 
 \item{items}{\code{vector} or \code{NULL} that contains the universe
 of items. When \code{items} is defined, \code{n_items} is ignored.}
@@ -78,67 +87,54 @@ argument \code{sizes}, which takes priority over \code{min_size}, and
 \code{max_size}.
 }
 \examples{
-set_list <- make_venn_test(n_items=100,
+## basic setlist without signed direction
+setlist <- make_venn_test(n_items=100,
    n_sets=3,
    min_size=5,
    max_size=25)
-set_im <- list2im_opt(set_list);
-pryr::object_size(set_im)
-pryr::object_size(as.matrix(set_im)*1)
-head(set_im)
+set_im <- list2im_opt(setlist);
 table(jamba::pasteByRow(as.matrix(set_im)*1))
 
-set_list <- make_venn_test()
-jamba::sdim(set_list);
-sv1 <- signed_overlaps(setlist=set_list, "overlap")
-sv2 <- signed_overlaps(setlist=set_list, "each")
-sv3 <- signed_overlaps(setlist=set_list, "concordant")
+## basic setlist with signed direction
+setlist <- make_venn_test(n_items=100,
+   n_sets=3,
+   do_signed=TRUE)
+jamba::sdim(setlist);
 
-set_im <- list2im_opt(set_list)
-dim(set_im)
-head(set_im)
+## some example overlap summaries
+sv1 <- signed_overlaps(setlist=setlist, "overlap")
+sv1
 
-set_lists <- make_venn_test(n_items=100, do_signed=TRUE)
-jamba::sdim(set_lists);
-set_ims <- list2im_signed(set_lists, do_sparse=TRUE);
-dim(set_ims);
-head(set_ims);
+## Familiar named overlap counts
+jamba::nameVector(sv1[,c("count","sets")])
 
+## directional count table for each combination
+sv2 <- signed_overlaps(setlist=setlist, "each")
+sv2
 
-svs1 <- signed_overlaps(setlist=set_lists, "overlap")
-svs2 <- signed_overlaps(setlist=set_lists, "each")
-svs3 <- signed_overlaps(setlist=set_lists, "concordance")
-svs4 <- signed_overlaps(setlist=set_lists, "concordant")
+## directional count table for agreement or mixed
+sv3 <- signed_overlaps(setlist=setlist, "agreement")
+sv3
 
-sv <- signed_overlaps(set_lists, "overlap")
-jamba::nameVector(sv[,c("count","overlap_set")])
+## signed incidence matrix
+set_im_signed <- list2im_signed(setlist)
+dim(set_im_signed)
+head(set_im_signed)
 
-sv_each <- slicejam::signed_venn(set_lists, "each")
-jamba::ssdim(sv_each)
-sv_each_counts_df <- jamba::rbindList(lapply(names(sv_each$Venn_Counts), function(i){
-   idf <- sv_each$Venn_Counts[[i]];
-   idf$set <- i;
-   idf$sign <- rownames(idf);
-   idf$nz_sign <- gsub("[ ]+", " ",
-      gsub("0", "", idf$sign));
-   idf[,c("set","sign","count","nz_sign"),drop=FALSE];
-}))
-head(sv_each_counts_df,20)
+## text venn diagram
+textvenn(setlist, overlap_type="overlap")
 
-sv_concordance <- slicejam::signed_venn(set_lists, "concordance")
-jamba::ssdim(sv_concordance)
-sv_concordance$Venn_Counts
-
-sv_concordant <- slicejam::signed_venn(set_lists, "concordant")
-jamba::ssdim(sv_concordant)
-sv_concordant$Venn_Counts
+## text venn diagram with signed direction
+textvenn(setlist, overlap_type="each")
 
 }
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
+\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
+\code{\link{intersect_polygons}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()}

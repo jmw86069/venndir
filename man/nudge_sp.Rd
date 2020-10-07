@@ -25,7 +25,9 @@ Nudge SpatialPolygons
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
+\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
+\code{\link{intersect_polygons}()},
 \code{\link{make_venn_test}()},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()}

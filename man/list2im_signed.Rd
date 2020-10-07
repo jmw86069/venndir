@@ -23,6 +23,10 @@ vector values to the sign. When \code{coerce_sign=FALSE} the vector
 values are stored directly. When \code{coerce_sign=TRUE} the signs of
 the vector values are stored.}
 }
+\value{
+\code{Matrix} object that contains signed direction encoded
+as \code{c(-1, 0, 1)} values.
+}
 \description{
 Optimized list to signed incidence matrix
 }
@@ -46,3 +50,9 @@ the second list; therefore the absence of "geneA" of a non-zero
 value in the second list is not counted as "non-overlapping"
 because it was not possible for it to have a non-zero value.
 }
+\seealso{
+Other venndir sets: 
+\code{\link{list2im_opt}()},
+\code{\link{signed_overlaps}()}
+}
+\concept{venndir sets}

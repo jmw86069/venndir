@@ -9,13 +9,49 @@ find_vennpoly_overlaps(
   venn_counts = NULL,
   venn_items = NULL,
   venn_colors = NULL,
+  sep = "&",
   preset = "dichromat",
-  x_nudge = NULL,
-  y_nudge = NULL,
+  blend_preset = "ryb",
+  sp_nudge = NULL,
+  rotate_degrees = NULL,
   do_plot = FALSE,
   verbose = FALSE,
   ...
 )
+}
+\arguments{
+\item{sp}{\code{sp::SpatialPolygons} object that contains one polygon
+per set. Therefore for a three-way Venn diagram, the
+\code{sp} will contain three polygons. The \code{sp} object is expected
+to be named using set names.}
+
+\item{venn_counts}{\code{vector} with \code{integer} values, whose names
+represent each Venn overlap set combination, using
+\code{sep} as delimiter between set names.}
+
+\item{venn_items}{\code{list} or \code{NULL} that contains items in each
+overlap set.}
+
+\item{sep}{\code{character} string used as a delimiter between set names.}
+
+\item{preset, blend_preset}{\code{character} string passed to
+\code{colorjam::rainbowJam()} and \code{colorjam::blend_colors()},
+respectively, to define the color hue wheel used for categorical
+colors, and for color blending. The default \code{preset="dichromat"}
+chooses color-blindness-friendly categorical colors, and
+\code{blend_preset="ryb"} blends multiple colors using a red-yellow-blue
+color wheel, consistent with paint-type color combinations.}
+
+\item{sp_nudge, rotate_degrees}{passed to \code{nudge_sp()} to allow manual
+adjustment of \code{sp} objects.}
+
+\item{do_plot}{\code{logical} indicating whether to plot the output
+\code{SpatialPolygonsDataFrame} object.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{...}{additional arguments are passed to supporting functions
+\code{colorjam::group2colors()}, \code{colorjam::blend_colors()}, \code{nudge_sp()}.}
 }
 \value{
 \code{sp::SpatialPolygonsDataFrame} object, with
@@ -41,3 +77,35 @@ counts are associated with the respective polygon,
 and any counts not represented by a polygon
 are returned as an attribute \code{"venn_missing"}.
 }
+\examples{
+# simple Venn circles
+test_counts <- c(A=5, B=10, C=3, `B&C`=2)
+sp <- get_venn_shapes(counts=test_counts, proportional=TRUE)
+
+# Venn overlap polygons
+spdf <- find_vennpoly_overlaps(sp, venn_counts=test_counts)
+
+# behold the data.frame annotations
+data.frame(spdf)
+
+# simple Venn plot
+plot(spdf, col=spdf$color)
+text(x=spdf$x_label,
+   y=spdf$y_label,
+   labels=paste0(spdf$label,
+      "\n",
+      spdf$venn_counts))
+
+}
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{eulerr2polys}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{intersect_polygons}()},
+\code{\link{make_venn_test}()},
+\code{\link{nudge_sp}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()}
+}
+\concept{venndir utility}

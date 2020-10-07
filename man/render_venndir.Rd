@@ -12,6 +12,7 @@ render_venndir(
   xlim = NULL,
   ylim = NULL,
   xpd = NA,
+  font_cex = 1,
   plot_warning = TRUE,
   ...
 )

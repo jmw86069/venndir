@@ -1,10 +1,22 @@
 
 #' Signed overlaps
 #' 
-#' Signed overlaps
+#' Calculate signed, directional overlaps across sets
 #' 
 #' This function is the core function to summarize overlaps
-#' including directionality (signed).
+#' that include signed directionality. It is intended for
+#' situations where two sets may share items, but where the
+#' signed direction associated with those items may or may
+#' not also be shared.
+#' 
+#' One motivating example is with biological data, where
+#' a subset of genes, proteins, or regions of genome, may be
+#' regulated up or down, and this direction is relevant
+#' to understanding the biological process. Two experiments
+#' may identify similar genes, proteins, or regions of
+#' genome, but they may not regulate them in the same
+#' direction. This function is intended to help summarize
+#' item overlaps alongside the directionality of each item.
 #' 
 #' The directional counts can be summarized in slightly different
 #' ways, defined by the argument `overlap_type`:
@@ -26,7 +38,7 @@
 #' that agree and returns them as `"concordant"`, all others are
 #' returned as `"mixed"`.
 #' 
-#' @family venndir overlaps
+#' @family venndir sets
 #' 
 #' @param setlist `list` of named vectors, whose names represent
 #'    set items, and whose values represent direction using 
@@ -56,6 +68,10 @@
 #'    in that it guarantees all possible combinations of overlaps
 #'    are represented consistently in the output.
 #' @param ... additional arguments are passed to `list2imsigned()`.
+#' 
+#' @examples
+#' setlist <- make_venn_test(100, 2, do_signed=TRUE);
+#' textvenn(setlist);
 #' 
 #' @export
 signed_overlaps <- function
@@ -90,6 +106,9 @@ signed_overlaps <- function
          i
       });
       svims <- list2im_signed(setlist);
+      if (all(unique(as.vector(svims)) %in% c(0, 1, NA))) {
+         overlap_type <- "overlap";
+      }
    }
    
    ## 0.02sec
@@ -210,69 +229,8 @@ signed_overlaps <- function
       imatch <- match(rownames(svims_df2), names(svitems_split));
       svims_df2$items <- I(svitems_split[imatch]);
    }
+   attr(svims_df2, "overlap_type") <- overlap_type;
    return(svims_df2);
-
-   # 0.08sec
-   # assemble data.frame with relevant counts
-   svims_split_count_dfs <- lapply(svims_split_names2, function(iname){
-      olname <- svims_split_names3[iname];
-      i <- svims_split[[paste0(iname, "|", olname)]];
-      idf <- data.frame(count=as(table(i), "matrix"), check.names=FALSE);
-      idf$each <- rownames(idf);
-      idf$concordance <- ifelse(svimssu_concordance[idf$each], idf$each, "mixed");
-      idf$agreement <- ifelse(svimssu_concordance[idf$each], "concordant", "mixed");
-      idf$overlap <- olname;
-      idf$overlap_set <- iname;
-      idf;
-   });
-   # combine all rows
-   svims_split_count_df <- jamba::rbindList(svims_split_count_dfs);
-   
-   # group using overlap_type unless "each" where it returns everything
-   if (!"each" %in% overlap_type) {
-      svims_split_count_df$overlap_set <- factor(svims_split_count_df$overlap_set,
-         levels=unique(svims_split_count_df$overlap_set));
-      grp_colnames <- unique(c("overlap_set",
-         "overlap",
-         overlap_type,
-         "count"));
-      svims_split_count_df_g <- shrink_df(svims_split_count_df[,grp_colnames],
-         by=c("overlap_set", overlap_type),
-         num_func=sum);
-   } else {
-      svims_split_count_df_g <- svims_split_count_df;
-   }
-   rownames(svims_split_count_df_g) <- jamba::pasteByRow(svims_split_count_df_g[,c("overlap_set", overlap_type)],
-      sep=" ");
-   
-   # optionally include items
-   if (return_items) {
-      if ("overlap" %in% overlap_type) {
-         svims_split <- paste(svims_split_names2[svimsv],
-            svimsv);
-      } else if ("concordance" %in% overlap_type) {
-         svims_split <- paste(svims_split_names2[svimsv],
-            ifelse(svimssu_concordance[svimss],
-               svimss,
-               "mixed"));
-      } else if ("agreement" %in% overlap_type) {
-         svims_split <- paste(svims_split_names2[svimsv],
-            ifelse(svimssu_concordance[svimss],
-               "concordant",
-               "mixed"));
-      } else {
-         svims_split <- paste(svims_split_names2[svimsv],
-            svimss);
-      }
-      svims_items <- split(rownames(svims),
-         svims_split);
-      ol_id <- jamba::pasteByRow(svims_split_count_df_g[,c("overlap_set", overlap_type)],
-         sep=" ");
-      svims_items2 <- svims_items[ol_id];
-      svims_split_count_df_g$items <- I(svims_items2);
-   }
-
-   return(svims_split_count_df_g);
 }
 
 #' Make full Venn combination data.frame

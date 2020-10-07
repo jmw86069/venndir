@@ -48,9 +48,13 @@
 #'    `"shaded"` displays text on partially transparent colored background,
 #'    `"lite"` displays text on partially transparent lite background,
 #'    `"lite_box"` displays text on lite background with border.
+#' @param unicode `logical` passed to `curate_venn_labels()`
+#'    indicating whether the directional label can include special
+#'    Unicode characters.
+#' @param big.mark `character` passed to `format()` for numeric labels.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
-#' @family venndir overlaps
+#' @family venndir core
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 3);
@@ -94,7 +98,7 @@ venndir <- function
 (setlist,
  sets=seq_along(setlist),
  set_colors=NULL,
- overlap_type=c("concordance", "each", "overlap", "concordant"),
+ overlap_type=c("concordance", "each", "overlap", "agreement"),
  proportional=FALSE,
  return_items=FALSE,
  display_zero=TRUE,
@@ -110,6 +114,7 @@ venndir <- function
  y_nudge=NULL,
  circle_nudge=NULL,
  unicode=TRUE,
+ big.mark=",",
  do_plot=TRUE,
  ...)
 {
@@ -143,18 +148,22 @@ venndir <- function
    sv <- signed_overlaps(setlist[sets],
       overlap_type=overlap_type,
       return_items=return_items);
+   overlap_type <- attr(sv, "overlap_type");
    
    # numeric counts by set
    nCounts <- sapply(unique(sv$sets), function(i){
       sum(subset(sv, sets %in% i)$count)
    });
    # formatted numeric counts
-   fCounts <- format(big.mark=",",
+   fCounts <- format(big.mark=big.mark,
       trim=TRUE,
       nCounts);
    # subgrouped counts (directional)
    if ("overlap" %in% overlap_type) {
-      gCounts <- list(NULL);
+      #gCounts <- list(NULL);
+      gCounts <- lapply(jamba::nameVector(unique(sv$sets)), function(i){
+         NULL
+      });
    } else {
       gCounts <- lapply(jamba::nameVector(unique(sv$sets)), function(i){
          j <- subset(sv, sets %in% i);
@@ -171,7 +180,8 @@ venndir <- function
    # convert to venn overlap polygons
    venn_spdf <- find_vennpoly_overlaps(venn_sp,
       venn_counts=nCounts,
-      venn_colors=set_color);
+      venn_colors=set_color,
+      ...);
    
    # generate labels from nCounts and gCounts
    nlabel_df <- data.frame(label=names(nCounts),
@@ -217,35 +227,20 @@ venndir <- function
          gbase_labels[i],
          ": ",
          format(trim=TRUE,
-            big.mark=",",
+            big.mark=big.mark,
             unlist(gCounts)[i]));
    });
    ## order labels again?
    gdf <- jamba::mixedSortDF(data.frame(
       group=rep(seq_along(gCounts), lengths(gCounts)),
-      label=gbase_labels,
+      gbase_labels=gbase_labels,
+      label=rep(names(gCounts), lengths(gCounts)),
       index=seq_along(gbase_labels)), byCols=c(1, 2));
    gbase_labels <- gbase_labels[gdf$index];
    gbase_colors <- gbase_colors[gdf$index];
    gcount_labels <- gcount_labels[gdf$index];
    gcount_sorted <- unlist(gCounts)[gdf$index];
-   #jamba::printDebug("gbase_labels:", gbase_labels);
-   #jamba::printDebug("gcount_labels:", gcount_labels);
-   #jamba::printDebug("gcount_sorted:", gcount_sorted);
-   
-   if (1 == 2) {
-      jamba::printDebug("x_main:");
-      print(x_main);
-      jamba::printDebug("lengths(gCounts):");
-      print(lengths(gCounts));
-      counts_in_sp <- (names(gCounts) %in% names(x_main));
-      jamba::printDebug("counts_in_sp:", counts_in_sp);
-      
-      ## Allow for gCounts to have missing polygons
-      g_match <- match(names(x_main), names(gCounts));
-      gCounts_len <- lengths(gCounts)[g_match];
-      g_use <- rep(g_match, lengths(gCounts)[g_match]);
-   }
+
    gCounts_len <- lengths(gCounts);
 
    x_signed <- rep(x_main, gCounts_len);
@@ -331,33 +326,20 @@ venndir <- function
          gCounts_len);
    }
    ## Adjust signed labels for contrast
-   gx <- jamba::unalpha(gbase_colors)
-   gy <- ifelse(is.na(label_fill_signed),
-      rep(
-         jamba::alpha2col(nlabel_df$color,
-            alpha=poly_alpha),
-         gCounts_len),
-      label_fill_signed);
-   gbase_colors1 <- gbase_colors;
-   gbase_colors[names(x_main)] <- make_color_contrast(
-      x=jamba::unalpha(gbase_colors[names(x_main)]),
-      y=ifelse(is.na(label_fill_signed),
-         rep(
-            jamba::alpha2col(nlabel_df$color,
-               alpha=poly_alpha),
-            gCounts_len),
-         label_fill_signed),
-      ...);
-   
-   #print(label_fill_signed);
-   #print(venn_spdf$color);
-   #print(lengths(gCounts));
-   #print(data.frame(gx=gx,
-   #   gy=gy,
-   #   gbase_colors1=gbase_colors1,
-   #   gbase_colors=gbase_colors,
-   #   gbase_labels=gbase_labels));
-   
+   if (1 == 2) {
+      gbase_colors1 <- gbase_colors;
+      g_update <- (gdf$label %in% nlabel_df$label);
+      gbase_colors[g_update] <- make_color_contrast(
+         x=jamba::unalpha(gbase_colors[g_update]),
+         y=ifelse(is.na(label_fill_signed),
+            rep(
+               jamba::alpha2col(nlabel_df$color,
+                  alpha=poly_alpha),
+               gCounts_len),
+            label_fill_signed),
+         ...);
+   }
+
    ## Hide zero if display_zero=FALSE
    show_main <- (!is.na(nlabel_df$x_label));
    show_signed <- rep(show_main, gCounts_len);
@@ -374,14 +356,13 @@ venndir <- function
       venn_spdf$color,
       darkFactor=1.2,
       sFactor=1.2);
-   
-   
+
    ## Prepare label data.frame
    label_n <- length(c(x_main, x_signed));
    label_df <- data.frame(
       x=c(x_main, x_signed),
       y=c(y_main, y_signed),
-      text=c(venn_text, gcount_labels),
+      text=unlist(c(venn_text, gcount_labels)),
       venn_counts=c(nCounts, gcount_sorted),
       overlap_set=c(nlabel_df$label,
          rep(nlabel_df$label, gCounts_len)),
@@ -392,7 +373,7 @@ venndir <- function
       hjust=c(hjust_main, hjust_signed),
       halign=c(halign_main, halign_signed),
       rot=rep(0, label_n),
-      col=c(label_color_main, gbase_colors),
+      col=unlist(c(label_color_main, gbase_colors)),
       fontsize=rep(c(14, 14) * font_cex,
          c(length(x_main), length(x_signed))),
       border=c(label_border_main, label_border_signed),
@@ -404,6 +385,23 @@ venndir <- function
       r=rep(2, label_n),
       r_unit=rep("pt", label_n)
    );
+
+   ## Adjust signed color
+   g_update <- (label_df$type %in% "signed" &
+      label_df$show_label & 
+      (!is.na(label_df$fill) |
+         (label_df$overlap_set %in% venn_spdf$label)));
+   if (any(g_update)) {
+      g_update_match <- match(label_df$overlap_set[g_update],
+         venn_spdf$label);
+      g_update_color <- label_df$col[g_update];
+      g_update_fill <- ifelse(is.na(label_df$fill[g_update]),
+         jamba::alpha2col(
+            venn_spdf$color[g_update_match],
+            alpha=venn_spdf$alpha[g_update_match]),
+         label_df$fill[g_update]);
+      label_df$col[g_update] <- make_color_contrast(g_update_color, g_update_fill);
+   }
    
    ## Call render_venndir()
    if (do_plot) {

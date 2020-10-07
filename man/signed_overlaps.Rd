@@ -53,11 +53,23 @@ are represented consistently in the output.}
 \item{...}{additional arguments are passed to \code{list2imsigned()}.}
 }
 \description{
-Signed overlaps
+Calculate signed, directional overlaps across sets
 }
 \details{
 This function is the core function to summarize overlaps
-including directionality (signed).
+that include signed directionality. It is intended for
+situations where two sets may share items, but where the
+signed direction associated with those items may or may
+not also be shared.
+
+One motivating example is with biological data, where
+a subset of genes, proteins, or regions of genome, may be
+regulated up or down, and this direction is relevant
+to understanding the biological process. Two experiments
+may identify similar genes, proteins, or regions of
+genome, but they may not regulate them in the same
+direction. This function is intended to help summarize
+item overlaps alongside the directionality of each item.
 
 The directional counts can be summarized in slightly different
 ways, defined by the argument \code{overlap_type}:
@@ -80,9 +92,14 @@ that agree and returns them as \code{"concordant"}, all others are
 returned as \code{"mixed"}.
 }
 }
-\seealso{
-Other venndir overlaps: 
-\code{\link{textvenn}()},
-\code{\link{venndir}()}
+\examples{
+setlist <- make_venn_test(100, 2, do_signed=TRUE);
+textvenn(setlist);
+
 }
-\concept{venndir overlaps}
+\seealso{
+Other venndir sets: 
+\code{\link{list2im_opt}()},
+\code{\link{list2im_signed}()}
+}
+\concept{venndir sets}

@@ -35,13 +35,20 @@
 #' @param n_items `integer` total number of items available
 #'    to all sets, also known as the universe size.
 #' @param n_sets `integer` number of sets that contain items.
+#' @param do_signed `logical` indicating whether to return signed
+#'    sets, which indicate directionality with `-1` or `1` values,
+#'    named by the items.
+#' @param concordance `numeric` between -1 and 1, used when `do_signed=TRUE`.
+#'    This value imposes an approximate amount of concordance between
+#'    random pairs of sets, using the concordance equation:
+#'    `concordance = (agree - disagree) / (agree + disgree)` where
+#'    `(agree + disagree) = n`. This equation approximates
+#'    the number of items that agree as:
+#'    `agree = ceiling((concordance * n + n) / 2)`.
 #' @param min_size `integer` minimum range of items that may
 #'    be contained in each set.
 #' @param max_size `integer` maximum range of items that may
 #'    be contained in each set.
-#' @param do_signed `logical` indicating whether to return signed
-#'    sets, which indicate directionality with `-1` or `1` values,
-#'    named by the items.
 #' @param items `vector` or `NULL` that contains the universe
 #'    of items. When `items` is defined, `n_items` is ignored.
 #' @param sizes `vector` of `integer` values, or `NULL`, indicating
@@ -53,68 +60,54 @@
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
-#' set_list <- make_venn_test(n_items=100,
+#' ## basic setlist without signed direction
+#' setlist <- make_venn_test(n_items=100,
 #'    n_sets=3,
 #'    min_size=5,
 #'    max_size=25)
-#' set_im <- list2im_opt(set_list);
-#' pryr::object_size(set_im)
-#' pryr::object_size(as.matrix(set_im)*1)
-#' head(set_im)
+#' set_im <- list2im_opt(setlist);
 #' table(jamba::pasteByRow(as.matrix(set_im)*1))
 #' 
-#' set_list <- make_venn_test()
-#' jamba::sdim(set_list);
-#' sv1 <- signed_overlaps(setlist=set_list, "overlap")
-#' sv2 <- signed_overlaps(setlist=set_list, "each")
-#' sv3 <- signed_overlaps(setlist=set_list, "concordant")
+#' ## basic setlist with signed direction
+#' setlist <- make_venn_test(n_items=100,
+#'    n_sets=3,
+#'    do_signed=TRUE)
+#' jamba::sdim(setlist);
 #' 
-#' set_im <- list2im_opt(set_list)
-#' dim(set_im)
-#' head(set_im)
+#' ## some example overlap summaries
+#' sv1 <- signed_overlaps(setlist=setlist, "overlap")
+#' sv1
 #' 
-#' set_lists <- make_venn_test(n_items=100, do_signed=TRUE)
-#' jamba::sdim(set_lists);
-#' set_ims <- list2im_signed(set_lists, do_sparse=TRUE);
-#' dim(set_ims);
-#' head(set_ims);
+#' ## Familiar named overlap counts
+#' jamba::nameVector(sv1[,c("count","sets")])
 #' 
+#' ## directional count table for each combination
+#' sv2 <- signed_overlaps(setlist=setlist, "each")
+#' sv2
 #' 
-#' svs1 <- signed_overlaps(setlist=set_lists, "overlap")
-#' svs2 <- signed_overlaps(setlist=set_lists, "each")
-#' svs3 <- signed_overlaps(setlist=set_lists, "concordance")
-#' svs4 <- signed_overlaps(setlist=set_lists, "concordant")
+#' ## directional count table for agreement or mixed
+#' sv3 <- signed_overlaps(setlist=setlist, "agreement")
+#' sv3
 #' 
-#' sv <- signed_overlaps(set_lists, "overlap")
-#' jamba::nameVector(sv[,c("count","overlap_set")])
+#' ## signed incidence matrix
+#' set_im_signed <- list2im_signed(setlist)
+#' dim(set_im_signed)
+#' head(set_im_signed)
 #' 
-#' sv_each <- slicejam::signed_venn(set_lists, "each")
-#' jamba::ssdim(sv_each)
-#' sv_each_counts_df <- jamba::rbindList(lapply(names(sv_each$Venn_Counts), function(i){
-#'    idf <- sv_each$Venn_Counts[[i]];
-#'    idf$set <- i;
-#'    idf$sign <- rownames(idf);
-#'    idf$nz_sign <- gsub("[ ]+", " ",
-#'       gsub("0", "", idf$sign));
-#'    idf[,c("set","sign","count","nz_sign"),drop=FALSE];
-#' }))
-#' head(sv_each_counts_df,20)
+#' ## text venn diagram
+#' textvenn(setlist, overlap_type="overlap")
 #' 
-#' sv_concordance <- slicejam::signed_venn(set_lists, "concordance")
-#' jamba::ssdim(sv_concordance)
-#' sv_concordance$Venn_Counts
-#' 
-#' sv_concordant <- slicejam::signed_venn(set_lists, "concordant")
-#' jamba::ssdim(sv_concordant)
-#' sv_concordant$Venn_Counts
+#' ## text venn diagram with signed direction
+#' textvenn(setlist, overlap_type="each")
 #' 
 #' @export
 make_venn_test <- function
 (n_items=1000000,
  n_sets=4,
- min_size=ceiling(n_items / 1000),
- max_size=ceiling(n_items / 2),
  do_signed=FALSE,
+ concordance=0.5,
+ min_size=ceiling(n_items / 50),
+ max_size=ceiling(n_items / 2),
  items=NULL,
  sizes=NULL,
  seed=123,
@@ -125,19 +118,23 @@ make_venn_test <- function
       set.seed(head(seed, 1))
    }
    if (length(items) == 0) {
-      items <- paste0("peak_",
+      items <- paste0("item_",
          jamba::padInteger(seq_len(n_items)));
    } else {
       n_items <- length(items);
    }
    if (length(sizes) > 0) {
-      sizes <- rep(sizes, length.out=n_items);
+      sizes <- rep(sizes,
+         length.out=n_sets);
    }
 
    # define set names
    if (length(names(sizes)) == 0) {
       set_names <- paste0("set_",
          jamba::colNum2excelName(seq_len(n_sets)));
+      if (length(sizes) > 0) {
+         names(sizes) <- set_names;
+      }
    } else {
       # make sure names are unique
       names(sizes) <- jamba::makeNames(names(sizes));
@@ -164,12 +161,50 @@ make_venn_test <- function
    
    # define sign
    if (do_signed) {
-      set_list <- lapply(set_list, function(j){
+      #set_list <- lapply(set_list, function(j){
+      if (length(concordance) > 0) {
+         concordance <- jamba::noiseFloor(concordance,
+            minimum=-1,
+            ceiling=1);
+         concordance <- rep(concordance, length.out=length(set_names));
+         names(concordance) <- set_names;
+      }
+      ## Randomize the sign
+      set_list <- lapply(jamba::nameVector(set_names), function(i){
+         j <- set_list[[i]];
          k <- sample(c(-1, 1),
             replace=TRUE,
             size=length(j));
          jamba::nameVector(k, j);
       });
+      ## When concordance is defined, force overlaps to have fixed concordance
+      ## kruskalConcordance =  (Agree - Disagree)  / (Agree + Disagree)
+      ##  kruskalConcordance * (Agree + (n-Agree))  =  (Agree - (n-Agree))
+      ##  kruskalConcordance * n                    =  (2*Agree - n)
+      ##  kruskalConcordance * n + n                =  2*Agree
+      ## (kruskalConcordance * n + n) / 2           =  Agree
+      ##
+      ## kruskalConcordance * (Agree + Disagree) = (Agree - Disagree)
+      if (length(concordance) > 0 && length(set_names) > 1) {
+         #set_list <- lapply(jamba::nameVector(set_names), function(i){
+         for (i in set_names) {
+            i23 <- setdiff(set_names, i);
+            i2 <- sample(i23, 1);
+            j <- set_list[[i]];
+            j2 <- set_list[[i2]];
+            jj2 <- j2[intersect(names(j), names(j2))];
+            n12 <- length(jj2);
+            KC <- concordance[[i]];
+            if (n12 > 0) {
+               KC_agree <- ceiling((KC * n12 + n12) / 2);
+               jj2a <- head(names(jj2),  KC_agree);
+               jj2d <- tail(names(jj2),  -KC_agree);
+               jj2s <- rep(c(1, -1), c(length(jj2a), length(jj2d)));
+               j[c(jj2a, jj2d)] <- j2[c(jj2a, jj2d)] * jj2s;
+            }
+            set_list[[i]] <- j;
+         }
+      }
    }
    
    return(set_list);

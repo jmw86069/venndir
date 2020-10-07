@@ -8,7 +8,7 @@ venndir(
   setlist,
   sets = seq_along(setlist),
   set_colors = NULL,
-  overlap_type = c("concordance", "each", "overlap", "concordant"),
+  overlap_type = c("concordance", "each", "overlap", "agreement"),
   proportional = FALSE,
   return_items = FALSE,
   display_zero = TRUE,
@@ -19,6 +19,7 @@ venndir(
   y_nudge = NULL,
   circle_nudge = NULL,
   unicode = TRUE,
+  big.mark = ",",
   do_plot = TRUE,
   ...
 )
@@ -75,6 +76,12 @@ to display:
 \code{"shaded"} displays text on partially transparent colored background,
 \code{"lite"} displays text on partially transparent lite background,
 \code{"lite_box"} displays text on lite background with border.}
+
+\item{unicode}{\code{logical} passed to \code{curate_venn_labels()}
+indicating whether the directional label can include special
+Unicode characters.}
+
+\item{big.mark}{\code{character} passed to \code{format()} for numeric labels.}
 
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
 }
@@ -136,8 +143,7 @@ venndir(setlist2k, proportional=TRUE)
 
 }
 \seealso{
-Other venndir overlaps: 
-\code{\link{signed_overlaps}()},
+Other venndir core: 
 \code{\link{textvenn}()}
 }
-\concept{venndir overlaps}
+\concept{venndir core}

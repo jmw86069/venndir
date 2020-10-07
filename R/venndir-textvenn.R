@@ -10,7 +10,7 @@
 #' @return `data.frame` returned using `invisible()`, from the
 #'    output of `signed_overlaps()`.
 #' 
-#' @family venndir overlaps
+#' @family venndir core
 #' 
 #' @param setlist `list` of item vectors; `list` of vectors named by item;
 #'    incidence `matrix` with values `c(0, 1)` or `c(FALSE, TRUE)`, or
@@ -34,20 +34,31 @@
 #'    indicate whether to include items with each Venn set. This data
 #'    is returned using `invisible()`, and is relevant only when
 #'    storing the return value.
+#' @param unicode `logical` passed to `curate_venn_labels()`
+#'    indicating whether the directional label can include special
+#'    Unicode characters.
+#' @param big.mark `character` passed to `format()` for numeric labels.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' 
 #' @examples
 #' setlist <- make_venn_test(n_items=100, do_signed=TRUE)
-#' # basic text Venn without directionality
-#' textvenn(setlist, sets=c(1,2))
-#' textvenn(setlist, sets=c(1,2), overlap_type="each")
 #' 
-#' setlist <- make_venn_test(n_items=100000, do_signed=TRUE)
-#' # basic text Venn without directionality
-#' textvenn(setlist, sets=c(1,2,3))
+#' # two-way Venn by default shows concordance
+#' textvenn(setlist, sets=c(1,2))
+#' 
+#' # without signed directionality use overlap_type="overlap"
+#' textvenn(setlist, sets=c(1,2), overlap_type="overlap")
+#' 
+#' # three-way Venn showing each signed directionality
+#' textvenn(setlist, sets=c(1,2,3), overlap_type="each")
+#' 
+#' # larger number of items
+#' setlist <- make_venn_test(n_items=1000000, sizes=200000, do_signed=TRUE)
+#' # text Venn with directionality
+#' textvenn(setlist, sets=c(1,2,3), "agreement")
 #' 
 #' # basic text Venn with directionality
-#' textvenn(setlist, sets=c(1,2,3), "concordance")
+#' textvenn(setlist, sets=c(1,2,3), "each")
 #' 
 #' @export
 textvenn <- function
@@ -62,6 +73,7 @@ textvenn <- function
  color_by_counts=TRUE,
  return_items=FALSE,
  unicode=TRUE,
+ big.mark=",",
  verbose=FALSE,
  ...)
 {
@@ -125,7 +137,7 @@ textvenn <- function
       sum(subset(sv, sets %in% i)$count)
    });
    # formatted numeric counts
-   fCounts <- format(big.mark=",",
+   fCounts <- format(big.mark=big.mark,
       trim=TRUE,
       nCounts);
    # grouped counts (directional)
@@ -207,7 +219,8 @@ textvenn <- function
             unlist(lapply(gCounts, seq_along)) - 2;
          gbase_labels <- curate_venn_labels(
             names(unlist(unname(gCounts))),
-            "sign");
+            type="sign",
+            unicode=unicode);
          gbase_colors <- curate_venn_labels(
             names(unlist(unname(gCounts))),
             "color");
@@ -216,7 +229,7 @@ textvenn <- function
                gbase_labels[i],
                ": ",
                format(trim=TRUE,
-                  big.mark=",",
+                  big.mark=big.mark,
                   unlist(gCounts)[i]));
          });
          ## order labels again?
@@ -319,7 +332,8 @@ textvenn <- function
          #2   unlist(lapply(gCounts, seq_along)) - 2;
          gbase_labels <- curate_venn_labels(
             names(unlist(unname(gCounts))),
-            "sign");
+            type="sign",
+            unicode=unicode);
          gbase_colors <- curate_venn_labels(
             names(unlist(unname(gCounts))),
             "color");
@@ -343,7 +357,7 @@ textvenn <- function
             venn_m[seq_rownums[i],seq_colnums[i]] <- gcount_labels[[i]];
             venn_c[seq_rownums[i],seq_colnums[i]] <- gbase_colors[[i]];
             if (inverse_counts) {
-               venn_i[row_seq[j],set_colnum] <- TRUE;
+               venn_i[seq_rownums[i],seq_colnums[i]] <- TRUE;
             }
          }
       }

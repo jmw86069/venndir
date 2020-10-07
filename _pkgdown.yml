@@ -3,11 +3,15 @@ template:
   params:
     bootswatch: cosmo
 reference:
-- title: Overlap functions
-  desc: Functions that handle set overlaps
+- title: venndir Core Functions
+  desc: Core functions for venndir
   contents:
-  - has_concept("venndir overlaps")
-- title: Utility functions
+  - has_concept("venndir core")
+- title: Set and Incidence Matrix Functions
+  desc: Functions that manipulate sets, list, and incidence matrices.
+  contents:
+  - has_concept("venndir sets")
+- title: venndir Utility Functions
   desc: Helpful utility functions
   contents:
   - has_concept("venndir utility")

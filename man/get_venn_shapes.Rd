@@ -24,6 +24,8 @@ This function takes a Venn overlap counts
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
+\code{\link{find_vennpoly_overlaps}()},
+\code{\link{intersect_polygons}()},
 \code{\link{make_venn_test}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},

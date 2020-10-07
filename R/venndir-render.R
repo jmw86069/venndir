@@ -86,6 +86,7 @@ render_venndir <- function
  xlim=NULL,
  ylim=NULL,
  xpd=NA,
+ font_cex=1,
  plot_warning=TRUE,
  ...)
 {
@@ -247,7 +248,7 @@ render_venndir <- function
                label_df$r_unit[show_label]),
             gp=grid::gpar(
                col=label_df$col[show_label],
-               fontsize=label_df$fontsize[show_label]
+               fontsize=label_df$fontsize[show_label] * font_cex
             ),
             box_gp=grid::gpar(
                col=label_df$border[show_label],
