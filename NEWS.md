@@ -1,3 +1,16 @@
+# venndir version 0.0.5.900
+
+## bug fixes
+
+* `sp_ellipses()` argument renamed from `radius` to `xradius`
+and `yradius`.
+
+## changes to existing functions
+
+* `venndir()` new argument `alpha_by_counts` will adjust
+alpha transparency based upon the number of counts per
+overlap. Implemented to evaluate the visual effect for now.
+
 # venndir version 0.0.4.900
 
 ## changes to existing functions

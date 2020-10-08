@@ -477,10 +477,15 @@ sp_ellipses <- function
    
    xvals <- sin(angle_seq);
    yvals <- cos(angle_seq);
-   if (length(radius) == 0) {
-      radius <- 1;
+   if (length(xradius) == 0) {
+      xradius <- 1;
    }
-   radius <- rep(radius,
+   if (length(yradius) == 0) {
+      yradius <- 2;
+   }
+   xradius <- rep(xradius,
+      length.out=length(xcenter));
+   yradius <- rep(yradius,
       length.out=length(xcenter));
    if (length(rotation_degrees) == 0) {
       rotation_degrees <- 0;

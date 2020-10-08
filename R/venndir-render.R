@@ -267,5 +267,7 @@ render_venndir <- function
          }
       }
    }
-   
+   if (length(label_df) > 0) {
+      return(invisible(g_labels));
+   }
 }

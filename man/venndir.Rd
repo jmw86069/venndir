@@ -14,6 +14,7 @@ venndir(
   display_zero = TRUE,
   font_cex = c(1, 0.8),
   poly_alpha = 0.5,
+  alpha_by_counts = FALSE,
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   x_nudge = NULL,
   y_nudge = NULL,
@@ -68,6 +69,10 @@ and the directional labels with 80\% that size.}
 alpha transparency of the polygon backgroun color, where
 \code{poly_alpha=1} is completely 100\% opaque (no transparency), and
 \code{poly_alpha=0.4} is 40\% opaque, therefore 60\% transparency.}
+
+\item{alpha_by_counts}{\code{logical} indicating whether to define
+alpha transparency to Venn polygon fill based upon the counts
+contained in each polygon.}
 
 \item{label_style}{\code{character} string indicating the style of label
 to display:

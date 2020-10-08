@@ -41,6 +41,9 @@
 #'    alpha transparency of the polygon backgroun color, where
 #'    `poly_alpha=1` is completely 100% opaque (no transparency), and
 #'    `poly_alpha=0.4` is 40% opaque, therefore 60% transparency.
+#' @param alpha_by_counts `logical` indicating whether to define
+#'    alpha transparency to Venn polygon fill based upon the counts
+#'    contained in each polygon.
 #' @param label_style `character` string indicating the style of label
 #'    to display:
 #'    `"basic"` displays text with no background shading or border,
@@ -104,6 +107,7 @@ venndir <- function
  display_zero=TRUE,
  font_cex=c(1, 0.8),
  poly_alpha=0.5,
+ alpha_by_counts=FALSE,
  label_style=c("basic",
     "fill",
     "shaded",
@@ -251,6 +255,13 @@ venndir <- function
    }))) + 0.5;
    hjust_signed <- rep(0, length(x_signed));
    halign_signed <- rep(0, length(x_signed));
+   
+   if (alpha_by_counts) {
+      poly_alpha <- jamba::normScale(sqrt(nlabel_df$venn_counts),
+         low=0,
+         from=0,
+         to=1);
+   }
    
    ## label_style
    label_fill_main <- rep(NA, length(x_main));
