@@ -4,7 +4,7 @@
 \alias{nudge_sp}
 \title{Nudge SpatialPolygons}
 \usage{
-nudge_sp(sp, sp_nudge = NULL, rotate_degrees = 0, ...)
+nudge_sp(sp = NULL, sp_nudge = NULL, ...)
 }
 \arguments{
 \item{sp}{\code{sp::SpatialPolygons} object}
@@ -12,24 +12,47 @@ nudge_sp(sp, sp_nudge = NULL, rotate_degrees = 0, ...)
 \item{sp_nudge}{\code{list} whose names are found in \code{names(sp)},
 and whose values are \code{x} and \code{y} coordinates to be moved.}
 
+\item{...}{additional arguments are ignored.}
+
 \item{rotate_degrees}{\code{numeric} value in degrees (0, 360) to
 rotate the \code{sp} object and all contained polygons. (Not yet
 implemented.)}
-
-\item{...}{additional arguments are ignored.}
+}
+\value{
+object \code{sp::SpatialPolygons}.
 }
 \description{
 Nudge SpatialPolygons
+}
+\details{
+This helper function is intended to take \code{sp::SpatialPolygons}
+and "nudge" (move by adding a scalar value to each coordinate)
+only a subset of polygons identified by name.
+
+It differs from \code{rescale_sp()} because \code{rescale_sp()} manipulates
+all contained polygons together.
 }
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{find_vennpoly_overlaps}()},
+\code{\link{get_largest_polygon}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
+\code{\link{match_list}()},
 \code{\link{print_color_df}()},
-\code{\link{shrink_df}()}
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
 }
 \concept{venndir utility}

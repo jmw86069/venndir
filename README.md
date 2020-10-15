@@ -198,13 +198,12 @@ overlaps <- c(set_A=187, set_B=146, set_C=499,
    `set_A&set_C`=181,
    `set_B&set_C`=219,
    `set_A&set_B&set_C`=20);
-overlap_list <- lapply(jamba::nameVectorN(overlaps), function(i){
-   jamba::makeNames(rep(i, overlaps[[i]]))
-})
-setlist_o <- lapply(jamba::nameVector(c("set_A", "set_B", "set_C")), function(i){
-   unname(jamba::vigrep(i, unlist(overlap_list)))
-})
-venndir(setlist_o, proportional=TRUE)
+# convert to setlist
+setlist_o <- counts2setlist(overlaps)
+
+venndir(setlist_o,
+   proportional=TRUE,
+   set_colors=c("red", "blue", "#9999AA"))
 ```
 
 <img src="man/figures/README-nudge_1-1.png" width="100%" />
@@ -216,26 +215,63 @@ x,y coordinates.
 venndir_output <- venndir(setlist_o,
    font_cex=2,
    proportional=TRUE,
-   circle_nudge=list(set_A=c(2, 0)));
+   circle_nudge=list(set_A=c(1, 0), set_B=c(-1, 0)),
+   set_colors=c("red", "blue", "#9999AA"))
 ```
 
 <img src="man/figures/README-nudge_2-1.png" width="100%" />
 
-## Future work
+## Item labels
 
-I have been using this type of Venn diagram for several years, and one
-feature I use a lot that I am still porting into this package is “item
-labeling”. This option fills the Venn diagram with labels of the items
-in each set. It works surprisingly well, even up to a few hundred
-labels, depending upon the font size and figure size.
+An optional but useful feature is to include item labels inside the Venn
+diagram. It helps answer the question, “What are those shared items?”
+(In my experience, that’s a very early question.)
 
-An interesting feature when displaying item labels, is that the
-directional arrows can be used as a prefix, to see exactly which items
-are “up-up” and which are “down-down” for example. It turns out to be a
-pretty effective alternative to drawing a proportional Venn diagram,
-since the density of labels gives a visual indication for which overlaps
-are higher or lower.
+This step can also include the directional sign, which helps indicate
+which items are shared, and whether they have the same direction. In
+cases with too many labels to display, it is sometimes still useful to
+display the sign, as a visual cue for the proportion of shared or
+discordant signs.
 
-Also, Venn diagrams have consistent layout, and do not fail to display
-overlaps because the “proportional model fit” did not prioritize an
-overlap.
+``` r
+setlist <- make_venn_test(100, 3, do_signed=TRUE);
+venndir(setlist, display_items="sign item");
+```
+
+<img src="man/figures/README-vennitems_1-1.png" width="100%" />
+
+Interestingly, the density of labels gives some indication of the
+relative overlaps.
+
+The same plot using proportional circles makes the label density
+effectively uniform:
+
+``` r
+setlist <- make_venn_test(100, 3, do_signed=TRUE);
+venndir(setlist,
+  display_items="item",
+  proportional=TRUE);
+```
+
+<img src="man/figures/README-vennitems_1p-1.png" width="100%" />
+
+With too many features to label, it’s still interesting to indicate the
+sign.
+
+``` r
+setlist <- make_venn_test(10000, 3, do_signed=TRUE);
+venndir(setlist, display_items="sign");
+```
+
+<img src="man/figures/README-vennitems_2-1.png" width="100%" />
+
+Again, proportional Venn circles effectively makes the density uniform.
+
+``` r
+venndir(setlist,
+  overlap_type="each",
+  display_items="sign",
+  proportional=TRUE);
+```
+
+<img src="man/figures/README-vennitems_2p-1.png" width="100%" />

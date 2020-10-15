@@ -1,4 +1,7 @@
 destination: docs
+figures:
+  fig.height: 8
+  fig.width: 8
 template:
   params:
     bootswatch: cosmo
@@ -10,7 +13,7 @@ reference:
 - title: Set and Incidence Matrix Functions
   desc: Functions that manipulate sets, list, and incidence matrices.
   contents:
-  - has_concept("venndir sets")
+  - has_concept("venndir conversion")
 - title: venndir Utility Functions
   desc: Helpful utility functions
   contents:

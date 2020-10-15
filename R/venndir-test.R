@@ -90,9 +90,9 @@
 #' sv3
 #' 
 #' ## signed incidence matrix
-#' set_im_signed <- list2im_signed(setlist)
-#' dim(set_im_signed)
-#' head(set_im_signed)
+#' imv <- list2im_value(setlist)
+#' dim(imv)
+#' head(imv)
 #' 
 #' ## text venn diagram
 #' textvenn(setlist, overlap_type="overlap")
@@ -206,6 +206,7 @@ make_venn_test <- function
          }
       }
    }
+   names(set_list) <- set_names;
    
    return(set_list);
 }

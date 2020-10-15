@@ -94,12 +94,25 @@ returned as \code{"mixed"}.
 }
 \examples{
 setlist <- make_venn_test(100, 2, do_signed=TRUE);
-textvenn(setlist);
+
+# straight overlap counts
+signed_overlaps(setlist, "overlap");
+
+# each directional overlap count
+signed_overlaps(setlist, "each");
+
+# concordance overlap counts
+signed_overlaps(setlist, "concordance");
+
+# agreement overlap counts
+signed_overlaps(setlist, "agreement");
 
 }
 \seealso{
-Other venndir sets: 
-\code{\link{list2im_opt}()},
-\code{\link{list2im_signed}()}
+Other venndir core: 
+\code{\link{ggrender_venndir}()},
+\code{\link{render_venndir}()},
+\code{\link{textvenn}()},
+\code{\link{venndir}()}
 }
-\concept{venndir sets}
+\concept{venndir core}

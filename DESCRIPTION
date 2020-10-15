@@ -15,9 +15,11 @@ Imports: jamba(>= 0.0.56.900),
     colorjam(>= 0.0.16.900),
     sp,
     rgeos,
-    polylabelr
+    polylabelr,
+    matrixStats
 Suggests:
-    eulerr
+    eulerr,
+    Matrix
 License: MIT
 Encoding: UTF-8
 LazyData: true

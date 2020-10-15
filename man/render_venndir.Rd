@@ -14,6 +14,11 @@ render_venndir(
   xpd = NA,
   font_cex = 1,
   plot_warning = TRUE,
+  display_items = c("none", "sign label", "label", "sign"),
+  item_angle = 20,
+  display_counts = TRUE,
+  max_items = 100,
+  fontfamily = "Arial",
   ...
 )
 }
@@ -99,11 +104,27 @@ directly from the output of \code{venndir()} to allow customization
 of various aspects of the figure.
 }
 \examples{
-venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE)
+setlist <- make_venn_test(100, 3, do_signed=TRUE);
+venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
 render_venndir(venndir_output);
+
+venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
+venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);
+venndir_output$label_df[2,c("hjust")] <- c(0);
+venndir_output$label_df[1:2,c("vjust")] <- c(0, 0);
+render_venndir(venndir_output, font_cex=1.5);
+
 venndir_output$label_df[1,c("x", "y")] <- c(2, 6);
 venndir_output$label_df[2,c("x", "y")] <- c(8.3, 6);
 render_venndir(venndir_output);
 render_venndir(venndir_output, xpd=NA, xlim=c(2, 9));
 
 }
+\seealso{
+Other venndir core: 
+\code{\link{ggrender_venndir}()},
+\code{\link{signed_overlaps}()},
+\code{\link{textvenn}()},
+\code{\link{venndir}()}
+}
+\concept{venndir core}

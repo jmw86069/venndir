@@ -31,7 +31,8 @@ shrink_df <- function
    if (do_test) {
       df <- data.frame(A=rep(LETTERS[1:3], c(1,2,3)),
          B=1:6,
-         C=rep(LETTERS[4:6], c(3,2,1)));
+         C=rep(LETTERS[4:6], c(3,2,1)),
+         stringsAsFactors=FALSE);
       by <- "C";
    }
    by <- intersect(by, colnames(df));
@@ -86,7 +87,11 @@ shrink_df <- function
    dt <- tryCatch({
       data.table::data.table(df, key=by);
    }, error=function(e){
-      data.table::data.table(as.data.frame(df), key=by);
+      data.table::data.table(
+         data.frame(df,
+            stringsAsFactors=FALSE,
+            check.names=FALSE),
+         key=by);
    });
    
    # run each set of identical functions

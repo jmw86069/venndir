@@ -35,6 +35,8 @@
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
+#' options("warn"=-1); # make them stop
+#' 
 #' venn_labels <- c("0 1 0 -1", "1 -1", "1 1 1", "mixed", "agreement", "1 1 0 0");
 #' (curate_venn_labels(venn_labels, "sign"))
 #' (curate_venn_labels(venn_labels, "sign", unicode=FALSE))
@@ -96,8 +98,14 @@ curate_venn_labels <- function
    if ("color" %in% type) {
       x <- gsub("^[ ]+|[ ]+$", "",
          gsub("[ ]+", " ", x));
+      # split into colors
+      # replace non-colors with grey45
+      x_colors <- jamba::rmNULL(nullValue="grey45",
+         lapply(strsplit(x, " "), function(xc){
+            xc[jamba::isColor(xc)]
+         }))
       x <- jamba::rmNA(naValue="grey45",
-         colorjam::blend_colors(strsplit(x, " "),
+         colorjam::blend_colors(x_colors,
             preset=blend_preset));
    } else {
       x <- gsub(" ", "", x);

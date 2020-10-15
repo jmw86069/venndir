@@ -8,10 +8,10 @@ make_color_contrast(
   x,
   y,
   bg = "white",
-  L_threshold = 60,
+  L_threshold = 50,
   C_floor = 130,
-  L_hi = 90,
-  L_lo = 40,
+  L_hi = 80,
+  L_lo = 50,
   do_plot = FALSE,
   cex = 2,
   ...
@@ -20,19 +20,53 @@ make_color_contrast(
 \description{
 Make color contrast
 }
+\details{
+This function provides a simple method to ensure a color
+has adequate visual contrast with a background color,
+while retaining some color saturation. For example,
+red on red background will return something close to
+pink, so the pink retains the red color saturation
+but is visually distinct from the background color red.
+
+Similarly, pink on pink will return something close to
+red.
+}
 \examples{
-x <- c("red", "blue", "gold", "ivory");
+x <- c("red", "blue", "gold", "ivory", "pink", "white");
 y <- rep("red4", 4);
-make_color_contrast(x, y);
-make_color_contrast(x, y, C_floor=200);
+make_color_contrast(x, y, do_plot=TRUE);
+
+y <- rep("pink1", 4);
+make_color_contrast(x, y, do_plot=TRUE);
 
 y <- rep("gold", 4);
-make_color_contrast(x, y);
+make_color_contrast(x, y, do_plot=TRUE);
 
-y <- rep("darkorange", 4);
-make_color_contrast(x, y, L_threshold=60);
-
-y <- c("red4", "aquamarine4", "blue3", "yellow")
-make_color_contrast(x, y, C_floor=150);
+y <- c("red4", "aquamarine4", "blue3", "yellow", "pink2")
+make_color_contrast(x, y, do_plot=TRUE, C_floor=140);
 
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{eulerr2polys}()},
+\code{\link{find_vennpoly_overlaps}()},
+\code{\link{get_largest_polygon}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{intersect_polygons}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{make_venn_test}()},
+\code{\link{match_list}()},
+\code{\link{nudge_sp}()},
+\code{\link{print_color_df}()},
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
+}
+\concept{venndir utility}

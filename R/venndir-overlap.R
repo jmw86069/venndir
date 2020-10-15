@@ -38,7 +38,7 @@
 #' that agree and returns them as `"concordant"`, all others are
 #' returned as `"mixed"`.
 #' 
-#' @family venndir sets
+#' @family venndir core
 #' 
 #' @param setlist `list` of named vectors, whose names represent
 #'    set items, and whose values represent direction using 
@@ -71,7 +71,18 @@
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 2, do_signed=TRUE);
-#' textvenn(setlist);
+#' 
+#' # straight overlap counts
+#' signed_overlaps(setlist, "overlap");
+#' 
+#' # each directional overlap count
+#' signed_overlaps(setlist, "each");
+#' 
+#' # concordance overlap counts
+#' signed_overlaps(setlist, "concordance");
+#' 
+#' # agreement overlap counts
+#' signed_overlaps(setlist, "agreement");
 #' 
 #' @export
 signed_overlaps <- function
@@ -92,7 +103,7 @@ signed_overlaps <- function
    
    ## 1sec
    # convert setlist to signed incidence matrix
-   #svims <- list2im_signed(setlist, ...);
+   #svims <- list2im_value(setlist, ...);
    if (inherits(setlist, "Matrix") || inherits(setlist, "matrix")) {
       svims <- setlist;
    } else {
@@ -105,7 +116,7 @@ signed_overlaps <- function
          }
          i
       });
-      svims <- list2im_signed(setlist);
+      svims <- list2im_value(setlist);
       if (all(unique(as.vector(svims)) %in% c(0, 1, NA))) {
          overlap_type <- "overlap";
       }
@@ -177,7 +188,7 @@ signed_overlaps <- function
 
    # Create labels for each split
    svims_df <- data.frame(jamba::rbindList(strsplit(names(svims_split), "[|]")),
-      check.names=FALSE);
+      stringsAsFactors=FALSE);
    rownames(svims_df) <- names(svims_split);
    colnames(svims_df) <- c("sets", overlap_type);
    svims_df$overlap <- names(svims_split_names)[match(svims_df$sets, svims_split_names)];
@@ -185,7 +196,8 @@ signed_overlaps <- function
    svims_df$count <- lengths(svims_split[names(svims_split)]);
 
    # add one column per setlist name
-   sldf <- data.frame(jamba::rbindList(strsplit(svims_df$overlap, " ")));
+   sldf <- data.frame(jamba::rbindList(strsplit(svims_df$overlap, " ")),
+      stringsAsFactors=FALSE);
    colnames(sldf) <- colnames(svims);
    svims_df[,colnames(svims)] <- sldf;
    
@@ -199,7 +211,7 @@ signed_overlaps <- function
       blank_df$num_sets <- blank_df_num;
       rownames(blank_df) <- paste0(blank_df$sets, "|", blank_df$overlap);
       if ("agreement" %in% overlap_type) {
-         blank_df[[overlap_type]] <- "concordant";
+         blank_df[[overlap_type]] <- "agreement";
       } else {
          blank_df[[overlap_type]] <- blank_df$overlap;
       }
@@ -241,6 +253,13 @@ signed_overlaps <- function
 #' combinations of set overlaps for the number of sets
 #' provided.
 #' 
+#' @return `data.frame` where rownames indicate each possible
+#'    Venn overlap, colnames indicate each set name, and values
+#'    are `0` or `1` indicating whether each set should have
+#'    a value in each row.
+#' 
+#' @family venndir utility
+#' 
 #' @param x either character vector of set names, or integer number
 #'    of sets.
 #' @param include_zero logical indicating whether to include one
@@ -266,7 +285,9 @@ make_venn_combn_df <- function
    if (is.numeric(x) && length(x) == 1 && round(x) == x) {
       x <- paste0("set_", seq_len(x));
    }
-   setdf <- data.frame(check.names=FALSE,
+   setdf <- data.frame(
+      check.names=FALSE,
+      stringsAsFactors=FALSE,
       as.list(
          jamba::nameVector(
             rep(0, length(x)),

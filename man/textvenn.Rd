@@ -17,6 +17,7 @@ textvenn(
   return_items = FALSE,
   unicode = TRUE,
   big.mark = ",",
+  curate_df = NULL,
   verbose = FALSE,
   ...
 )
@@ -56,6 +57,8 @@ Unicode characters.}
 
 \item{big.mark}{\code{character} passed to \code{format()} for numeric labels.}
 
+\item{curate_df}{\code{data.frame} or \code{NULL} passed to \code{curate_venn_labels()}.}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \value{
@@ -93,6 +96,9 @@ textvenn(setlist, sets=c(1,2,3), "each")
 }
 \seealso{
 Other venndir core: 
+\code{\link{ggrender_venndir}()},
+\code{\link{render_venndir}()},
+\code{\link{signed_overlaps}()},
 \code{\link{venndir}()}
 }
 \concept{venndir core}

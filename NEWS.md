@@ -1,17 +1,80 @@
-# venndir version 0.0.5.900
+# venndir 0.0.5.900
 
 ## bug fixes
 
 * `sp_ellipses()` argument renamed from `radius` to `xradius`
 and `yradius`.
 
+## display item labels inside Venn polygons
+
+* `ggrender_venndir()` and `render_venndir()` both allow optional
+display of items inside the Venn polygons. For relatively small
+sets (<500) this works fairly well. You can configure the label
+to include the `"sign"`, and/or `"item"`. It works as an
+alternative or supplement to using proportional Venn diagrams.
+
+
+## new render functions
+
+* `ggrender_venndir()` renders a venndir diagram using ggplot2.
+Note that this function requires the package `sf`, and in future
+other objects internal to venndir may be converted from `sp` to `sf`.
+* `label_polyogn_fill()` takes a `sp::SpatialPolygons` object,
+a vector of labels, and returns coordinates to place labels
+inside the polygon. It has some adjustments to add buffer
+around polygon boundaries, but does not directly detect
+label overlaps. It either plots labels in base R graphics,
+or returns coordinates suitable for ggplot2.
+
+## new `rescale_*()` functions
+
+The `rescale_*()` functions
+are intended to allow manipulation of numeric coordinates in
+each relevant object type, aimed at `sp::SpatialPolygons`
+and the various sub-types.
+
+* `rescale_sp()` manipulates `sp::SpatialPolygons` which
+contains one or more `sp:Polygons` objects, and therefore calls:
+* `rescale_ps()` manipulates `sp:Polygons` which contains
+one or more `sp:Polygon` objects, and therefore calls:
+* `rescale_p()` manipulates `sp:Polygon` which contains
+numeric `matrix` coordinates, and therefore calls:
+* `rescale_coordinates()` manipulates numeric `matrix`
+coordinates.
+
+The `rescale_*()` operations enable three types of manipulations:
+
+1. `scale` - multiplies coordinates for each axis
+2. `rotate_degrees` - rotates points in degrees
+3. `shift` - shifts coordinates by adding a constant to each axis
+4. `center` - the `scale` and `rotate_degree` are applied relative
+to the `center`, which by default uses the mean bounding box.
+
+## new conversion functions
+
+* `list2im_opt()` - optimized method to convert a list of character
+vectors to a logical incidence matrix. The `list` names become
+colnames, which represent the names of each set. The rownames
+represent items.
+* `list2im_value()` - convert list of named vectors to a value
+incidence matrix. The list vectors are named by item, and the
+vector values are stored in the matrix.
+* `im2list()` - convert incidence matrix to list of character vectors.
+* `im_value2list()` - convert value incidence matrix to a list
+of vectors. Vectors are named by item, and values are from the
+incidence matrix.
+* `counts2setlist()` - convert vector of overlap counts to setlist,
+intended for compatibility with other packages like `eulerr`,
+`upsetr`, and `VennDiagram`.
+
 ## changes to existing functions
 
-* `venndir()` new argument `alpha_by_counts` will adjust
-alpha transparency based upon the number of counts per
-overlap. Implemented to evaluate the visual effect for now.
+* `venndir()` new argument `alpha_by_counts` adjusts
+alpha transparency of each overlap based upon the number
+of counts. Implemented to evaluate the visual effect for now.
 
-# venndir version 0.0.4.900
+
+# venndir 0.0.4.900
 
 ## changes to existing functions
 
@@ -34,14 +97,14 @@ can be hidden, but by default is displayed so the information
 is not lost.
 
 
-# venndir version 0.0.3.900
+# venndir 0.0.3.900
 
 ## new functions
 
 * `venndir()` the core visual function that displays either
 Venn diagram or a Euler diagram for proportional diagrams.
 
-# venndir version 0.0.2.900
+# venndir 0.0.2.900
 
 The `venndir` package is intended for analyses where direction
 is encoded alongside each item in a set. The driving example

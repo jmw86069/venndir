@@ -36,8 +36,10 @@ since this step can take several seconds when working with
 a list whose vectors contain millions of rows.
 }
 \seealso{
-Other venndir sets: 
-\code{\link{list2im_signed}()},
-\code{\link{signed_overlaps}()}
+Other venndir conversion: 
+\code{\link{counts2setlist}()},
+\code{\link{im2list}()},
+\code{\link{im_value2list}()},
+\code{\link{list2im_value}()}
 }
-\concept{venndir sets}
+\concept{venndir conversion}

@@ -6,11 +6,13 @@
 \usage{
 venndir(
   setlist,
-  sets = seq_along(setlist),
-  set_colors = NULL,
   overlap_type = c("concordance", "each", "overlap", "agreement"),
+  sets = NULL,
+  set_colors = NULL,
   proportional = FALSE,
   return_items = FALSE,
+  display_items = c("none", "sign item", "sign", "item"),
+  display_counts = TRUE,
   display_zero = TRUE,
   font_cex = c(1, 0.8),
   poly_alpha = 0.5,
@@ -21,6 +23,8 @@ venndir(
   circle_nudge = NULL,
   unicode = TRUE,
   big.mark = ",",
+  curate_df = NULL,
+  plot_style = c("base", "gg"),
   do_plot = TRUE,
   ...
 )
@@ -29,15 +33,6 @@ venndir(
 \item{setlist}{\code{list} of named vectors, whose names represent
 set items, and whose values represent direction using
 values \code{c(-1, 0, 1)}.}
-
-\item{sets}{\code{integer} index of sets in \code{setlist} to display in
-the Venn diagram. This subset is useful when creating a Venn
-diagram for a subset of a list, because it defines consistent
-colors across all sets, and uses the appropriate subset of
-colors in the Venn diagram.}
-
-\item{set_colors}{\code{character} vector of R colors, or \code{NULL} to
-use default colors defined by \code{colorjam::rainbowJam()}.}
 
 \item{overlap_type}{\code{character} value indicating the type of
 overlap logic: \code{"each"} records each combination of
@@ -48,6 +43,15 @@ direction; \code{"agreement"} represents full agreement in direction
 as \code{"agreement"}, and \code{"mixed"} for any inconsistent
 direction.}
 
+\item{sets}{\code{integer} index of sets in \code{setlist} to display in
+the Venn diagram. This subset is useful when creating a Venn
+diagram for a subset of a list, because it defines consistent
+colors across all sets, and uses the appropriate subset of
+colors in the Venn diagram.}
+
+\item{set_colors}{\code{character} vector of R colors, or \code{NULL} to
+use default colors defined by \code{colorjam::rainbowJam()}.}
+
 \item{proportional}{\code{logical} indicating whether the Venn circles
 are proportionally sized, also known as a Euler diagram. Note
 that proportionally sized circles are not guaranteed to represent
@@ -55,6 +59,14 @@ every possible overlap.}
 
 \item{return_items}{\code{logical} indicating whether to return
 the items within each overlap set.}
+
+\item{display_items}{\code{character} indicating the type of item
+label: \code{"none"} does not display item labels; \code{"sign"}
+displays the sign; \code{"item"} displays the item; \code{"sign item"}
+will display the sign and item together; \code{"item sign"} will
+reverse the order, with item followed by sign. In this
+context \code{"sign"} refers to the incidence values concatenated
+by space, sent to \code{curate_venn_labels(..., type="sign")}.}
 
 \item{display_zero}{\code{logical} indicating whether empty overlaps
 are labeled with zero \code{0} when \code{display_zero=TRUE}, or are
@@ -88,6 +100,12 @@ Unicode characters.}
 
 \item{big.mark}{\code{character} passed to \code{format()} for numeric labels.}
 
+\item{curate_df}{\code{data.frame} or \code{NULL} passed to \code{curate_venn_labels()}.}
+
+\item{plot_style}{\code{character} indicating the style of graphics plot:
+\code{"gg"} uses ggplot2 and calls \code{ggrender_venndir()}; \code{"base"}
+uses base R graphics and calls \code{render_venndir()}.}
+
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
 }
 \description{
@@ -108,9 +126,116 @@ counts include summary counts for the different forms of
 agreement in direction. See \code{signed_overlaps()} for description
 of each \code{overlap_type}, for different methods of summarizing
 the overlapping directions.
+\subsection{Detailed workflow}{
+
+In more detail, input \code{setlist} is named by set names, and each
+\code{vector} contains items.
+
+When the \code{vector} elements in \code{setlist} are not named,
+the values are considered items. In this case, the values are all
+defined as \code{1} for the purpose of defining overlaps, and
+\code{overlap_type} is automatically set to \code{overlap_type="overlap"}.
+At this point the \code{"sign"} is no longer used.
+
+When the \code{vector} elements in \code{setlist} are named, the
+vector element names are considered items, and vector values
+are considered the \code{"sign"}.
+For common scenarios, the \code{"sign"} is usually one of the
+values \code{c(-1, 1)} to indicate \code{"up"} and \code{"down"}. However,
+the \code{"sign"} may contain any atomic value, including \code{numeric},
+\code{integer}, or \code{character} values for example.
+
+The \code{setlist} data is passed to \code{signed_overlaps()} which
+in turn calls \code{list2im_signed()}. At this point the incidence
+matrix values represent the values from each \code{vector} in \code{setlist}.
+
+For each item, the \code{"sign"} is defined as the concatenated signs
+from each \code{vector} in \code{setlist} for that item. For example
+the \code{"sign"} may be \code{"1 1 -1"}, which indicates the item is
+present in all three \code{vectors} of \code{setlist}, and is \code{"up"}, \code{"up"},
+\code{"down"} in these vectors. The sign \code{"0 1 0"} indicates an
+item is present only in the second \code{vector} of \code{setlist} and
+is \code{"up"}.
+
+Each item sign is curated by calling \code{curate_venn_labels()}.
+This function is used to convert \code{"sign"} to visual symbols,
+for example \code{"1"} may be converted to a Unicode up arrow
+\code{"\\u2191"}. Unicode output can be disabled with \code{unicode=FALSE}.
+The same function converts \code{"sign"} to color, which can be
+a helpful visual cue. This step can be customized to use
+any output valid in R and recognized by \code{gridtext::richtext_grob()}
+or \code{ggtext::geom_richtext()}. Specifically, it can contain
+Unicode characters, or limited markdown format recognized
+by these functions.
+}
+
+\subsection{Display of Venn or Euler circles}{
+
+The overlap counts are used to define suitable Venn circles
+or ellipses when \code{proportional=FALSE}, or Euler proportional
+circles when \code{proportional=TRUE}. This step is performed
+by \code{get_venn_shapes()}.
+
+For Venn circles, the method allows 1, 2, or 3 sets.
+
+For Venn ellipses, the method allows 4 or 5 sets.
+
+For Euler circles, the method allows as many sets as are
+supported by \code{eulerr::euler()}.
+
+In the event the circles or ellipses does not include
+an overlap, a label is printed below the plot. See
+\code{render_venndir()} and the argument \code{plot_warning=TRUE}.
+For proportional Euler diagrams, even for 3-way diagrams
+there are often missing overlaps, and this warning is
+helpful to reinforce what is missing.
+}
+
+\subsection{Adjusting Venn or Euler circles}{
+
+As indicated above, when \code{proportional=TRUE} sometimes
+the Euler circles do not represent all set overlaps.
+It may be helpful to nudge one or more circles to
+represent a missing overlap, using the argument
+\code{circle_nudge}. This argument takes a \code{list} named
+by one or more \code{names(setlist)}, of vectors with \code{c(x, y)}
+values to "nudge" that set circle.
+}
+
+\subsection{Display of counts}{
+
+By default, total counts are displayed for each set overlap.
+When \code{setlist} contains signed data, count signs are summarized
+and displayed beside the total counts. The
+summary options are defined by \code{overlap_type}.
+
+Count labels can be styled using \code{label_style}, which
+customizes the background color fill and optional border.
+}
+
+\subsection{Display of items}{
+
+Displaying item labels inside the polygons can be a convenient
+way to answer the question, "What are those shared items?"
+This step can also include the \code{"sign"}, showing which shared items
+also have the same or different \code{"sign"} values.
+
+Note that when items are displayed, summary counts are currently
+hidden. In future the counts may be positioned outside the
+polygons.
+}
+
+\subsection{More customizations}{
+
+This function actually calls \code{render_venndir()} to display the
+diagram. The output from this function can be customized and
+passed to \code{render_venndir()} or \code{ggrender_venndir()} to allow
+much more customized options.
+}
 }
 \examples{
 setlist <- make_venn_test(100, 3);
+print(setlist);
 venndir(setlist)
 
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
@@ -146,9 +271,33 @@ setlist2k <- make_venn_test(2000, 3, 80, do_signed=TRUE);
 venndir(setlist2k)
 venndir(setlist2k, proportional=TRUE)
 
+# example using character values
+setlist <- make_venn_test(100, 3, do_signed=TRUE)
+# make a simple character vector list
+setlistv <- lapply(setlist, function(i){
+   j <- letters[i+3];
+   names(j) <- names(i);
+   j;
+});
+# make custom curate_df
+curate_df <- data.frame(
+   from=c("b", "d"),
+   sign=c("b", "d"),
+   color=c("blue", "red"),
+   stringsAsFactors=FALSE)
+vo <- venndir(setlistv,
+   overlap_type="each",
+   font_cex=c(1.5, 0.9), 
+   curate_df=curate_df,
+   display_zero=TRUE);
+
+
 }
 \seealso{
 Other venndir core: 
+\code{\link{ggrender_venndir}()},
+\code{\link{render_venndir}()},
+\code{\link{signed_overlaps}()},
 \code{\link{textvenn}()}
 }
 \concept{venndir core}

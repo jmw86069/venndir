@@ -140,31 +140,44 @@ print_color_df <- function
 }
 
 #' Make color contrast
+#' 
+#' Make color contrast
+#' 
+#' This function provides a simple method to ensure a color
+#' has adequate visual contrast with a background color,
+#' while retaining some color saturation. For example,
+#' red on red background will return something close to
+#' pink, so the pink retains the red color saturation
+#' but is visually distinct from the background color red.
+#' 
+#' Similarly, pink on pink will return something close to
+#' red.
+#' 
+#' @family venndir utility
 #'
 #' @examples
-#' x <- c("red", "blue", "gold", "ivory");
+#' x <- c("red", "blue", "gold", "ivory", "pink", "white");
 #' y <- rep("red4", 4);
-#' make_color_contrast(x, y);
-#' make_color_contrast(x, y, C_floor=200);
+#' make_color_contrast(x, y, do_plot=TRUE);
+#' 
+#' y <- rep("pink1", 4);
+#' make_color_contrast(x, y, do_plot=TRUE);
 #' 
 #' y <- rep("gold", 4);
-#' make_color_contrast(x, y);
+#' make_color_contrast(x, y, do_plot=TRUE);
 #' 
-#' y <- rep("darkorange", 4);
-#' make_color_contrast(x, y, L_threshold=60);
-#' 
-#' y <- c("red4", "aquamarine4", "blue3", "yellow")
-#' make_color_contrast(x, y, C_floor=150);
+#' y <- c("red4", "aquamarine4", "blue3", "yellow", "pink2")
+#' make_color_contrast(x, y, do_plot=TRUE, C_floor=140);
 #' 
 #' @export
 make_color_contrast <- function
 (x,
  y,
  bg="white",
- L_threshold=60,
+ L_threshold=50,
  C_floor=130,
- L_hi=90,
- L_lo=40,
+ L_hi=80,
+ L_lo=50,
  do_plot=FALSE,
  cex=2,
  ...)
@@ -198,8 +211,8 @@ make_color_contrast <- function
             rep(y, each=2)));
       text(x=rep(seq_along(x), 2),
          y=rep(c(2, 1), each=length(x)),
-         labels=rep(c("input", "output"),
-            each=length(x)),
+         labels=c(x, rep(c("output"),
+            length(x))),
          cex=cex,
          col=c(x, x2));
    }

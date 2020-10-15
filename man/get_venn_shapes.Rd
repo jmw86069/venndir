@@ -10,25 +10,80 @@ get_venn_shapes(
   sep = "&",
   circles_only = FALSE,
   circle_nudge = NULL,
-  rotate_degrees = rotate_degrees,
+  rotate_degrees = 0,
   ...
 )
+}
+\arguments{
+\item{counts}{\code{integer} vector whose names represent set overlaps,
+where set names are separated by \code{sep} delimiter.}
+
+\item{proportional}{\code{logical} indicating whether to create proportional
+circles, where \code{proportional=FALSE} creates standard Venn diagram,
+and \code{proportional=TRUE} creates a Euler diagram.}
+
+\item{sep}{\code{character} delimiter used to separate set names in
+\code{names(counts)}.}
+
+\item{circles_only}{\code{logical} indicating whether to force Venn
+4-way diagram to use only circles; or passed to \code{eulerr::euler()}
+to force it to return circles instead of allowing ellipse shapes.}
+
+\item{circle_nudge}{\code{list} of \code{numeric} vectors each length 2, whose
+names match set names derived from \code{counts}. For example if
+\code{counts=c(set_A=5, set_B=10, "setA&set_B"=3)}, then to nudge
+the \code{set_A} circle, use \code{circle_nudge=list(set_A=c(1, 0))}.
+This argument is intended to allow manipulation of specific
+circle or ellipse positions for aesthetic effects. Particularly
+for proportional Euler diagrams, sometimes the algorithm places
+circles in non-ideal locations}
+
+\item{rotate_degrees}{\code{numeric} value indicating rotation in degrees
+for the entire set of shapes. This argument is intended to
+change the overall orientation, for example so that certain
+sets are at the top.}
+
+\item{...}{additional arguments are ignored.}
 }
 \description{
 Get Venn shapes
 }
 \details{
-This function takes a Venn overlap counts
+This function takes a Venn overlap counts and creates
+corresponding circles or ellipses that represent
+either a Venn diagram, or proportional Venn (Euler)
+diagram.
+
+For non-proportional Venn diagrams, this function accepts
+up to 5 sets, although the 5-way Venn diagram is not
+visually intuitive.
+
+For proportional Euler diagrams, this function simply passes
+the count vector to \code{eulerr::euler()} and returns the output.
+That function accepts more sets, however not all overlaps may
+be represented in the output.
 }
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{find_vennpoly_overlaps}()},
+\code{\link{get_largest_polygon}()},
 \code{\link{intersect_polygons}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
+\code{\link{match_list}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},
-\code{\link{shrink_df}()}
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
 }
 \concept{venndir utility}

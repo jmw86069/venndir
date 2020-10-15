@@ -13,7 +13,7 @@ find_vennpoly_overlaps(
   preset = "dichromat",
   blend_preset = "ryb",
   sp_nudge = NULL,
-  rotate_degrees = NULL,
+  rotate_degrees = 0,
   do_plot = FALSE,
   verbose = FALSE,
   ...
@@ -101,11 +101,23 @@ text(x=spdf$x_label,
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
+\code{\link{get_largest_polygon}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
+\code{\link{match_list}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},
-\code{\link{shrink_df}()}
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
 }
 \concept{venndir utility}

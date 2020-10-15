@@ -38,6 +38,7 @@
 #'    indicating whether the directional label can include special
 #'    Unicode characters.
 #' @param big.mark `character` passed to `format()` for numeric labels.
+#' @param curate_df `data.frame` or `NULL` passed to `curate_venn_labels()`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' 
 #' @examples
@@ -74,6 +75,7 @@ textvenn <- function
  return_items=FALSE,
  unicode=TRUE,
  big.mark=",",
+ curate_df=NULL,
  verbose=FALSE,
  ...)
 {
@@ -93,38 +95,6 @@ textvenn <- function
          length.out=n);
    }
 
-   #c("^(-1.* 1.*|1.* -1.*)$", "\u21C6"),
-   if (unicode) {
-      curate_list <- list(
-         c("[ ]*-1", "\u2193", "dodgerblue"),
-         c("[ ]*1", "\u2191", "firebrick"),
-         c("[ ]*concordant", "\u21F6", "dodgerblue"),
-         c("[ ]*mixed", "\u21C6", "firebrick"));
-   } else {
-      curate_list <- list(
-         c("[ ]*-1", "v", "dodgerblue"),
-         c("[ ]*1", "^", "firebrick"),
-         c("[ ]*concordant", ">>>", "dodgerblue"),
-         c("[ ]*mixed", ">|<", "grey45"));
-   }
-   curate_df <- jamba::rbindList(curate_list)
-   curate_labels <- function(x, curate_df){
-      for (i in seq_len(nrow(curate_df))) {
-         x <- gsub(curate_df[i,1],
-            curate_df[i,2],
-            x);
-      }
-      x;
-   }
-   curate_colors <- function(x, curate_df){
-      for (i in seq_len(nrow(curate_df))) {
-         x <- gsub(curate_df[i,1],
-            curate_df[i,3],
-            x);
-      }
-      x;
-   }
-   
    # get overlap data
    sv <- signed_overlaps(setlist[sets],
       overlap_type=overlap_type,
@@ -149,7 +119,7 @@ textvenn <- function
    ctNchar <- max(nchar(fCounts));
    nameNchar <- nchar(names(setlist));
    spacer <- paste(rep(" ", length.out=spacing), collapse="");
-   
+
    if (n == 2) {
       ## 2-way Venn, one central number
       vCol <- set_color;
@@ -220,10 +190,14 @@ textvenn <- function
          gbase_labels <- curate_venn_labels(
             names(unlist(unname(gCounts))),
             type="sign",
-            unicode=unicode);
+            unicode=unicode,
+            curate_df=curate_df,
+            ...);
          gbase_colors <- curate_venn_labels(
             names(unlist(unname(gCounts))),
-            "color");
+            "color",
+            curate_df=curate_df,
+            ...);
          gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
             ilabel <- paste0(
                gbase_labels[i],
@@ -236,7 +210,8 @@ textvenn <- function
          gdf <- jamba::mixedSortDF(data.frame(
             group=rep(seq_along(gCounts), lengths(gCounts)),
             label=gbase_labels,
-            index=seq_along(gbase_labels)), byCols=c(1, 2))
+            index=seq_along(gbase_labels),
+            stringsAsFactors=FALSE), byCols=c(1, 2))
          gbase_labels <- gbase_labels[gdf$index];
          gbase_colors <- gbase_colors[gdf$index];
          gcount_labels <- gcount_labels[gdf$index];
@@ -333,10 +308,14 @@ textvenn <- function
          gbase_labels <- curate_venn_labels(
             names(unlist(unname(gCounts))),
             type="sign",
-            unicode=unicode);
+            unicode=unicode,
+            curate_df=curate_df,
+            ...);
          gbase_colors <- curate_venn_labels(
             names(unlist(unname(gCounts))),
-            "color");
+            "color",
+            curate_df=curate_df,
+            ...);
          gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
             ilabel <- paste0(
                gbase_labels[i],
@@ -349,7 +328,8 @@ textvenn <- function
          gdf <- jamba::mixedSortDF(data.frame(
             group=rep(seq_along(gCounts), lengths(gCounts)),
             label=gbase_labels,
-            index=seq_along(gbase_labels)), byCols=c(1, 2))
+            index=seq_along(gbase_labels),
+            stringsAsFactors=FALSE), byCols=c(1, 2))
          gbase_labels <- gbase_labels[gdf$index];
          gbase_colors <- gbase_colors[gdf$index];
          gcount_labels <- gcount_labels[gdf$index];

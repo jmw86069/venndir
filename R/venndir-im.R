@@ -11,7 +11,7 @@
 #' since this step can take several seconds when working with
 #' a list whose vectors contain millions of rows.
 #' 
-#' @family venndir sets
+#' @family venndir conversion
 #' 
 #' @return `Matrix` object with class `"ngCMatrix"` that contains
 #'    contains `logical` values. When `do_sparse=FALSE` the returned
@@ -76,7 +76,7 @@ list2im_opt <- function
 #' value in the second list is not counted as "non-overlapping"
 #' because it was not possible for it to have a non-zero value.
 #' 
-#' @family venndir sets
+#' @family venndir conversion
 #' 
 #' @return `Matrix` object that contains signed direction encoded
 #'    as `c(-1, 0, 1)` values.
@@ -93,28 +93,55 @@ list2im_opt <- function
 #'    the vector values are stored.
 #' @param ... additional arguments are ignored.
 #' 
+#' @examples
+#' setlist <- make_venn_test(100, 3, do_signed=TRUE)
+#' imv <- list2im_value(setlist);
+#' print(head(imv));
+#' 
+#' # convert back to list
+#' im_value2list(imv);
+#' 
+#' # make a simple character vector list
+#' setlistv <- lapply(setlist, function(i){
+#'    j <- letters[i+3];
+#'    names(j) <- names(i);
+#'    j;
+#' })
+#' imv <- list2im_value(setlistv);
+#' print(head(imv));
+#' im_value2list(imv);
+#' 
 #' @export
-list2im_signed <- function
+list2im_value <- function
 (setlist,
- empty=0,
+ empty=NULL,
  do_sparse=TRUE,
  force_sign=FALSE,
  ...)
 {
    setnames <- lapply(setlist, names);
    setnamesunion <- Reduce("union", setnames);
+   
+   # define empty when not defined
    if (length(empty) == 0) {
-      empty <- NA;
+      #empty <- NA;
    } else {
       empty <- head(empty, 1);
    }
    setlistim <- do.call(cbind, lapply(setlist, function(i){
       i_match <- match(names(i), setnamesunion);
-      j <- rep(empty, length(setnamesunion));
+      j <- rep(NA, length(setnamesunion));
       if (force_sign) {
          j[i_match] <- sign(i);
       } else {
          j[i_match] <- i;
+      }
+      if (any(is.na(j)) && length(empty) == 0) {
+         if (is.character(j)) {
+            j[is.na(j)] <- "";
+         } else {
+            j[is.na(j)] <- 0;
+         }
       }
       j;
    }))
@@ -125,4 +152,95 @@ list2im_signed <- function
       setlistim <- as(setlistim, "dgCMatrix");
    }
    return(setlistim);
+}
+
+#' Value incidence matrix to list
+#' 
+#' Value incidence matrix to list
+#' 
+#' This function is the reciprocal to `list2im_value()`.
+#' 
+#' A value incidence matrix is a matrix whose non-empty values
+#' are retained in each item vector, where items are stored as
+#' vector names.
+#' 
+#' This function is most commonly used with signed values
+#' `c(-1, 0, 1)`, to indicate direction where `1` is `up`,
+#' `-1` is `down`, and `0` is `not changed`. In this case `0`
+#' which is considered empty by default.
+#' 
+#' @return `list` whose names are set names derived from `colnames(x)`,
+#'    and where each `vector` is named using `rownames(x)` and the
+#'    values from `x`, for non-empty values.
+#' 
+#' @family venndir conversion
+#' 
+#' @examples
+#' setlist <- make_venn_test(100, 3, do_signed=TRUE)
+#' ims <- list2im_value(setlist);
+#' print(head(ims));
+#' 
+#' # convert back to list
+#' im_value2list(ims);
+#' 
+#' # make a simple character vector list
+#' setlistv <- lapply(setlist, function(i){
+#'    j <- letters[i+3];
+#'    names(j) <- names(i);
+#'    j;
+#' })
+#' imv <- list2im_value(setlistv);
+#' print(head(imv));
+#' im_value2list(imv);
+#'
+#' @export
+im_value2list <- function
+(x,
+ empty=c(NA, "", 0),
+ ...)
+{
+   # the reciprocal of list2im_value()
+   x_rows <- rownames(x);
+   x_cols <- colnames(x);
+   l <- lapply(jamba::nameVector(x_cols), function(i){
+      has_value <- (!x[,i] %in% empty);
+      jamba::nameVector(x[has_value,i], x_rows[has_value], makeNamesFunc=c);
+   });
+   return(l);
+}
+
+
+#' Incidence matrix to list
+#' 
+#' Incidence matrix to list
+#' 
+#' This function is the reciprocal to `list2im()`. This function
+#' will also convert a signed incidence matrix to a normal
+#' list, removing the directional sign.
+#' 
+#' @family venndir conversion
+#' 
+#' @examples
+#' setlist <- make_venn_test(100, 3, do_signed=TRUE)
+#' ims <- list2im_value(setlist);
+#' print(head(ims));
+#' 
+#' # convert back to list
+#' im_value2list(ims);
+#' im2list(ims);
+#'
+#' @export
+im2list <- function
+(x,
+ empty=c(NA, "", 0),
+ ...)
+{
+   # the reciprocal of list2im()
+   x_rows <- rownames(x);
+   x_cols <- colnames(x);
+   l <- lapply(jamba::nameVector(x_cols), function(i){
+      has_value <- (!x[,i] %in% empty);
+      x_rows[has_value];
+   });
+   return(l);
 }

@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Text Venn diagram — textvenn" />
 <meta property="og:description" content="Text Venn diagram" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
       </span>
     </div>
 
@@ -90,7 +93,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jmw86069/venndir">
+  <a href="http://github.com/jmw86069/venndir/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -109,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Text Venn diagram</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmw86069/venndir/blob/master/R/venndir-textvenn.R'><code>R/venndir-textvenn.R</code></a></small>
+    <small class="dont-index">Source: <a href='http://github.com/jmw86069/venndir/blob/master/R/venndir-textvenn.R'><code>R/venndir-textvenn.R</code></a></small>
     <div class="hidden name"><code>textvenn.Rd</code></div>
     </div>
 
@@ -117,22 +120,23 @@
     <p>Text Venn diagram</p>
     </div>
 
-    <pre class="usage"><span class='fu'>textvenn</span>(
-  <span class='no'>setlist</span>,
-  <span class='kw'>sets</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span>(<span class='no'>setlist</span>),
-  <span class='kw'>overlap_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"concordance"</span>, <span class='st'>"overlap"</span>, <span class='st'>"each"</span>, <span class='st'>"agreement"</span>),
-  <span class='kw'>set_colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>spacing</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>padding</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>inverse_title</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>inverse_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>color_by_counts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_items</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>unicode</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>big.mark</span> <span class='kw'>=</span> <span class='st'>","</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>textvenn</span><span class='op'>(</span>
+  <span class='va'>setlist</span>,
+  sets <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span><span class='op'>(</span><span class='va'>setlist</span><span class='op'>)</span>,
+  overlap_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"concordance"</span>, <span class='st'>"overlap"</span>, <span class='st'>"each"</span>, <span class='st'>"agreement"</span><span class='op'>)</span>,
+  set_colors <span class='op'>=</span> <span class='cn'>NULL</span>,
+  spacing <span class='op'>=</span> <span class='fl'>5</span>,
+  padding <span class='op'>=</span> <span class='fl'>1</span>,
+  inverse_title <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  inverse_counts <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  color_by_counts <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  return_items <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  unicode <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  big.mark <span class='op'>=</span> <span class='st'>","</span>,
+  curate_df <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -188,6 +192,10 @@ Unicode characters.</p></td>
       <td><p><code>character</code> passed to <code><a href='https://rdrr.io/r/base/format.html'>format()</a></code> for numeric labels.</p></td>
     </tr>
     <tr>
+      <th>curate_df</th>
+      <td><p><code>data.frame</code> or <code>NULL</code> passed to <code><a href='curate_venn_labels.html'>curate_venn_labels()</a></code>.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p><code>logical</code> indicating whether to print verbose output.</p></td>
     </tr>
@@ -205,35 +213,76 @@ on an R console.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir core: 
+<code><a href='ggrender_venndir.html'>ggrender_venndir</a>()</code>,
+<code><a href='render_venndir.html'>render_venndir</a>()</code>,
+<code><a href='signed_overlaps.html'>signed_overlaps</a>()</code>,
 <code><a href='venndir.html'>venndir</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>setlist</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span>(<span class='kw'>n_items</span><span class='kw'>=</span><span class='fl'>100</span>, <span class='kw'>do_signed</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
+    <pre class="examples"><div class='input'><span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span>n_items<span class='op'>=</span><span class='fl'>100</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># two-way Venn by default shows concordance</span>
-<span class='fu'>textvenn</span>(<span class='no'>setlist</span>, <span class='kw'>sets</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>))</div><div class='output co'>#&gt; <span class='error'>Error in venn_m[cbind(set_rownums, set_colnums)] &lt;- names(fCounts): replacement has length zero</span></div><div class='input'>
+<span class='fu'>textvenn</span><span class='op'>(</span><span class='va'>setlist</span>, sets<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  <span style='color: #BBBBBB;background-color: #BB0000;'> set_A </span><span style='color: #BB0000;'> ↑: 13 </span><span style='color: #555555;'>      </span><span style='color: #000000;background-color: #BB0000;'> set_A&amp;set_B </span><span style='color: #BB0000;'> ↑↑: 3 </span><span style='color: #555555;'>      </span><span style='color: #000000;background-color: #BBBB00;'> set_B </span><span style='color: #BB0000;'> ↑: 6 </span><span> 
+#&gt;  </span><span style='color: #BB0000;'>  26   </span><span style='color: #0000BB;'> ↓: 13 </span><span style='color: #555555;'>      </span><span style='color: #BB0000;'>      6      </span><span style='color: #0000BB;'> ↓↓: 1 </span><span style='color: #555555;'>      </span><span style='color: #BB0000;'>  10   </span><span style='color: #0000BB;'> ↓: 4 </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                  X: 2                     </span><span> </div><div class='input'>
 <span class='co'># without signed directionality use overlap_type="overlap"</span>
-<span class='fu'>textvenn</span>(<span class='no'>setlist</span>, <span class='kw'>sets</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>), <span class='kw'>overlap_type</span><span class='kw'>=</span><span class='st'>"overlap"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in venn_m[cbind(set_rownums, set_colnums)] &lt;- names(fCounts): replacement has length zero</span></div><div class='input'>
+<span class='fu'>textvenn</span><span class='op'>(</span><span class='va'>setlist</span>, sets<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>)</span>, overlap_type<span class='op'>=</span><span class='st'>"overlap"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  </span><span style='color: #BBBBBB;background-color: #BB0000;'> set_A </span><span style='color: #555555;'>         </span><span style='color: #000000;background-color: #BB0000;'> set_A&amp;set_B </span><span style='color: #555555;'>         </span><span style='color: #000000;background-color: #BBBB00;'> set_B </span><span style='color: #555555;'>   </span><span> 
+#&gt;  </span><span style='color: #BB0000;'>  26   </span><span style='color: #555555;'>         </span><span style='color: #BB0000;'>      6      </span><span style='color: #555555;'>         </span><span style='color: #BB0000;'>  10   </span><span style='color: #555555;'>   </span><span> </div><div class='input'>
 <span class='co'># three-way Venn showing each signed directionality</span>
-<span class='fu'>textvenn</span>(<span class='no'>setlist</span>, <span class='kw'>sets</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>), <span class='kw'>overlap_type</span><span class='kw'>=</span><span class='st'>"each"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in venn_m[cbind(set_rownums, set_colnums)] &lt;- names(fCounts): replacement has length zero</span></div><div class='input'>
+<span class='fu'>textvenn</span><span class='op'>(</span><span class='va'>setlist</span>, sets<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span><span class='op'>)</span>, overlap_type<span class='op'>=</span><span class='st'>"each"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #000000;background-color: #BB0000;'>    set_A&amp;set_B    </span><span style='color: #BB0000;'> ↑↑: 3  </span><span style='color: #555555;'>                                    </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #BB0000;'>         5         </span><span style='color: #555555;'> ↓↑: 1                                      </span><span> 
+#&gt;  </span><span style='color: #BBBBBB;background-color: #BB0000;'> set_A </span><span style='color: #BB0000;'> ↑: 9 </span><span style='color: #555555;'>                                       </span><span style='color: #0000BB;'> ↓↓: 1  </span><span style='color: #555555;'>                       </span><span style='color: #000000;background-color: #BBBB00;'> set_B </span><span style='color: #BB0000;'> ↑: 6 </span><span> 
+#&gt;  </span><span style='color: #BB0000;'>  18   </span><span style='color: #0000BB;'> ↓: 9 </span><span style='color: #555555;'>                                                                      </span><span style='color: #BB0000;'>  10   </span><span style='color: #0000BB;'> ↓: 4 </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                                                                                </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #000000;background-color: #BBBB00;'> set_A&amp;set_B&amp;set_C </span><span style='color: #555555;'> ↓↑↑: 1                                     </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #BB0000;'>         1         </span><span style='color: #555555;'>                                            </span><span> 
+#&gt;  </span><span style='color: #555555;'>             </span><span style='color: #BBBBBB;background-color: #BB00BB;'> set_A&amp;set_C </span><span style='color: #BB0000;'> ↑↑: 2 </span><span style='color: #555555;'>                              </span><span style='color: #000000;background-color: #BBBB00;'> set_B&amp;set_C </span><span style='color: #BB0000;'> ↑↑: 0 </span><span style='color: #555555;'>             </span><span> 
+#&gt;  </span><span style='color: #555555;'>             </span><span style='color: #BB0000;'>      8      </span><span style='color: #555555;'> ↑↓: 2                               </span><span style='color: #BB0000;'>      0      </span><span style='color: #555555;'>                    </span><span> 
+#&gt;  </span><span style='color: #555555;'>                           ↓↑: 2                                                                </span><span> 
+#&gt;  </span><span style='color: #555555;'>                          </span><span style='color: #0000BB;'> ↓↓: 2 </span><span style='color: #555555;'>                                                               </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #BBBBBB;background-color: #00BBBB;'>       set_C       </span><span style='color: #BB0000;'>  ↑: 1  </span><span style='color: #555555;'>                                    </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #BB0000;'>         6         </span><span style='color: #0000BB;'>  ↓: 5  </span><span style='color: #555555;'>                                    </span><span> </div><div class='input'>
 <span class='co'># larger number of items</span>
-<span class='no'>setlist</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span>(<span class='kw'>n_items</span><span class='kw'>=</span><span class='fl'>1000000</span>, <span class='kw'>sizes</span><span class='kw'>=</span><span class='fl'>200000</span>, <span class='kw'>do_signed</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
+<span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span>n_items<span class='op'>=</span><span class='fl'>1000000</span>, sizes<span class='op'>=</span><span class='fl'>200000</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='co'># text Venn with directionality</span>
-<span class='fu'>textvenn</span>(<span class='no'>setlist</span>, <span class='kw'>sets</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>), <span class='st'>"agreement"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in venn_m[cbind(set_rownums, set_colnums)] &lt;- names(fCounts): replacement has length zero</span></div><div class='input'>
+<span class='fu'>textvenn</span><span class='op'>(</span><span class='va'>setlist</span>, sets<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span><span class='op'>)</span>, <span class='st'>"agreement"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  </span><span style='color: #555555;'>                                             </span><span style='color: #000000;background-color: #BB0000;'>    set_A&amp;set_B    </span><span style='color: #0000BB;'> =: 24,013  </span><span style='color: #555555;'>                                                </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                             </span><span style='color: #BB0000;'>      31,988       </span><span style='color: #555555;'>  X: 7,975                                                  </span><span> 
+#&gt;  </span><span style='color: #BBBBBB;background-color: #BB0000;'>  set_A  </span><span style='color: #0000BB;'> =: 128,007 </span><span style='color: #555555;'>                                                                                  </span><span style='color: #000000;background-color: #BBBB00;'>  set_B  </span><span style='color: #0000BB;'> =: 128,192 </span><span> 
+#&gt;  </span><span style='color: #BB0000;'> 128,007 </span><span style='color: #555555;'>                                                                                              </span><span style='color: #BB0000;'> 128,192 </span><span style='color: #555555;'>            </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                                                                                                            </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                             </span><span style='color: #000000;background-color: #BBBB00;'> set_A&amp;set_B&amp;set_C </span><span style='color: #0000BB;'>  =: 4,497  </span><span style='color: #555555;'>                                                </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                             </span><span style='color: #BB0000;'>       8,054       </span><span style='color: #555555;'>  X: 3,557                                                  </span><span> 
+#&gt;  </span><span style='color: #555555;'>                     </span><span style='color: #BBBBBB;background-color: #BB00BB;'> set_A&amp;set_C </span><span style='color: #0000BB;'> =: 15,882 </span><span style='color: #555555;'>                                  </span><span style='color: #000000;background-color: #BBBB00;'> set_B&amp;set_C </span><span style='color: #0000BB;'> =: 23,863 </span><span style='color: #555555;'>                     </span><span> 
+#&gt;  </span><span style='color: #555555;'>                     </span><span style='color: #BB0000;'>   31,951    </span><span style='color: #555555;'> X: 16,069                                   </span><span style='color: #BB0000;'>   31,766    </span><span style='color: #555555;'> X: 7,903                       </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                                                                                                            </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                                                                                                            </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                             </span><span style='color: #BBBBBB;background-color: #00BBBB;'>       set_C       </span><span style='color: #0000BB;'> =: 128,229 </span><span style='color: #555555;'>                                                </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                             </span><span style='color: #BB0000;'>      128,229      </span><span style='color: #555555;'>                                                            </span><span> </div><div class='input'>
 <span class='co'># basic text Venn with directionality</span>
-<span class='fu'>textvenn</span>(<span class='no'>setlist</span>, <span class='kw'>sets</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>), <span class='st'>"each"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in venn_m[cbind(set_rownums, set_colnums)] &lt;- names(fCounts): replacement has length zero</span></div><div class='input'>
-</div></pre>
+<span class='fu'>textvenn</span><span class='op'>(</span><span class='va'>setlist</span>, sets<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span><span class='op'>)</span>, <span class='st'>"each"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  </span><span style='color: #555555;'>                                            </span><span style='color: #000000;background-color: #BB0000;'>    set_A&amp;set_B    </span><span style='color: #BB0000;'> ↑↑: 11,990 </span><span style='color: #555555;'>                                                         </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                            </span><span style='color: #BB0000;'>      31,988       </span><span style='color: #555555;'> ↑↓: 4,007                                                           </span><span> 
+#&gt;  </span><span style='color: #BBBBBB;background-color: #BB0000;'>  set_A  </span><span style='color: #BB0000;'> ↑: 64,078 </span><span style='color: #555555;'>                                            ↓↑: 3,968                                       </span><span style='color: #000000;background-color: #BBBB00;'>  set_B  </span><span style='color: #BB0000;'> ↑: 63,910 </span><span> 
+#&gt;  </span><span style='color: #BB0000;'> 128,007 </span><span style='color: #0000BB;'> ↓: 63,929 </span><span style='color: #555555;'>                                           </span><span style='color: #0000BB;'> ↓↓: 12,023 </span><span style='color: #555555;'>                                     </span><span style='color: #BB0000;'> 128,192 </span><span style='color: #0000BB;'> ↓: 64,282 </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                                                                                                                    </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                            </span><span style='color: #000000;background-color: #BBBB00;'> set_A&amp;set_B&amp;set_C </span><span style='color: #BB0000;'> ↑↑↑: 2,243 </span><span style='color: #555555;'>  ↓↑↑: 757                                               </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                            </span><span style='color: #BB0000;'>       8,054       </span><span style='color: #555555;'>  ↑↑↓: 766    ↓↑↓: 243                                               </span><span> 
+#&gt;  </span><span style='color: #555555;'>                    </span><span style='color: #BBBBBB;background-color: #BB00BB;'> set_A&amp;set_C </span><span style='color: #BB0000;'> ↑↑: 7,950 </span><span style='color: #555555;'>                     ↑↓↑: 287    ↓↓↑: 756  </span><span style='color: #000000;background-color: #BBBB00;'> set_B&amp;set_C </span><span style='color: #BB0000;'> ↑↑: 11,919 </span><span style='color: #555555;'>                    </span><span> 
+#&gt;  </span><span style='color: #555555;'>                    </span><span style='color: #BB0000;'>   31,951    </span><span style='color: #555555;'> ↑↓: 7,902                      ↑↓↓: 748  </span><span style='color: #0000BB;'> ↓↓↓: 2,254 </span><span style='color: #BB0000;'>   31,766    </span><span style='color: #555555;'> ↑↓: 3,918                      </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                  ↓↑: 8,167                                                          ↓↑: 3,985                      </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                 </span><span style='color: #0000BB;'> ↓↓: 7,932 </span><span style='color: #555555;'>                                                        </span><span style='color: #0000BB;'> ↓↓: 11,944 </span><span style='color: #555555;'>                    </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                            </span><span style='color: #BBBBBB;background-color: #00BBBB;'>       set_C       </span><span style='color: #BB0000;'> ↑: 64,000  </span><span style='color: #555555;'>                                                         </span><span> 
+#&gt;  </span><span style='color: #555555;'>                                            </span><span style='color: #BB0000;'>      128,229      </span><span style='color: #0000BB;'> ↓: 64,229  </span><span style='color: #555555;'>                                                         </span><span> </div><div class='input'>
+</div></span></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -244,7 +293,7 @@ on an R console.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

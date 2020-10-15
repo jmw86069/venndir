@@ -18,6 +18,112 @@
 #' of each `overlap_type`, for different methods of summarizing
 #' the overlapping directions.
 #' 
+#' ## Detailed workflow
+#' 
+#' In more detail, input `setlist` is named by set names, and each
+#' `vector` contains items.
+#' 
+#' When the `vector` elements in `setlist` are not named,
+#' the values are considered items. In this case, the values are all
+#' defined as `1` for the purpose of defining overlaps, and
+#' `overlap_type` is automatically set to `overlap_type="overlap"`.
+#' At this point the `"sign"` is no longer used.
+#' 
+#' When the `vector` elements in `setlist` are named, the
+#' vector element names are considered items, and vector values
+#' are considered the `"sign"`.
+#' For common scenarios, the `"sign"` is usually one of the
+#' values `c(-1, 1)` to indicate `"up"` and `"down"`. However,
+#' the `"sign"` may contain any atomic value, including `numeric`,
+#' `integer`, or `character` values for example.
+#' 
+#' The `setlist` data is passed to `signed_overlaps()` which
+#' in turn calls `list2im_signed()`. At this point the incidence
+#' matrix values represent the values from each `vector` in `setlist`.
+#' 
+#' For each item, the `"sign"` is defined as the concatenated signs
+#' from each `vector` in `setlist` for that item. For example
+#' the `"sign"` may be `"1 1 -1"`, which indicates the item is
+#' present in all three `vectors` of `setlist`, and is `"up"`, `"up"`,
+#' `"down"` in these vectors. The sign `"0 1 0"` indicates an
+#' item is present only in the second `vector` of `setlist` and
+#' is `"up"`.
+#' 
+#' Each item sign is curated by calling `curate_venn_labels()`.
+#' This function is used to convert `"sign"` to visual symbols,
+#' for example `"1"` may be converted to a Unicode up arrow
+#' `"\u2191"`. Unicode output can be disabled with `unicode=FALSE`.
+#' The same function converts `"sign"` to color, which can be
+#' a helpful visual cue. This step can be customized to use
+#' any output valid in R and recognized by `gridtext::richtext_grob()`
+#' or `ggtext::geom_richtext()`. Specifically, it can contain
+#' Unicode characters, or limited markdown format recognized
+#' by these functions.
+#' 
+#' ## Display of Venn or Euler circles
+#' 
+#' The overlap counts are used to define suitable Venn circles
+#' or ellipses when `proportional=FALSE`, or Euler proportional
+#' circles when `proportional=TRUE`. This step is performed
+#' by `get_venn_shapes()`.
+#' 
+#' For Venn circles, the method allows 1, 2, or 3 sets.
+#' 
+#' For Venn ellipses, the method allows 4 or 5 sets.
+#' 
+#' For Euler circles, the method allows as many sets as are
+#' supported by `eulerr::euler()`.
+#' 
+#' In the event the circles or ellipses does not include
+#' an overlap, a label is printed below the plot. See
+#' `render_venndir()` and the argument `plot_warning=TRUE`.
+#' For proportional Euler diagrams, even for 3-way diagrams
+#' there are often missing overlaps, and this warning is
+#' helpful to reinforce what is missing.
+#' 
+#' 
+#' ## Adjusting Venn or Euler circles
+#' 
+#' As indicated above, when `proportional=TRUE` sometimes
+#' the Euler circles do not represent all set overlaps.
+#' It may be helpful to nudge one or more circles to
+#' represent a missing overlap, using the argument
+#' `circle_nudge`. This argument takes a `list` named
+#' by one or more `names(setlist)`, of vectors with `c(x, y)`
+#' values to "nudge" that set circle.
+#' 
+#' 
+#' ## Display of counts
+#' 
+#' By default, total counts are displayed for each set overlap.
+#' When `setlist` contains signed data, count signs are summarized
+#' and displayed beside the total counts. The
+#' summary options are defined by `overlap_type`.
+#' 
+#' Count labels can be styled using `label_style`, which
+#' customizes the background color fill and optional border.
+#' 
+#' 
+#' ## Display of items
+#' 
+#' Displaying item labels inside the polygons can be a convenient
+#' way to answer the question, "What are those shared items?"
+#' This step can also include the `"sign"`, showing which shared items
+#' also have the same or different `"sign"` values.
+#' 
+#' Note that when items are displayed, summary counts are currently
+#' hidden. In future the counts may be positioned outside the
+#' polygons.
+#' 
+#' 
+#' ## More customizations
+#' 
+#' This function actually calls `render_venndir()` to display the
+#' diagram. The output from this function can be customized and
+#' passed to `render_venndir()` or `ggrender_venndir()` to allow
+#' much more customized options.
+#' 
+#' 
 #' @inheritParams signed_overlaps
 #' @param sets `integer` index of sets in `setlist` to display in
 #'    the Venn diagram. This subset is useful when creating a Venn
@@ -30,6 +136,13 @@
 #'    are proportionally sized, also known as a Euler diagram. Note
 #'    that proportionally sized circles are not guaranteed to represent
 #'    every possible overlap.
+#' @param display_items `character` indicating the type of item
+#'    label: `"none"` does not display item labels; `"sign"`
+#'    displays the sign; `"item"` displays the item; `"sign item"`
+#'    will display the sign and item together; `"item sign"` will
+#'    reverse the order, with item followed by sign. In this
+#'    context `"sign"` refers to the incidence values concatenated
+#'    by space, sent to `curate_venn_labels(..., type="sign")`.
 #' @param display_zero `logical` indicating whether empty overlaps
 #'    are labeled with zero `0` when `display_zero=TRUE`, or are
 #'    blank when `display_zero=FALSE`.
@@ -55,12 +168,17 @@
 #'    indicating whether the directional label can include special
 #'    Unicode characters.
 #' @param big.mark `character` passed to `format()` for numeric labels.
+#' @param curate_df `data.frame` or `NULL` passed to `curate_venn_labels()`.
+#' @param plot_style `character` indicating the style of graphics plot:
+#'    `"gg"` uses ggplot2 and calls `ggrender_venndir()`; `"base"`
+#'    uses base R graphics and calls `render_venndir()`.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
 #' @family venndir core
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 3);
+#' print(setlist);
 #' venndir(setlist)
 #' 
 #' setlist <- make_venn_test(100, 3, do_signed=TRUE);
@@ -96,14 +214,37 @@
 #' venndir(setlist2k)
 #' venndir(setlist2k, proportional=TRUE)
 #' 
+#' # example using character values
+#' setlist <- make_venn_test(100, 3, do_signed=TRUE)
+#' # make a simple character vector list
+#' setlistv <- lapply(setlist, function(i){
+#'    j <- letters[i+3];
+#'    names(j) <- names(i);
+#'    j;
+#' });
+#' # make custom curate_df
+#' curate_df <- data.frame(
+#'    from=c("b", "d"),
+#'    sign=c("b", "d"),
+#'    color=c("blue", "red"),
+#'    stringsAsFactors=FALSE)
+#' vo <- venndir(setlistv,
+#'    overlap_type="each",
+#'    font_cex=c(1.5, 0.9), 
+#'    curate_df=curate_df,
+#'    display_zero=TRUE);
+#' 
+#' 
 #' @export
 venndir <- function
 (setlist,
- sets=seq_along(setlist),
- set_colors=NULL,
  overlap_type=c("concordance", "each", "overlap", "agreement"),
+ sets=NULL,
+ set_colors=NULL,
  proportional=FALSE,
  return_items=FALSE,
+ display_items=c("none", "sign item", "sign", "item"),
+ display_counts=TRUE,
  display_zero=TRUE,
  font_cex=c(1, 0.8),
  poly_alpha=0.5,
@@ -119,6 +260,8 @@ venndir <- function
  circle_nudge=NULL,
  unicode=TRUE,
  big.mark=",",
+ curate_df=NULL,
+ plot_style=c("base", "gg"),
  do_plot=TRUE,
  ...)
 {
@@ -130,13 +273,30 @@ venndir <- function
    #   - identify any overlaps not represented (to label on the side)
    
    overlap_type <- match.arg(overlap_type);
-   label_style <- match.arg(label_style);
+   plot_style <- match.arg(plot_style);
+   label_style <- head(label_style, 1);
+   display_items <- head(display_items, 1);
+   if (length(display_items) == 0) {
+      display_items <- "none";
+   }
+   if (!"none" %in% display_items) {
+      return_items <- TRUE;
+      display_counts <- FALSE;
+   }
 
    if (length(font_cex) < 2) {
       if (length(font_cex) == 0) {
          font_cex <- c(1, 0.8);
       }
       font_cex <- rep(font_cex, length.out=2);
+   }
+   if (length(sets) == 0) {
+      sets <- seq_along(setlist);
+   } else if ("character" %in% class(sets)) {
+      sets <- jamba::rmNA(match(sets, names(setlist)));
+      if (length(sets) == 0) {
+         stop("sets did not match any values in names(setlist)");
+      }
    }
    # define colors
    if (length(set_colors) == 0) {
@@ -158,6 +318,7 @@ venndir <- function
    nCounts <- sapply(unique(sv$sets), function(i){
       sum(subset(sv, sets %in% i)$count)
    });
+   names(nCounts) <- unique(sv$sets);
    # formatted numeric counts
    fCounts <- format(big.mark=big.mark,
       trim=TRUE,
@@ -168,11 +329,17 @@ venndir <- function
       gCounts <- lapply(jamba::nameVector(unique(sv$sets)), function(i){
          NULL
       });
+      gbase_signs <- NULL;
    } else {
       gCounts <- lapply(jamba::nameVector(unique(sv$sets)), function(i){
          j <- subset(sv, sets %in% i);
          jamba::nameVector(j$count, j$overlap_label)
       });
+      gbase_signs_l <- lapply(jamba::nameVector(unique(sv$sets)), function(i){
+         j <- subset(sv, sets %in% i);
+         jamba::nameVector(j$count, paste0(j$sets, "|", j[[overlap_type]]))
+      });
+      gbase_signs <- unlist(unname(gbase_signs_l));
    }
    
    # get Venn circles
@@ -184,13 +351,14 @@ venndir <- function
    # convert to venn overlap polygons
    venn_spdf <- find_vennpoly_overlaps(venn_sp,
       venn_counts=nCounts,
-      venn_colors=set_color,
-      ...);
+      venn_colors=set_color); # removed ...
    
    # generate labels from nCounts and gCounts
    nlabel_df <- data.frame(label=names(nCounts),
-      venn_counts=nCounts);
-   nlabel_df <- jamba::mergeAllXY(as.data.frame(venn_spdf), nlabel_df);
+      venn_counts=nCounts,
+      stringsAsFactors=FALSE,
+      check.names=FALSE);
+   nlabel_df <- jamba::mergeAllXY(data.frame(venn_spdf), nlabel_df);
    nlabel_df <- nlabel_df[match(names(nCounts), nlabel_df$label),,drop=FALSE];
    nlabel_df$color <- jamba::rmNA(nlabel_df$color,
       naValue="#FFFFFFFF");
@@ -221,11 +389,15 @@ venndir <- function
    gbase_labels <- curate_venn_labels(
       names(unlist(unname(gCounts))),
       unicode=unicode,
-      "sign");
-   gbase_colors <- (curate_venn_labels(
+      "sign",
+      curate_df=curate_df,
+      ...);
+   gbase_colors <- curate_venn_labels(
       names(unlist(unname(gCounts))),
       unicode=unicode,
-      "color"));
+      "color",
+      curate_df=curate_df,
+      ...);
    gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
       ilabel <- paste0(
          gbase_labels[i],
@@ -239,11 +411,14 @@ venndir <- function
       group=rep(seq_along(gCounts), lengths(gCounts)),
       gbase_labels=gbase_labels,
       label=rep(names(gCounts), lengths(gCounts)),
-      index=seq_along(gbase_labels)), byCols=c(1, 2));
+      index=seq_along(gbase_labels),
+      stringsAsFactors=FALSE,
+      check.names=FALSE), byCols=c(1, 2));
    gbase_labels <- gbase_labels[gdf$index];
    gbase_colors <- gbase_colors[gdf$index];
    gcount_labels <- gcount_labels[gdf$index];
    gcount_sorted <- unlist(gCounts)[gdf$index];
+   gbase_signs <- gbase_signs[gdf$index];
 
    gCounts_len <- lengths(gCounts);
 
@@ -274,81 +449,40 @@ venndir <- function
    label_color_signed <- jamba::setTextContrastColor(
       jamba::alpha2col(rep(nlabel_df$color, gCounts_len),
          alpha=poly_alpha));
-   if ("fill" %in% label_style) {
+   
+   if (grepl("_box", label_style)) {
+      label_border_main <- jamba::alpha2col(alpha=0.8,
+         jamba::makeColorDarker(nlabel_df$color,
+            darkFactor=1.2));
+      label_border_signed <- rep(label_border_main,
+         gCounts_len);
+   }
+   if (grepl("fill", label_style)) {
       label_fill_main <- nlabel_df$color;
-      label_border_main <- jamba::makeColorDarker(nlabel_df$color,
-         darkFactor=1.2);
       label_color_main <- jamba::setTextContrastColor(nlabel_df$color);
       label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_border_signed <- rep(label_border_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   } else if ("shaded" %in% label_style) {
-      label_fill_main <- jamba::alpha2col(nlabel_df$color,
-         alpha=0.5);
-      label_border_main <- rep(NA, length(x_main));
-      label_color_main <- jamba::setTextContrastColor(
-         jamba::alpha2col(nlabel_df$color,
-            alpha=mean(c(poly_alpha, 0.9))));
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_border_signed <- rep(label_border_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   } else if ("shaded_box" %in% label_style) {
-      label_fill_main <- jamba::alpha2col(nlabel_df$color,
-         alpha=0.5);
-      label_border_main <- jamba::alpha2col(alpha=0.8,
-         jamba::makeColorDarker(nlabel_df$color,
-            darkFactor=1.2));
-      label_color_main <- jamba::setTextContrastColor(
-         jamba::alpha2col(nlabel_df$color,
-            alpha=mean(c(poly_alpha, 0.9))));
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_border_signed <- rep(label_border_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   } else if ("lite_box" %in% label_style) {
-      label_fill_main <- rep("#FFEEAA", length(x_main));
-      label_border_main <- jamba::alpha2col(alpha=0.8,
-         jamba::makeColorDarker(nlabel_df$color,
-            darkFactor=1.2));
-      label_color_main <- rep("#000000", length(x_main));
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_border_signed <- rep(label_border_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   } else if ("lite" %in% label_style) {
-      label_fill_main <- rep("#FFEEAABB", length(x_main));
-      label_border_main <- rep(NA, length(x_main));
-      label_color_main <- rep("#000000", length(x_main));
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_border_signed <- rep(label_border_main,
          gCounts_len);
       label_color_signed <- rep(label_color_main,
          gCounts_len);
    }
-   ## Adjust signed labels for contrast
-   if (1 == 2) {
-      gbase_colors1 <- gbase_colors;
-      g_update <- (gdf$label %in% nlabel_df$label);
-      gbase_colors[g_update] <- make_color_contrast(
-         x=jamba::unalpha(gbase_colors[g_update]),
-         y=ifelse(is.na(label_fill_signed),
-            rep(
-               jamba::alpha2col(nlabel_df$color,
-                  alpha=poly_alpha),
-               gCounts_len),
-            label_fill_signed),
-         ...);
+   if (grepl("shaded", label_style)) {
+      label_fill_main <- jamba::alpha2col(nlabel_df$color,
+         alpha=0.5);
+      label_color_main <- jamba::setTextContrastColor(
+         jamba::alpha2col(nlabel_df$color,
+            alpha=mean(c(poly_alpha, 0.9))));
+      label_fill_signed <- rep(label_fill_main,
+         gCounts_len);
+      label_color_signed <- rep(label_color_main,
+         gCounts_len);
+   }
+   if (grepl("lite", label_style)) {
+      label_fill_main <- rep("#FFEEAABB", length(x_main));
+      label_color_main <- rep("#000000", length(x_main));
+      label_fill_signed <- rep(label_fill_main,
+         gCounts_len);
+      label_color_signed <- rep(label_color_main,
+         gCounts_len);
    }
 
    ## Hide zero if display_zero=FALSE
@@ -394,8 +528,25 @@ venndir <- function
       padding=rep(2, label_n),
       padding_unit=rep("pt", label_n),
       r=rep(2, label_n),
-      r_unit=rep("pt", label_n)
+      r_unit=rep("pt", label_n),
+      stringsAsFactors=FALSE,
+      check.names=FALSE
    );
+   if ("overlap" %in% overlap_type) {
+      sv_match <- match(label_df$overlap_set, sv$sets);
+      label_df$overlap_sign <- paste0(sv$sets, "|", sv$overlap)[sv_match];
+   } else {
+      label_df$overlap_sign <- c(rep("", length(x_main)),
+         names(gbase_signs));
+   }
+   
+   ## Check for missing signed labels, then we nudge main label to center
+   for (i in unique(label_df$overlap_set)) {
+      irows <- (label_df$overlap_set %in% i & label_df$show_label);
+      if (length(unique(label_df[irows,"type"])) == 1) {
+         label_df[irows,"hjust"] <- 0.5;
+      }
+   }
 
    ## Adjust signed color
    g_update <- (label_df$type %in% "signed" &
@@ -413,66 +564,57 @@ venndir <- function
          label_df$fill[g_update]);
       label_df$col[g_update] <- make_color_contrast(g_update_color, g_update_fill);
    }
-   
-   ## Call render_venndir()
-   if (do_plot) {
-      render_venndir(venn_spdf=venn_spdf,
-         label_df=label_df,
+   if (!"overlap" %in% overlap_type && any(label_df$type %in% "signed")) {
+      ## Adjust signed labels for contrast
+      is_signed <- label_df$type %in% "signed";
+      poly_match <- match(label_df$overlap_set, venn_spdf$label);
+      poly_fill <- jamba::alpha2col(
+         data.frame(venn_spdf)[poly_match,"color"],
+         alpha=data.frame(venn_spdf)[poly_match,"alpha"]);
+      label_fill <- ifelse(is.na(label_df$fill),
+         poly_fill,
+         label_df$fill);
+      bg_fill <- ifelse(is.na(label_df$fill),
+         "white",
+         poly_fill);
+      label_col1 <- label_df$col;
+      label_col <- make_color_contrast(
+         x=label_df$col,
+         y=label_fill,
+         bg=bg_fill,
          ...);
+      label_df$col[is_signed] <- label_col[is_signed];
    }
    
-   if (1 == 2) {
-      g_labels <- gridtext::richtext_grob(
-         text=c(venn_text[show_main],
-            gcount_labels[show_signed]),
-         x=c(x_main[show_main],
-            x_signed[show_signed]),
-         y=c(y_main[show_main],
-            y_signed[show_signed]),
-         default.units="native",
-         vjust=c(vjust_main[show_main],
-            vjust_signed[show_signed]),
-         hjust=c(hjust_main[show_main],
-            hjust_signed[show_signed]),
-         halign=c(halign_main[show_main],
-            halign_signed[show_signed]),
-         rot=0,
-         padding=grid::unit(c(2), "pt"),
-         r=grid::unit(c(2), "pt"),
-         gp=grid::gpar(
-            col=c(label_color_main[show_main],
-               gbase_colors[show_signed]),
-            fontsize=rep(c(14, 14) * font_cex,
-               c(sum(show_main), sum(show_signed)))
-         ),
-         box_gp=grid::gpar(
-            col=c(label_border_main[show_main],
-               label_border_signed[show_signed]),
-            fill=c(label_fill_main[show_main],
-               label_fill_signed[show_signed]),
-            lty=1)
-      )
+   ## Optionally return items
+   if (return_items) {
+      sv_label <- paste0(sv$sets, "|", sv[[overlap_type]]);
+      sv_match <- match(label_df$overlap_sign, sv_label);
+      label_df$items <- I(sv$items[sv_match]);
+   }
    
-      # Now plot the polygons
-      plot(venn_spdf,
-         asp=1,
-         col=jamba::alpha2col(venn_spdf$color,
-            alpha=poly_alpha),
-         lwd=2,
-         border=jamba::makeColorDarker(
-            venn_spdf$color,
-            darkFactor=1.2,
-            sFactor=1.2));
-      
-      # to draw using grid we have to use a custom viewport
-      vps <- gridBase::baseViewports();
-      grid::pushViewport(vps$inner, vps$figure, vps$plot);
-      grid::grid.draw(g_labels);
-      grid::popViewport(3);
+   ## Call render_venndir()
+   gg <- NULL;
+   if (do_plot) {
+      if ("base" %in% plot_style) {
+         render_venndir(venn_spdf=venn_spdf,
+            label_df=label_df,
+            display_items=display_items,
+            display_counts=display_counts,
+            ...);
+      } else {
+         gg <- ggrender_venndir(venn_spdf=venn_spdf,
+            label_df=label_df,
+            display_items=display_items,
+            display_counts=display_counts,
+            ...);
+         print(gg);
+      }
    }
 
    return(invisible(
       list(
          venn_spdf=venn_spdf,
-         label_df=label_df)));
+         label_df=label_df,
+         gg=gg)));
 }

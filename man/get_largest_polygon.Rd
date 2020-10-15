@@ -6,6 +6,12 @@
 \usage{
 get_largest_polygon(sp, ...)
 }
+\arguments{
+\item{sp}{object with class \code{sp::SpatialPolygons} that may
+contain one or more closed polygons.}
+
+\item{...}{additional arguments are ignored.}
+}
 \description{
 Largest polygon in a SpatialPolygons object
 }
@@ -18,4 +24,32 @@ The function calculates the largest area using
 
 If two polygons have identical area, the first
 polygon is returned.
+
+This function calls a helper function \code{sp::disaggregate()}
+which creates one \code{sp::SpatialPolygons} object
+for each individual polygon in the source object.
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{eulerr2polys}()},
+\code{\link{find_vennpoly_overlaps}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{intersect_polygons}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{make_venn_test}()},
+\code{\link{match_list}()},
+\code{\link{nudge_sp}()},
+\code{\link{print_color_df}()},
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
+}
+\concept{venndir utility}

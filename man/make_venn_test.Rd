@@ -117,9 +117,9 @@ sv3 <- signed_overlaps(setlist=setlist, "agreement")
 sv3
 
 ## signed incidence matrix
-set_im_signed <- list2im_signed(setlist)
-dim(set_im_signed)
-head(set_im_signed)
+imv <- list2im_value(setlist)
+dim(imv)
+head(imv)
 
 ## text venn diagram
 textvenn(setlist, overlap_type="overlap")
@@ -133,10 +133,22 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{find_vennpoly_overlaps}()},
+\code{\link{get_largest_polygon}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{match_list}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},
-\code{\link{shrink_df}()}
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
 }
 \concept{venndir utility}

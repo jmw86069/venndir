@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Directional Venn diagram — venndir" />
 <meta property="og:description" content="Directional Venn diagram" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
       </span>
     </div>
 
@@ -90,7 +93,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jmw86069/venndir">
+  <a href="http://github.com/jmw86069/venndir/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -109,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Directional Venn diagram</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmw86069/venndir/blob/master/R/venndir.R'><code>R/venndir.R</code></a></small>
+    <small class="dont-index">Source: <a href='http://github.com/jmw86069/venndir/blob/master/R/venndir.R'><code>R/venndir.R</code></a></small>
     <div class="hidden name"><code>venndir.Rd</code></div>
     </div>
 
@@ -117,25 +120,30 @@
     <p>Directional Venn diagram</p>
     </div>
 
-    <pre class="usage"><span class='fu'>venndir</span>(
-  <span class='no'>setlist</span>,
-  <span class='kw'>sets</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span>(<span class='no'>setlist</span>),
-  <span class='kw'>set_colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>overlap_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"concordance"</span>, <span class='st'>"each"</span>, <span class='st'>"overlap"</span>, <span class='st'>"agreement"</span>),
-  <span class='kw'>proportional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>return_items</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>display_zero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>font_cex</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>0.8</span>),
-  <span class='kw'>poly_alpha</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>label_style</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"basic"</span>, <span class='st'>"fill"</span>, <span class='st'>"shaded"</span>, <span class='st'>"shaded_box"</span>, <span class='st'>"lite"</span>, <span class='st'>"lite_box"</span>),
-  <span class='kw'>x_nudge</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>y_nudge</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>circle_nudge</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>unicode</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>big.mark</span> <span class='kw'>=</span> <span class='st'>","</span>,
-  <span class='kw'>do_plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>venndir</span><span class='op'>(</span>
+  <span class='va'>setlist</span>,
+  overlap_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"concordance"</span>, <span class='st'>"each"</span>, <span class='st'>"overlap"</span>, <span class='st'>"agreement"</span><span class='op'>)</span>,
+  sets <span class='op'>=</span> <span class='cn'>NULL</span>,
+  set_colors <span class='op'>=</span> <span class='cn'>NULL</span>,
+  proportional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  return_items <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  display_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"sign item"</span>, <span class='st'>"sign"</span>, <span class='st'>"item"</span><span class='op'>)</span>,
+  display_counts <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  display_zero <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  font_cex <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0.8</span><span class='op'>)</span>,
+  poly_alpha <span class='op'>=</span> <span class='fl'>0.5</span>,
+  alpha_by_counts <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  label_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"basic"</span>, <span class='st'>"fill"</span>, <span class='st'>"shaded"</span>, <span class='st'>"shaded_box"</span>, <span class='st'>"lite"</span>, <span class='st'>"lite_box"</span><span class='op'>)</span>,
+  x_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
+  y_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
+  circle_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unicode <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  big.mark <span class='op'>=</span> <span class='st'>","</span>,
+  curate_df <span class='op'>=</span> <span class='cn'>NULL</span>,
+  plot_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"base"</span>, <span class='st'>"gg"</span><span class='op'>)</span>,
+  do_plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,6 +153,17 @@
       <td><p><code>list</code> of named vectors, whose names represent
 set items, and whose values represent direction using
 values <code><a href='https://rdrr.io/r/base/c.html'>c(-1, 0, 1)</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>overlap_type</th>
+      <td><p><code>character</code> value indicating the type of
+overlap logic: <code>"each"</code> records each combination of
+signs; <code>"overlap"</code> disregards the sign and returns any match
+item overlap; <code>"concordance"</code> represents counts for full
+agreement, or <code>"mixed"</code> for any inconsistent overlapping
+direction; <code>"agreement"</code> represents full agreement in direction
+as <code>"agreement"</code>, and <code>"mixed"</code> for any inconsistent
+direction.</p></td>
     </tr>
     <tr>
       <th>sets</th>
@@ -160,17 +179,6 @@ colors in the Venn diagram.</p></td>
 use default colors defined by <code><a href='https://rdrr.io/pkg/colorjam/man/rainbowJam.html'>colorjam::rainbowJam()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>overlap_type</th>
-      <td><p><code>character</code> value indicating the type of
-overlap logic: <code>"each"</code> records each combination of
-signs; <code>"overlap"</code> disregards the sign and returns any match
-item overlap; <code>"concordance"</code> represents counts for full
-agreement, or <code>"mixed"</code> for any inconsistent overlapping
-direction; <code>"agreement"</code> represents full agreement in direction
-as <code>"agreement"</code>, and <code>"mixed"</code> for any inconsistent
-direction.</p></td>
-    </tr>
-    <tr>
       <th>proportional</th>
       <td><p><code>logical</code> indicating whether the Venn circles
 are proportionally sized, also known as a Euler diagram. Note
@@ -181,6 +189,16 @@ every possible overlap.</p></td>
       <th>return_items</th>
       <td><p><code>logical</code> indicating whether to return
 the items within each overlap set.</p></td>
+    </tr>
+    <tr>
+      <th>display_items</th>
+      <td><p><code>character</code> indicating the type of item
+label: <code>"none"</code> does not display item labels; <code>"sign"</code>
+displays the sign; <code>"item"</code> displays the item; <code>"sign item"</code>
+will display the sign and item together; <code>"item sign"</code> will
+reverse the order, with item followed by sign. In this
+context <code>"sign"</code> refers to the incidence values concatenated
+by space, sent to <code><a href='curate_venn_labels.html'>curate_venn_labels(..., type="sign")</a></code>.</p></td>
     </tr>
     <tr>
       <th>display_zero</th>
@@ -203,6 +221,12 @@ alpha transparency of the polygon backgroun color, where
 <code>poly_alpha=0.4</code> is 40% opaque, therefore 60% transparency.</p></td>
     </tr>
     <tr>
+      <th>alpha_by_counts</th>
+      <td><p><code>logical</code> indicating whether to define
+alpha transparency to Venn polygon fill based upon the counts
+contained in each polygon.</p></td>
+    </tr>
+    <tr>
       <th>label_style</th>
       <td><p><code>character</code> string indicating the style of label
 to display:
@@ -223,6 +247,16 @@ Unicode characters.</p></td>
       <td><p><code>character</code> passed to <code><a href='https://rdrr.io/r/base/format.html'>format()</a></code> for numeric labels.</p></td>
     </tr>
     <tr>
+      <th>curate_df</th>
+      <td><p><code>data.frame</code> or <code>NULL</code> passed to <code><a href='curate_venn_labels.html'>curate_venn_labels()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>plot_style</th>
+      <td><p><code>character</code> indicating the style of graphics plot:
+<code>"gg"</code> uses ggplot2 and calls <code><a href='ggrender_venndir.html'>ggrender_venndir()</a></code>; <code>"base"</code>
+uses base R graphics and calls <code><a href='render_venndir.html'>render_venndir()</a></code>.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>additional arguments are passed to <code><a href='render_venndir.html'>render_venndir()</a></code>.</p></td>
     </tr>
@@ -241,46 +275,192 @@ Venn overlaps.</p>
 counts include summary counts for the different forms of
 agreement in direction. See <code><a href='signed_overlaps.html'>signed_overlaps()</a></code> for description
 of each <code>overlap_type</code>, for different methods of summarizing
-the overlapping directions.</p>
+the overlapping directions.</p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Detailed workflow</h3>
+
+
+<p>In more detail, input <code>setlist</code> is named by set names, and each
+<code>vector</code> contains items.</p>
+<p>When the <code>vector</code> elements in <code>setlist</code> are not named,
+the values are considered items. In this case, the values are all
+defined as <code>1</code> for the purpose of defining overlaps, and
+<code>overlap_type</code> is automatically set to <code>overlap_type="overlap"</code>.
+At this point the <code>"sign"</code> is no longer used.</p>
+<p>When the <code>vector</code> elements in <code>setlist</code> are named, the
+vector element names are considered items, and vector values
+are considered the <code>"sign"</code>.
+For common scenarios, the <code>"sign"</code> is usually one of the
+values <code><a href='https://rdrr.io/r/base/c.html'>c(-1, 1)</a></code> to indicate <code>"up"</code> and <code>"down"</code>. However,
+the <code>"sign"</code> may contain any atomic value, including <code>numeric</code>,
+<code>integer</code>, or <code>character</code> values for example.</p>
+<p>The <code>setlist</code> data is passed to <code><a href='signed_overlaps.html'>signed_overlaps()</a></code> which
+in turn calls <code>list2im_signed()</code>. At this point the incidence
+matrix values represent the values from each <code>vector</code> in <code>setlist</code>.</p>
+<p>For each item, the <code>"sign"</code> is defined as the concatenated signs
+from each <code>vector</code> in <code>setlist</code> for that item. For example
+the <code>"sign"</code> may be <code>"1 1 -1"</code>, which indicates the item is
+present in all three <code>vectors</code> of <code>setlist</code>, and is <code>"up"</code>, <code>"up"</code>,
+<code>"down"</code> in these vectors. The sign <code>"0 1 0"</code> indicates an
+item is present only in the second <code>vector</code> of <code>setlist</code> and
+is <code>"up"</code>.</p>
+<p>Each item sign is curated by calling <code><a href='curate_venn_labels.html'>curate_venn_labels()</a></code>.
+This function is used to convert <code>"sign"</code> to visual symbols,
+for example <code>"1"</code> may be converted to a Unicode up arrow
+<code>"\u2191"</code>. Unicode output can be disabled with <code>unicode=FALSE</code>.
+The same function converts <code>"sign"</code> to color, which can be
+a helpful visual cue. This step can be customized to use
+any output valid in R and recognized by <code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code>
+or <code><a href='https://wilkelab.org/ggtext/reference/geom_richtext.html'>ggtext::geom_richtext()</a></code>. Specifically, it can contain
+Unicode characters, or limited markdown format recognized
+by these functions.</p>
+
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Display of Venn or Euler circles</h3>
+
+
+<p>The overlap counts are used to define suitable Venn circles
+or ellipses when <code>proportional=FALSE</code>, or Euler proportional
+circles when <code>proportional=TRUE</code>. This step is performed
+by <code><a href='get_venn_shapes.html'>get_venn_shapes()</a></code>.</p>
+<p>For Venn circles, the method allows 1, 2, or 3 sets.</p>
+<p>For Venn ellipses, the method allows 4 or 5 sets.</p>
+<p>For Euler circles, the method allows as many sets as are
+supported by <code><a href='https://jolars.github.io/eulerr/reference/euler.html'>eulerr::euler()</a></code>.</p>
+<p>In the event the circles or ellipses does not include
+an overlap, a label is printed below the plot. See
+<code><a href='render_venndir.html'>render_venndir()</a></code> and the argument <code>plot_warning=TRUE</code>.
+For proportional Euler diagrams, even for 3-way diagrams
+there are often missing overlaps, and this warning is
+helpful to reinforce what is missing.</p>
+
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Adjusting Venn or Euler circles</h3>
+
+
+<p>As indicated above, when <code>proportional=TRUE</code> sometimes
+the Euler circles do not represent all set overlaps.
+It may be helpful to nudge one or more circles to
+represent a missing overlap, using the argument
+<code>circle_nudge</code>. This argument takes a <code>list</code> named
+by one or more <code><a href='https://rdrr.io/r/base/names.html'>names(setlist)</a></code>, of vectors with <code><a href='https://rdrr.io/r/base/c.html'>c(x, y)</a></code>
+values to "nudge" that set circle.</p>
+
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Display of counts</h3>
+
+
+<p>By default, total counts are displayed for each set overlap.
+When <code>setlist</code> contains signed data, count signs are summarized
+and displayed beside the total counts. The
+summary options are defined by <code>overlap_type</code>.</p>
+<p>Count labels can be styled using <code>label_style</code>, which
+customizes the background color fill and optional border.</p>
+
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Display of items</h3>
+
+
+<p>Displaying item labels inside the polygons can be a convenient
+way to answer the question, "What are those shared items?"
+This step can also include the <code>"sign"</code>, showing which shared items
+also have the same or different <code>"sign"</code> values.</p>
+<p>Note that when items are displayed, summary counts are currently
+hidden. In future the counts may be positioned outside the
+polygons.</p>
+
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>More customizations</h3>
+
+
+<p>This function actually calls <code><a href='render_venndir.html'>render_venndir()</a></code> to display the
+diagram. The output from this function can be customized and
+passed to <code><a href='render_venndir.html'>render_venndir()</a></code> or <code><a href='ggrender_venndir.html'>ggrender_venndir()</a></code> to allow
+much more customized options.</p>
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir core: 
+<code><a href='ggrender_venndir.html'>ggrender_venndir</a>()</code>,
+<code><a href='render_venndir.html'>render_venndir</a>()</code>,
+<code><a href='signed_overlaps.html'>signed_overlaps</a>()</code>,
 <code><a href='textvenn.html'>textvenn</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>setlist</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span>(<span class='fl'>100</span>, <span class='fl'>3</span>);
-<span class='fu'>venndir</span>(<span class='no'>setlist</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
-<span class='no'>setlist</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span>(<span class='fl'>100</span>, <span class='fl'>3</span>, <span class='kw'>do_signed</span><span class='kw'>=</span><span class='fl'>TRUE</span>);
-<span class='fu'>venndir</span>(<span class='no'>setlist</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
-<span class='fu'>venndir</span>(<span class='no'>setlist</span>, <span class='kw'>label_style</span><span class='kw'>=</span><span class='st'>"basic"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist</span>, <span class='kw'>label_style</span><span class='kw'>=</span><span class='st'>"fill"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist</span>, <span class='kw'>label_style</span><span class='kw'>=</span><span class='st'>"shaded"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist</span>, <span class='kw'>label_style</span><span class='kw'>=</span><span class='st'>"shaded_box"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist</span>, <span class='kw'>label_style</span><span class='kw'>=</span><span class='st'>"lite"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist</span>, <span class='kw'>label_style</span><span class='kw'>=</span><span class='st'>"lite_box"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span><span class='op'>)</span>;
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>setlist</span><span class='op'>)</span>;
+</div><div class='output co'>#&gt; $set_A
+#&gt;  [1] "item_067" "item_042" "item_050" "item_043" "item_014" "item_025"
+#&gt;  [7] "item_090" "item_091" "item_069" "item_093" "item_057" "item_009"
+#&gt; [13] "item_072" "item_026" "item_007" "item_099" "item_089" "item_083"
+#&gt; [19] "item_036" "item_078" "item_097" "item_076" "item_015" "item_032"
+#&gt; [25] "item_086" "item_084" "item_041" "item_023" "item_027" "item_060"
+#&gt; [31] "item_053" "item_079"
+#&gt; 
+#&gt; $set_B
+#&gt;  [1] "item_053" "item_027" "item_096" "item_038" "item_089" "item_034"
+#&gt;  [7] "item_093" "item_069" "item_072" "item_076" "item_063" "item_013"
+#&gt; [13] "item_082" "item_025" "item_097" "item_021"
+#&gt; 
+#&gt; $set_C
+#&gt;  [1] "item_079" "item_041" "item_047" "item_090" "item_060" "item_095"
+#&gt;  [7] "item_016" "item_006" "item_072" "item_086" "item_091" "item_039"
+#&gt; [13] "item_031" "item_081" "item_050"
+#&gt; </div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-1.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
+<span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-2.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-3.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>, label_style<span class='op'>=</span><span class='st'>"basic"</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-4.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>, label_style<span class='op'>=</span><span class='st'>"fill"</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-5.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>, label_style<span class='op'>=</span><span class='st'>"shaded"</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-6.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>, label_style<span class='op'>=</span><span class='st'>"shaded_box"</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-7.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>, label_style<span class='op'>=</span><span class='st'>"lite"</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-8.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>, label_style<span class='op'>=</span><span class='st'>"lite_box"</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-9.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='co'># proportional Euler diagram</span>
-<span class='fu'>venndir</span>(<span class='no'>setlist</span>,
-   <span class='kw'>proportional</span><span class='kw'>=</span><span class='fl'>TRUE</span>);</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
+<span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>,
+   proportional<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
+</div><div class='img'><img src='venndir-10.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='co'># nudge circles and hide the zero</span>
-<span class='fu'>venndir</span>(<span class='no'>setlist</span>,
-   <span class='kw'>proportional</span><span class='kw'>=</span><span class='fl'>TRUE</span>,
-   <span class='kw'>display_zero</span><span class='kw'>=</span><span class='fl'>FALSE</span>,
-   <span class='kw'>circle_nudge</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>set_C</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>0.5</span>, <span class='fl'>0.1</span>))
-)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
+<span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>,
+   proportional<span class='op'>=</span><span class='cn'>TRUE</span>,
+   display_zero<span class='op'>=</span><span class='cn'>FALSE</span>,
+   circle_nudge<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>set_C<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.5</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='img'><img src='venndir-11.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='co'># nudge circles so one overlap is no longer shown</span>
-<span class='fu'>venndir</span>(<span class='no'>setlist</span>,
-   <span class='kw'>proportional</span><span class='kw'>=</span><span class='fl'>TRUE</span>,
-   <span class='kw'>display_zero</span><span class='kw'>=</span><span class='fl'>FALSE</span>,
-   <span class='kw'>circle_nudge</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>set_C</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>1.4</span>, <span class='fl'>0.1</span>))
-)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
-<span class='no'>setlist2k</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span>(<span class='fl'>2000</span>, <span class='fl'>3</span>, <span class='fl'>80</span>, <span class='kw'>do_signed</span><span class='kw'>=</span><span class='fl'>TRUE</span>);
-<span class='fu'>venndir</span>(<span class='no'>setlist2k</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'><span class='fu'>venndir</span>(<span class='no'>setlist2k</span>, <span class='kw'>proportional</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in strsplit(names(counts), split = sep): non-character argument</span></div><div class='input'>
+<span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>,
+   proportional<span class='op'>=</span><span class='cn'>TRUE</span>,
+   display_zero<span class='op'>=</span><span class='cn'>FALSE</span>,
+   circle_nudge<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>set_C<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1.4</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='img'><img src='venndir-12.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='va'>setlist2k</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>2000</span>, <span class='fl'>3</span>, <span class='fl'>80</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
+<span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist2k</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-13.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist2k</span>, proportional<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='img'><img src='venndir-14.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='co'># example using character values</span>
+<span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='co'># make a simple character vector list</span>
+<span class='va'>setlistv</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>setlist</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span><span class='op'>{</span>
+   <span class='va'>j</span> <span class='op'>&lt;-</span> <span class='va'>letters</span><span class='op'>[</span><span class='va'>i</span><span class='op'>+</span><span class='fl'>3</span><span class='op'>]</span>;
+   <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>j</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span>;
+   <span class='va'>j</span>;
+<span class='op'>}</span><span class='op'>)</span>;
+<span class='co'># make custom curate_df</span>
+<span class='va'>curate_df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+   from<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"b"</span>, <span class='st'>"d"</span><span class='op'>)</span>,
+   sign<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"b"</span>, <span class='st'>"d"</span><span class='op'>)</span>,
+   color<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"blue"</span>, <span class='st'>"red"</span><span class='op'>)</span>,
+   stringsAsFactors<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlistv</span>,
+   overlap_type<span class='op'>=</span><span class='st'>"each"</span>,
+   font_cex<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.5</span>, <span class='fl'>0.9</span><span class='op'>)</span>, 
+   curate_df<span class='op'>=</span><span class='va'>curate_df</span>,
+   display_zero<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
+</div><div class='img'><img src='venndir-15.png' alt='' width='768' height='768' /></div><div class='input'>
+
 </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -291,7 +471,7 @@ the overlapping directions.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

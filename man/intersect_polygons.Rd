@@ -6,18 +6,45 @@
 \usage{
 intersect_polygons(sp, ...)
 }
+\arguments{
+\item{sp}{\code{list} object that contains one or more
+\code{sp::SpatialPolygons}.}
+
+\item{...}{additional arguments are ignored.}
+}
+\value{
+object \code{sp::SpatialPolygons}
+}
 \description{
 Intersect one or more polygons
+}
+\details{
+This function takes a \code{list} of \code{sp::SpatialPolygons}
+objects, and performs iterative \code{rgeos::gIntersection()} on
+the full list, since \code{rgeos::gIntersection()} only operates on
+two polygons at a time.
 }
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{find_vennpoly_overlaps}()},
+\code{\link{get_largest_polygon}()},
 \code{\link{get_venn_shapes}()},
+\code{\link{label_polygon_fill}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
+\code{\link{match_list}()},
 \code{\link{nudge_sp}()},
 \code{\link{print_color_df}()},
-\code{\link{shrink_df}()}
+\code{\link{rescale_coordinates}()},
+\code{\link{rescale_ps}()},
+\code{\link{rescale_p}()},
+\code{\link{rescale_sp}()},
+\code{\link{shrink_df}()},
+\code{\link{sp_circles}()},
+\code{\link{sp_ellipses}()},
+\code{\link{union_polygons}()}
 }
 \concept{venndir utility}

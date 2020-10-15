@@ -7,6 +7,8 @@
 #' directly from the output of `venndir()` to allow customization
 #' of various aspects of the figure.
 #' 
+#' @family venndir core
+#' 
 #' @param venndir_output `list` object produced by `venndir()` with
 #'    at least two elements: `"venn_spdf"` which is a
 #'    `sp::SpatialPolygonsDataFrame`; and `label_df` which is
@@ -70,8 +72,16 @@
 #'    `sp::SpatialPolygonsDataFrame`.
 #'    
 #' @examples
-#' venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE)
+#' setlist <- make_venn_test(100, 3, do_signed=TRUE);
+#' venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
 #' render_venndir(venndir_output);
+#' 
+#' venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
+#' venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);
+#' venndir_output$label_df[2,c("hjust")] <- c(0);
+#' venndir_output$label_df[1:2,c("vjust")] <- c(0, 0);
+#' render_venndir(venndir_output, font_cex=1.5);
+#' 
 #' venndir_output$label_df[1,c("x", "y")] <- c(2, 6);
 #' venndir_output$label_df[2,c("x", "y")] <- c(8.3, 6);
 #' render_venndir(venndir_output);
@@ -88,6 +98,11 @@ render_venndir <- function
  xpd=NA,
  font_cex=1,
  plot_warning=TRUE,
+ display_items=c("none", "sign label", "label", "sign"),
+ item_angle=20,
+ display_counts=TRUE,
+ max_items=100,
+ fontfamily="Arial",
  ...)
 {
    if (length(venndir_output) > 0 && is.list(venndir_output)) {
@@ -103,6 +118,7 @@ render_venndir <- function
       }
       label_df <- venndir_output[["label_df"]];
    }
+   display_items <- head(display_items, 1);
    
    ## Determine suitable xlim and ylim
    if (length(xlim) == 0 || length(ylim) == 0) {
@@ -247,6 +263,7 @@ render_venndir <- function
             r=grid::unit(label_df$r[show_label],
                label_df$r_unit[show_label]),
             gp=grid::gpar(
+               fontfamily=fontfamily,
                col=label_df$col[show_label],
                fontsize=label_df$fontsize[show_label] * font_cex
             ),
@@ -259,15 +276,240 @@ render_venndir <- function
          
          ## Draw labels
          # to draw using grid we have to use a custom viewport
-         if (length(dev.list()) > 0) {
-            vps <- gridBase::baseViewports();
-            grid::pushViewport(vps$inner, vps$figure, vps$plot);
-            grid::grid.draw(g_labels);
-            grid::popViewport(3);
+         if (display_counts) {
+            if (length(dev.list()) > 0) {
+               vps <- gridBase::baseViewports();
+               grid::pushViewport(vps$inner, vps$figure, vps$plot);
+               grid::grid.draw(g_labels);
+               grid::popViewport(3);
+            }
          }
       }
    }
+   
+   ## Draw item labels
+   if (!"none" %in% display_items && "items" %in% colnames(data.frame(label_df, stringsAsFactors=FALSE, check.names=FALSE))) {
+      label_dfs <- subset(label_df, lengths(label_df$items) > 0);
+      label_dfs <- split(label_dfs, label_dfs$overlap_set);
+      label_df1 <- label_dfs[[2]];
+      display_items_order <- strsplit(display_items, "[- _.]")[[1]];
+      for (label_df1 in label_dfs) {
+         items <- unname(unlist(jamba::mixedSorts(label_df1$items)));
+         color1 <- rep(label_df1$col, lengths(label_df1$items));
+         vi <- which(data.frame(venn_spdf)$label %in% label_df1$overlap_set);
+         vdf <- data.frame(venn_spdf)[vi,,drop=FALSE];
+         prefixes <- rep(
+            gsub(":.+", "", label_df1$text),
+            lengths(label_df1$items));
+         labels <- NULL;
+         for (dio in display_items_order) {
+            if (grepl("sign", dio)) {
+               labels <- paste(labels, prefixes);
+            } else if (grepl("item", dio)) {
+               labels <- paste(labels, items);
+            }
+         }
+         labels <- gsub("^[ ]+|[ ]+$", "", labels);
+         #labels <- paste(prefixes,
+         #   items);
+         #labels <- prefixes;
+         bg <- jamba::alpha2col(vdf$color, vdf$alpha)
+         color <- make_color_contrast(color1, bg)
+         
+         label_polygon_fill(sp=venn_spdf[vi,],
+            ref_sp=venn_spdf,
+            color=color,
+            cex=1,
+            draw_points=FALSE,
+            polygon_scale=-0.01,
+            labels=labels,
+            angle=item_angle);
+      }
+      
+   }
+   
    if (length(label_df) > 0) {
       return(invisible(g_labels));
    }
 }
+
+#' Render Venn or Euler diagram using ggplot2
+#' 
+#' Render Venn or Euler diagram using ggplot2
+#' 
+#' This function is intended to render a Venn or Euler diagram
+#' directly from the output of `venndir()` to allow customization
+#' of various aspects of the figure.
+#' 
+#' @family venndir core
+#' 
+#' @inheritParams render_venndir
+#' 
+#' @examples
+#' options("warn"=-1); # oml the warnings
+#' 
+#' setlist <- make_venn_test(100, 3, do_signed=TRUE);
+#' venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
+#' ggrender_venndir(venndir_output);
+#' 
+#' venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
+#' venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);
+#' venndir_output$label_df[2,c("hjust")] <- c(0);
+#' venndir_output$label_df[1:2,c("vjust")] <- c(0, 0);
+#' ggrender_venndir(venndir_output, font_cex=1.5, family="Arial");
+#' 
+#' @export
+ggrender_venndir <- function
+(venndir_output=NULL,
+ venn_spdf=NULL,
+ label_df=NULL,
+ xlim=NULL,
+ ylim=NULL,
+ xpd=NA,
+ font_cex=1,
+ plot_warning=TRUE,
+ display_items=c("none", "sign label", "label", "sign"),
+ item_angle=20,
+ display_counts=TRUE,
+ max_items=100,
+ ggtheme=ggplot2::theme_void,
+ family="Arial",
+ ...)
+{
+   has_deps <- sapply(c("sf", "ggplot2", "ggtext"), function(i){
+      suppressPackageStartupMessages(require(i, character.only=TRUE))
+   });
+   if (any(!has_deps)) {
+      stop(paste0("ggrender_venndir() requires: ",
+         paste(names(has_deps)[!has_deps], collapse=", ")));
+   }
+   
+   if (length(venndir_output) > 0 && is.list(venndir_output)) {
+      if (!any(c("venn_spdf", "label_df") %in% names(venndir_output))) {
+         stop("List input must contain element names 'venn_spdf' or 'label_df'.");
+      }
+      if (!inherits(venndir_output[["venn_spdf"]], "SpatialPolygonsDataFrame")) {
+         stop("Element 'venn_spdf' must inherit from 'SpatialPolygonsDataFrame'.");
+      }
+      venn_spdf <- venndir_output[["venn_spdf"]];
+      if (!inherits(venndir_output[["label_df"]], "data.frame")) {
+         stop("Element 'label_df' must inherit from 'data.frame'.");
+      }
+      label_df <- venndir_output[["label_df"]];
+   }
+   display_items <- head(display_items, 1);
+   
+   ## Convert to sf
+   vosf <- st_as_sf(venn_spdf);
+   
+   ggv <- ggplot2::ggplot(data=vosf) + 
+      ggplot2::geom_sf(
+         aes(fill=jamba::alpha2col(color, alpha=alpha),
+            color=border)) + 
+      ggplot2::scale_fill_identity() +
+      ggplot2::scale_color_identity() +
+      ggtheme()
+
+   if (length(label_df) > 0 &&
+         any(label_df$show_label) &&
+         "none" %in% display_items) {
+      label_df <- subset(label_df, show_label);
+      ggv <- ggv + ggtext::geom_richtext(
+         data=label_df,
+         aes(x=x,
+            y=y,
+            label=text,
+            group=overlap_set,
+            hjust=hjust,
+            vjust=vjust,
+            #halign=halign,
+            family=family,
+            text.colour=col,
+            fill=fill,
+            label.colour=border),
+         label.padding=grid::unit(label_df$padding,
+            label_df$padding_unit),
+         label.r=grid::unit(label_df$r,
+            label_df$r_unit),
+         size=label_df$fontsize * 5/14 * font_cex)
+   }
+   
+   if (length(xlim) > 0 || length(ylim) > 0) {
+      ggv <- ggv + ggplot2::coord_sf(xlim=xlim, ylim=ylim);
+   }
+
+   # optionally display items
+   ## Draw item labels
+   if (!"none" %in% display_items && "items" %in% colnames(data.frame(label_df, check.names=FALSE, stringsAsFactors=FALSE))) {
+      jamba::printDebug("ggrender_venndir(): ", "display_items:", display_items);
+      label_dfs <- subset(label_df, lengths(label_df$items) > 0);
+      label_dfs <- split(label_dfs, label_dfs$overlap_set);
+      label_df1 <- label_dfs[[2]];
+      display_items_order <- strsplit(display_items, "[- _.]")[[1]];
+      #for (label_df1 in label_dfs) {
+      items_df <- jamba::rbindList(lapply(names(label_dfs), function(iname) {
+         label_df1 <- label_dfs[[iname]];
+         items <- unname(unlist(jamba::mixedSorts(label_df1$items)));
+         color1 <- rep(label_df1$col, lengths(label_df1$items));
+         vi <- which(data.frame(venn_spdf)$label %in% label_df1$overlap_set);
+         vdf <- data.frame(venn_spdf)[vi,,drop=FALSE];
+         prefixes <- rep(
+            gsub(":.+", "", label_df1$text),
+            lengths(label_df1$items));
+         labels <- NULL;
+         for (dio in display_items_order) {
+            if (grepl("sign", dio)) {
+               labels <- paste(labels, prefixes);
+            } else if (grepl("item", dio)) {
+               labels <- paste(labels, items);
+            }
+         }
+         labels <- gsub("^[ ]+|[ ]+$", "", labels);
+         #labels <- paste(prefixes,
+         #   items);
+         #labels <- prefixes;
+         bg <- jamba::alpha2col(vdf$color, vdf$alpha)
+         color <- make_color_contrast(color1, bg)
+         
+         lpf <- label_polygon_fill(sp=venn_spdf[vi,],
+            ref_sp=venn_spdf,
+            color=color,
+            cex=1,
+            draw_points=FALSE,
+            polygon_scale=-0.01,
+            labels=labels,
+            angle=item_angle,
+            draw_labels=FALSE)$items_df;
+         lpf$group <- iname;
+         lpf;
+      }));
+      print(head(items_df, 6));
+      ## create ggtext geom
+      ggitems <- ggtext::geom_richtext(
+         data=items_df,
+         aes(x=x,
+            y=y,
+            label=text,
+            group=group,
+            angle=rot,
+            hjust=0.5,
+            vjust=0.5,
+            #halign=0.5,
+            text.colour=col,
+            fill=NA,
+            label.colour=NA),
+         #label.padding=grid::unit(label_df$padding,
+         #   label_df$padding_unit),
+         #label.r=grid::unit(label_df$r,
+         #   label_df$r_unit),
+         size=items_df$fontsize * 5/14 * font_cex);
+      ggv <- ggv + ggitems;
+      
+   }
+   if (length(family) > 0) {
+      ggv <- ggv + ggplot2::theme(text=ggplot2::element_text(family=family));
+   }
+      
+   return(ggv);
+}
+

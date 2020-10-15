@@ -3,9 +3,45 @@
 #' 
 #' Get Venn shapes
 #' 
-#' This function takes a Venn overlap counts
+#' This function takes a Venn overlap counts and creates
+#' corresponding circles or ellipses that represent
+#' either a Venn diagram, or proportional Venn (Euler)
+#' diagram.
+#' 
+#' For non-proportional Venn diagrams, this function accepts
+#' up to 5 sets, although the 5-way Venn diagram is not
+#' visually intuitive.
+#' 
+#' For proportional Euler diagrams, this function simply passes
+#' the count vector to `eulerr::euler()` and returns the output.
+#' That function accepts more sets, however not all overlaps may
+#' be represented in the output.
 #' 
 #' @family venndir utility
+#' 
+#' @param counts `integer` vector whose names represent set overlaps,
+#'    where set names are separated by `sep` delimiter.
+#' @param proportional `logical` indicating whether to create proportional
+#'    circles, where `proportional=FALSE` creates standard Venn diagram,
+#'    and `proportional=TRUE` creates a Euler diagram.
+#' @param sep `character` delimiter used to separate set names in
+#'    `names(counts)`.
+#' @param circles_only `logical` indicating whether to force Venn
+#'    4-way diagram to use only circles; or passed to `eulerr::euler()`
+#'    to force it to return circles instead of allowing ellipse shapes.
+#' @param circle_nudge `list` of `numeric` vectors each length 2, whose
+#'    names match set names derived from `counts`. For example if
+#'    `counts=c(set_A=5, set_B=10, "setA&set_B"=3)`, then to nudge
+#'    the `set_A` circle, use `circle_nudge=list(set_A=c(1, 0))`.
+#'    This argument is intended to allow manipulation of specific
+#'    circle or ellipse positions for aesthetic effects. Particularly
+#'    for proportional Euler diagrams, sometimes the algorithm places
+#'    circles in non-ideal locations
+#' @param rotate_degrees `numeric` value indicating rotation in degrees
+#'    for the entire set of shapes. This argument is intended to
+#'    change the overall orientation, for example so that certain
+#'    sets are at the top.
+#' @param ... additional arguments are ignored.
 #' 
 #' @export
 get_venn_shapes <- function
@@ -14,7 +50,7 @@ get_venn_shapes <- function
  sep="&",
  circles_only=FALSE,
  circle_nudge=NULL,
- rotate_degrees=rotate_degrees,
+ rotate_degrees=0,
  ...)
 {
    # 
@@ -71,7 +107,7 @@ get_venn_shapes <- function
       stop("Proportional diagrams require the eulerr package.");
    }
    if (length(circle_nudge) > 0) {
-      venn_sp <- nudge_sp(venn_sp,
+      venn_sp <- nudge_sp(sp=venn_sp,
          sp_nudge=circle_nudge,
          rotate_degrees=rotate_degrees);
    }
