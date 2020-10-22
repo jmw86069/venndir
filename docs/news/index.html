@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -114,6 +114,49 @@
       <small>Source: <a href='http://github.com/jmw86069/venndir/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="venndir-006900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.6.900">
+<a href="#venndir-006900" class="anchor"></a>venndir 0.0.6.900</h1>
+<p>Much closer to a release-ready form. It needs the ggplot2 option enabled with the newest <code><a href="../reference/render_venndir.html">render_venndir()</a></code> logic.</p>
+<div id="bug-fixes--changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes--changes" class="anchor"></a>bug fixes / changes</h2>
+<ul>
+<li>Fixed obscure bug where set names could fail if not provided in alphabetic order.</li>
+<li>Changed <code><a href="../reference/venndir.html">venndir()</a></code> default <code>show_zero=FALSE</code> to hide empty labels.</li>
+<li>Removed <code><a href="../reference/ggrender_venndir.html">ggrender_venndir()</a></code> from the exported functions list, this function needs to be included inside <code><a href="../reference/render_venndir.html">render_venndir()</a></code>.</li>
+</ul>
+</div>
+<div id="refactoring-the-details" class="section level2">
+<h2 class="hasAnchor">
+<a href="#refactoring-the-details" class="anchor"></a>refactoring the details</h2>
+<p>More refactoring may take place to simplify the workflow, until the package is publicized.</p>
+<ul>
+<li>
+<code>label_df$col</code> renamed to <code>label_df$color</code> for consistency, and preparing for use by others.</li>
+<li>
+<code>ggrender_vendir()</code> will be retired, or will be converted to a simple wrapper function which calls <code><a href="../reference/render_venndir.html">render_venndir()</a></code>.</li>
+</ul>
+</div>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>new features</h2>
+<ul>
+<li>
+<code><a href="../reference/label_polygon_fill.html">label_polygon_fill()</a></code> new arguments <code>dither_cex</code> and <code>dither_color</code> which slightly adjust the <code>cex</code> and <code>color</code> values. The <code>cex</code> is uniformly distributed +/- the <code>dither_cex</code> value, as a fraction of the <code>cex</code>, the default is roughly 4% variation in <code>cex</code>. The <code>dither_color</code> is similar, it adds some heterogeneity to <code>darkFactor</code> and <code>sFactor</code> and calls <code><a href="https://rdrr.io/pkg/jamba/man/makeColorDarker.html">jamba::makeColorDarker()</a></code> to adjust brightness and saturation.</li>
+<li>
+<code><a href="../reference/label_polygon_fill.html">label_polygon_fill()</a></code> can plot the polygon buffer behind the labels, to review the effect of adjusting <code>scale_width</code> for each polygon.</li>
+<li>
+<code>label_df</code> uses <code>show_label</code> and <code>show_items</code> to control visibility of the count label, and item labels, respectively. When the values are <code>NA</code> it applied default rules, which favors showing count label, unless the count label is moved outside the polygon.</li>
+<li>
+<code>label_df</code> recognizes <code>x_offset,y_offset</code> to nudge count labels somewhere else. Currently manual, this adjustment may be automated at some point. When a label is moved outside its parent polygon, a line segment is drawn from the label to just inside the polygon boundary. When no items are displayed, the segment is drawn more toward the center.</li>
+<li>
+<code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> new function to control the visual style of count labels, with option to fill and draw a border around labels.</li>
+<li>
+<code><a href="../reference/polygon_label_segment.html">polygon_label_segment()</a></code> is used when moving a label from inside a polygon to somewhere that may or may not be inside that polygon. When it is moved outside, it returns the point on the polygon boundary along that line segment. It can be used with <code>sp_buffer</code> so the line can be drawn slightly inside the polygon boundary.</li>
+</ul>
+</div>
+</div>
     <div id="venndir-005900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.5.900">
 <a href="#venndir-005900" class="anchor"></a>venndir 0.0.5.900</h1>

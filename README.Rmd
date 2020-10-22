@@ -93,8 +93,8 @@ venndir(setlist, proportional=TRUE)
 ```
 
 At this point, labeling is an issue, and the best current
-remedy is manual adjustment. (In future, non-overlapping labels
-will be available.)
+remedy is manual placement of labels. So I'm trying to
+make it easy to move labels.
 
 The output of `venndir()` contains a `list` with
 the polygon coordinates, and the label coordinates, so you
@@ -103,36 +103,52 @@ can manually adjust as needed.
 Also, I really like having a function named `render_venndir()`.
 
 ```{r venndir_each_p2}
+setlist <- make_venn_test(1000, 3, do_signed=TRUE)
 venndir_output <- venndir(setlist, proportional=TRUE, do_plot=FALSE);
 
-# get label coordinate data
-label_df <- venndir_output$label_df;
-
-# get polygon data
-venn_spdf <- venndir_output$venn_spdf;
 
 # adjust set_A&set_C
-ac_rows <- which(label_df$overlap_set %in% "set_A&set_C");
-label_df <- venndir_output$label_df;
-label_df[ac_rows,"x"] <- label_df[ac_rows,"x"] - 4.2;
-label_df[ac_rows,"y"] <- label_df[ac_rows,"y"] + 1.3;
-
-# be fancy and add color background to the label
-label_df[ac_rows,"fill"] <- jamba::alpha2col(data.frame(venn_spdf)["set_A&set_C","color"], alpha=0.5);
-label_df[ac_rows,"border"] <- data.frame(venn_spdf)["set_A&set_C","color"];
-
-render_venndir(venn_spdf=venn_spdf, label_df=label_df, font_cex=1.3)
-
-lines(x=label_df[ac_rows[1],"x"] + c(1.5, 4.2),
-   y=label_df[ac_rows[1],"y"] + c(-0.4, -1.3))
+venndir_output <- nudge_venndir_label(venndir_output,
+   set=c("set_A&set_C"),
+   x_offset=-4.6,
+   y_offset=1.3,
+   unit_type="absolute");
+render_venndir(venndir_output)
 ```
 
+When the label is moved outside the venn set polygon,
+a line segment is automatically drawn to just inside
+the border.
+
+Lastly, you can customize the label style, using
+`venndir_label_style()`. There are two aspects to the
+label style: background fill, and border outline.
+
+For background fill, the options are:
+
+* `"basic"` or `"none"` which does not have background fill
+* `"lite"` which uses a default lite background color
+* `"shaded"` which uses semi-transparent fill using the polygon color
+* `"fill"` which uses opaque fill using the polygon color
+
+For the border, include `"box"` somewhere in the `label_style`.
+
+Examples: `label_style="lite box"`, `label_style="shaded"`,
+`label_style="basic"`.
+
+```{r label_style_1}
+venndir_output <- venndir_label_style(venndir_output,
+   label_style="lite box")
+render_venndir(venndir_output);
+```
 
 
 ## Text Venn?
 
 There is a text Venn diagram, surprisingly useful for quickly
-checking overlaps and direction.
+checking overlaps and direction. Note that the R console,
+and R help examples display colored text, just not in
+Rmarkdown.
 
 The first example is the basic Venn overlap, without direction.
 
@@ -210,7 +226,8 @@ proportion of shared or discordant signs.
 
 ```{r vennitems_1}
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
-venndir(setlist, display_items="sign item");
+venndir(setlist,
+   show_items="sign item");
 ```
 
 Interestingly, the density of labels gives some indication
@@ -223,16 +240,18 @@ label density effectively uniform:
 ```{r vennitems_1p}
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir(setlist,
-  display_items="item",
-  proportional=TRUE);
+   show_items="item",
+   proportional=TRUE);
 ```
 
 With too many features to label, it's still interesting to indicate
 the sign.
 
 ```{r vennitems_2}
-setlist <- make_venn_test(10000, 3, do_signed=TRUE);
-venndir(setlist, display_items="sign");
+setlist <- make_venn_test(5000, 3, do_signed=TRUE);
+venndir(setlist,
+   show_items="sign",
+   max_items=10000);
 ```
 
 Again, proportional Venn circles effectively makes the density
@@ -240,7 +259,8 @@ uniform.
 
 ```{r vennitems_2p}
 venndir(setlist,
-  overlap_type="each",
-  display_items="sign",
-  proportional=TRUE);
+   overlap_type="each",
+   show_items="sign",
+   max_items=10000,
+   proportional=TRUE);
 ```

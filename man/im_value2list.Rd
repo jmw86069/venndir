@@ -50,6 +50,7 @@ Other venndir conversion:
 \code{\link{counts2setlist}()},
 \code{\link{im2list}()},
 \code{\link{list2im_opt}()},
-\code{\link{list2im_value}()}
+\code{\link{list2im_value}()},
+\code{\link{overlaplist2setlist}()}
 }
 \concept{venndir conversion}

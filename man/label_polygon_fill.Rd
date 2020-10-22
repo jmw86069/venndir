@@ -9,9 +9,12 @@ label_polygon_fill(
   labels,
   color = "black",
   border = NA,
-  cex = 1,
   fontsize = 10,
+  cex = 1,
   angle = -20,
+  dither_cex = 0.04,
+  dither_color = 0.07,
+  dither_angle = 0,
   scale_width = -0.1,
   apply_n_scale = TRUE,
   buffer_w = 0,
@@ -23,6 +26,7 @@ label_polygon_fill(
   buffer_border = "red",
   draw_points = FALSE,
   draw_labels = TRUE,
+  seed = NULL,
   verbose = FALSE,
   ...
 )
@@ -39,14 +43,29 @@ color of each label.}
 \item{border}{\code{vector} or \code{NA} with colors to define the border around
 each label.}
 
+\item{fontsize}{\code{numeric} value indicating the font size in points.}
+
 \item{cex}{\code{numeric} value used to resize all text labels by
 multiplying the font size.}
-
-\item{fontsize}{\code{numeric} value indicating the font size in points.}
 
 \item{angle}{\code{numeric} \code{vector} indicating the angle in degrees
 to rotate each text label, where positive values rotate
 in clockwise direction.}
+
+\item{dither_cex}{\code{numeric} or \code{NULL}, where a numeric value
+is applied to \code{cex} in random fashion to provide some
+visual heterogeneity in the \code{cex} for item labels. When
+\code{dither_cex=0} or \code{dither_cex=NULL} then no adjustment
+is performed.}
+
+\item{dither_color}{\code{numeric} or \code{NULL}, where a numeric value
+is use to adjust each \code{color} slightly lighter or darker
+via \code{jamba::makeColorDarker()}. The effect is to make adjacent
+labels visibly different but in a subtle way.}
+
+\item{dither_angle}{\code{numeric} or \code{NULL}, where a numeric value
+is used to adjust the text angle slightly more or less that
+the \code{angle} value.}
 
 \item{scale_width}{\code{numeric} value or \code{NULL}, where a numeric
 value indicates the relative size of the polygon to use as
@@ -87,6 +106,10 @@ each coordinate position, intended for visual review of the processing.}
 which is performed using \code{gridtext::richtext_grob()} inside
 a base R plot.}
 
+\item{seed}{\code{numeric} or \code{NULL}, where a \code{numeric} value is
+passed to \code{set.seed()} to make the \code{dither_cex} process reproducible.
+Set \code{seed=NULL} to disable this step.}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \value{
@@ -115,6 +138,22 @@ text labels to nestle beside each other without much
 overlap.
 }
 \examples{
+sp <- sp_ellipses(3, 3, xradius=1.2, yradius=3, rotation_degrees=15)
+words <- jamba::unvigrep("[0-9]",
+   jamba::vigrep("[a-zA-Z]", 
+      unique(unlist(
+      strsplit(as.character(packageDescription("venndir")),
+      '[", _()<>:;/\n\t.@&=]+')))));
+words <- words[nchar(words) > 2];
+plot(sp, col="gold", border="gold4", lwd=2);
+label_polygon_fill(sp=sp, angle=-10, labels=words, dither_color=0.2, color="red2", cex=1.2)
+
+plot(sp, col="gold", border="gold4", lwd=2);
+label_polygon_fill(sp=sp, angle=-10,
+   scale_width=-0.3,
+   draw_buffer=TRUE,
+   labels=words, dither_color=0.2, color="red2", cex=1.2)
+
 setlist <- make_venn_test(100, 3);
 vo <- venndir(setlist, return_items=TRUE, font_cex=0.01, proportional=FALSE);
 
@@ -166,6 +205,8 @@ Other venndir utility:
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
 \code{\link{nudge_sp}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{polygon_label_segment}()},
 \code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
 \code{\link{rescale_ps}()},
@@ -174,6 +215,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
-\code{\link{union_polygons}()}
+\code{\link{union_polygons}()},
+\code{\link{venndir_label_style}()}
 }
 \concept{venndir utility}

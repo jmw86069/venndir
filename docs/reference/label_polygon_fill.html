@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -125,9 +125,12 @@
   <span class='va'>labels</span>,
   color <span class='op'>=</span> <span class='st'>"black"</span>,
   border <span class='op'>=</span> <span class='cn'>NA</span>,
-  cex <span class='op'>=</span> <span class='fl'>1</span>,
   fontsize <span class='op'>=</span> <span class='fl'>10</span>,
+  cex <span class='op'>=</span> <span class='fl'>1</span>,
   angle <span class='op'>=</span> <span class='op'>-</span><span class='fl'>20</span>,
+  dither_cex <span class='op'>=</span> <span class='fl'>0.04</span>,
+  dither_color <span class='op'>=</span> <span class='fl'>0.07</span>,
+  dither_angle <span class='op'>=</span> <span class='fl'>0</span>,
   scale_width <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.1</span>,
   apply_n_scale <span class='op'>=</span> <span class='cn'>TRUE</span>,
   buffer_w <span class='op'>=</span> <span class='fl'>0</span>,
@@ -139,6 +142,7 @@
   buffer_border <span class='op'>=</span> <span class='st'>"red"</span>,
   draw_points <span class='op'>=</span> <span class='cn'>FALSE</span>,
   draw_labels <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  seed <span class='op'>=</span> <span class='cn'>NULL</span>,
   verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
@@ -166,19 +170,40 @@ color of each label.</p></td>
 each label.</p></td>
     </tr>
     <tr>
+      <th>fontsize</th>
+      <td><p><code>numeric</code> value indicating the font size in points.</p></td>
+    </tr>
+    <tr>
       <th>cex</th>
       <td><p><code>numeric</code> value used to resize all text labels by
 multiplying the font size.</p></td>
-    </tr>
-    <tr>
-      <th>fontsize</th>
-      <td><p><code>numeric</code> value indicating the font size in points.</p></td>
     </tr>
     <tr>
       <th>angle</th>
       <td><p><code>numeric</code> <code>vector</code> indicating the angle in degrees
 to rotate each text label, where positive values rotate
 in clockwise direction.</p></td>
+    </tr>
+    <tr>
+      <th>dither_cex</th>
+      <td><p><code>numeric</code> or <code>NULL</code>, where a numeric value
+is applied to <code>cex</code> in random fashion to provide some
+visual heterogeneity in the <code>cex</code> for item labels. When
+<code>dither_cex=0</code> or <code>dither_cex=NULL</code> then no adjustment
+is performed.</p></td>
+    </tr>
+    <tr>
+      <th>dither_color</th>
+      <td><p><code>numeric</code> or <code>NULL</code>, where a numeric value
+is use to adjust each <code>color</code> slightly lighter or darker
+via <code><a href='https://rdrr.io/pkg/jamba/man/makeColorDarker.html'>jamba::makeColorDarker()</a></code>. The effect is to make adjacent
+labels visibly different but in a subtle way.</p></td>
+    </tr>
+    <tr>
+      <th>dither_angle</th>
+      <td><p><code>numeric</code> or <code>NULL</code>, where a numeric value
+is used to adjust the text angle slightly more or less that
+the <code>angle</code> value.</p></td>
     </tr>
     <tr>
       <th>scale_width</th>
@@ -236,6 +261,12 @@ which is performed using <code><a href='https://wilkelab.org/gridtext/reference/
 a base R plot.</p></td>
     </tr>
     <tr>
+      <th>seed</th>
+      <td><p><code>numeric</code> or <code>NULL</code>, where a <code>numeric</code> value is
+passed to <code><a href='https://rdrr.io/r/base/Random.html'>set.seed()</a></code> to make the <code>dither_cex</code> process reproducible.
+Set <code>seed=NULL</code> to disable this step.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p><code>logical</code> indicating whether to print verbose output.</p></td>
     </tr>
@@ -276,6 +307,8 @@ overlap.</p>
 <code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
 <code><a href='match_list.html'>match_list</a>()</code>,
 <code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
+<code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
+<code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
 <code><a href='print_color_df.html'>print_color_df</a>()</code>,
 <code><a href='rescale_coordinates.html'>rescale_coordinates</a>()</code>,
 <code><a href='rescale_ps.html'>rescale_ps</a>()</code>,
@@ -284,10 +317,27 @@ overlap.</p>
 <code><a href='shrink_df.html'>shrink_df</a>()</code>,
 <code><a href='sp_circles.html'>sp_circles</a>()</code>,
 <code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
-<code><a href='union_polygons.html'>union_polygons</a>()</code></p></div>
+<code><a href='union_polygons.html'>union_polygons</a>()</code>,
+<code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span><span class='op'>)</span>;
+    <pre class="examples"><div class='input'><span class='va'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sp_ellipses.html'>sp_ellipses</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, xradius<span class='op'>=</span><span class='fl'>1.2</span>, yradius<span class='op'>=</span><span class='fl'>3</span>, rotation_degrees<span class='op'>=</span><span class='fl'>15</span><span class='op'>)</span>
+<span class='va'>words</span> <span class='op'>&lt;-</span> <span class='fu'>jamba</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/jamba/man/unvigrep.html'>unvigrep</a></span><span class='op'>(</span><span class='st'>"[0-9]"</span>,
+   <span class='fu'>jamba</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/jamba/man/vigrep.html'>vigrep</a></span><span class='op'>(</span><span class='st'>"[a-zA-Z]"</span>, 
+      <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span>
+      <span class='fu'><a href='https://rdrr.io/r/base/strsplit.html'>strsplit</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/packageDescription.html'>packageDescription</a></span><span class='op'>(</span><span class='st'>"venndir"</span><span class='op'>)</span><span class='op'>)</span>,
+      <span class='st'>'[", _()&lt;&gt;:;/\n\t.@&amp;=]+'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>;
+<span class='va'>words</span> <span class='op'>&lt;-</span> <span class='va'>words</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/nchar.html'>nchar</a></span><span class='op'>(</span><span class='va'>words</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='fl'>2</span><span class='op'>]</span>;
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
+</div><div class='input'><span class='fu'>label_polygon_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>, angle<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>, labels<span class='op'>=</span><span class='va'>words</span>, dither_color<span class='op'>=</span><span class='fl'>0.2</span>, color<span class='op'>=</span><span class='st'>"red2"</span>, cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>
+</div><div class='img'><img src='label_polygon_fill-1.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
+</div><div class='input'><span class='fu'>label_polygon_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>, angle<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>,
+   scale_width<span class='op'>=</span><span class='op'>-</span><span class='fl'>0.3</span>,
+   draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>,
+   labels<span class='op'>=</span><span class='va'>words</span>, dither_color<span class='op'>=</span><span class='fl'>0.2</span>, color<span class='op'>=</span><span class='st'>"red2"</span>, cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>
+</div><div class='img'><img src='label_polygon_fill-2.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span><span class='op'>)</span>;
 <span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, return_items<span class='op'>=</span><span class='cn'>TRUE</span>, font_cex<span class='op'>=</span><span class='fl'>0.01</span>, proportional<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>;
 </div><div class='input'>
 <span class='co'># labels inside each venn overlap polygon</span>
@@ -304,7 +354,7 @@ overlap.</p>
       labels<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>label_df</span><span class='op'>[</span><span class='va'>j</span>,<span class='st'>"items"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>;
    <span class='op'>}</span>
 <span class='op'>}</span>
-</div><div class='img'><img src='label_polygon_fill-1.png' alt='' width='768' height='768' /></div><div class='input'>
+</div><div class='img'><img src='label_polygon_fill-3.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='co'># same example as above but using proportional circles</span>
 <span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, return_items<span class='op'>=</span><span class='cn'>TRUE</span>, font_cex<span class='op'>=</span><span class='fl'>0.01</span>, proportional<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
 </div><div class='input'>
@@ -322,7 +372,7 @@ overlap.</p>
       labels<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>label_df</span><span class='op'>[</span><span class='va'>j</span>,<span class='st'>"items"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>;
    <span class='op'>}</span>
 <span class='op'>}</span>
-</div><div class='img'><img src='label_polygon_fill-2.png' alt='' width='768' height='768' /></div><div class='input'>
+</div><div class='img'><img src='label_polygon_fill-4.png' alt='' width='768' height='768' /></div><div class='input'>
 
 </div></pre>
   </div>

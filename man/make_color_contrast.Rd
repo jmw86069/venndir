@@ -8,10 +8,10 @@ make_color_contrast(
   x,
   y,
   bg = "white",
-  L_threshold = 50,
+  L_threshold = 55,
   C_floor = 130,
   L_hi = 80,
-  L_lo = 50,
+  L_lo = 40,
   do_plot = FALSE,
   cex = 2,
   ...
@@ -59,6 +59,8 @@ Other venndir utility:
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
 \code{\link{nudge_sp}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{polygon_label_segment}()},
 \code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
 \code{\link{rescale_ps}()},
@@ -67,6 +69,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
-\code{\link{union_polygons}()}
+\code{\link{union_polygons}()},
+\code{\link{venndir_label_style}()}
 }
 \concept{venndir utility}

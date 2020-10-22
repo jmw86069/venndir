@@ -13,10 +13,10 @@ ggrender_venndir(
   xpd = NA,
   font_cex = 1,
   plot_warning = TRUE,
-  display_items = c("none", "sign label", "label", "sign"),
+  show_items = c("none", "sign label", "label", "sign"),
   item_angle = 20,
   display_counts = TRUE,
-  max_items = 100,
+  max_items = 1000,
   ggtheme = ggplot2::theme_void,
   family = "Arial",
   ...
@@ -37,7 +37,7 @@ expected to contain colnames:
 \item \code{"alpha"} with transparency optionally applied to \code{"color"};
 \item \code{"border"} with border color, where \code{NA} draws no border;
 \item \code{"lwd"} with line width; and \code{"lty"} with line type. Only
-\item \code{"color"} is required, the others are filled with defaults
+\code{"color"} is required, the others are filled with defaults
 as needed.
 }}
 
@@ -53,10 +53,11 @@ format compatible with \code{gridtext::richtext_grob()}.
 Optional colnames are filled with defaults as needed:
 \itemize{
 \item \code{"show_label"} a \code{logical} vector for which labels to show \verb{[TRUE]};
+\item \code{"show_items"} a \code{logical} indicating whether to show item labels \verb{[FALSE]};
 \item \code{"vjust"}, \code{"hjust"} vertical/horizontal position \verb{[0.5, 0.5]};
 \item \code{"halign"} with horizontal alignment \verb{[0.5]};
 \item \code{"rot"} label rotation \verb{[0]};
-\item \code{"col"} label color \verb{[black]};
+\item \code{"color"} label color \verb{[black]};
 \item \code{"fontsize"} fontsize used by \code{grid::par()} \verb{[14]};
 \item \code{"border"} border color, where \code{NA} draws no border \verb{[NA]};
 \item \code{"lty"}, \code{"lwd"} line type and line width \verb{[1, 1]};
@@ -66,6 +67,9 @@ to define padding around each label \verb{[2, "pt"]};
 \item \code{"r"}, \code{"r_unit"} passed to \code{gridtext::richtext_grob()} to define
 rounded corners, relevant only when \code{"border"} or \code{"fill"} are
 not \code{NA} \verb{[2, "pt"]}.
+\item \code{"item_cex"} cex adjustment for item labels
+\item \code{"show_label"} \code{logical} indicating whether to show each label
+\item \code{"show_items"} \code{logical} indicating whether to show items
 }}
 
 \item{xlim}{\code{numeric} range for x- and y-axis, respectively.
@@ -116,11 +120,3 @@ venndir_output$label_df[1:2,c("vjust")] <- c(0, 0);
 ggrender_venndir(venndir_output, font_cex=1.5, family="Arial");
 
 }
-\seealso{
-Other venndir core: 
-\code{\link{render_venndir}()},
-\code{\link{signed_overlaps}()},
-\code{\link{textvenn}()},
-\code{\link{venndir}()}
-}
-\concept{venndir core}

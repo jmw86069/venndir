@@ -13,12 +13,17 @@ render_venndir(
   ylim = NULL,
   xpd = NA,
   font_cex = 1,
+  item_cex = 0.9,
   plot_warning = TRUE,
-  display_items = c("none", "sign label", "label", "sign"),
-  item_angle = 20,
+  show_label = TRUE,
+  show_items = c("none", "sign label", "label", "sign"),
+  show_zero = TRUE,
+  item_angle = -18,
   display_counts = TRUE,
   max_items = 100,
+  label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   fontfamily = "Arial",
+  plot_style = c("base", "gg"),
   ...
 )
 }
@@ -37,7 +42,7 @@ expected to contain colnames:
 \item \code{"alpha"} with transparency optionally applied to \code{"color"};
 \item \code{"border"} with border color, where \code{NA} draws no border;
 \item \code{"lwd"} with line width; and \code{"lty"} with line type. Only
-\item \code{"color"} is required, the others are filled with defaults
+\code{"color"} is required, the others are filled with defaults
 as needed.
 }}
 
@@ -53,10 +58,11 @@ format compatible with \code{gridtext::richtext_grob()}.
 Optional colnames are filled with defaults as needed:
 \itemize{
 \item \code{"show_label"} a \code{logical} vector for which labels to show \verb{[TRUE]};
+\item \code{"show_items"} a \code{logical} indicating whether to show item labels \verb{[FALSE]};
 \item \code{"vjust"}, \code{"hjust"} vertical/horizontal position \verb{[0.5, 0.5]};
 \item \code{"halign"} with horizontal alignment \verb{[0.5]};
 \item \code{"rot"} label rotation \verb{[0]};
-\item \code{"col"} label color \verb{[black]};
+\item \code{"color"} label color \verb{[black]};
 \item \code{"fontsize"} fontsize used by \code{grid::par()} \verb{[14]};
 \item \code{"border"} border color, where \code{NA} draws no border \verb{[NA]};
 \item \code{"lty"}, \code{"lwd"} line type and line width \verb{[1, 1]};
@@ -66,6 +72,9 @@ to define padding around each label \verb{[2, "pt"]};
 \item \code{"r"}, \code{"r_unit"} passed to \code{gridtext::richtext_grob()} to define
 rounded corners, relevant only when \code{"border"} or \code{"fill"} are
 not \code{NA} \verb{[2, "pt"]}.
+\item \code{"item_cex"} cex adjustment for item labels
+\item \code{"show_label"} \code{logical} indicating whether to show each label
+\item \code{"show_items"} \code{logical} indicating whether to show items
 }}
 
 \item{asp}{\code{numeric} value indicating the aspect ratio, passed
@@ -90,6 +99,26 @@ count cannot be displayed given the \code{label_df} data. This
 occurs when a proportional Venn (Euler) diagram does not
 or cannot represent every possible overlap, causing some
 overlaps to be hidden from the plot.}
+
+\item{label_style}{\code{character} string indicating the style of label
+to display. The values \verb{"basic","none","shaded","lite","fill"}
+style the label background fill, while presence of \code{"box"} in
+the string will draw a border around the label:
+\code{"basic"} or \code{"none"} uses no background fill,
+\code{"lite"} uses lite background fill,
+\code{"fill"} uses opaque fill with the overlap set color,
+\code{"shaded"} uses slightly transparent fill with overlap set color,
+\code{"box"} displays border around the label.}
+
+\item{fontfamily}{\code{character} string indicating the font family,
+which can be useful if Unicode characters are displayed as empty
+boxes instead of proper Unicode characters. This value may be
+device-dependent, for example fonts available for PDF output
+may differ from those for PNG.}
+
+\item{plot_style}{\code{character} string indicating the style
+of plot: \code{"base"} uses base R graphics; \code{"gg"} uses
+ggplot2 graphics (not yet implemented).}
 
 \item{...}{additional arguments are passed to \code{plot()}
 when plotting \code{venn_spdf} which is expected to be a
@@ -122,7 +151,6 @@ render_venndir(venndir_output, xpd=NA, xlim=c(2, 9));
 }
 \seealso{
 Other venndir core: 
-\code{\link{ggrender_venndir}()},
 \code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
 \code{\link{venndir}()}

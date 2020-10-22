@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -115,40 +115,49 @@
 <div class="sourceCode" id="cb6"><pre class="downlit">
 <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></pre></div>
 <p><img src="reference/figures/README-venndir_each_p-1.png" width="100%"></p>
-<p>At this point, labeling is an issue, and the best current remedy is manual adjustment. (In future, non-overlapping labels will be available.)</p>
+<p>At this point, labeling is an issue, and the best current remedy is manual placement of labels. So I’m trying to make it easy to move labels.</p>
 <p>The output of <code><a href="reference/venndir.html">venndir()</a></code> contains a <code>list</code> with the polygon coordinates, and the label coordinates, so you can manually adjust as needed.</p>
 <p>Also, I really like having a function named <code><a href="reference/render_venndir.html">render_venndir()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">venndir_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, proportional<span class="op">=</span><span class="cn">TRUE</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>;
 
-<span class="co"># get label coordinate data</span>
-<span class="va">label_df</span> <span class="op">&lt;-</span> <span class="va">venndir_output</span><span class="op">$</span><span class="va">label_df</span>;
-
-<span class="co"># get polygon data</span>
-<span class="va">venn_spdf</span> <span class="op">&lt;-</span> <span class="va">venndir_output</span><span class="op">$</span><span class="va">venn_spdf</span>;
 
 <span class="co"># adjust set_A&amp;set_C</span>
-<span class="va">ac_rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span> <span class="op">%in%</span> <span class="st">"set_A&amp;set_C"</span><span class="op">)</span>;
-<span class="va">label_df</span> <span class="op">&lt;-</span> <span class="va">venndir_output</span><span class="op">$</span><span class="va">label_df</span>;
-<span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span>,<span class="st">"x"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span>,<span class="st">"x"</span><span class="op">]</span> <span class="op">-</span> <span class="fl">4.2</span>;
-<span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span>,<span class="st">"y"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span>,<span class="st">"y"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1.3</span>;
-
-<span class="co"># be fancy and add color background to the label</span>
-<span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span>,<span class="st">"fill"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/alpha2col.html">alpha2col</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">venn_spdf</span><span class="op">)</span><span class="op">[</span><span class="st">"set_A&amp;set_C"</span>,<span class="st">"color"</span><span class="op">]</span>, alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span>;
-<span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span>,<span class="st">"border"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">venn_spdf</span><span class="op">)</span><span class="op">[</span><span class="st">"set_A&amp;set_C"</span>,<span class="st">"color"</span><span class="op">]</span>;
-
-<span class="fu"><a href="reference/render_venndir.html">render_venndir</a></span><span class="op">(</span>venn_spdf<span class="op">=</span><span class="va">venn_spdf</span>, label_df<span class="op">=</span><span class="va">label_df</span>, font_cex<span class="op">=</span><span class="fl">1.3</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,<span class="st">"x"</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">4.2</span><span class="op">)</span>,
-   y<span class="op">=</span><span class="va">label_df</span><span class="op">[</span><span class="va">ac_rows</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,<span class="st">"y"</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.4</span>, <span class="op">-</span><span class="fl">1.3</span><span class="op">)</span><span class="op">)</span></pre></div>
+<span class="va">venndir_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nudge_venndir_label.html">nudge_venndir_label</a></span><span class="op">(</span><span class="va">venndir_output</span>,
+   set<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"set_A&amp;set_C"</span><span class="op">)</span>,
+   x_offset<span class="op">=</span><span class="op">-</span><span class="fl">4.6</span>,
+   y_offset<span class="op">=</span><span class="fl">1.3</span>,
+   unit_type<span class="op">=</span><span class="st">"absolute"</span><span class="op">)</span>;
+<span class="fu"><a href="reference/render_venndir.html">render_venndir</a></span><span class="op">(</span><span class="va">venndir_output</span><span class="op">)</span></pre></div>
 <p><img src="reference/figures/README-venndir_each_p2-1.png" width="100%"></p>
+<p>When the label is moved outside the venn set polygon, a line segment is automatically drawn to just inside the border.</p>
+<p>Lastly, you can customize the label style, using <code><a href="reference/venndir_label_style.html">venndir_label_style()</a></code>. There are two aspects to the label style: background fill, and border outline.</p>
+<p>For background fill, the options are:</p>
+<ul>
+<li>
+<code>"basic"</code> or <code>"none"</code> which does not have background fill</li>
+<li>
+<code>"lite"</code> which uses a default lite background color</li>
+<li>
+<code>"shaded"</code> which uses semi-transparent fill using the polygon color</li>
+<li>
+<code>"fill"</code> which uses opaque fill using the polygon color</li>
+</ul>
+<p>For the border, include <code>"box"</code> somewhere in the <code>label_style</code>.</p>
+<p>Examples: <code>label_style="lite box"</code>, <code>label_style="shaded"</code>, <code>label_style="basic"</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="va">venndir_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir_label_style.html">venndir_label_style</a></span><span class="op">(</span><span class="va">venndir_output</span>,
+   label_style<span class="op">=</span><span class="st">"lite box"</span><span class="op">)</span>
+<span class="fu"><a href="reference/render_venndir.html">render_venndir</a></span><span class="op">(</span><span class="va">venndir_output</span><span class="op">)</span>;</pre></div>
+<p><img src="reference/figures/README-label_style_1-1.png" width="100%"></p>
 </div>
 <div id="text-venn" class="section level2">
 <h2 class="hasAnchor">
 <a href="#text-venn" class="anchor"></a>Text Venn?</h2>
-<p>There is a text Venn diagram, surprisingly useful for quickly checking overlaps and direction.</p>
+<p>There is a text Venn diagram, surprisingly useful for quickly checking overlaps and direction. Note that the R console, and R help examples display colored text, just not in Rmarkdown.</p>
 <p>The first example is the basic Venn overlap, without direction.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
+<div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="reference/textvenn.html">textvenn</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"overlap"</span><span class="op">)</span>
 <span class="co">#&gt;                                set_A&amp;set_B                                     </span>
 <span class="co">#&gt;                                    27                                          </span>
@@ -164,7 +173,7 @@
 <span class="co">#&gt;                                   set_C                                        </span>
 <span class="co">#&gt;                                    71</span></pre></div>
 <p>But of course direction is helpful, so here it is with the default <code>overlap_type="concordance"</code> (below)</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
+<div class="sourceCode" id="cb10"><pre class="downlit">
 <span class="fu"><a href="reference/textvenn.html">textvenn</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"concordance"</span><span class="op">)</span>
 <span class="co">#&gt;                                        set_A&amp;set_B     ↑↑: 9                                          </span>
 <span class="co">#&gt;                                            27          ↓↓: 12                                         </span>
@@ -180,7 +189,7 @@
 <span class="co">#&gt;                                           set_C        ↑: 30                                          </span>
 <span class="co">#&gt;                                            71          ↓: 41</span></pre></div>
 <p>Not all consoles can display Unicode arrows, so you can use ASCII output only with <code>unicode=FALSE</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
+<div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="fu"><a href="reference/textvenn.html">textvenn</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"concordance"</span>, unicode<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt;                                        set_A&amp;set_B     ^^: 9                                          </span>
 <span class="co">#&gt;                                            27          vv: 12                                         </span>
@@ -202,7 +211,7 @@
 <a href="#nudge-venn-circles" class="anchor"></a>Nudge Venn circles</h2>
 <p>Another driving reason for this package is that sometimes proportional Venn (Euler) diagrams fail to produce circles that show all the overlaps. While sometimes it is mathematically impossible, other times are just… puzzling.</p>
 <p>See below, the overlap <code>set_A&amp;set_B</code> has 1 count, but is not displayed.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
+<div class="sourceCode" id="cb12"><pre class="downlit">
 <span class="va">overlaps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>set_A<span class="op">=</span><span class="fl">187</span>, set_B<span class="op">=</span><span class="fl">146</span>, set_C<span class="op">=</span><span class="fl">499</span>,
    `set_A&amp;set_B`<span class="op">=</span><span class="fl">1</span>,
    `set_A&amp;set_C`<span class="op">=</span><span class="fl">181</span>,
@@ -216,7 +225,7 @@
    set_colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="st">"blue"</span>, <span class="st">"#9999AA"</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="reference/figures/README-nudge_1-1.png" width="100%"></p>
 <p>The argument <code>circle_nudge</code> lets you nudge (move) a Venn circle given x,y coordinates.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
+<div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="va">venndir_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist_o</span>,
    font_cex<span class="op">=</span><span class="fl">2</span>,
    proportional<span class="op">=</span><span class="cn">TRUE</span>,
@@ -229,29 +238,33 @@
 <a href="#item-labels" class="anchor"></a>Item labels</h2>
 <p>An optional but useful feature is to include item labels inside the Venn diagram. It helps answer the question, “What are those shared items?” (In my experience, that’s a very early question.)</p>
 <p>This step can also include the directional sign, which helps indicate which items are shared, and whether they have the same direction. In cases with too many labels to display, it is sometimes still useful to display the sign, as a visual cue for the proportion of shared or discordant signs.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;
-<span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, display_items<span class="op">=</span><span class="st">"sign item"</span><span class="op">)</span>;</pre></div>
-<p><img src="reference/figures/README-vennitems_1-1.png" width="100%"></p>
-<p>Interestingly, the density of labels gives some indication of the relative overlaps.</p>
-<p>The same plot using proportional circles makes the label density effectively uniform:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit">
 <span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;
 <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,
-  display_items<span class="op">=</span><span class="st">"item"</span>,
-  proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</pre></div>
+   show_items<span class="op">=</span><span class="st">"sign item"</span><span class="op">)</span>;</pre></div>
+<p><img src="reference/figures/README-vennitems_1-1.png" width="100%"></p>
+<p>Interestingly, the density of labels gives some indication of the relative overlaps.</p>
+<p>The same plot using proportional circles makes the label density effectively uniform:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit">
+<span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;
+<span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,
+   show_items<span class="op">=</span><span class="st">"item"</span>,
+   proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</pre></div>
 <p><img src="reference/figures/README-vennitems_1p-1.png" width="100%"></p>
 <p>With too many features to label, it’s still interesting to indicate the sign.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">10000</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;
-<span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, display_items<span class="op">=</span><span class="st">"sign"</span><span class="op">)</span>;</pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit">
+<span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">5000</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;
+<span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,
+   show_items<span class="op">=</span><span class="st">"sign"</span>,
+   max_items<span class="op">=</span><span class="fl">10000</span><span class="op">)</span>;</pre></div>
 <p><img src="reference/figures/README-vennitems_2-1.png" width="100%"></p>
 <p>Again, proportional Venn circles effectively makes the density uniform.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit">
+<div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,
-  overlap_type<span class="op">=</span><span class="st">"each"</span>,
-  display_items<span class="op">=</span><span class="st">"sign"</span>,
-  proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</pre></div>
+   overlap_type<span class="op">=</span><span class="st">"each"</span>,
+   show_items<span class="op">=</span><span class="st">"sign"</span>,
+   max_items<span class="op">=</span><span class="fl">10000</span>,
+   proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</pre></div>
 <p><img src="reference/figures/README-vennitems_2p-1.png" width="100%"></p>
 </div>
 </div>

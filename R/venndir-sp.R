@@ -1,13 +1,18 @@
 
-#' Convert eulerr() output to polygons
+#' Convert euler output to polygons
 #' 
-#' # @import sp
+#' Convert euler output to polygons
+#' 
+#' This function takes the output from `eulerr::euler()` and
+#' converts it to polygons in `sp::SpatialPolygons` format.
+#' Essentially the output from `eulerr::euler()` is either a
+#' set of circles, or ellipses.
+#' 
+#' @return `sp::SpatialPolygons` object with one `sp::Polygons`
+#'    element for each Euler circle or ellipse.
 #' 
 #' @family venndir utility
 #' 
-#' @examples
-#' if (require(eulerr)) {
-#' }
 #' 
 #' @export
 eulerr2polys <- function
@@ -111,7 +116,7 @@ eulerr2polys <- function
 #' data.frame(spdf)
 #' 
 #' # simple Venn plot
-#' plot(spdf, col=spdf$color)
+#' sp::plot(spdf, col=spdf$color)
 #' text(x=spdf$x_label,
 #'    y=spdf$y_label,
 #'    labels=paste0(spdf$label,
@@ -188,7 +193,8 @@ find_vennpoly_overlaps <- function
          preset=blend_preset,
          ...);
       poly_name <- paste(
-         jamba::mixedSort(colnames(el1)[whichYes]),
+         #jamba::mixedSort(colnames(el1)[whichYes]),
+         (colnames(el1)[whichYes]),
          collapse="&");
       if (length(venn_counts) > 0) {
          venn_match <- match_list(list(i_names), venn_counts_names);
@@ -328,9 +334,6 @@ intersect_polygons <- function
 {
    ## Purpose is to use rgeos gIntersection() on more than 2 Polygons objects,
    ## but allowing 1, 2, or more than 2.
-   if (!suppressPackageStartupMessages(require(rgeos))) {
-      stop("The rgeos (and thus the sp) package is required for this function.");
-   }
    if (length(sp) <= 1) {
       return(sp);
    } else {
@@ -370,9 +373,6 @@ union_polygons <- function
 {
    ## Purpose is to use rgeos gUnion() on more than 2 Polygons objects,
    ## but allowing 1, 2, or more than 2.
-   if (!suppressPackageStartupMessages(require(rgeos))) {
-      stop("The rgeos (and thus the sp) package is required for this function.");
-   }
    if (length(sp) <= 1) {
       return(sp);
    } else {
@@ -710,12 +710,24 @@ nudge_sp <- function
 #'    color of each label.
 #' @param border `vector` or `NA` with colors to define the border around
 #'    each label.
+#' @param fontsize `numeric` value indicating the font size in points.
 #' @param cex `numeric` value used to resize all text labels by
 #'    multiplying the font size.
-#' @param fontsize `numeric` value indicating the font size in points.
 #' @param angle `numeric` `vector` indicating the angle in degrees
 #'    to rotate each text label, where positive values rotate
 #'    in clockwise direction.
+#' @param dither_cex `numeric` or `NULL`, where a numeric value
+#'    is applied to `cex` in random fashion to provide some
+#'    visual heterogeneity in the `cex` for item labels. When
+#'    `dither_cex=0` or `dither_cex=NULL` then no adjustment
+#'    is performed.
+#' @param dither_color `numeric` or `NULL`, where a numeric value
+#'    is use to adjust each `color` slightly lighter or darker
+#'    via `jamba::makeColorDarker()`. The effect is to make adjacent
+#'    labels visibly different but in a subtle way.
+#' @param dither_angle `numeric` or `NULL`, where a numeric value
+#'    is used to adjust the text angle slightly more or less that
+#'    the `angle` value.
 #' @param scale_width `numeric` value or `NULL`, where a numeric
 #'    value indicates the relative size of the polygon to use as
 #'    a buffer around the polygon, and should be given as
@@ -747,6 +759,9 @@ nudge_sp <- function
 #' @param draw_labels `logical` indicating whether to draw text labels
 #'    which is performed using `gridtext::richtext_grob()` inside
 #'    a base R plot.
+#' @param seed `numeric` or `NULL`, where a `numeric` value is
+#'    passed to `set.seed()` to make the `dither_cex` process reproducible.
+#'    Set `seed=NULL` to disable this step.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' 
 #' @return `list` that contains: `items_df` as a `data.frame` of item
@@ -757,6 +772,22 @@ nudge_sp <- function
 #' @family venndir utility
 #' 
 #' @examples
+#' sp <- sp_ellipses(3, 3, xradius=1.2, yradius=3, rotation_degrees=15)
+#' words <- jamba::unvigrep("[0-9]",
+#'    jamba::vigrep("[a-zA-Z]", 
+#'       unique(unlist(
+#'       strsplit(as.character(packageDescription("venndir")),
+#'       '[", _()<>:;/\n\t.@&=]+')))));
+#' words <- words[nchar(words) > 2];
+#' plot(sp, col="gold", border="gold4", lwd=2);
+#' label_polygon_fill(sp=sp, angle=-10, labels=words, dither_color=0.2, color="red2", cex=1.2)
+#' 
+#' plot(sp, col="gold", border="gold4", lwd=2);
+#' label_polygon_fill(sp=sp, angle=-10,
+#'    scale_width=-0.3,
+#'    draw_buffer=TRUE,
+#'    labels=words, dither_color=0.2, color="red2", cex=1.2)
+#' 
 #' setlist <- make_venn_test(100, 3);
 #' vo <- venndir(setlist, return_items=TRUE, font_cex=0.01, proportional=FALSE);
 #' 
@@ -800,9 +831,12 @@ label_polygon_fill <- function
  labels,
  color="black",
  border=NA,
- cex=1,
  fontsize=10,
+ cex=1,
  angle=-20,
+ dither_cex=0.04,
+ dither_color=0.07,
+ dither_angle=0,
  scale_width=-0.1,
  apply_n_scale=TRUE,
  buffer_w=0,
@@ -818,11 +852,15 @@ label_polygon_fill <- function
  buffer_border="red",
  draw_points=FALSE,
  draw_labels=TRUE,
+ seed=NULL,
  verbose=FALSE,
  ...)
 {
    ##
    label_method <- match.arg(label_method);
+   if (length(seed) == 1) {
+      set.seed(seed);
+   }
    n <- length(labels);
    if (n == 0) {
       return(NULL);
@@ -832,7 +870,26 @@ label_polygon_fill <- function
    color <- rep(color, length.out=n);
    border <- rep(border, length.out=n);
    cex <- rep(cex, length.out=n);
+   if (length(dither_cex) > 0 & all(dither_cex != 0)) {
+      #cex <- rnorm(n) * dither_cex * cex + dither_cex/3 + cex;
+      cex <- runif(n, min=-dither_cex, max=dither_cex) * cex + dither_cex/3 + cex;
+   }
    angle <- rep(angle, length.out=n);
+
+   if (length(dither_angle) > 0 & all(dither_angle != 0)) {
+      #cex <- rnorm(n) * dither_cex * cex + dither_cex/3 + cex;
+      angle <- runif(n, min=-dither_angle, max=dither_angle) + angle;
+   }
+   
+   # optionally dither colors for slight visual distinction
+   if (length(dither_color) == 1 & dither_color > 0) {
+      df <- runif(n, min=-dither_color, max=dither_color);
+      sf <- (abs(df)*2 + 1) * sign(df);
+      df <- (abs(df) + 1) * sign(df) 
+      color <- jamba::makeColorDarker(color,
+         darkFactor=df,
+         sFactor=sf)
+   }
    
    ## resize polygon before applying labels
    #ellYesDiffsmall11 <- shrinkPolygon(ellYesDiffsmall11,
@@ -861,7 +918,7 @@ label_polygon_fill <- function
          "scale_width:",
          format(digits=2, scale_width));
    }
-   if (scale_width < 0) {
+   if (scale_width != 0) {
       for (sw in unique(seq(from=scale_width, to=0, length.out=5))) {
          if (sw == 0) {
             sp_buffer <- sp;
@@ -876,6 +933,7 @@ label_polygon_fill <- function
       scale_width <- sw;
    } else {
       sp_buffer <- sp;
+      scale_width <- 0;
    }
 
    buffer_ws <- unique(c(0, buffer_w * c(-1, -0.5, 0.5, 1)));
@@ -919,33 +977,49 @@ label_polygon_fill <- function
     type,
     iter,
     offset=c(0.5, 0.5),
-    tries=50,
+    tries=100,
+    singlet_polylabelr=TRUE,
     ...)
    {
       if (n == 0) {
          return(NULL);
       }
-      try_step <- ceiling(n/100);
+      if (n == 1 && singlet_polylabelr) {
+         i_sp <- get_largest_polygon(sp);
+         ixy <- i_sp@polygons[[1]]@Polygons[[1]]@coords;
+         pt_xy <- polylabelr::poi(ixy, precision=0.01);
+         pt_m <- as.matrix(as.data.frame(pt_xy));
+         if (length(pt_m) > 0) {
+            # make sure point is inside the polygon
+            spt <- sp::SpatialPoints(pt_m[,1:2,drop=FALSE]);
+            if (rgeos::gContains(sp, spt)) {
+               return(pt_m[,1:2,drop=FALSE]);
+            }
+         }
+      }
+      try_step <- ceiling(n/200);
       for (k in (seq_len(tries)-1)*try_step) {
          if (n + k == 1 && "hexagonal" %in% type) {
             type <- "regular";
          }
-         label_xy <- tryCatch({
-            sp::coordinates(
-               sp::spsample(sp,
-                  n=n + k,
-                  type=type,
-                  offset=offset,
-                  iter=iter));
-         }, error=function(e){
-            NULL;
-         });
-         if (length(label_xy) > 0 && nrow(label_xy) >= n) {
-            # sort coordinates top to bottom
-            label_xy <- jamba::mixedSortDF(label_xy,
-               byCols=c(-2, 1));
-            label_xy <- head(label_xy, n);
-            return(label_xy);
+         for (offset_i in seq(from=0, to=0.99, by=0.2)) {
+            label_xy <- tryCatch({
+               sp::coordinates(
+                  sp::spsample(sp,
+                     n=n + k,
+                     type=type,
+                     offset=(offset + offset_i) %% 1,
+                     iter=iter));
+            }, error=function(e){
+               NULL;
+            });
+            if (length(label_xy) > 0 && nrow(label_xy) >= n) {
+               # sort coordinates top to bottom
+               label_xy <- jamba::mixedSortDF(label_xy,
+                  byCols=c(-2, 1));
+               label_xy <- head(label_xy, n);
+               return(label_xy);
+            }
          }
       }
       stop(paste0("spsample failed to return ", n, " points, ", nrow(label_xy),
@@ -955,6 +1029,7 @@ label_polygon_fill <- function
       n,
       type=label_method,
       iter=50,
+      singlet_polylabelr=TRUE,
       ...);
    
    if (draw_points) {
@@ -971,7 +1046,7 @@ label_polygon_fill <- function
       y=label_xy[,2],
       text=labels,
       rot=angle,
-      col=color,
+      color=color,
       fontsize=fontsize * cex,
       border=border,
       stringsAsFactors=FALSE);
@@ -1010,7 +1085,8 @@ label_polygon_fill <- function
    return(invisible(
       list(
          items_df=items_df,
-         g_labels=g_labels)));
+         g_labels=g_labels,
+         scale_width=scale_width)));
 }
 
 #' Rescale a SpatialPolygons object
@@ -1048,7 +1124,7 @@ rescale_sp <- function
 {
    ## SpatialPolygons
    if (length(center) == 0 && share_center) {
-      center <- rowMeans(bbox(sp));
+      center <- rowMeans(sp::bbox(sp));
    }
    sp@polygons <- lapply(sp@polygons, function(ps){
       rescale_ps(ps,
@@ -1387,4 +1463,380 @@ rescale_coordinates <- function
    }
 
    return(x)
+}
+
+
+#' Define a polygon label line segment
+#' 
+#' Define a polygon label line segment
+#' 
+#' This function takes a line segment and polygon, and
+#' returns the point where a line segment starting
+#' at the source point touches the outer boundary of
+#' the polygon.
+#' 
+#' This function is intended to be used with polygon
+#' labels, where the original label position
+#' is inside the polygon, but is manually adjusted
+#' and may be placed somewhere outside the polygon.
+#' This function finds a suitable point to draw a line
+#' segment from the new label position to the polygon.
+#' 
+#' Some different situations are handled as follows,
+#' use `verbose=TRUE` to see which situation occurred.
+#' 
+#' * When the starting point is outside the polygon,
+#' and end point is inside the polygon, this function
+#' finds the point where this line segment first
+#' intersects the polygon boundary. This is the
+#' driving reason for this function.
+#' * When the starting point is outside the polygon,
+#' and end point also outside the polygon, this function
+#' finds the nearest the nearest point along
+#' the polygon boundary.
+#' * When the starting point is inside the polygon,
+#' this function returns NULL.
+#' 
+#' Note that this function currently does not adjust for
+#' the size or position of a label.
+#' 
+#' @return `numeric` matrix with one row, representing the
+#'    point of intersection with the polygon boundary,
+#'    see comments above for exceptions. When
+#'    `return_class="matrix"` then the `matrix` contains
+#'    two rows, where the second row contains the
+#'    point of intersection. When `return_class="SpatialLines"`
+#'    the object is `sp::SpatialLines` and represents the
+#'    line from the first point and the point of intersection.
+#'    Note that when there is no second point, the
+#'    `sp::SpatialLines` object will only have one point.
+#' 
+#' @family venndir utility
+#' 
+#' @examples
+#' x0 <- 0;x1 <- 1;y0 <- 0; y1 <- 1;
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1)
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment drawn to boundary intersection");
+#' 
+#' # example of making a debug plot
+#' lxy <- cbind(c(x0, x1), c(y0, y1));
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+#' sl <- sp::SpatialLines(list(sp::Lines(list(sp::Line(lxy)), ID="a")));
+#' sp::plot(sp, col="#00007777", border="blue3", lwd=2,
+#'    xlim=c(0, 2), ylim=c(0, 2), asp=1,
+#'    main="segment drawn to boundary intersection");
+#' sp::plot(sl, lty="dotted", lwd=2, col="blue2", add=TRUE);
+#' sp::plot(sl2, col="red3", lwd=4, add=TRUE)
+#' 
+#' # example where the line intersects multiple boundaries
+#' x0 <- 0;x1 <- 2;y0 <- 0; y1 <- 2;
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment drawn to first boundary intersection");
+#' 
+#' # example where starting line does not intersect
+#' x0 <- 0;x1 <- 1;y0 <- 0; y1 <- 1;
+#' sp <- sp_ellipses(xcenter=2, ycenter=1, xradius=0.5, yradius=1);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment drawn to nearest boundary point");
+#' 
+#' lxy <- cbind(c(x0, x1), c(y0, y1));
+#' sp <- sp_ellipses(xcenter=2, ycenter=1, xradius=0.5, yradius=1);
+#' sl <- sp::SpatialLines(list(sp::Lines(list(sp::Line(lxy)), ID="a")));
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp, "SpatialLines"); 
+#' sp::plot(sl, xlim=c(0, 3), ylim=c(0, 2), asp=1, lty="dotted",
+#'    main="segment drawn to nearest boundary point");
+#' sp::plot(sp, col="#00007777", border="navy", lwd=2, add=TRUE)
+#' sp::plot(sl2, col="red", lwd=4, add=TRUE)
+#' 
+#' # example showing line fully inside the polygon
+#' x0 <- 0;x1 <- 2;y0 <- 0; y1 <- 2;
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=1.5, yradius=2.2);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment contained inside returns one point");
+#' 
+#' # example showing polygon with a hole inside
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+#' sp_hole <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.2, yradius=0.5);
+#' sp_donut <- rgeos::gDifference(sp, sp_hole);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp_donut,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment drawn to first outer boundary intersection");
+#' 
+#' # example with line inside the polygon hole
+#' x0 <- 0.9;x1 <- 1.1;y0 <- 0.9; y1 <- 1.1;
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+#' sp_hole <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.2, yradius=0.5);
+#' sp_donut <- rgeos::gDifference(sp, sp_hole);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp_donut,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment drawn to nearest boundary");
+#' 
+#' # line crosses inside the polygon hole
+#' x0 <- 1;x1 <- 1.4;y0 <- 1; y1 <- 1.4;
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+#' sp_hole <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.2, yradius=0.5);
+#' sp_donut <- rgeos::gDifference(sp, sp_hole);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp_donut,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="segment drawn to boundary intersection");
+#' 
+#' x0 <- 0.6;x1 <- 1;y0 <- 0.6; y1 <- 1;
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+#' sp_hole <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.2, yradius=0.5);
+#' sp_donut <- rgeos::gDifference(sp, sp_hole);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp_donut,
+#'    return_class="SpatialLines",
+#'    plot_debug=TRUE,
+#'    main="first point inside the polygon, returns one point");
+#' 
+#' # example showing multiple input points
+#' x0 <- c(0.6, 1.1);
+#' x1 <- c(1, 1.4);
+#' y0 <- c(0.6, 1.1);
+#' y1 <- c(1, 1.4);
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp=sp_donut,
+#'    return_class="point", verbose=TRUE, plot_debug=TRUE); 
+#' 
+#' # example showing sp_buffer
+#' sl2 <- polygon_label_segment(x0, x1, y0, y1, sp=sp_donut,
+#'    sp_buffer=-0.1,
+#'    return_class="point", verbose=TRUE, plot_debug=TRUE); 
+#' 
+#' @param x0 `numeric` x-axis source position
+#' @param x1 `numeric` x-axis target position
+#' @param y0 `numeric` y-axis source position
+#' @param y1 `numeric` y-axis target position
+#' @param sp `sp::SpatialPolygons` object representing the polygon
+#' @param sp_buffer `numeric` indicating an optional buffer to
+#'    use for the `sp` polygon. By default `sp_buffer=0` uses no
+#'    buffer, but a suggested buffer `sp_buffer=-0.01` would make
+#'    the polygon `1%` smaller, therefore the line segment would be
+#'    slightly inside the polygon border.
+#' @param return_class `character` string where `"point"` returns a
+#'    `matrix` with one row containing the new target point;
+#'    `"matrix"` contains two rows with source and new target points;
+#'    `"SpatialLines"` returns `sp::SpatialLines` with the line
+#'    segment from source to new target points.
+#' @param verbose `logical` indicating whether to print verbose output,
+#'    specifically describing which situation occurred.
+#' @param ... additional arguments are ignored.
+#' 
+#' @export
+polygon_label_segment <- function
+(x0,
+ x1,
+ y0,
+ y1,
+ sp,
+ return_class=c("point", "matrix", "SpatialLines"),
+ sp_buffer=0,
+ plot_debug=FALSE,
+ verbose=FALSE,
+ ...)
+{
+   return_class <- match.arg(return_class);
+   if (length(x0) > 1) {
+      i <- seq_along(x0);
+      x1 <- rep(x1, length.out=length(x0));
+      y0 <- rep(y0, length.out=length(x0));
+      y1 <- rep(y1, length.out=length(x0));
+      sp_buffer <- rep(sp_buffer, length.out=length(x0));
+      spi <- ((i - 1) %% length(sp)) + 1;
+      listout <- lapply(i, function(j){
+         if (verbose) {
+            jamba::printDebug("polygon_label_segment(): ",
+               "j:", j, ", spi[j]:", spi[j]);
+         }
+         if (is.list(sp)) {
+            sp_use <- sp[[spi[j]]];
+         } else {
+            sp_use <- sp[spi[j]];
+         }
+         polygon_label_segment(x0=x0[j],
+            x1=x1[j],
+            y0=y0[j],
+            y1=y1[j],
+            sp=sp_use,
+            sp_buffer=sp_buffer[[j]],
+            return_class=return_class,
+            plot_debug=plot_debug,
+            verbose=verbose,
+            add=(j > 1),
+            ...);
+      });
+      if ("point" %in% return_class) {
+         listout <- jamba::rbindList(listout);
+      }
+      return(listout);
+   }
+   
+   lxy <- cbind(c(x0, x1), c(y0, y1));
+   sl <- sp::SpatialLines(list(sp::Lines(list(sp::Line(lxy)), ID="a")))
+   spt <- sp::SpatialPoints(lxy);
+
+   # optional debug plot
+   if (TRUE %in% plot_debug) {
+      xlim <- range(c(sp::bbox(sp)[1,],
+         lxy[,1]), 
+         na.rm=TRUE);
+      ylim <- range(c(sp::bbox(sp)[2,], 
+         lxy[,2]), 
+         na.rm=TRUE);
+      sp::plot(sp,
+         col=jamba::alpha2col("blue2", alpha=0.2),
+         border="blue2",
+         lwd=3,
+         xlim=xlim,
+         ylim=ylim,
+         lty="solid",
+         ...)
+      sp::plot(sl,
+         col="blue4",
+         lwd=2,
+         lty="dotted",
+         add=TRUE)
+   }
+   
+   # optional polygon buffer
+   sp_buffer <- head(sp_buffer, 1);
+   if (is.numeric(sp_buffer) && !sp_buffer %in% 0) {
+      sp1 <- rgeos::gBuffer(sp,
+         width=sp_buffer);
+      # only use the new polygon if it has non-zero area
+      if (length(sp1) > 0 && rgeos::gArea(sp1) > 0) {
+         if (verbose) {
+            jamba::printDebug("polygon_label_segment(): ",
+               "Applied sp_buffer:", sp_buffer);
+         }
+         sp <- sp1;
+         rm(sp1);
+         # optional debug plot
+         if (TRUE %in% plot_debug) {
+            sp::plot(sp,
+               col=jamba::alpha2col("white", alpha=0.2),
+               border=jamba::alpha2col("white", alpha=0.4),
+               lwd=2,
+               lty="dashed",
+               add=TRUE)
+         }
+      } else {
+         if (verbose) {
+            jamba::printDebug("polygon_label_segment(): ",
+               "Original sp was used, due to zero area with sp_buffer:",
+               sp_buffer);
+         }
+      }
+   }
+   print(length(sp))
+   if (rgeos::gContains(sp, sl)) {
+      # return if sl is fully contained inside sp
+      if (verbose) {
+         jamba::printDebug("polygon_label_segment(): ",
+            "The line is fully contained by the polygon.");
+      }
+      #lxy[2,] <- lxy[1,];
+      lxy[2,] <- rep(NA, 2);
+   } else if (!rgeos::gIntersects(sl, sp)) {
+      # nearest boundary point if sl does not intersect sp at all
+      if (verbose) {
+         jamba::printDebug("polygon_label_segment(): ",
+            "The line does not intersect the polygon.");
+      }
+      spt_new <- rgeos::gNearestPoints(spt[1], sp);
+      lxy[2,] <- spt_new@coords[2,];
+   } else if (rgeos::gContains(sp, spt[1]) || rgeos::gIntersects(spt[1], sp)) {
+      # return if first point is inside the polygon or intersects the boundary
+      if (verbose) {
+         jamba::printDebug("polygon_label_segment(): ",
+            "The first point is inside the polygon.");
+      }
+      #lxy[2,] <- lxy[1,];
+      lxy[2,] <- rep(NA, 2);
+   } else {
+      
+      # subtract the polygon from the line
+      sl_diff <- rgeos::gDifference(sl, sp);
+      if (plot_debug) {
+         sp::plot(sl_diff,
+            col="darkorange",
+            lwd=4,
+            lty="dashed",
+            add=TRUE);
+      }
+      
+      # The new line may have multiple segments,
+      # take the first segment that includes the first input point
+      if (verbose) {
+         jamba::printDebug("polygon_label_segment(): ",
+            "The first point is outside the polygon.");
+      }
+      sl_diff_int <- sapply(sl_diff@lines[[1]]@Lines, function(L){
+         sl1 <- sp::SpatialLines(list(sp::Lines(list(L), ID="b")))
+         rgeos::gIntersects(sl1, spt[1])
+      });
+      
+      
+      if (!any(sl_diff_int)) {
+         # make new segment from the first original point
+         # to the first diff line segment
+         lxy[2,] <- sl_diff@lines[[1]]@Lines[[1]]@coords[2,];
+         if (verbose) {
+            jamba::printDebug("polygon_label_segment(): ",
+               "No gDifference segment intersects the source point.");
+         }
+      } else {
+         sl_diff_which <- head(which(sl_diff_int), 1);
+         if (verbose) {
+            jamba::printDebug("polygon_label_segment(): ",
+               "Using first outer line segment ", sl_diff_which);
+         }
+         lxy <- sl_diff@lines[[1]]@Lines[[sl_diff_which]]@coords;
+      }
+   }
+   
+   # optional debug plot
+   if (plot_debug) {
+      if (is.na(lxy[2,1])) {
+         points(x=lxy[1,c(1, 1, 1)],
+            y=lxy[1,c(2, 2, 2)],
+            cex=c(1, 3, 5),
+            pch=c(20, 1, 1),
+            col="red3",
+            add=TRUE);
+      } else {
+         sl@lines[[1]]@Lines[[1]]@coords <- lxy;
+         sp::plot(sl,
+            col="darkorchid4",
+            lwd=4,
+            lty="solid",
+            add=TRUE);
+         points(x=lxy[1:2,c(1, 1, 1)],
+            y=lxy[1:2,c(2, 2, 2)],
+            cex=c(1, 3, 5),
+            pch=c(20, 1, 1),
+            col=rep(c("blue2", "red3"), 3),
+            add=TRUE);
+      }
+   }
+   
+   if ("matrix" %in% return_class) {
+      return(lxy);
+   } else if ("point" %in% return_class) {
+      return(lxy[2,,drop=FALSE]);
+   } else {
+      sl@lines[[1]]@Lines[[1]]@coords <- lxy;
+      return(sl);
+   }
 }

@@ -1,3 +1,57 @@
+# venndir 0.0.6.900
+
+Much closer to a release-ready form. It needs the ggplot2
+option enabled with the newest `render_venndir()` logic.
+
+## bug fixes / changes
+
+* Fixed obscure bug where set names could fail if not provided
+in alphabetic order.
+* Changed `venndir()` default `show_zero=FALSE` to hide empty labels.
+* Removed `ggrender_venndir()` from the exported functions list,
+this function needs to be included inside `render_venndir()`.
+
+## refactoring the details
+
+More refactoring may take place to simplify the workflow,
+until the package is publicized.
+
+* `label_df$col` renamed to `label_df$color` for consistency,
+and preparing for use by others.
+* `ggrender_vendir()` will be retired, or will be converted to
+a simple wrapper function which calls `render_venndir()`.
+
+## new features
+
+* `label_polygon_fill()` new arguments `dither_cex` and `dither_color`
+which slightly adjust the `cex` and `color` values. The
+`cex` is uniformly distributed +/- the `dither_cex` value,
+as a fraction of the `cex`, the default is roughly 4% variation
+in `cex`. The `dither_color` is similar, it adds some
+heterogeneity to `darkFactor` and `sFactor` and calls
+`jamba::makeColorDarker()` to adjust brightness and saturation.
+* `label_polygon_fill()` can plot the polygon buffer behind the
+labels, to review the effect of adjusting `scale_width` for each
+polygon.
+* `label_df` uses `show_label` and `show_items` to control visibility
+of the count label, and item labels, respectively. When the values
+are `NA` it applied default rules, which favors showing count
+label, unless the count label is moved outside the polygon.
+* `label_df` recognizes `x_offset,y_offset` to nudge
+count labels somewhere else. Currently manual, this adjustment
+may be automated at some point. When a label is moved outside
+its parent polygon, a line segment is drawn from the label
+to just inside the polygon boundary. When no items are displayed,
+the segment is drawn more toward the center.
+* `venndir_label_style()` new function to control the visual
+style of count labels, with option to fill and draw a border
+around labels.
+* `polygon_label_segment()` is used when moving a label from inside
+a polygon to somewhere that may or may not be inside that polygon.
+When it is moved outside, it returns the point on the polygon
+boundary along that line segment. It can be used with `sp_buffer`
+so the line can be drawn slightly inside the polygon boundary.
+
 # venndir 0.0.5.900
 
 ## bug fixes

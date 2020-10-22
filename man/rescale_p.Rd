@@ -63,6 +63,8 @@ Other venndir utility:
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
 \code{\link{nudge_sp}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{polygon_label_segment}()},
 \code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
 \code{\link{rescale_ps}()},
@@ -70,6 +72,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
-\code{\link{union_polygons}()}
+\code{\link{union_polygons}()},
+\code{\link{venndir_label_style}()}
 }
 \concept{venndir utility}

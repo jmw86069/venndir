@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert eulerr() output to polygons — eulerr2polys • venndir</title>
+<title>Convert euler output to polygons — eulerr2polys • venndir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Convert eulerr() output to polygons — eulerr2polys" />
-<meta property="og:description" content="Convert eulerr() output to polygons" />
+<meta property="og:title" content="Convert euler output to polygons — eulerr2polys" />
+<meta property="og:description" content="Convert euler output to polygons" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -111,18 +111,28 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Convert eulerr() output to polygons</h1>
+    <h1>Convert euler output to polygons</h1>
     <small class="dont-index">Source: <a href='http://github.com/jmw86069/venndir/blob/master/R/venndir-sp.R'><code>R/venndir-sp.R</code></a></small>
     <div class="hidden name"><code>eulerr2polys.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Convert eulerr() output to polygons</p>
+    <p>Convert euler output to polygons</p>
     </div>
 
     <pre class="usage"><span class='fu'>eulerr2polys</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>sp::SpatialPolygons</a></code> object with one <code><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>sp::Polygons</a></code>
+element for each Euler circle or ellipse.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function takes the output from <code><a href='https://jolars.github.io/eulerr/reference/euler.html'>eulerr::euler()</a></code> and
+converts it to polygons in <code><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>sp::SpatialPolygons</a></code> format.
+Essentially the output from <code><a href='https://jolars.github.io/eulerr/reference/euler.html'>eulerr::euler()</a></code> is either a
+set of circles, or ellipses.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir utility: 
@@ -137,6 +147,8 @@
 <code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
 <code><a href='match_list.html'>match_list</a>()</code>,
 <code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
+<code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
+<code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
 <code><a href='print_color_df.html'>print_color_df</a>()</code>,
 <code><a href='rescale_coordinates.html'>rescale_coordinates</a>()</code>,
 <code><a href='rescale_ps.html'>rescale_ps</a>()</code>,
@@ -145,17 +157,9 @@
 <code><a href='shrink_df.html'>shrink_df</a>()</code>,
 <code><a href='sp_circles.html'>sp_circles</a>()</code>,
 <code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
-<code><a href='union_polygons.html'>union_polygons</a>()</code></p></div>
-    <h2 class="hasAnchor" id="-import-sp"><a class="anchor" href="#-import-sp"></a>@import sp</h2>
+<code><a href='union_polygons.html'>union_polygons</a>()</code>,
+<code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
 
-    
-
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/jolars/eulerr'>eulerr</a></span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; NULL</div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

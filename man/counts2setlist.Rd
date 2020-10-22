@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-conversion.R
 \name{counts2setlist}
 \alias{counts2setlist}
-\title{venndir conversion from combinations to setlist}
+\title{venndir conversion from overlap counts to setlist}
 \usage{
 counts2setlist(x, sep = "&", ...)
 }
@@ -12,7 +12,7 @@ and values of each list element is a vector of items.
 The items are artificial labels used for convenience.
 }
 \description{
-venndir conversion from combinations to setlist
+venndir conversion from overlap counts to setlist
 }
 \details{
 This function takes input in the form of named \code{vector}
@@ -44,6 +44,7 @@ Other venndir conversion:
 \code{\link{im2list}()},
 \code{\link{im_value2list}()},
 \code{\link{list2im_opt}()},
-\code{\link{list2im_value}()}
+\code{\link{list2im_value}()},
+\code{\link{overlaplist2setlist}()}
 }
 \concept{venndir conversion}

@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -115,42 +115,140 @@
 
 <div id="todo-on-venndir" class="section level1">
 
-<div id="add-notice-of-missing-overlaps-to-ggrender_venndir" class="section level2">
+<div id="miscellaneous-items" class="section level2">
 <h2 class="hasAnchor">
-<a href="#add-notice-of-missing-overlaps-to-ggrender_venndir" class="anchor"></a>add notice of missing overlaps to <code>ggrender_venndir()</code>
-</h2>
+<a href="#miscellaneous-items" class="anchor"></a>Miscellaneous items</h2>
+<div id="make-render_venndir-work-for-ggplot2-output" class="section level3">
+<h3 class="hasAnchor">
+<a href="#make-render_venndir-work-for-ggplot2-output" class="anchor"></a>make render_venndir() work for ggplot2 output</h3>
+<ul>
+<li>Essentially roll <code><a href="reference/ggrender_venndir.html">ggrender_venndir()</a></code> into <code><a href="reference/render_venndir.html">render_venndir()</a></code> then remove <code><a href="reference/ggrender_venndir.html">ggrender_venndir()</a></code> (or make it a silent alias.)</li>
+</ul>
 </div>
-<div id="place-set-names-at-periphery-of-venn-circles" class="section level2">
-<h2 class="hasAnchor">
-<a href="#place-set-names-at-periphery-of-venn-circles" class="anchor"></a>place set names at periphery of Venn circles</h2>
+<div id="venn-meme-function" class="section level3">
+<h3 class="hasAnchor">
+<a href="#venn-meme-function" class="anchor"></a>venn meme function</h3>
+<ul>
+<li>basic idea is to make it “easy” to create a Venn meme when needed. The ability is already in place, but seems to have very consistently different default values than other Venn styles.</li>
+</ul>
+</div>
+<div id="item-labels" class="section level3">
+<h3 class="hasAnchor">
+<a href="#item-labels" class="anchor"></a>item labels</h3>
+<ul>
+<li><p>It still sometimes fails to find enough labels inside the polygon, usually for large number of labels. Workaround might be for the user to change layout type to something like <code>"regular"</code> or <code>"nonaligned"</code> which could improve the search success rate.</p></li>
+<li>
+<p>DONE: When there is only one item, consider using the center label instead of choosing a location inside the polygon, which sometimes chooses something away from the center.</p>
+<ul>
+<li>Note that sometimes the <code><a href="https://jolars.github.io/polylabelr//reference/poi.html">polylabelr::poi()</a></code> point is outside the polygon, which happens sometimes when the polygon has a hole or otherwise “weird” shape. The method checks for that and uses the buffer polygon <code><a href="https://rdrr.io/pkg/sp/man/spsample.html">sp::spsample()</a></code> approach if the <code><a href="https://jolars.github.io/polylabelr//reference/poi.html">polylabelr::poi()</a></code> point is not contained in the source polygon.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="label_polygon_fill" class="section level3">
+<h3 class="hasAnchor">
+<a href="#label_polygon_fill" class="anchor"></a>label_polygon_fill</h3>
+<ul>
+<li>add option for scale_width to be relative to the object size instead of absolute dimensions. The idea is for scale_width=-1 to be whatever width barely removes the object, and scale_width=-0.5 is half that width. Thin object at a 45 degree angle would have a large bounding box, but the absolute width would be about half the width of the narrow dimension.</li>
+<li>DONE: dither_cex,dither_color,dither_angle to adjust each text label slightly in three ways: <code>cex</code> to make label font slightly larger or smaller; <code>color</code> to make label color slightly lighter or darker; <code>angle</code> to adjust the angle of text slightly more or less than the original <code>angle</code> value. These effects can help visibly distinguish large number of labels packed into a relatively small polygon area.</li>
+</ul>
+</div>
+<div id="missing-counts-warning" class="section level3">
+<h3 class="hasAnchor">
+<a href="#missing-counts-warning" class="anchor"></a>missing counts warning</h3>
+<ul>
+<li>DONE: The warning needs to check both <code>show_label</code> and <code>show_items</code> for each overlap set before deciding that a set is not displayed.</li>
+<li>Add to ggplot2 output. Currently the notice is only displayed for <code><a href="reference/render_venndir.html">render_venndir()</a></code>, but could use <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">ggtext::geom_textbox()</a></code> for a wider label in ggplot2.</li>
+</ul>
+</div>
+<div id="make-output-compatible-with-plotly-or-something-interactive" class="section level3">
+<h3 class="hasAnchor">
+<a href="#make-output-compatible-with-plotly-or-something-interactive" class="anchor"></a>make output compatible with plotly (or something interactive)</h3>
+<ul>
+<li>Currently <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> is not compatible with <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html">plotly::ggplotly()</a></code> but probably just lacks the <code>to_basic</code> wrapper function. (See <code><a href="https://rdrr.io/pkg/splicejam/man/to_basic.GeomShape.html">splicejam::to_basic.GeomShape()</a></code> for an example workaround.)</li>
+</ul>
+</div>
+<div id="consider-refactoring-base-r-plot-to-use-grid-graphics" class="section level3">
+<h3 class="hasAnchor">
+<a href="#consider-refactoring-base-r-plot-to-use-grid-graphics" class="anchor"></a>consider refactoring “base R plot” to use “grid graphics”</h3>
+<ul>
+<li>The main benefit would be compatibility with <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html">gridtext::richtext_grob()</a></code> which uses grid graphics. Currently using <code>gridBase</code> to combine <code>grid</code> and base R plotting works in interactive R sessions, but in Rmarkdown it is sometimes glitchy, because Rmarkdown now calls <code><a href="https://ragg.r-lib.org/reference/agg_png.html">ragg::agg_png()</a></code> and I’m almost sure this use would not be recommended or supported. “Pick one method” is a reasonable thing to ask of me.</li>
+</ul>
+</div>
+<div id="refactor-venn-count-label-styling" class="section level3">
+<h3 class="hasAnchor">
+<a href="#refactor-venn-count-label-styling" class="anchor"></a>refactor venn count label styling</h3>
+<ul>
+<li>DONE: <code><a href="reference/venndir_label_style.html">venndir_label_style()</a></code>
+</li>
+<li>currently resides inside <code><a href="reference/venndir.html">venndir()</a></code> which makes it hard to change the style in <code><a href="reference/render_venndir.html">render_venndir()</a></code>. I guess ideally the count label style can be updated by a separate function to make it easy to change styles.</li>
+</ul>
+</div>
+<div id="refactor-venndir-output" class="section level3">
+<h3 class="hasAnchor">
+<a href="#refactor-venndir-output" class="anchor"></a>refactor venndir output</h3>
+<p>Most of the changes below are DONE.</p>
+<ul>
+<li>
+<p>each polygon is represented per row in <code>venn_spdf</code></p>
+<ul>
+<li>label (set overlap)</li>
+<li>venn_counts</li>
+<li>count label x,y coordinates</li>
+<li>count label x_offset,y_offset to displace a label outside the polygon (actually the offset will be stored in <code>label_df</code> for each label)</li>
+<li>polygon fill, border</li>
+<li>alpha, lwd, lty</li>
+</ul>
+</li>
+<li>
+<p>each label is represented in label_df, sometimes multiple labels per polygon</p>
+<ul>
+<li><p>venn_counts</p></li>
+<li><p>text (visible label)</p></li>
+<li><p>overlap_set (matches venn_spdf$label)</p></li>
+<li><p>type (main for total counts, signed for directional counts)</p></li>
+<li><p>x,y coordinates for each label (they should move together but not required)</p></li>
+<li><p>x_offset,y_offset for each label (make sure to draw each unique line only once)</p></li>
+<li><p>col (label text color), fill (label box fill), border (label box border)</p></li>
+<li><p>fontsize, vjust, hjust, halign, rot</p></li>
+<li><p>show_label - whether to display <code>text</code> for this polygon</p></li>
+<li><p>show_items - whether to display <code>items</code> for this polygon</p></li>
+<li>
+<p>show_label and show_items are intended to be mutually exclusive per polygon, default behavior:</p>
+<ul>
+<li>default <code>show_label=NA</code> and <code>show_items=NA</code> each row of <code>label_df</code>
+</li>
+<li>function argument decides behavior for rows with <code>NA</code>.</li>
+<li>if any <code>show_label=TRUE</code> for a polygon in <code>label_df</code> then set <code>show_items=FALSE</code>, or in future move the label outside the polygon.</li>
+<li>if <code>show_items=TRUE</code> then if <code>length(items) &gt; max_items</code> then set <code>show_items=FALSE</code> and <code>show_label=TRUE</code>.</li>
+<li>if both <code>show_labels=TRUE</code> and <code>show_items=TRUE</code> then display both, trust the user to adjust coordinates as needed.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="option-to-place-set-names-at-periphery-of-venn-circles" class="section level3">
+<h3 class="hasAnchor">
+<a href="#option-to-place-set-names-at-periphery-of-venn-circles" class="anchor"></a>option to place set names at periphery of Venn circles</h3>
 <ul>
 <li>outer label placement will be necessary when displaying items inside each polygon. Even if I could determine the count label size inside the polygon to place labels around it, it seems non-ideal</li>
 <li>this process is different for proportional circles which may be placed at various locations</li>
 <li>for Venn circles and ellipses the coordinates could be pre-defined</li>
 </ul>
 </div>
-<div id="place-count-labels-outside-a-polygon" class="section level2">
-<h2 class="hasAnchor">
-<a href="#place-count-labels-outside-a-polygon" class="anchor"></a>place count labels outside a polygon</h2>
+<div id="done-option-to-move-count-labels-outside-the-polygon" class="section level3">
+<h3 class="hasAnchor">
+<a href="#done-option-to-move-count-labels-outside-the-polygon" class="anchor"></a>DONE: option to move count labels outside the polygon</h3>
 <ul>
-<li>when polygons are small and count labels do not fit inside, we need a method to push the label elsewhere, and draw a line segment back to the polygon center.</li>
-<li>maybe a label_offset, which moves a label from its normal position to a new position – thus triggering a segment between those two points.</li>
+<li>
+<p>DONE: implement <code>x_offset,y_offset</code> for count labels</p>
+<ul>
+<li>Draw a line to polygon border if needed (<code><a href="reference/polygon_label_segment.html">polygon_label_segment()</a></code>)</li>
+</ul>
+</li>
 </ul>
 </div>
-<div id="consider-switching-default-venndir-to-call-ggplot2" class="section level2">
-<h2 class="hasAnchor">
-<a href="#consider-switching-default-venndir-to-call-ggplot2" class="anchor"></a>consider switching default <code>venndir()</code> to call ggplot2</h2>
-<ul>
-<li>could move <code><a href="reference/ggrender_venndir.html">ggrender_venndir()</a></code> into <code><a href="reference/render_venndir.html">render_venndir()</a></code> and have just the one function serve both purposes.</li>
-<li>note that pkgdown output for most example pages is not aligned, probably because <code>gridBase</code> is not compatible with the ragg rendering engine used for pkgdown. Mixing base R with grid R graphics is not going to be well-supported.</li>
-</ul>
-</div>
-<div id="find-some-betterhumorous-venn-diagram-examples" class="section level2">
-<h2 class="hasAnchor">
-<a href="#find-some-betterhumorous-venn-diagram-examples" class="anchor"></a>find some better/humorous Venn diagram examples</h2>
-<ul>
-<li>bonus points if the items include some sort of image or icon that could be placed beside the item labels.</li>
-</ul>
 </div>
 </div>
 

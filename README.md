@@ -81,8 +81,8 @@ venndir(setlist, proportional=TRUE)
 <img src="man/figures/README-venndir_each_p-1.png" width="100%" />
 
 At this point, labeling is an issue, and the best current remedy is
-manual adjustment. (In future, non-overlapping labels will be
-available.)
+manual placement of labels. So I’m trying to make it easy to move
+labels.
 
 The output of `venndir()` contains a `list` with the polygon
 coordinates, and the label coordinates, so you can manually adjust as
@@ -91,36 +91,53 @@ needed.
 Also, I really like having a function named `render_venndir()`.
 
 ``` r
+setlist <- make_venn_test(1000, 3, do_signed=TRUE)
 venndir_output <- venndir(setlist, proportional=TRUE, do_plot=FALSE);
 
-# get label coordinate data
-label_df <- venndir_output$label_df;
-
-# get polygon data
-venn_spdf <- venndir_output$venn_spdf;
 
 # adjust set_A&set_C
-ac_rows <- which(label_df$overlap_set %in% "set_A&set_C");
-label_df <- venndir_output$label_df;
-label_df[ac_rows,"x"] <- label_df[ac_rows,"x"] - 4.2;
-label_df[ac_rows,"y"] <- label_df[ac_rows,"y"] + 1.3;
-
-# be fancy and add color background to the label
-label_df[ac_rows,"fill"] <- jamba::alpha2col(data.frame(venn_spdf)["set_A&set_C","color"], alpha=0.5);
-label_df[ac_rows,"border"] <- data.frame(venn_spdf)["set_A&set_C","color"];
-
-render_venndir(venn_spdf=venn_spdf, label_df=label_df, font_cex=1.3)
-
-lines(x=label_df[ac_rows[1],"x"] + c(1.5, 4.2),
-   y=label_df[ac_rows[1],"y"] + c(-0.4, -1.3))
+venndir_output <- nudge_venndir_label(venndir_output,
+   set=c("set_A&set_C"),
+   x_offset=-4.6,
+   y_offset=1.3,
+   unit_type="absolute");
+render_venndir(venndir_output)
 ```
 
 <img src="man/figures/README-venndir_each_p2-1.png" width="100%" />
 
+When the label is moved outside the venn set polygon, a line segment is
+automatically drawn to just inside the border.
+
+Lastly, you can customize the label style, using
+`venndir_label_style()`. There are two aspects to the label style:
+background fill, and border outline.
+
+For background fill, the options are:
+
+  - `"basic"` or `"none"` which does not have background fill
+  - `"lite"` which uses a default lite background color
+  - `"shaded"` which uses semi-transparent fill using the polygon color
+  - `"fill"` which uses opaque fill using the polygon color
+
+For the border, include `"box"` somewhere in the `label_style`.
+
+Examples: `label_style="lite box"`, `label_style="shaded"`,
+`label_style="basic"`.
+
+``` r
+venndir_output <- venndir_label_style(venndir_output,
+   label_style="lite box")
+render_venndir(venndir_output);
+```
+
+<img src="man/figures/README-label_style_1-1.png" width="100%" />
+
 ## Text Venn?
 
 There is a text Venn diagram, surprisingly useful for quickly checking
-overlaps and direction.
+overlaps and direction. Note that the R console, and R help examples
+display colored text, just not in Rmarkdown.
 
 The first example is the basic Venn overlap, without direction.
 
@@ -235,7 +252,8 @@ discordant signs.
 
 ``` r
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
-venndir(setlist, display_items="sign item");
+venndir(setlist,
+   show_items="sign item");
 ```
 
 <img src="man/figures/README-vennitems_1-1.png" width="100%" />
@@ -249,8 +267,8 @@ effectively uniform:
 ``` r
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir(setlist,
-  display_items="item",
-  proportional=TRUE);
+   show_items="item",
+   proportional=TRUE);
 ```
 
 <img src="man/figures/README-vennitems_1p-1.png" width="100%" />
@@ -259,8 +277,10 @@ With too many features to label, it’s still interesting to indicate the
 sign.
 
 ``` r
-setlist <- make_venn_test(10000, 3, do_signed=TRUE);
-venndir(setlist, display_items="sign");
+setlist <- make_venn_test(5000, 3, do_signed=TRUE);
+venndir(setlist,
+   show_items="sign",
+   max_items=10000);
 ```
 
 <img src="man/figures/README-vennitems_2-1.png" width="100%" />
@@ -269,9 +289,10 @@ Again, proportional Venn circles effectively makes the density uniform.
 
 ``` r
 venndir(setlist,
-  overlap_type="each",
-  display_items="sign",
-  proportional=TRUE);
+   overlap_type="each",
+   show_items="sign",
+   max_items=10000,
+   proportional=TRUE);
 ```
 
 <img src="man/figures/README-vennitems_2p-1.png" width="100%" />

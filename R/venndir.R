@@ -136,16 +136,16 @@
 #'    are proportionally sized, also known as a Euler diagram. Note
 #'    that proportionally sized circles are not guaranteed to represent
 #'    every possible overlap.
-#' @param display_items `character` indicating the type of item
+#' @param show_items `character` indicating the type of item
 #'    label: `"none"` does not display item labels; `"sign"`
 #'    displays the sign; `"item"` displays the item; `"sign item"`
 #'    will display the sign and item together; `"item sign"` will
 #'    reverse the order, with item followed by sign. In this
 #'    context `"sign"` refers to the incidence values concatenated
 #'    by space, sent to `curate_venn_labels(..., type="sign")`.
-#' @param display_zero `logical` indicating whether empty overlaps
-#'    are labeled with zero `0` when `display_zero=TRUE`, or are
-#'    blank when `display_zero=FALSE`.
+#' @param show_zero `logical` indicating whether empty overlaps
+#'    are labeled with zero `0` when `show_zero=TRUE`, or are
+#'    blank when `show_zero=FALSE`.
 #' @param font_cex `numeric` `vector` length 2, indicating relative
 #'    font size for the main label, and directional label, respectively.
 #'    The default `c(1, 0.8)` defines the main label with 1x size,
@@ -199,14 +199,14 @@
 #' # nudge circles and hide the zero
 #' venndir(setlist,
 #'    proportional=TRUE,
-#'    display_zero=FALSE,
+#'    show_zero=FALSE,
 #'    circle_nudge=list(set_C=c(-0.5, 0.1))
 #' )
 #' 
 #' # nudge circles so one overlap is no longer shown
 #' venndir(setlist,
 #'    proportional=TRUE,
-#'    display_zero=FALSE,
+#'    show_zero=FALSE,
 #'    circle_nudge=list(set_C=c(-1.4, 0.1))
 #' )
 #' 
@@ -232,7 +232,7 @@
 #'    overlap_type="each",
 #'    font_cex=c(1.5, 0.9), 
 #'    curate_df=curate_df,
-#'    display_zero=TRUE);
+#'    show_zero=TRUE);
 #' 
 #' 
 #' @export
@@ -243,9 +243,10 @@ venndir <- function
  set_colors=NULL,
  proportional=FALSE,
  return_items=FALSE,
- display_items=c("none", "sign item", "sign", "item"),
+ show_label=NA,
+ show_items=c(NA, "none", "sign item", "sign", "item"),
  display_counts=TRUE,
- display_zero=TRUE,
+ show_zero=FALSE,
  font_cex=c(1, 0.8),
  poly_alpha=0.5,
  alpha_by_counts=FALSE,
@@ -255,9 +256,8 @@ venndir <- function
     "shaded_box",
     "lite",
     "lite_box"),
- x_nudge=NULL,
- y_nudge=NULL,
  circle_nudge=NULL,
+ rotate_degrees=0,
  unicode=TRUE,
  big.mark=",",
  curate_df=NULL,
@@ -275,13 +275,12 @@ venndir <- function
    overlap_type <- match.arg(overlap_type);
    plot_style <- match.arg(plot_style);
    label_style <- head(label_style, 1);
-   display_items <- head(display_items, 1);
-   if (length(display_items) == 0) {
-      display_items <- "none";
+   show_items <- head(show_items, 1);
+   if (length(show_items) == 0) {
+      show_items <- NA;
    }
-   if (!"none" %in% display_items) {
+   if (any(!show_items %in% c("none","FALSE"))) {
       return_items <- TRUE;
-      display_counts <- FALSE;
    }
 
    if (length(font_cex) < 2) {
@@ -347,11 +346,19 @@ venndir <- function
       proportional=proportional,
       circle_nudge=circle_nudge,
       ...);
+   
+   # optionally rotate the shapes
+   if (length(rotate_degrees) > 0 && rotate_degrees != 0) {
+      venn_sp <- rescale_sp(sp=venn_sp,
+         share_center=TRUE,
+         rotate_degrees=rotate_degrees);
+   }
 
    # convert to venn overlap polygons
    venn_spdf <- find_vennpoly_overlaps(venn_sp,
       venn_counts=nCounts,
-      venn_colors=set_color); # removed ...
+      venn_colors=set_color,
+      ...); # removed ...
    
    # generate labels from nCounts and gCounts
    nlabel_df <- data.frame(label=names(nCounts),
@@ -485,10 +492,10 @@ venndir <- function
          gCounts_len);
    }
 
-   ## Hide zero if display_zero=FALSE
+   ## Hide zero if show_zero=FALSE
    show_main <- (!is.na(nlabel_df$x_label));
    show_signed <- rep(show_main, gCounts_len);
-   if (!display_zero && any(nlabel_df$venn_counts == 0)) {
+   if (!show_zero && any(nlabel_df$venn_counts == 0)) {
       show_main <- (show_main & nlabel_df$venn_counts != 0);
    }
    show_signed <- (show_signed & unlist(gCounts) != 0)
@@ -513,12 +520,13 @@ venndir <- function
          rep(nlabel_df$label, gCounts_len)),
       type=rep(c("main", "signed"),
          c(length(x_main), length(x_signed))),
-      show_label=c(show_main, show_signed),
+      #show_label=c(show_main, show_signed),
+      show_label=NA,
       vjust=c(vjust_main, vjust_signed),
       hjust=c(hjust_main, hjust_signed),
       halign=c(halign_main, halign_signed),
       rot=rep(0, label_n),
-      col=unlist(c(label_color_main, gbase_colors)),
+      color=unlist(c(label_color_main, gbase_colors)),
       fontsize=rep(c(14, 14) * font_cex,
          c(length(x_main), length(x_signed))),
       border=c(label_border_main, label_border_signed),
@@ -542,7 +550,8 @@ venndir <- function
    
    ## Check for missing signed labels, then we nudge main label to center
    for (i in unique(label_df$overlap_set)) {
-      irows <- (label_df$overlap_set %in% i & label_df$show_label);
+      irows <- (label_df$overlap_set %in% i & 
+            label_df$show_label %in% c(NA,TRUE));
       if (length(unique(label_df[irows,"type"])) == 1) {
          label_df[irows,"hjust"] <- 0.5;
       }
@@ -550,19 +559,19 @@ venndir <- function
 
    ## Adjust signed color
    g_update <- (label_df$type %in% "signed" &
-      label_df$show_label & 
+      label_df$show_label %in% c(NA,TRUE) & 
       (!is.na(label_df$fill) |
          (label_df$overlap_set %in% venn_spdf$label)));
    if (any(g_update)) {
       g_update_match <- match(label_df$overlap_set[g_update],
          venn_spdf$label);
-      g_update_color <- label_df$col[g_update];
+      g_update_color <- label_df$color[g_update];
       g_update_fill <- ifelse(is.na(label_df$fill[g_update]),
          jamba::alpha2col(
             venn_spdf$color[g_update_match],
             alpha=venn_spdf$alpha[g_update_match]),
          label_df$fill[g_update]);
-      label_df$col[g_update] <- make_color_contrast(g_update_color, g_update_fill);
+      label_df$color[g_update] <- make_color_contrast(g_update_color, g_update_fill);
    }
    if (!"overlap" %in% overlap_type && any(label_df$type %in% "signed")) {
       ## Adjust signed labels for contrast
@@ -577,13 +586,13 @@ venndir <- function
       bg_fill <- ifelse(is.na(label_df$fill),
          "white",
          poly_fill);
-      label_col1 <- label_df$col;
+      label_col1 <- label_df$color;
       label_col <- make_color_contrast(
-         x=label_df$col,
+         x=label_df$color,
          y=label_fill,
          bg=bg_fill,
          ...);
-      label_df$col[is_signed] <- label_col[is_signed];
+      label_df$color[is_signed] <- label_col[is_signed];
    }
    
    ## Optionally return items
@@ -595,17 +604,25 @@ venndir <- function
    
    ## Call render_venndir()
    gg <- NULL;
+   if (!display_counts) {
+      #label_df$show_label <- FALSE;
+      label_df$display_counts <- FALSE;
+   }
    if (do_plot) {
       if ("base" %in% plot_style) {
          render_venndir(venn_spdf=venn_spdf,
             label_df=label_df,
-            display_items=display_items,
+            show_label=show_label,
+            show_items=show_items,
+            show_zero=show_zero,
             display_counts=display_counts,
+            label_style=label_style,
+            plot_style=plot_style,
             ...);
       } else {
          gg <- ggrender_venndir(venn_spdf=venn_spdf,
             label_df=label_df,
-            display_items=display_items,
+            show_items=show_items,
             display_counts=display_counts,
             ...);
          print(gg);

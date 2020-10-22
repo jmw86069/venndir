@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -225,6 +225,8 @@ are returned as an attribute <code>"venn_missing"</code>.</p>
 <code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
 <code><a href='match_list.html'>match_list</a>()</code>,
 <code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
+<code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
+<code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
 <code><a href='print_color_df.html'>print_color_df</a>()</code>,
 <code><a href='rescale_coordinates.html'>rescale_coordinates</a>()</code>,
 <code><a href='rescale_ps.html'>rescale_ps</a>()</code>,
@@ -233,7 +235,8 @@ are returned as an attribute <code>"venn_missing"</code>.</p>
 <code><a href='shrink_df.html'>shrink_df</a>()</code>,
 <code><a href='sp_circles.html'>sp_circles</a>()</code>,
 <code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
-<code><a href='union_polygons.html'>union_polygons</a>()</code></p></div>
+<code><a href='union_polygons.html'>union_polygons</a>()</code>,
+<code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># simple Venn circles</span>
@@ -251,7 +254,7 @@ are returned as an attribute <code>"venn_missing"</code>.</p>
 #&gt; C   #0091FFFF     C           3  #0091FFFF  3.26938168  0.1394788
 #&gt; B&amp;C #8BB47BFF   B&amp;C           2  #8BB47BFF  2.00960662  0.1850620</div><div class='input'>
 <span class='co'># simple Venn plot</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>spdf</span>, col<span class='op'>=</span><span class='va'>spdf</span><span class='op'>$</span><span class='va'>color</span><span class='op'>)</span>
+<span class='fu'>sp</span><span class='fu'>::</span><span class='fu'>plot</span><span class='op'>(</span><span class='va'>spdf</span>, col<span class='op'>=</span><span class='va'>spdf</span><span class='op'>$</span><span class='va'>color</span><span class='op'>)</span>
 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/text.html'>text</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>spdf</span><span class='op'>$</span><span class='va'>x_label</span>,
    y<span class='op'>=</span><span class='va'>spdf</span><span class='op'>$</span><span class='va'>y_label</span>,
    labels<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>spdf</span><span class='op'>$</span><span class='va'>label</span>,

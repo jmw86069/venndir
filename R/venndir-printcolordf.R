@@ -174,10 +174,10 @@ make_color_contrast <- function
 (x,
  y,
  bg="white",
- L_threshold=50,
+ L_threshold=55,
  C_floor=130,
  L_hi=80,
- L_lo=50,
+ L_lo=40,
  do_plot=FALSE,
  cex=2,
  ...)

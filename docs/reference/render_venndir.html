@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -129,12 +129,17 @@
   ylim <span class='op'>=</span> <span class='cn'>NULL</span>,
   xpd <span class='op'>=</span> <span class='cn'>NA</span>,
   font_cex <span class='op'>=</span> <span class='fl'>1</span>,
+  item_cex <span class='op'>=</span> <span class='fl'>0.9</span>,
   plot_warning <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  display_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"sign label"</span>, <span class='st'>"label"</span>, <span class='st'>"sign"</span><span class='op'>)</span>,
-  item_angle <span class='op'>=</span> <span class='fl'>20</span>,
+  show_label <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  show_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"sign label"</span>, <span class='st'>"label"</span>, <span class='st'>"sign"</span><span class='op'>)</span>,
+  show_zero <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  item_angle <span class='op'>=</span> <span class='op'>-</span><span class='fl'>18</span>,
   display_counts <span class='op'>=</span> <span class='cn'>TRUE</span>,
   max_items <span class='op'>=</span> <span class='fl'>100</span>,
+  label_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"basic"</span>, <span class='st'>"fill"</span>, <span class='st'>"shaded"</span>, <span class='st'>"shaded_box"</span>, <span class='st'>"lite"</span>, <span class='st'>"lite_box"</span><span class='op'>)</span>,
   fontfamily <span class='op'>=</span> <span class='st'>"Arial"</span>,
+  plot_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"base"</span>, <span class='st'>"gg"</span><span class='op'>)</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -157,8 +162,8 @@ expected to contain colnames:</p><ul>
 <li><p><code>"color"</code> with fill color;</p></li>
 <li><p><code>"alpha"</code> with transparency optionally applied to <code>"color"</code>;</p></li>
 <li><p><code>"border"</code> with border color, where <code>NA</code> draws no border;</p></li>
-<li><p><code>"lwd"</code> with line width; and <code>"lty"</code> with line type. Only</p></li>
-<li><p><code>"color"</code> is required, the others are filled with defaults
+<li><p><code>"lwd"</code> with line width; and <code>"lty"</code> with line type. Only
+<code>"color"</code> is required, the others are filled with defaults
 as needed.</p></li>
 </ul></td>
     </tr>
@@ -174,10 +179,11 @@ format compatible with <code><a href='https://wilkelab.org/gridtext/reference/ri
 
 <p>Optional colnames are filled with defaults as needed:</p><ul>
 <li><p><code>"show_label"</code> a <code>logical</code> vector for which labels to show <code>[TRUE]</code>;</p></li>
+<li><p><code>"show_items"</code> a <code>logical</code> indicating whether to show item labels <code>[FALSE]</code>;</p></li>
 <li><p><code>"vjust"</code>, <code>"hjust"</code> vertical/horizontal position <code>[0.5, 0.5]</code>;</p></li>
 <li><p><code>"halign"</code> with horizontal alignment <code>[0.5]</code>;</p></li>
 <li><p><code>"rot"</code> label rotation <code>[0]</code>;</p></li>
-<li><p><code>"col"</code> label color <code>[black]</code>;</p></li>
+<li><p><code>"color"</code> label color <code>[black]</code>;</p></li>
 <li><p><code>"fontsize"</code> fontsize used by <code>grid::par()</code> <code>[14]</code>;</p></li>
 <li><p><code>"border"</code> border color, where <code>NA</code> draws no border <code>[NA]</code>;</p></li>
 <li><p><code>"lty"</code>, <code>"lwd"</code> line type and line width <code>[1, 1]</code>;</p></li>
@@ -187,6 +193,9 @@ to define padding around each label <code>[2, "pt"]</code>;</p></li>
 <li><p><code>"r"</code>, <code>"r_unit"</code> passed to <code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code> to define
 rounded corners, relevant only when <code>"border"</code> or <code>"fill"</code> are
 not <code>NA</code> <code>[2, "pt"]</code>.</p></li>
+<li><p><code>"item_cex"</code> cex adjustment for item labels</p></li>
+<li><p><code>"show_label"</code> <code>logical</code> indicating whether to show each label</p></li>
+<li><p><code>"show_items"</code> <code>logical</code> indicating whether to show items</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -221,6 +230,32 @@ or cannot represent every possible overlap, causing some
 overlaps to be hidden from the plot.</p></td>
     </tr>
     <tr>
+      <th>label_style</th>
+      <td><p><code>character</code> string indicating the style of label
+to display. The values <code>"basic","none","shaded","lite","fill"</code>
+style the label background fill, while presence of <code>"box"</code> in
+the string will draw a border around the label:
+<code>"basic"</code> or <code>"none"</code> uses no background fill,
+<code>"lite"</code> uses lite background fill,
+<code>"fill"</code> uses opaque fill with the overlap set color,
+<code>"shaded"</code> uses slightly transparent fill with overlap set color,
+<code>"box"</code> displays border around the label.</p></td>
+    </tr>
+    <tr>
+      <th>fontfamily</th>
+      <td><p><code>character</code> string indicating the font family,
+which can be useful if Unicode characters are displayed as empty
+boxes instead of proper Unicode characters. This value may be
+device-dependent, for example fonts available for PDF output
+may differ from those for PNG.</p></td>
+    </tr>
+    <tr>
+      <th>plot_style</th>
+      <td><p><code>character</code> string indicating the style
+of plot: <code>"base"</code> uses base R graphics; <code>"gg"</code> uses
+ggplot2 graphics (not yet implemented).</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>additional arguments are passed to <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code>
 when plotting <code>venn_spdf</code> which is expected to be a
@@ -236,7 +271,6 @@ of various aspects of the figure.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir core: 
-<code><a href='ggrender_venndir.html'>ggrender_venndir</a>()</code>,
 <code><a href='signed_overlaps.html'>signed_overlaps</a>()</code>,
 <code><a href='textvenn.html'>textvenn</a>()</code>,
 <code><a href='venndir.html'>venndir</a>()</code></p></div>

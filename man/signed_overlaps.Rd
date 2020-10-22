@@ -110,7 +110,6 @@ signed_overlaps(setlist, "agreement");
 }
 \seealso{
 Other venndir core: 
-\code{\link{ggrender_venndir}()},
 \code{\link{render_venndir}()},
 \code{\link{textvenn}()},
 \code{\link{venndir}()}

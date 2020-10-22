@@ -11,16 +11,16 @@ venndir(
   set_colors = NULL,
   proportional = FALSE,
   return_items = FALSE,
-  display_items = c("none", "sign item", "sign", "item"),
+  show_label = NA,
+  show_items = c(NA, "none", "sign item", "sign", "item"),
   display_counts = TRUE,
-  display_zero = TRUE,
+  show_zero = FALSE,
   font_cex = c(1, 0.8),
   poly_alpha = 0.5,
   alpha_by_counts = FALSE,
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
-  x_nudge = NULL,
-  y_nudge = NULL,
   circle_nudge = NULL,
+  rotate_degrees = 0,
   unicode = TRUE,
   big.mark = ",",
   curate_df = NULL,
@@ -60,7 +60,7 @@ every possible overlap.}
 \item{return_items}{\code{logical} indicating whether to return
 the items within each overlap set.}
 
-\item{display_items}{\code{character} indicating the type of item
+\item{show_items}{\code{character} indicating the type of item
 label: \code{"none"} does not display item labels; \code{"sign"}
 displays the sign; \code{"item"} displays the item; \code{"sign item"}
 will display the sign and item together; \code{"item sign"} will
@@ -68,9 +68,9 @@ reverse the order, with item followed by sign. In this
 context \code{"sign"} refers to the incidence values concatenated
 by space, sent to \code{curate_venn_labels(..., type="sign")}.}
 
-\item{display_zero}{\code{logical} indicating whether empty overlaps
-are labeled with zero \code{0} when \code{display_zero=TRUE}, or are
-blank when \code{display_zero=FALSE}.}
+\item{show_zero}{\code{logical} indicating whether empty overlaps
+are labeled with zero \code{0} when \code{show_zero=TRUE}, or are
+blank when \code{show_zero=FALSE}.}
 
 \item{font_cex}{\code{numeric} \code{vector} length 2, indicating relative
 font size for the main label, and directional label, respectively.
@@ -256,14 +256,14 @@ venndir(setlist,
 # nudge circles and hide the zero
 venndir(setlist,
    proportional=TRUE,
-   display_zero=FALSE,
+   show_zero=FALSE,
    circle_nudge=list(set_C=c(-0.5, 0.1))
 )
 
 # nudge circles so one overlap is no longer shown
 venndir(setlist,
    proportional=TRUE,
-   display_zero=FALSE,
+   show_zero=FALSE,
    circle_nudge=list(set_C=c(-1.4, 0.1))
 )
 
@@ -289,13 +289,12 @@ vo <- venndir(setlistv,
    overlap_type="each",
    font_cex=c(1.5, 0.9), 
    curate_df=curate_df,
-   display_zero=TRUE);
+   show_zero=TRUE);
 
 
 }
 \seealso{
 Other venndir core: 
-\code{\link{ggrender_venndir}()},
 \code{\link{render_venndir}()},
 \code{\link{signed_overlaps}()},
 \code{\link{textvenn}()}

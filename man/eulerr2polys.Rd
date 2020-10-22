@@ -2,17 +2,22 @@
 % Please edit documentation in R/venndir-sp.R
 \name{eulerr2polys}
 \alias{eulerr2polys}
-\title{Convert eulerr() output to polygons}
+\title{Convert euler output to polygons}
 \usage{
 eulerr2polys(x)
 }
+\value{
+\code{sp::SpatialPolygons} object with one \code{sp::Polygons}
+element for each Euler circle or ellipse.
+}
 \description{
-Convert eulerr() output to polygons
+Convert euler output to polygons
 }
-\examples{
-if (require(eulerr)) {
-}
-
+\details{
+This function takes the output from \code{eulerr::euler()} and
+converts it to polygons in \code{sp::SpatialPolygons} format.
+Essentially the output from \code{eulerr::euler()} is either a
+set of circles, or ellipses.
 }
 \seealso{
 Other venndir utility: 
@@ -27,6 +32,8 @@ Other venndir utility:
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
 \code{\link{nudge_sp}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{polygon_label_segment}()},
 \code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
 \code{\link{rescale_ps}()},
@@ -35,8 +42,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
-\code{\link{union_polygons}()}
+\code{\link{union_polygons}()},
+\code{\link{venndir_label_style}()}
 }
 \concept{venndir utility}
-\section{@import sp}{
-}

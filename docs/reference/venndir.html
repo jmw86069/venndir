@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -127,16 +127,16 @@
   set_colors <span class='op'>=</span> <span class='cn'>NULL</span>,
   proportional <span class='op'>=</span> <span class='cn'>FALSE</span>,
   return_items <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  display_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"sign item"</span>, <span class='st'>"sign"</span>, <span class='st'>"item"</span><span class='op'>)</span>,
+  show_label <span class='op'>=</span> <span class='cn'>NA</span>,
+  show_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='st'>"none"</span>, <span class='st'>"sign item"</span>, <span class='st'>"sign"</span>, <span class='st'>"item"</span><span class='op'>)</span>,
   display_counts <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  display_zero <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  show_zero <span class='op'>=</span> <span class='cn'>FALSE</span>,
   font_cex <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0.8</span><span class='op'>)</span>,
   poly_alpha <span class='op'>=</span> <span class='fl'>0.5</span>,
   alpha_by_counts <span class='op'>=</span> <span class='cn'>FALSE</span>,
   label_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"basic"</span>, <span class='st'>"fill"</span>, <span class='st'>"shaded"</span>, <span class='st'>"shaded_box"</span>, <span class='st'>"lite"</span>, <span class='st'>"lite_box"</span><span class='op'>)</span>,
-  x_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
-  y_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
   circle_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
+  rotate_degrees <span class='op'>=</span> <span class='fl'>0</span>,
   unicode <span class='op'>=</span> <span class='cn'>TRUE</span>,
   big.mark <span class='op'>=</span> <span class='st'>","</span>,
   curate_df <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -191,7 +191,7 @@ every possible overlap.</p></td>
 the items within each overlap set.</p></td>
     </tr>
     <tr>
-      <th>display_items</th>
+      <th>show_items</th>
       <td><p><code>character</code> indicating the type of item
 label: <code>"none"</code> does not display item labels; <code>"sign"</code>
 displays the sign; <code>"item"</code> displays the item; <code>"sign item"</code>
@@ -201,10 +201,10 @@ context <code>"sign"</code> refers to the incidence values concatenated
 by space, sent to <code><a href='curate_venn_labels.html'>curate_venn_labels(..., type="sign")</a></code>.</p></td>
     </tr>
     <tr>
-      <th>display_zero</th>
+      <th>show_zero</th>
       <td><p><code>logical</code> indicating whether empty overlaps
-are labeled with zero <code>0</code> when <code>display_zero=TRUE</code>, or are
-blank when <code>display_zero=FALSE</code>.</p></td>
+are labeled with zero <code>0</code> when <code>show_zero=TRUE</code>, or are
+blank when <code>show_zero=FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>font_cex</th>
@@ -374,7 +374,6 @@ much more customized options.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir core: 
-<code><a href='ggrender_venndir.html'>ggrender_venndir</a>()</code>,
 <code><a href='render_venndir.html'>render_venndir</a>()</code>,
 <code><a href='signed_overlaps.html'>signed_overlaps</a>()</code>,
 <code><a href='textvenn.html'>textvenn</a>()</code></p></div>
@@ -419,14 +418,14 @@ much more customized options.</p>
 <span class='co'># nudge circles and hide the zero</span>
 <span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>,
    proportional<span class='op'>=</span><span class='cn'>TRUE</span>,
-   display_zero<span class='op'>=</span><span class='cn'>FALSE</span>,
+   show_zero<span class='op'>=</span><span class='cn'>FALSE</span>,
    circle_nudge<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>set_C<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.5</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span>
 </div><div class='img'><img src='venndir-11.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='co'># nudge circles so one overlap is no longer shown</span>
 <span class='fu'>venndir</span><span class='op'>(</span><span class='va'>setlist</span>,
    proportional<span class='op'>=</span><span class='cn'>TRUE</span>,
-   display_zero<span class='op'>=</span><span class='cn'>FALSE</span>,
+   show_zero<span class='op'>=</span><span class='cn'>FALSE</span>,
    circle_nudge<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>set_C<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1.4</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span>
 </div><div class='img'><img src='venndir-12.png' alt='' width='768' height='768' /></div><div class='input'>
@@ -452,7 +451,7 @@ much more customized options.</p>
    overlap_type<span class='op'>=</span><span class='st'>"each"</span>,
    font_cex<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.5</span>, <span class='fl'>0.9</span><span class='op'>)</span>, 
    curate_df<span class='op'>=</span><span class='va'>curate_df</span>,
-   display_zero<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
+   show_zero<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
 </div><div class='img'><img src='venndir-15.png' alt='' width='768' height='768' /></div><div class='input'>
 
 </div></pre>
