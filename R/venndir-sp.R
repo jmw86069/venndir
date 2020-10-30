@@ -172,10 +172,14 @@ find_vennpoly_overlaps <- function
    }
    
    if (length(venn_counts) > 0) {
-      venn_counts_names <- strsplit(names(venn_counts), "&");
+      venn_counts_names <- strsplit(names(venn_counts),
+         fixed=TRUE,
+         sep);
    }
    if (length(venn_items) > 0) {
-      venn_items_names <- strsplit(names(venn_items), "&");
+      venn_items_names <- strsplit(names(venn_items),
+         fixed=TRUE,
+         sep);
    }
    
    ## calculate venn overlap polygons
@@ -195,7 +199,7 @@ find_vennpoly_overlaps <- function
       poly_name <- paste(
          #jamba::mixedSort(colnames(el1)[whichYes]),
          (colnames(el1)[whichYes]),
-         collapse="&");
+         collapse=sep);
       if (length(venn_counts) > 0) {
          venn_match <- match_list(list(i_names), venn_counts_names);
          if (is.na(venn_match)) {
@@ -762,12 +766,18 @@ nudge_sp <- function
 #' @param seed `numeric` or `NULL`, where a `numeric` value is
 #'    passed to `set.seed()` to make the `dither_cex` process reproducible.
 #'    Set `seed=NULL` to disable this step.
+#' @param plot_style `character` string indicating the expected output
+#'    plot style: `"base"` uses base R graphics, `gridtext::richtext_grob()`;
+#'    `"gg"` uses `ggplot2` style; `"none"` does not plot anything.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' 
 #' @return `list` that contains: `items_df` as a `data.frame` of item
 #'    label coordinates; and `g_labels` as output from
 #'    `gridtext::richtext_grob()` whose coordinates are defined
-#'    as `"native"`.
+#'    as `"native"`, or `g_labels=NULL` when `plot_style="gg"`;
+#'    `scale_width` with the `numeric` value used; and
+#'    `sp_buffer` with the `sp::SpatialPolygons` object representing
+#'    the buffer region used for item labels.
 #' 
 #' @family venndir utility
 #' 
@@ -853,11 +863,13 @@ label_polygon_fill <- function
  draw_points=FALSE,
  draw_labels=TRUE,
  seed=NULL,
+ plot_style=c("base", "gg", "none"),
  verbose=FALSE,
  ...)
 {
    ##
    label_method <- match.arg(label_method);
+   plot_style <- match.arg(plot_style);
    if (length(seed) == 1) {
       set.seed(seed);
    }
@@ -1051,42 +1063,46 @@ label_polygon_fill <- function
       border=border,
       stringsAsFactors=FALSE);
 
-   # define text label grob   
-   g_labels <- gridtext::richtext_grob(
-      x=label_xy[,1],
-      y=label_xy[,2],
-      text=labels,
-      rot=-angle,
-      default.units="native",
-      padding=grid::unit(2, "pt"),
-      r=grid::unit(2, "pt"),
-      vjust=0.5,
-      hjust=0.5,
-      halign=0.5,
-      gp=grid::gpar(
-         col=color,
-         fontsize=fontsize * cex
-      ),
-      box_gp=grid::gpar(
-         col=border
-      )
-   );
-   
-   if (draw_labels) {
-      ## Draw labels
-      # to draw using grid we have to use a custom viewport
-      if (length(dev.list()) > 0) {
-         vps <- gridBase::baseViewports();
-         grid::pushViewport(vps$inner, vps$figure, vps$plot);
-         grid::grid.draw(g_labels);
-         grid::popViewport(3);
+   # define text label grob
+   g_labels <- NULL;
+   if ("base" %in% plot_style) {
+      g_labels <- gridtext::richtext_grob(
+         x=label_xy[,1],
+         y=label_xy[,2],
+         text=labels,
+         rot=-angle,
+         default.units="native",
+         padding=grid::unit(2, "pt"),
+         r=grid::unit(2, "pt"),
+         vjust=0.5,
+         hjust=0.5,
+         halign=0.5,
+         gp=grid::gpar(
+            col=color,
+            fontsize=fontsize * cex
+         ),
+         box_gp=grid::gpar(
+            col=border
+         )
+      );
+      if (draw_labels) {
+         ## Draw labels
+         # to draw using grid we have to use a custom viewport
+         if (length(dev.list()) > 0) {
+            vps <- gridBase::baseViewports();
+            grid::pushViewport(vps$inner, vps$figure, vps$plot);
+            grid::grid.draw(g_labels);
+            grid::popViewport(3);
+         }
       }
    }
+   
    return(invisible(
       list(
          items_df=items_df,
          g_labels=g_labels,
-         scale_width=scale_width)));
+         scale_width=scale_width,
+         sp_buffer=sp_buffer)));
 }
 
 #' Rescale a SpatialPolygons object
@@ -1711,6 +1727,9 @@ polygon_label_segment <- function
    
    # optional polygon buffer
    sp_buffer <- head(sp_buffer, 1);
+   if (is.list(sp)) {
+      sp <- sp[[1]];
+   }
    if (is.numeric(sp_buffer) && !sp_buffer %in% 0) {
       sp1 <- rgeos::gBuffer(sp,
          width=sp_buffer);
@@ -1739,7 +1758,6 @@ polygon_label_segment <- function
          }
       }
    }
-   print(length(sp))
    if (rgeos::gContains(sp, sl)) {
       # return if sl is fully contained inside sp
       if (verbose) {

@@ -11,8 +11,10 @@ venndir(
   set_colors = NULL,
   proportional = FALSE,
   return_items = FALSE,
+  show_set = c("main", "all", "none"),
   show_label = NA,
   show_items = c(NA, "none", "sign item", "sign", "item"),
+  max_items = 3000,
   display_counts = TRUE,
   show_zero = FALSE,
   font_cex = c(1, 0.8),
@@ -23,9 +25,11 @@ venndir(
   rotate_degrees = 0,
   unicode = TRUE,
   big.mark = ",",
+  sep = "&",
   curate_df = NULL,
   plot_style = c("base", "gg"),
   do_plot = TRUE,
+  verbose = FALSE,
   ...
 )
 }
@@ -99,6 +103,9 @@ indicating whether the directional label can include special
 Unicode characters.}
 
 \item{big.mark}{\code{character} passed to \code{format()} for numeric labels.}
+
+\item{sep}{\code{character} used as a delimiter between set names,
+the default is \code{"&"}.}
 
 \item{curate_df}{\code{data.frame} or \code{NULL} passed to \code{curate_venn_labels()}.}
 

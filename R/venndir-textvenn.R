@@ -75,6 +75,7 @@ textvenn <- function
  return_items=FALSE,
  unicode=TRUE,
  big.mark=",",
+ sep="&",
  curate_df=NULL,
  verbose=FALSE,
  ...)
@@ -98,7 +99,8 @@ textvenn <- function
    # get overlap data
    sv <- signed_overlaps(setlist[sets],
       overlap_type=overlap_type,
-      return_items=return_items);
+      return_items=return_items,
+      sep=sep);
    #sv <- signed_overlaps(list(A=letters[1:10], B=LETTERS[1:20]), "overlap");
    #sv
    

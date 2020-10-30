@@ -54,7 +54,9 @@ get_venn_shapes <- function
  ...)
 {
    # 
-   setnames <- unique(unlist(strsplit(names(counts), split=sep)));
+   setnames <- unique(unlist(strsplit(names(counts),
+      fixed=TRUE,
+      split=sep)));
    n <- length(setnames);
    
    if (!proportional) {

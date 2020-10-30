@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.6.9000
+Version: 0.0.7.9000
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -14,12 +14,18 @@ biocViews:
 Imports: jamba(>= 0.0.56.900),
     colorjam(>= 0.0.16.900),
     sp,
+    sf,
     rgeos,
     polylabelr,
-    matrixStats
+    matrixStats,
+    gridtext,
+    ggtext,
+    gridBase
 Suggests:
     eulerr,
-    Matrix
+    Matrix,
+    knitr,
+    rmarkdown
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -29,3 +35,4 @@ URL: http://github.com/jmw86069/venndir
 BugReports: http://github.com/jmw86069/venndir/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.0.2
+VignetteBuilder: knitr

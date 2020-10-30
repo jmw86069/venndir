@@ -15,15 +15,17 @@ render_venndir(
   font_cex = 1,
   item_cex = 0.9,
   plot_warning = TRUE,
-  show_label = TRUE,
-  show_items = c("none", "sign label", "label", "sign"),
+  show_label = NA,
+  show_items = c(NA, "none", "sign item", "item", "sign"),
   show_zero = TRUE,
   item_angle = -18,
   display_counts = TRUE,
   max_items = 100,
-  label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
+  label_style = c("custom", "basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   fontfamily = "Arial",
   plot_style = c("base", "gg"),
+  ggtheme = ggplot2::theme_void,
+  draw_buffer = FALSE,
   ...
 )
 }
@@ -136,6 +138,27 @@ of various aspects of the figure.
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
 render_venndir(venndir_output);
+render_venndir(venndir_output, plot_style="gg");
+
+vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE, show_items="sign item", show_set="all");
+vo <- nudge_venndir_label(vo, set="set_A",
+   label_type="main",
+   x_offset=-0.5, y_offset=1.5)
+vo <- nudge_venndir_label(vo, set="set_B",
+   label_type="main",
+   x_offset=0.5, y_offset=1.5)
+vo <- nudge_venndir_label(vo, set="set_A&set_B",
+   label_type="main",
+   x_offset=0, y_offset=2)
+vo$label_df$hjust[1:3] <- 0.5;
+vo$label_df$vjust[1:3] <- c(0, 0, 0.5);
+render_venndir(vo, show_set="all", show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
+render_venndir(vo, show_set="all",
+   label_style="lite_box",
+   show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
+render_venndir(vo, plot_style="gg", show_set="all",
+   label_style="lite_box",
+   show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
 
 venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
 venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);

@@ -17,6 +17,7 @@ textvenn(
   return_items = FALSE,
   unicode = TRUE,
   big.mark = ",",
+  sep = "&",
   curate_df = NULL,
   verbose = FALSE,
   ...

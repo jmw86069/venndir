@@ -187,7 +187,13 @@ signed_overlaps <- function
    svims_split <- split(svimss, svimsv_olt);
 
    # Create labels for each split
-   svims_df <- data.frame(jamba::rbindList(strsplit(names(svims_split), "[|]")),
+   svims_df <- data.frame(
+      sets=gsub("^(.+)[|]([^|]+)$",
+         "\\1",
+         names(svims_split)),
+      overlap_type=gsub("^(.+)[|]([^|]+)$",
+         "\\2",
+         names(svims_split)),
       stringsAsFactors=FALSE);
    rownames(svims_df) <- names(svims_split);
    colnames(svims_df) <- c("sets", overlap_type);

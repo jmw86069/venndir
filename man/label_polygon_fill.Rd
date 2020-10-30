@@ -27,6 +27,7 @@ label_polygon_fill(
   draw_points = FALSE,
   draw_labels = TRUE,
   seed = NULL,
+  plot_style = c("base", "gg", "none"),
   verbose = FALSE,
   ...
 )
@@ -110,13 +111,20 @@ a base R plot.}
 passed to \code{set.seed()} to make the \code{dither_cex} process reproducible.
 Set \code{seed=NULL} to disable this step.}
 
+\item{plot_style}{\code{character} string indicating the expected output
+plot style: \code{"base"} uses base R graphics, \code{gridtext::richtext_grob()};
+\code{"gg"} uses \code{ggplot2} style; \code{"none"} does not plot anything.}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \value{
 \code{list} that contains: \code{items_df} as a \code{data.frame} of item
 label coordinates; and \code{g_labels} as output from
 \code{gridtext::richtext_grob()} whose coordinates are defined
-as \code{"native"}.
+as \code{"native"}, or \code{g_labels=NULL} when \code{plot_style="gg"};
+\code{scale_width} with the \code{numeric} value used; and
+\code{sp_buffer} with the \code{sp::SpatialPolygons} object representing
+the buffer region used for item labels.
 }
 \description{
 Arrange text labels inside a polygon

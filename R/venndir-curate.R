@@ -58,21 +58,21 @@ curate_venn_labels <- function
 {
    type <- match.arg(type);
    if (length(curate_df) == 0) {
-      if (unicode) {
+      if (2 %in% unicode) {
          curate_list <- list(
-            c("[ ]*-1", "\u2193", "dodgerblue3"),
-            c("[ ]*1", "\u2191", "firebrick"),
-            c("[ ]*concordant|agreement", "\u21F6", "dodgerblue3"),
-            c("[ ]*mixed", "\u2193\u2191", "grey45"));
+            c("-1", "\u2193", "dodgerblue3"),
+            c("1", "\u2191", "firebrick"),
+            c("concordant|agreement", "\u21F6", "dodgerblue3"),
+            #c("[ ]*mixed", "\u2193\u2191", "grey45"));
             #c("[ ]*mixed", "\u21C6", "grey45"));
+            c("mixed", "\u2194", "grey45"));
+      } else if (1 %in% unicode) {
          curate_list <- list(
             c("-1", "\u2193", "dodgerblue3"),
             c("1", "\u2191", "firebrick"),
             c("0", "-", ""),
-            #c("concordant|agreement", "\u21F6", "dodgerblue3"),
             c("concordant|agreement", "=", "dodgerblue3"),
             c("mixed", "X", "grey45"));
-            #c("mixed", "\u2193\u2191", "grey45"));
             #c("mixed", "\u21C6", "grey45"));
       } else {
          curate_list <- list(

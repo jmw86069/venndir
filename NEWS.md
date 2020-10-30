@@ -1,3 +1,50 @@
+
+# venndir 0.0.7.900
+
+Several refactoring processes being implemented, some
+further updates ad bugfixes may be necessary. Pushed
+this version for more testing on CentOS where the
+`gridtext` package was hard to install for GCC below
+version 5.3, but was installed with GCC 5.3.
+
+## new dependencies
+
+* Added dependencies:
+
+   * `sf` package dependency for ggplot2 output
+   * `gridtext` and `ggtext` for label output
+   * `gridBase` for base R plotting
+
+## bug fixes
+
+* `render_venndir()` added `sp` prefix to `sp::plot()` for
+base R plotting.
+* `signed_overlaps()` was updated to allow using `sep="|"`.
+Previous this delimited was used to make unique rownames,
+and needed to be parsed properly to prevent errors.
+* `venndir()` new argument `sep` which is now properly passed
+to `signed_overlaps()` and `get_venn_shapes()`.
+* `find_vennpoly_overlaps()`, `overlaplist2setlist()`, `counts2setlist()`
+now call `strsplit(..., fixed=TRUE)` so the `sep` character is not
+treated like a regular expression, thus allowing delimiter `sep="|"`
+if specified.
+
+## changes to existing functions
+
+* `textvenn()` new argument `sep` to allow customizing
+the delimiter between set names, for example the default `sep="&"`
+creates overlap names like `set_A&set_B`; but `sep=" | "`
+creates overlap names like `set_A | set_B`.
+* `venndir()` new argument `show_set` to customize display of each
+set name.
+
+   * `show_set="main"` displays only the set name for main sets
+   * `show_set="all"` displays all set names in each overlap
+   * `show_set="none"` displays no set name
+   * `show_set="boundary"` *not yet implemented* will display the set
+   label for each circle/ellipse boundary
+
+
 # venndir 0.0.6.900
 
 Much closer to a release-ready form. It needs the ggplot2

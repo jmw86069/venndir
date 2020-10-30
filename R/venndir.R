@@ -243,8 +243,10 @@ venndir <- function
  set_colors=NULL,
  proportional=FALSE,
  return_items=FALSE,
+ show_set=c("main", "all", "none"),
  show_label=NA,
  show_items=c(NA, "none", "sign item", "sign", "item"),
+ max_items=3000,
  display_counts=TRUE,
  show_zero=FALSE,
  font_cex=c(1, 0.8),
@@ -260,9 +262,11 @@ venndir <- function
  rotate_degrees=0,
  unicode=TRUE,
  big.mark=",",
+ sep="&",
  curate_df=NULL,
  plot_style=c("base", "gg"),
  do_plot=TRUE,
+ verbose=FALSE,
  ...)
 {
    # basic workflow:
@@ -274,12 +278,14 @@ venndir <- function
    
    overlap_type <- match.arg(overlap_type);
    plot_style <- match.arg(plot_style);
+   show_set <- match.arg(show_set);
+   
    label_style <- head(label_style, 1);
    show_items <- head(show_items, 1);
    if (length(show_items) == 0) {
       show_items <- NA;
    }
-   if (any(!show_items %in% c("none","FALSE"))) {
+   if (!all(show_items %in% c("none","FALSE"))) {
       return_items <- TRUE;
    }
 
@@ -310,7 +316,9 @@ venndir <- function
    # get overlap data
    sv <- signed_overlaps(setlist[sets],
       overlap_type=overlap_type,
-      return_items=return_items);
+      return_items=return_items,
+      sep=sep,
+      ...);
    overlap_type <- attr(sv, "overlap_type");
    
    # numeric counts by set
@@ -345,6 +353,7 @@ venndir <- function
    venn_sp <- get_venn_shapes(counts=nCounts,
       proportional=proportional,
       circle_nudge=circle_nudge,
+      sep=sep,
       ...);
    
    # optionally rotate the shapes
@@ -358,6 +367,7 @@ venndir <- function
    venn_spdf <- find_vennpoly_overlaps(venn_sp,
       venn_counts=nCounts,
       venn_colors=set_color,
+      sep=sep,
       ...); # removed ...
    
    # generate labels from nCounts and gCounts
@@ -376,12 +386,25 @@ venndir <- function
    nlabel_df$y_label <- unlist(jamba::rmNULL(nlabel_df$y_label, nullValue=NA))
    
    # Now add the main count labels
-   venn_text <- ifelse(grepl("&", nlabel_df$label),
-      jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts)),
-      paste0("**",
+   if ("main" %in% show_set) {
+      venn_text <- ifelse(grepl(sep, fixed=TRUE, x=nlabel_df$label),
+         jamba::formatInt(
+            jamba::rmNA(naValue=0,
+               nlabel_df$venn_counts)),
+         paste0("**",
+            nlabel_df$label,
+            "**<br>\n",
+            jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))));
+   } else if ("all" %in% show_set) {
+      venn_text <- paste0("**",
          nlabel_df$label,
          "**<br>\n",
-         jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))));
+         jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts)));
+   } else {
+      venn_text <- jamba::formatInt(
+         jamba::rmNA(naValue=0,
+            nlabel_df$venn_counts));
+   }
    x_main <- nlabel_df$x_label;
    y_main <- nlabel_df$y_label;
    vjust_main <- rep(0.5, length(x_main));
@@ -457,6 +480,8 @@ venndir <- function
       jamba::alpha2col(rep(nlabel_df$color, gCounts_len),
          alpha=poly_alpha));
    
+   ## replace or remove? 
+   # venndir_label_style() performs this function
    if (grepl("_box", label_style)) {
       label_border_main <- jamba::alpha2col(alpha=0.8,
          jamba::makeColorDarker(nlabel_df$color,
@@ -557,6 +582,7 @@ venndir <- function
       }
    }
 
+   ## remove or replace with venndir_label_style()
    ## Adjust signed color
    g_update <- (label_df$type %in% "signed" &
       label_df$show_label %in% c(NA,TRUE) & 
@@ -573,6 +599,8 @@ venndir <- function
          label_df$fill[g_update]);
       label_df$color[g_update] <- make_color_contrast(g_update_color, g_update_fill);
    }
+   ## remove or replace
+   ## this logic is inside render_venndir()
    if (!"overlap" %in% overlap_type && any(label_df$type %in% "signed")) {
       ## Adjust signed labels for contrast
       is_signed <- label_df$type %in% "signed";
@@ -609,8 +637,8 @@ venndir <- function
       label_df$display_counts <- FALSE;
    }
    if (do_plot) {
-      if ("base" %in% plot_style) {
-         render_venndir(venn_spdf=venn_spdf,
+      if (any(c("gg", "base") %in% plot_style)) {
+         gg <- render_venndir(venn_spdf=venn_spdf,
             label_df=label_df,
             show_label=show_label,
             show_items=show_items,
@@ -618,6 +646,7 @@ venndir <- function
             display_counts=display_counts,
             label_style=label_style,
             plot_style=plot_style,
+            max_items=max_items,
             ...);
       } else {
          gg <- ggrender_venndir(venn_spdf=venn_spdf,

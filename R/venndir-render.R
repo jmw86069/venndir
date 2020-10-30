@@ -97,6 +97,27 @@
 #' setlist <- make_venn_test(100, 3, do_signed=TRUE);
 #' venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
 #' render_venndir(venndir_output);
+#' render_venndir(venndir_output, plot_style="gg");
+#' 
+#' vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE, show_items="sign item", show_set="all");
+#' vo <- nudge_venndir_label(vo, set="set_A",
+#'    label_type="main",
+#'    x_offset=-0.5, y_offset=1.5)
+#' vo <- nudge_venndir_label(vo, set="set_B",
+#'    label_type="main",
+#'    x_offset=0.5, y_offset=1.5)
+#' vo <- nudge_venndir_label(vo, set="set_A&set_B",
+#'    label_type="main",
+#'    x_offset=0, y_offset=2)
+#' vo$label_df$hjust[1:3] <- 0.5;
+#' vo$label_df$vjust[1:3] <- c(0, 0, 0.5);
+#' render_venndir(vo, show_set="all", show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
+#' render_venndir(vo, show_set="all",
+#'    label_style="lite_box",
+#'    show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
+#' render_venndir(vo, plot_style="gg", show_set="all",
+#'    label_style="lite_box",
+#'    show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
 #' 
 #' venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
 #' venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);
@@ -121,13 +142,14 @@ render_venndir <- function
  font_cex=1,
  item_cex=0.9,
  plot_warning=TRUE,
- show_label=TRUE,
- show_items=c("none", "sign label", "label", "sign"),
+ show_label=NA,
+ show_items=c(NA, "none", "sign item", "item", "sign"),
  show_zero=TRUE,
  item_angle=-18,
  display_counts=TRUE,
  max_items=100,
- label_style=c("basic",
+ label_style=c("custom",
+    "basic",
     "fill",
     "shaded",
     "shaded_box",
@@ -135,6 +157,8 @@ render_venndir <- function
     "lite_box"),
  fontfamily="Arial",
  plot_style=c("base", "gg"),
+ ggtheme=ggplot2::theme_void,
+ draw_buffer=FALSE,
  ...)
 {
    if (length(venndir_output) > 0 && is.list(venndir_output)) {
@@ -154,7 +178,7 @@ render_venndir <- function
    plot_style <- match.arg(plot_style);
    
    ## Determine suitable xlim and ylim
-   if (length(xlim) == 0 || length(ylim) == 0) {
+   if ((length(xlim) == 0 || length(ylim) == 0) && !"gg" %in% plot_style) {
       xlim_1 <- NULL;
       ylim_1 <- NULL;
       if (length(venn_spdf) > 0) {
@@ -174,9 +198,18 @@ render_venndir <- function
       }
    }
    
-   ## Process SpatialPolygonsDataFrame
+   # Apply label_style
+   if (!"custom" %in% label_style) {
+      venndir_output <- venndir_label_style(list(venn_spdf=venn_spdf, label_df=label_df),
+         label_style=label_style,
+         ...);
+      venn_spdf <- venndir_output$venn_spdf;
+      label_df <- venndir_output$label_df;
+   }
+   
+   # Process SpatialPolygonsDataFrame
    if (length(venn_spdf) > 0) {
-      ## Fill any missing optional colnames with defaults
+      # Fill missing attribute colnames with default values
       venn_spdf_defaults <- c(
          alpha=venn_spdf$alpha,#jamba::col2alpha(venn_spdf$color),
          lwd=2,
@@ -188,22 +221,9 @@ render_venndir <- function
          venn_spdf[[i]] <- rep(venn_spdf_defaults[[i]],
             nrow(venn_spdf));
       }
-      ## Plot the Venn polygons
-      plot(venn_spdf,
-         asp=asp,
-         col=jamba::alpha2col(venn_spdf$color,
-            alpha=venn_spdf$alpha),
-         lwd=venn_spdf$lwd,
-         lty=venn_spdf$lty,
-         border=venn_spdf$border,
-         xlim=xlim,
-         ylim=ylim,
-         xpd=xpd,
-         ...);
    }
    
-   
-   ## Process labels   
+   # Process labels   
    if (length(label_df) > 0) {
       ## Verify label_df contains required columns
       label_df_required <- c(
@@ -254,7 +274,7 @@ render_venndir <- function
       
       # define show_label and show_items for each label_df row
       if (length(show_label) == 0) {
-         show_label <- rNA;
+         show_label <- NA;
       }
       if (length(show_items) == 0) {
          show_items <- "none";
@@ -376,14 +396,8 @@ render_venndir <- function
       label_df$show_label <- show_label;
       label_df$show_items <- show_items;
 
-      #show_label <- (label_df$show_label %in% c(TRUE, 1));
       
-      
-      ## Create gridtext object
-      ## warn about hidden non-zero labels
-      #warn_rows <- (!show_label &
-      #      label_df$venn_counts != 0 &
-      #      label_df$type %in% "main");
+      # warn about hidden non-zero labels
       warn_rows <- (
          (label_df$x %in% NA |
             label_df$y %in% NA) &
@@ -411,23 +425,187 @@ render_venndir <- function
                "\n",
                jamba::cPaste(warn_labels,
                   sep="; "));
-            cp <- jamba::coordPresets("bottom");
-            jamba::drawLabels(
-               x=cp$x,
-               y=cp$y,
-               adjX=cp$adjX,
-               adjY=0.5,
-               #preset="bottom",
-               txt=warning_label,
-               labelCex=1,
-               xpd=NA,
-               boxColor="#FFFFFF99",
-               boxBorderColor="#99999999",
-            );
          }
       }
       
-      ## display labels
+      # display labels
+      g_labels <- NULL;
+      segment_df <- NULL;
+      if (any(show_label)) {
+         # Determine if any offset labels require line segment
+         has_offset <- (label_df$x_offset != 0 | 
+               label_df$y_offset != 0);
+         if (any(show_label & has_offset)) {
+            use_offset <- (show_label & has_offset);
+            offset_sets <- label_df$overlap_set[use_offset];
+            sp_index <- match(offset_sets, venn_spdf$label);
+            segment_buffer <- ifelse(show_items_by_set %in% c(NA, FALSE),
+               (label_df$segment_buffer + -1) / 3,
+               label_df$segment_buffer);
+            test_xy <- data.frame(
+               x0=label_df$x[use_offset] + label_df$x_offset[use_offset],
+               x1=label_df$x[use_offset],
+               y0=label_df$y[use_offset] + label_df$y_offset[use_offset],
+               y1=label_df$y[use_offset],
+               segment_buffer=jamba::rmNA(segment_buffer[use_offset], naValue=0),
+               sp_index=sp_index,
+               label_color=label_df$color[use_offset],
+               label_fill=label_df$fill[use_offset],
+               label_border=label_df$border[use_offset],
+               poly_color=venn_spdf$color[sp_index],
+               poly_border=venn_spdf$border[sp_index]);
+
+            sp_list <- lapply(sp_index, function(i){
+               venn_spdf[i,]});
+            new_xy <- polygon_label_segment(
+               x0=test_xy$x0,
+               x1=test_xy$x1,
+               y0=test_xy$y0,
+               y1=test_xy$y1,
+               sp=sp_list,
+               sp_buffer=test_xy$segment_buffer,
+               verbose=FALSE);
+            # non-NULL result means we draw a line segment
+            if (any(!is.na(new_xy[,1]))) {
+               has_segment <- !is.na(new_xy[,1]);
+               # priority of colors to use for the line segment
+               sc_cols <- c(
+                  "label_border",
+                  "poly_border",
+                  "poly_color",
+                  "label_fill",
+                  "label_color");
+               seg_colors <- apply(test_xy[has_segment,sc_cols,drop=FALSE], 1, function(sc1){
+                  head(jamba::rmNA(sc1), 1)
+               });
+               segment_df <- data.frame(
+                  x=as.vector(rbind(test_xy$x0[has_segment], new_xy[,1][has_segment])),
+                  y=as.vector(rbind(test_xy$y0[has_segment], new_xy[,2][has_segment])),
+                  group=rep(venn_spdf$label[test_xy$sp_index[has_segment]], each=2),
+                  color=rep(seg_colors, each=2),
+                  lwd=rep(venn_spdf$lwd[test_xy$sp_index[has_segment]], each=2),
+                  point_order=c(1, 2)
+               );
+            }
+         }
+         
+      }
+   }
+   
+   ## Draw item labels
+   itemlabels_df <- NULL;
+   if (any(!show_items %in% FALSE)) {
+      items_dfs <- subset(label_df, !show_items %in% FALSE);
+      items_dfs <- split(items_dfs, items_dfs$overlap_set);
+      
+      #for (items_df1 in items_dfs) {
+      itemlabels_list <- lapply(items_dfs, function(items_df1){
+         items <- unname(unlist(jamba::mixedSorts(items_df1$items)));
+         color1 <- rep(items_df1$color, lengths(items_df1$items));
+         vi <- which(data.frame(venn_spdf)$label %in% items_df1$overlap_set);
+         vdf <- data.frame(venn_spdf)[vi,,drop=FALSE];
+         prefixes <- rep(
+            gsub(":.+", "", items_df1$text),
+            lengths(items_df1$items));
+         labels <- NULL;
+         # note currently uses the same show_items format per polygon
+         # not for each row in items_dfs, so it is not possible to
+         # use different show_items format for up-up and down-down within
+         # the same polygon
+         show_items_order <- strsplit(items_df1$show_items[1], "[- _.]")[[1]];
+         for (dio in show_items_order) {
+            if (grepl("sign", dio)) {
+               labels <- paste(labels, prefixes);
+            } else if (grepl("item", dio)) {
+               labels <- paste(labels, items);
+            }
+         }
+         labels <- gsub("^[ ]+|[ ]+$", "", labels);
+         bg <- jamba::alpha2col(vdf$color, vdf$alpha)
+         color <- make_color_contrast(color1,
+            bg,
+            ...);
+         
+         lpf <- label_polygon_fill(sp=venn_spdf[vi,],
+            ref_sp=venn_spdf,
+            color=color,
+            cex=items_df1$item_cex[1],
+            draw_points=FALSE,
+            labels=labels,
+            plot_style="none",
+            draw_labels=FALSE,
+            angle=items_df1$item_angle[1],
+            ...);
+      });
+      # combine item label into one data.frame
+      itemlabels_df <- jamba::rbindList(lapply(itemlabels_list, function(i1){
+         i1$items_df;
+      }));
+      itemlabels_sp <- lapply(itemlabels_list, function(i1){
+         if (!grepl("Spatial", class(i1$sp_buffer))) {
+            return(NULL)
+         }
+         i1$sp_buffer
+      });
+   }
+   
+   # Render the different aspects of the venndir plot
+   if ("base" %in% plot_style) {
+      # Plot the Venn polygons
+      if (length(venn_spdf) > 0) {
+         sp::plot(venn_spdf,
+            asp=asp,
+            col=jamba::alpha2col(venn_spdf$color,
+               alpha=venn_spdf$alpha),
+            lwd=venn_spdf$lwd,
+            lty=venn_spdf$lty,
+            border=venn_spdf$border,
+            xlim=xlim,
+            ylim=ylim,
+            xpd=xpd,
+            ...);
+      }
+      # Display the warning text label
+      if (length(warning_label) > 0) {
+         cp <- jamba::coordPresets("bottom");
+         jamba::drawLabels(
+            x=cp$x,
+            y=cp$y,
+            adjX=cp$adjX,
+            adjY=0.5,
+            #preset="bottom",
+            txt=warning_label,
+            labelCex=1,
+            xpd=NA,
+            boxColor="#FFFFFFAA",
+            boxBorderColor="#999999AA",
+         );
+      }
+      # draw label line segments if needed
+      if (length(segment_df) > 0) {
+         #jamba::printDebug("segment_df:");print(segment_df);
+         segment_df1 <- subset(segment_df, point_order %in% 1);
+         segment_df2 <- subset(segment_df, point_order %in% 2);
+         # make unique data.frame to avoid overplotting the same line
+         segment_wide <- unique(data.frame(
+            x0=segment_df1$x,
+            x1=segment_df2$x,
+            y0=segment_df1$y,
+            y1=segment_df2$y,
+            color=segment_df1$color,
+            lwd=segment_df1$lwd));
+         xpd1 <- par(xpd=NA);
+         segments(
+            x0=segment_wide$x0,
+            x1=segment_wide$x1,
+            y0=segment_wide$y0,
+            y1=segment_wide$y1,
+            col=jamba::makeColorDarker(segment_wide$color,
+               darkFactor=1.2),
+            lwd=segment_wide$lwd);
+         par(xpd1);
+      }
+      # display count/set labels
       g_labels <- NULL;
       if (any(show_label)) {
          g_labels <- gridtext::richtext_grob(
@@ -458,145 +636,146 @@ render_venndir <- function
                lty=label_df$lty[show_label],
                lwd=label_df$lwd[show_label])
          );
-         
-         ## Determine if any offset labels require line segment
-         has_offset <- (label_df$x_offset != 0 | 
-               label_df$y_offset != 0);
-         segment_df <- NULL;
-         if (any(show_label & has_offset)) {
-            use_offset <- (show_label & has_offset);
-            offset_sets <- label_df$overlap_set[use_offset];
-            sp_index <- match(offset_sets, venn_spdf$label);
-            segment_buffer <- ifelse(show_items_by_set %in% c(NA, FALSE),
-               (label_df$segment_buffer + -1) / 3,
-               label_df$segment_buffer);
-            test_xy <- data.frame(
-               x0=label_df$x[use_offset] + label_df$x_offset[use_offset],
-               x1=label_df$x[use_offset],
-               y0=label_df$y[use_offset] + label_df$y_offset[use_offset],
-               y1=label_df$y[use_offset],
-               segment_buffer=jamba::rmNA(segment_buffer[use_offset], naValue=0),
-               sp_index=sp_index,
-               label_color=label_df$color[use_offset],
-               label_fill=label_df$fill[use_offset],
-               label_border=label_df$border[use_offset],
-               poly_color=venn_spdf$color[sp_index],
-               poly_border=venn_spdf$border[sp_index]);
-
-            sp_list <- lapply(sp_index, function(i){
-               venn_spdf[i,]})
-            new_xy <- polygon_label_segment(
-               x0=test_xy$x0,
-               x1=test_xy$x1,
-               y0=test_xy$y0,
-               y1=test_xy$y1,
-               sp=sp_list,
-               sp_buffer=test_xy$segment_buffer,
-               verbose=FALSE);
-            # non-NULL result means we draw a line segment
-            if (any(!is.na(new_xy[,1]))) {
-               has_segment <- !is.na(new_xy[,1]);
-               # priority of colors to use for the line segment
-               sc_cols <- c(
-                  "label_border",
-                  "poly_border",
-                  "poly_color",
-                  "label_fill",
-                  "label_color");
-               seg_colors <- apply(test_xy[has_segment,sc_cols,drop=FALSE], 1, function(sc1){
-                  head(jamba::rmNA(sc1), 1)
-               });
-               segment_df <- data.frame(
-                  x=as.vector(rbind(test_xy$x0[has_segment], new_xy[,1][has_segment])),
-                  y=as.vector(rbind(test_xy$y0[has_segment], new_xy[,2][has_segment])),
-                  group=venn_spdf$label[test_xy$sp_index[has_segment]],
-                  color=rep(seg_colors, each=2),
-                  lwd=rep(venn_spdf$lwd[test_xy$sp_index[has_segment]], each=2),
-                  point_order=c(1, 2)
-               );
-            }
-         }
-         
-         ## Draw labels
-         # to draw using grid we have to use a custom viewport
-         if (display_counts) {
-            # draw segments if needed
-            if (length(segment_df) > 0) {
-               #jamba::printDebug("segment_df:");print(segment_df);
-               segment_df1 <- subset(segment_df, point_order %in% 1);
-               segment_df2 <- subset(segment_df, point_order %in% 2);
-               # make unique data.frame to avoid overplotting the same line
-               segment_wide <- unique(data.frame(
-                  x0=segment_df1$x,
-                  x1=segment_df2$x,
-                  y0=segment_df1$y,
-                  y1=segment_df2$y,
-                  color=segment_df1$color,
-                  lwd=segment_df1$lwd));
-               xpd1 <- par(xpd=NA);
-               segments(
-                  x0=segment_wide$x0,
-                  x1=segment_wide$x1,
-                  y0=segment_wide$y0,
-                  y1=segment_wide$y1,
-                  col=jamba::makeColorDarker(segment_wide$color,
-                     darkFactor=1.2),
-                  lwd=segment_wide$lwd);
-               par(xpd1);
-            }
-            if (length(dev.list()) > 0) {
-               vps <- gridBase::baseViewports();
-               grid::pushViewport(vps$inner, vps$figure, vps$plot);
-               grid::grid.draw(g_labels);
-               grid::popViewport(3);
-            }
+         if (length(dev.list()) > 0) {
+            vps <- gridBase::baseViewports();
+            grid::pushViewport(vps$inner, vps$figure, vps$plot);
+            grid::grid.draw(g_labels);
+            grid::popViewport(3);
          }
       }
+      # display item labels if available
+      g_labels_items <- NULL;
+      if (length(itemlabels_df) > 0) {
+         # display item label buffer
+         if (draw_buffer) {
+            for (isp in itemlabels_sp) {
+               try(
+                  sp::plot(isp,
+                     add=TRUE,
+                     col="#FFFFFF77",
+                     border="#FF999977",
+                     lwd=2,
+                     lty="dotted")
+               )
+            }
+         }
+         # display items
+         g_labels_items <- gridtext::richtext_grob(
+            x=itemlabels_df$x,
+            y=itemlabels_df$y,
+            text=itemlabels_df$text,
+            rot=-itemlabels_df$rot,
+            default.units="native",
+            padding=grid::unit(0, "pt"),
+            r=grid::unit(0, "pt"),
+            vjust=0.5,
+            hjust=0.5,
+            halign=0.5,
+            gp=grid::gpar(
+               col=itemlabels_df$color,
+               fontsize=itemlabels_df$fontsize
+            ),
+            box_gp=grid::gpar(
+               col=itemlabels_df$border
+            )
+         );
+         if (length(dev.list()) > 0) {
+            vps <- gridBase::baseViewports();
+            grid::pushViewport(vps$inner, vps$figure, vps$plot);
+            grid::grid.draw(g_labels_items);
+            grid::popViewport(3);
+         }
+      }
+   } else if ("gg" %in% plot_style) {
+      # create ggplot2 output
+      # convert spdf to sf
+      vosf <- sf::st_as_sf(venn_spdf);
+      # Venn overlap polygons
+      ggv <- ggplot2::ggplot(data=vosf) + 
+         ggplot2::geom_sf(
+            ggplot2::aes(fill=jamba::alpha2col(color, alpha=alpha),
+               color=border)) + 
+         ggplot2::scale_fill_identity() +
+         ggplot2::scale_color_identity();
+      if (length(ggtheme) > 0) {
+         ggv <- ggv + ggtheme();
+      }
+      # optional segment to count labels
+      if (length(segment_df) > 0) {
+         segment_df <- unique(segment_df);
+         ggv <- ggv + ggplot2::geom_line(
+            data=segment_df,
+            inherit.aes=FALSE,
+            ggplot2::aes(x=x,
+               y=y,
+               group=group,
+               color=color)
+         );
+      }
+      # count labels
+      if (any(show_label)) {
+         show_label_df <- subset(label_df, show_label %in% c(TRUE));
+         ggv <- ggv + ggtext::geom_richtext(
+            data=show_label_df,
+            ggplot2::aes(
+               x=x + x_offset,
+               y=y + y_offset,
+               label=text,
+               group=overlap_set,
+               hjust=hjust,
+               vjust=vjust,
+               #halign=halign,
+               family=fontfamily,
+               text.colour=color,
+               fill=fill,
+               label.colour=border),
+            label.padding=grid::unit(show_label_df$padding,
+               show_label_df$padding_unit),
+            label.r=grid::unit(show_label_df$r,
+               show_label_df$r_unit),
+            size=show_label_df$fontsize * 5/14 * font_cex)
+      }
+      # optional xlim, ylim
+      if (length(xlim) > 0 & length(ylim) > 0) {
+         jamba::printDebug("xlim:", xlim, ", ylim:", ylim);
+         ggv <- ggv + ggplot2::coord_sf(xlim=xlim, ylim=ylim);
+      }
+      # optional item labels
+      if (length(itemlabels_df) > 0) {
+         if (draw_buffer) {
+            # optionally draw item polygon buffer
+            rbind_sp <- function(...){
+               sp::rbind.SpatialPolygons(..., makeUniqueIDs=TRUE)
+            }
+            buffer_sp <- do.call(rbind_sp, itemlabels_sp);
+            buffer_sf <- sf::st_as_sf(buffer_sp);
+            # Venn overlap polygons
+            ggv <- ggv + ggplot2::geom_sf(
+               data=buffer_sf,
+               ggplot2::aes(
+                  fill="#FFFFFF77",
+                  color="#FF999977"));
+         }
+         ggitems <- ggtext::geom_richtext(
+            data=itemlabels_df,
+            ggplot2::aes(x=x,
+               y=y,
+               label=text,
+               #group=group,
+               angle=-rot,
+               hjust=0.5,
+               vjust=0.5,
+               #halign=0.5,
+               text.colour=color,
+               fill=NA,
+               label.colour=NA),
+            size=itemlabels_df$fontsize * 5/14);
+         ggv <- ggv + ggitems;
+      }
+      print(ggv);
+      return(ggv);
    }
    
-   ## Draw item labels
-   if (any(!show_items %in% FALSE)) {
-      items_dfs <- subset(label_df, !show_items %in% FALSE);
-      items_dfs <- split(items_dfs, items_dfs$overlap_set);
-      
-      for (items_df1 in items_dfs) {
-         items <- unname(unlist(jamba::mixedSorts(items_df1$items)));
-         color1 <- rep(items_df1$color, lengths(items_df1$items));
-         vi <- which(data.frame(venn_spdf)$label %in% items_df1$overlap_set);
-         vdf <- data.frame(venn_spdf)[vi,,drop=FALSE];
-         prefixes <- rep(
-            gsub(":.+", "", items_df1$text),
-            lengths(items_df1$items));
-         labels <- NULL;
-         # note currently uses the same show_items format per polygon
-         # not for each row in items_dfs, so it is not possible to
-         # use different show_items format for up-up and down-down within
-         # the same polygon
-         show_items_order <- strsplit(items_df1$show_items[1], "[- _.]")[[1]];
-         for (dio in show_items_order) {
-            if (grepl("sign", dio)) {
-               labels <- paste(labels, prefixes);
-            } else if (grepl("item", dio)) {
-               labels <- paste(labels, items);
-            }
-         }
-         labels <- gsub("^[ ]+|[ ]+$", "", labels);
-         bg <- jamba::alpha2col(vdf$color, vdf$alpha)
-         color <- make_color_contrast(color1,
-            bg,
-            ...);
-         
-         label_polygon_fill(sp=venn_spdf[vi,],
-            ref_sp=venn_spdf,
-            color=color,
-            cex=items_df1$item_cex[1],
-            draw_points=FALSE,
-            labels=labels,
-            angle=items_df1$item_angle[1],
-            ...);
-      }
-      
-   }
    
    return(invisible(list(venn_spdf=venn_spdf,
       label_df=label_df,
