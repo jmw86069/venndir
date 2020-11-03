@@ -100,7 +100,10 @@ text(x=spdf$x_label,
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
+\code{\link{degrees_to_adj}()},
+\code{\link{diff_degrees}()},
 \code{\link{eulerr2polys}()},
+\code{\link{expand_range}()},
 \code{\link{get_largest_polygon}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
@@ -109,8 +112,10 @@ Other venndir utility:
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
+\code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
 \code{\link{nudge_venndir_label}()},
+\code{\link{polygon_label_outside}()},
 \code{\link{polygon_label_segment}()},
 \code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
@@ -120,6 +125,8 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
+\code{\link{sp_polylabelr}()},
+\code{\link{spread_degrees}()},
 \code{\link{union_polygons}()},
 \code{\link{venndir_label_style}()}
 }

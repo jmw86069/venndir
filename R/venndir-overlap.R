@@ -112,7 +112,9 @@ signed_overlaps <- function
             if (is.numeric(i)) {
                warning("signed_overlaps(): input list contains vector with un-named numeric values.");
             }
-            i <- jamba::nameVector(rep(1, length(i)), i);
+            i <- jamba::nameVector(rep(1, length(i)),
+               i,
+               makeNamesFunc=c);
          }
          i
       });

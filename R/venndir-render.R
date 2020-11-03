@@ -138,6 +138,7 @@ render_venndir <- function
  asp=1,
  xlim=NULL,
  ylim=NULL,
+ expand_fraction=0,
  xpd=NA,
  font_cex=1,
  item_cex=0.9,
@@ -191,10 +192,10 @@ render_venndir <- function
          ylim_1 <- range(c(ylim_1, label_df$y), na.rm=TRUE);
       }
       if (length(xlim) == 0) {
-         xlim <- xlim_1;
+         xlim <- expand_range(xlim_1, expand_fraction);
       }
       if (length(ylim) == 0) {
-         ylim <- ylim_1;
+         ylim <- expand_range(ylim_1, expand_fraction);
       }
    }
    
@@ -1165,3 +1166,171 @@ venndir_label_style <- function
    return(venndir_output);
 }
 
+
+#' Expand numeric range
+#' 
+#' Expand numeric range
+#' 
+#' This function takes a `numeric` range (or numeric vector
+#' and calculates its range) and expands this range by
+#' a fraction given by `expand_fraction`.
+#' 
+#' When the input range is zero, the minimum absolute range
+#' can be given by `minimum_range`.
+#' 
+#' The input may be a `list` that contains `numeric` vectors,
+#' in which case the `list` will be iterated to produce an
+#' expanded range for each `numeric` vector. Each `numeric`
+#' vector is expanded independently.
+#' 
+#' This function is intended to be a simple technique to expand
+#' x-axis and y-axis ranges of a graphical plot.
+#' 
+#' @return `numeric` vector, or when input `x` is `list` the
+#'    output will also be a `list` of `numeric` vectors.
+#'    The numeric vector will contain the range after
+#'    expansion.
+#' 
+#' @family venndir utility
+#' 
+#' @param x `numeric` vector, or `list` of `numeric` vectors.
+#'    The input is converted to a range using `range(x, na.rm=TRUE)`
+#'    to ensure no `NA` values are included. Note that this
+#'    step will force the range to be in ascending order.
+#' @param expand_fraction `numeric` value indicating the
+#'    fraction of the range defined by `diff(range(x, na.rm=TRUE))`
+#'    to add to the total range.
+#' @param minimum_range `numeric` value indicating the minimum
+#'    range of the output, useful when the input has zero
+#'    range, for example if `x=c(10, 10)`.
+#' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' x <- c(1, 10);
+#' expand_range(x, 0.1)
+#' diff(x);
+#' diff(expand_range(x, 0.1));
+#' 
+#' # input with no range is extended to some minimum value
+#' expand_range(1, minimum_range=1)
+#' 
+#' # list input is iterated, for example xlim, ylim
+#' xlim <- c(1, 10)
+#' ylim <- c(1, 100)
+#' expand_range(list(xlim=xlim, ylim=ylim))
+#' 
+#' @export
+expand_range <- function
+(x,
+ expand_fraction=0.1,
+ minimum_range=0.01,
+ ...)
+{
+   if (is.list(x)) {
+      x <- lapply(x, function(xi){
+         expand_range(x=xi,
+            expand_percent=expand_percent,
+            minimum_range=minimum_range,
+            ...)
+      });
+      return(x);
+   }
+   if (!is.numeric(x)) {
+      stop("x must be a numeric vector, or a list of numeric vectors.");
+   }
+   x <- range(x, na.rm=TRUE);
+   xdiff <- diff(x);
+   xmean <- mean(x);
+   if (xdiff == 0) {
+      minimum_range <- head(minimum_range, 1);
+      x_expand <- minimum_range * c(-0.5, 0.5);
+   } else {
+      expand_fraction <- head(expand_fraction, 1);
+      x_expand <- xdiff * expand_fraction * c(-0.5, 0.5);
+   }
+   x <- x + x_expand;
+   return(x);
+}
+
+#' Degrees to text adjustment
+#' 
+#' Degrees to text adjustment
+#' 
+#' Utility function to define `adj` values suitable
+#' for text plotting, which arranges text relative
+#' to the angle in degrees.
+#' 
+#' @family venndir utility
+#' 
+#' @param degrees `numeric` value for angles in degrees
+#' @param top `numeric` value indicating the angle at the
+#'    top position
+#' @param clockwise `logical` indicating whether the angle
+#'    increases in clockwise direction
+#' @param expand `numeric` value intended to expand the adjust
+#'    value. For example `expand=0.5` will expand the adjust
+#'    value 50%.
+#' @param ... additional arguments are ignored
+#' 
+#' @examples
+#' degrees <- seq(from=1, to=360, by=33);
+#' adjdf <- degrees_to_adj(degrees);
+#' x <- cos(jamba::deg2rad(degrees));
+#' y <- sin(jamba::deg2rad(degrees));
+#' plot(x, y,
+#'    pch=20, asp=1,
+#'    xlim=c(-1.3, 1.3),
+#'    ylim=c(-1.3, 1.3));
+#' for (i in seq_along(degrees)) {
+#'    text(labels=i,
+#'       x=x[i], y=y[i],
+#'       adj=unlist(adjdf[i,]))
+#' }
+#' 
+#' @export
+degrees_to_adj <- function
+(degrees,
+ top=90,
+ clockwise=FALSE,
+ expand=0,
+ ...)
+{
+   if (length(top) != 1) {
+      top <- 90
+   }
+   if (length(expand) == 0) {
+      expand <- 0;
+   }
+   expand <- rep(expand, length.out=2);
+   degrees <- degrees + (top - 90)
+   if (length(clockwise) && any(clockwise)) {
+      degrees <- -degrees1;
+   }
+   degrees <- degrees %% 360;
+   degreebreaks <- seq(from=-45/2,
+      to=360 + 45/2,
+      by=45);
+   degreecut <- cut(degrees,
+      degreebreaks,
+      labels=c("right", "topright", "top",
+         "topleft", "left", "bottomleft",
+         "bottom", "bottomright", "right"));
+   degreeset <- as.character(degreecut);
+   adjx <- ifelse(grepl("right", degreeset),
+      0,
+      ifelse(grepl("left", degreeset),
+         1,
+         0.5));
+   if (expand[1] != 0) {
+      adjx <- (adjx - 0.5) * (1 + expand[1]) + 0.5;
+   }
+   adjy <- ifelse(grepl("top", degreeset),
+      0,
+      ifelse(grepl("bottom", degreeset),
+         1,
+         0.5));
+   if (expand[2] != 0) {
+      adjy <- (adjy - 0.5) * (1 + expand[2]) + 0.5;
+   }
+   data.frame(adjx=adjx, adjy=adjy);
+}

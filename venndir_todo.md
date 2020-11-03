@@ -2,6 +2,67 @@
 # todo on venndir
 
 
+## small features for roll-out
+
+* DONE: Bug: Fix `polylabelr::poi()` when there is one or more holes
+inside a polygon.
+* Yes: change all arguments with `angle` to use `degrees` for
+consistency, and to make clear the type of angle.
+* Yes: refactor to handle `"set name"` separate from
+`"main count"` in the count label, so the `"set name"` can
+be moved, for example to perimeter or outside the polygon,
+leaving the numeric count inside as needed.
+
+   * Yes: Proportional diagram with one circle fully inside
+   another does not have set name displayed -- it must be.
+   Consider choosing one internal polygon with fewest set overlaps
+   with the largest area.
+   * need idea for where to store the set label coordinates,
+   since the Venn circle/ellipse shape does not have its own
+   row.
+   * maybe venn shapes need to be stored in another `list`
+   element returned by `venndir()`? It makes that output
+   a bit too heavy imo.
+
+* Maybe: new function `venndir_bender()` to modify a `venndir`
+result. resize, move, rotate venndir circles/ellipses.
+* Maybe: change default to `return_items=TRUE` for
+`venndir()` and `signed_overlaps()`.
+
+### refactor label position
+
+Design ideas:
+
+* each label has focal point `polylabelr::poi()` inside the polygon
+* each label has outer point `polygon_label_outside()` outside the polygon
+* label can be `"inside"` or `"outside"`
+* label `x_offset,y_offset` can be defined upfront by
+`polygon_label_outside()` then may be modified as needed
+* labels now have three parts
+
+   1. `"set_name"`
+   2. main counts (total venn counts in each overlap set)
+   3. signed counts (directional counts in each overlap set)
+
+* label coordinates in `label_df` contain `x,y` and `x_offset,y_offset`
+
+   * it does not handle `"set_name"` differently than `"main counts"`
+   * it makes sense to allow `"set_name"` to be outside the polygon
+   but the counts inside the polygon
+   * maybe we need to store the Venn shapes (full circle) apart
+   from the overlap polygons?
+
+
+### update `polygon_label_outside()` for multiple labels
+
+* The idea is to position labels by angle relative to the
+same central point, detect labels "too close" to one another,
+then spread them out evenly to assist with spacing between labels.
+* Labels would be defined mainly by center point and angle in degrees.
+* "Too close" would be defined by user-configurable minimum degrees,
+with some suitable default value.
+
+
 ## features for wider roll-out
 
 

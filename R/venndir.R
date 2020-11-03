@@ -250,7 +250,7 @@ venndir <- function
  display_counts=TRUE,
  show_zero=FALSE,
  font_cex=c(1, 0.8),
- poly_alpha=0.5,
+ poly_alpha=0.8,
  alpha_by_counts=FALSE,
  label_style=c("basic",
     "fill",

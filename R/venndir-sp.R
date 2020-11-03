@@ -295,9 +295,7 @@ find_vennpoly_overlaps <- function
    ## Get central label from each polygon
    ## Optional: allow using sp::coordinates()
    venn_labels_xys <- lapply(venn_poly_coords[vennUse], function(i){
-      i_sp <- get_largest_polygon(i);
-      ixy <- i_sp@polygons[[1]]@Polygons[[1]]@coords;
-      polylabelr::poi(ixy, precision=0.01)
+      sp_polylabelr(i)
    });
    venn_labels_xy <- jamba::rbindList(venn_labels_xys);
    venn_spdf$x_label <- unname(unlist(venn_labels_xy[,1]));
@@ -999,14 +997,10 @@ label_polygon_fill <- function
       if (n == 1 && singlet_polylabelr) {
          i_sp <- get_largest_polygon(sp);
          ixy <- i_sp@polygons[[1]]@Polygons[[1]]@coords;
-         pt_xy <- polylabelr::poi(ixy, precision=0.01);
-         pt_m <- as.matrix(as.data.frame(pt_xy));
-         if (length(pt_m) > 0) {
-            # make sure point is inside the polygon
-            spt <- sp::SpatialPoints(pt_m[,1:2,drop=FALSE]);
-            if (rgeos::gContains(sp, spt)) {
-               return(pt_m[,1:2,drop=FALSE]);
-            }
+         pt_xy <- sp_polylabelr(sp);
+         pt_m <- as.matrix(as.data.frame(pt_xy$x, pt_xy$y));
+         if (rgeos::gContains(sp, spt)) {
+            return(pt_m[,1:2,drop=FALSE]);
          }
       }
       try_step <- ceiling(n/200);
@@ -1744,8 +1738,8 @@ polygon_label_segment <- function
          # optional debug plot
          if (TRUE %in% plot_debug) {
             sp::plot(sp,
-               col=jamba::alpha2col("white", alpha=0.2),
-               border=jamba::alpha2col("white", alpha=0.4),
+               col=jamba::alpha2col("gold", alpha=0.2),
+               border=jamba::alpha2col("gold", alpha=0.4),
                lwd=2,
                lty="dashed",
                add=TRUE)
@@ -1857,4 +1851,566 @@ polygon_label_segment <- function
       sl@lines[[1]]@Lines[[1]]@coords <- lxy;
       return(sl);
    }
+}
+
+#' Get SpatialPolygons polylabelr coordinate
+#' 
+#' Get SpatialPolygons polylabelr coordinate
+#' 
+#' This function is a simple wrapper function around
+#' `polylabelr::poi()` for `sp::SpatialPolygons` input.
+#' This function does two things:
+#' 
+#' 1. It finds the largest polygon in the `sp::SpatialPolygons`
+#' input, which may contain multiple disconnected polygons.
+#' 2. It applies "holes" inside the polygon when present,
+#' to prevent the label from being chosen inside the hole.
+#' 
+#' @return `list` with items `x` with x coordinate, `y` with
+#' y coordinate, and `dist` with distance to the enclosing
+#' polygon.
+#' 
+#' @family venndir utility
+#' 
+#' @param sp `sp::SpatialPolygons` object
+#' @param apply_holes `logical` indicating whether to apply any
+#'    polygon holes when present in `sp`.
+#' @param ... additional arguments are ignored
+#' 
+#' @examples
+#' setlist <- list(A=letters, B=sample(letters, 4));
+#' vo <- venndir(setlist, proportional=TRUE, do_plot=FALSE);
+#' sp <- vo$venn_spdf[1,];
+#' plot(sp, col="gold")
+#' xy <- sp_polylabelr(sp);
+#' points(xy, pch=20, cex=4, col="navy")
+#' 
+#' @export
+sp_polylabelr <- function
+(sp,
+ apply_holes=TRUE,
+ ...)
+{
+   isp <- get_largest_polygon(sp);
+   # get main polygon coordinates
+   ixy <- isp@polygons[[1]]@Polygons[[1]]@coords;
+   # if more than one sub-polygon exists, include it with NA space
+   # so it is properly used as a hole inside the main polygon
+   if (apply_holes) {
+      for (i in seq_len(length(isp@polygons[[1]]@Polygons)-1)+1) {
+         ixy2 <- isp@polygons[[1]]@Polygons[[i]]@coords;
+         ixy <- rbind(ixy, c(NA, NA), ixy2)
+      }
+   }
+   polylabelr::poi(ixy, precision=0.01)
+}
+
+#' Polygon label outside
+#' 
+#' Polygon label outside
+#' 
+#' This function takes a `sp::SpatialPolygons` object and
+#' determines an appropriate place for a label outside the
+#' polygon, with line segment drawn back to the outer border.
+#' 
+#' The expected input is `sp::SpatialPolygonsDataFrame` which
+#' contains multiple polygons, and one of the polygons should
+#' be labeled.
+#' 
+#' @family venndir utility
+#' 
+#' @examples
+#' setlist <- list(A=letters, B=sample(letters, 4));
+#' C <- sample(setdiff(letters, setlist$B), 4);
+#' setlist$C <- C;
+#' 
+#' vo <- venndir(setlist, proportional=FALSE, expand_fraction=0.2);
+#' segment1 <- polygon_label_outside(sp=vo$venn_spdf)
+#' lines(segment1[[1]], col=vo$venn_spdf$border[1], lwd=2)
+#' jamba::drawLabels(txt=vo$venn_spdf$label[1],
+#'    labelCex=1.5,
+#'    x=segment1[[1]][2,1], y=segment1[[1]][2,2])
+#' 
+#' i <- 5;
+#' lines(segment1[[i]], col=vo$venn_spdf$border[i], lwd=2)
+#' jamba::drawLabels(txt=vo$venn_spdf$label[i],
+#'    labelCex=1.5,
+#'    x=segment1[[i]][2,1], y=segment1[[i]][2,2])
+#' 
+#' par("xpd"=NA);
+#' par("mfrow"=c(4,2));
+#' st <- "nearest";
+#' for (cm in c("label", "bbox")) {
+#' for (vm in c("farthest", "label")) {
+#'    for (st in c("vector", "nearest")) {
+#'       vo <- venndir(setlist, proportional=FALSE,
+#'          expand_fraction=0.2);
+#'       title(cex.main=1,
+#'          main=paste0("vector_method:", vm,
+#'             "\ncenter_method:", cm,
+#'             "\nsegment_type:", st));
+#'       segmentxy <- polygon_label_outside(sp=vo$venn_spdf,
+#'          center_method=cm,
+#'          vector_method=vm,
+#'          debug=2)
+#'    }
+#' }
+#' }
+#' 
+#' par("mfrow"=c(1, 2));
+#' st <- "nearest";
+#' for (cm in c("label", "bbox")) {
+#' for (vm in c("farthest", "label")) {
+#'    for (st in c("vector", "nearest")) {
+#'       set.seed(12);
+#'       vo <- venndir(setlist, proportional=TRUE,
+#'          expand_fraction=0.2);
+#'       title(cex.main=1,
+#'          main=paste0("vector_method:", vm,
+#'             "\ncenter_method:", cm,
+#'             "\nsegment_type:", st));
+#'       segmentxy <- polygon_label_outside(sp=vo$venn_spdf,
+#'          center_method=cm,
+#'          vector_method=vm,
+#'          debug=2)
+#'    }
+#' }
+#' }
+#' 
+#' vo <- venndir(setlist, proportional=TRUE);
+#' segmentxy <- polygon_label_outside(sp=vo$venn_spdf, debug=2)
+#' 
+#' set.seed(1)
+#' vo <- venndir(setlist, proportional=TRUE, expand_fraction=0.3);
+#' segmentxy <- polygon_label_outside(sp=vo$venn_spdf,
+#'    debug=TRUE, segment_type="nearest")
+#' segmentxy <- polygon_label_outside(sp=vo$venn_spdf, 
+#'    debug=TRUE, segment_type="vector")
+#' 
+#' @param sp `sp::SpatialPolygonsDataFrame` or `sp::SpatialPolygons`
+#'    object, which may contain multiple polygons.
+#' @param which_sp `integer` or `NULL`; when `which_sp` contains one
+#'    or more `integer` values, they refer to polygons in `sp`, and
+#'    each will be analyzed in sequence. When `which_sp=NULL` then
+#'    all the polygons in `sp` will be analyzed in sequence.
+#' @param center `numeric` vector or matrix with two values indicating
+#'    the center position. When `center=NULL` then the center is
+#'    determined using a method defined by `center_method`.
+#' @param distance `numeric` value indicating the absolute coordinate
+#'    distance away from the perimiter of `sp` to place labels.
+#'    This value is effectively the same as buffer used in
+#'    `rgeos::gBuffer()`.
+#' @param center_method `character` string indicating the method to
+#'    determine the `center`: `"label"` uses the mean x,y coordinate
+#'    of all the polygon label positions; `"bbox"` uses the mean x,y
+#'    coordinate of the bounding box that encompasses `sp`. The effect
+#'    is to extend outer labels radially around this center point.
+#'    Using the mean label position with `center_method="label"`
+#'    is helpful because it ensures labels are extended in all directions
+#'    even when most labels are in one upper or lower section of
+#'    the `sp` polygons.
+#' @param vector_method `character` string indicating the point to draw
+#'    a vector from the `center` position for each polygon:
+#'    `"farthest"` chooses the farthest point in each polygon from
+#'    the `center` point; `"label"` uses the position of the label.
+#'    Using `vector_method="farthest"` works well to label the outer
+#'    edge of each polygon. Using `vector_method="label"` works well
+#'    when the polygon label is set based upon the interior open area
+#'    of the polygon.
+#' @param segment_type `character` string indicating how to draw the
+#'    line segment from the outside label back to the polygon:
+#'    `"vector"` defines the line segment by extending the line
+#'    used by `vector_method` along the same direction; `"nearest"`
+#'    defines a new line to the nearest point on the polygon.
+#' @param min_degrees `numeric` value passed to `spread_degrees()`
+#'    with the minimum angle in degrees for labels to be placed
+#'    around the outside of a polygon.
+#' @param debug `logical` indicating whether to plot the results
+#'    using base R graphics. When `debug=2` it will also add some
+#'    visual decorations showing the center point, the points
+#'    determined by polygon boundaries.
+#' @param ... additional arguments are ignored.
+#' 
+#' @export
+polygon_label_outside <- function
+(sp,
+ which_sp=NULL,
+ center=NULL,
+ distance=1,
+ center_method=c("label", "bbox"),
+ vector_method=c("farthest", "label"),
+ segment_type=c("vector", "nearest"),
+ min_degrees=15,
+ debug=FALSE,
+ seed=1,
+ ...)
+{
+   #
+   # logical workflow:
+   # - define center point for the full source polygon
+   # -
+   #
+   if (length(seed) == 1) {
+      set.seed(seed);
+   }
+   center_method <- match.arg(center_method);
+   vector_method <- match.arg(vector_method);
+   segment_type <- match.arg(segment_type);
+   # get bbox for the whole polygon
+   spall <- rgeos::gUnaryUnion(sp);
+   spbox <- sp::bbox(sp);
+   
+   # expand the bounding box
+   spbox_ex <- spbox;
+   spbox_ex[] <- t(apply(spbox, 1, expand_range, 0.2));
+
+   # get center
+   if (length(center) != 2) {
+      if ("bbox" %in% center_method) {
+         # use middle of bounding box
+         center <- matrix(ncol=2, rowMeans(spbox)) + (rnorm(2) / 1000);
+      } else {
+         # use mean of label positions
+         center <- matrix(ncol=2,
+            colMeans(jamba::rbindList(lapply(seq_len(nrow(sp)), function(i){
+               unlist(sp_polylabelr(sp[i,]))}))[,c("x", "y")]));
+      }
+   } else {
+      center <- matrix(ncol=2, center);
+   }
+   if (debug > 1) {
+      points(center, col="navy", pch=20, cex=0.5);
+      points(center, col="navy", pch="c", cex=2);
+   }
+
+   # utility function to get farthest polygon point from reference point
+   farthest_point_from_polygon <- function
+   (sp,
+    xy)
+   {
+      # get polygon points
+      spi <- get_largest_polygon(sp);
+      spxy <- spi@polygons[[1]]@Polygons[[1]]@coords;
+      xy <- matrix(ncol=ncol(spxy), rep(xy, length.out=ncol(spxy)));
+      xydist <- as.matrix(dist(rbind(xy, spxy)))[-1,1];
+      xymax <- spxy[which.max(xydist),,drop=FALSE];
+      return(xymax);
+   }
+   
+   if (length(which_sp) == 0) {
+      which_sp <- seq_len(length(sp));
+   }
+   
+   # iterate multiple polygons
+   angles <- sapply(which_sp, function(iwhich){
+      # get sub-polygon
+      if ("SpatialPolygonsDataFrame" %in% class(sp)) {
+         isp <- sp[iwhich,];
+      } else {
+         isp <- sp[iwhich];
+      }
+      if (debug > 1) {
+         plot(isp, col="#44000011", add=TRUE)
+      }
+   
+      # get point farthest from center
+      if ("farthest" %in% vector_method) {
+         # get farthest point from xy
+         xymax <- farthest_point_from_polygon(isp, center);
+      } else {
+         # possible check to see if xymax equals center or
+         # within a small fraction compared to total bbox size,
+         # if so then consider using farthest point
+         xymax <- matrix(ncol=2,
+            unlist(sp_polylabelr(isp))[c("x", "y")]);
+         if (all(xymax == center)) {
+            xymax <- farthest_point_from_polygon(isp, center);
+         }
+      }
+      if (debug > 1) {
+         points(xymax, col="purple3", pch=20, cex=3);
+      }
+   
+      # get angle
+      x1 <- c(center[1,1], xymax[1,1]);
+      y1 <- c(center[1,2], xymax[1,2]);
+      # add a small random value to prevent identical angles
+      angle <- jamba::rad2deg(atan2(y=diff(y1), x=diff(x1)) + rnorm(1) * 1e-6) %% 360;
+      return(angle);
+   });
+   jamba::printDebug("angles:", angles);
+   
+   # logic here to spread out angles too close to each other
+   angles <- spread_degrees(angles,
+      min_degrees=min_degrees);
+   jamba::printDebug("angles:", angles);
+   
+   # expand to twice the bbox size
+   max_radius <- max(rowDiffs(spbox)) * 2;
+   
+   segmentxy_list <- lapply(which_sp, function(iwhich){
+      # get sub-polygon
+      if ("SpatialPolygonsDataFrame" %in% class(sp)) {
+         isp <- sp[iwhich,];
+         iname <- rownames(data.frame(isp));
+      } else {
+         isp <- sp[iwhich];
+         iname <- names(isp);
+      }
+      # get outer point using angle
+      angle <- angles[[iwhich]];
+      xedge <- cos(jamba::deg2rad(angle)) * 
+         (max_radius + distance) + center[1,1];
+      yedge <- sin(jamba::deg2rad(angle)) * 
+         (max_radius + distance) + center[1,2];
+      # find the point at the encompassing polygon outer edge
+      plsxy1 <- polygon_label_segment(
+         sp=spall,
+         sp_buffer=distance,
+         x0=xedge,
+         y0=yedge,
+         x1=center[1,1],
+         y1=center[1,2]);
+      if (debug > 1) {
+         points(plsxy1, col="darkorange", pch=2, cex=1);
+      }
+      # find the point at the polygon outer edge
+      if ("vector" %in% segment_type) {
+         # use the boundary point on the vector to the inside label position
+         # not the closest point on the inside polygon
+         x1use <- center[1,1];
+         y1use <- center[1,2];
+      } else {
+         # use closest point on the inside polygon
+         # not along the vector to the inside label position
+         x1use <- xedge;
+         y1use <- yedge;
+      }
+      plsxy <- polygon_label_segment(
+         sp=isp,
+         x0=xedge,
+         y0=yedge,
+         x1=x1use,
+         y1=y1use);
+      if (debug > 1) {
+         points(plsxy, col="red", pch=2, cex=2);
+      }
+
+      # line segment
+      segmentxy <- cbind(
+         x=unname(c(plsxy[1,1], plsxy1[1,1])),
+         y=unname(c(plsxy[1,2], plsxy1[1,2])),
+         angle=unname(angle));
+      rownames(segmentxy) <- c("border", "label");
+      if (debug) {
+         lines(segmentxy,
+            col="black",
+            lwd=2);
+         adjdf <- degrees_to_adj(angle, top=90, clockwise=FALSE);
+         jamba::drawLabels(
+            txt=iname,
+            labelCex=1.3,
+            adjX=adjdf[,1],
+            adjY=adjdf[,2],
+            x=segmentxy[2,1],
+            y=segmentxy[2,2])
+      }
+      return(segmentxy);
+   });
+   return(segmentxy_list);
+}
+
+
+#' Angular difference in degrees
+#' 
+#' Angular difference in degrees
+#' 
+#' This function simply returns the difference between two
+#' angles in degrees. When `degree1` and `degree2` are vectors,
+#' this function operates on the full set in one step.
+#' 
+#' When `degree1` is a vector, and `degree2` is `NULL`, this
+#' function calculates the difference of each pair in `degree1`,
+#' in the order supplied.
+#' 
+#' @family venndir utility
+#' 
+#' @param degree1 `numeric` vector that contains angles in degrees.
+#' @param degree2 `numeric` vector that contains angles in degrees,
+#'    or `NULL` when the input should only consider `degree1`.
+#' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' diff_degrees(5, 355)
+#' diff_degrees(355, 5)
+#' diff_degrees(-10, 5)
+#' diff_degrees(-10, 355)
+#' diff_degrees(180, 361)
+#' 
+#' @export
+diff_degrees <- function
+(degree1,
+ degree2=NULL,
+ ...)
+{
+   if (length(degree1) == 0) {
+      return(degree1);
+   }
+   if (length(degree2) == 0) {
+      if (length(degree1) == 1) {
+         return(0);
+      }
+      diff_degrees <- sapply(seq_len(length(degree1) - 1), function(i){
+         diff_degrees(degree1[i],
+            degree1[i+1])
+      });
+      return(diff_degrees);
+   }
+   degree1 <- degree1 %% 360;
+   degree2 <- degree2 %% 360;
+   diff_degrees <- min(c(
+      abs(degree1 - degree2),
+      abs(degree1 - (degree2 - 360)),
+      abs((degree1 - 360) - degree2)
+      )
+   );
+   sign_degrees <- ifelse((degree1 + diff_degrees) %% 360 == degree2,
+      1,
+      -1);
+   diff_degrees * sign_degrees;
+}
+
+#' Spread angles to minimum degrees difference
+#' 
+#' Spread angles to minimum degrees difference
+#' 
+#' @family venndir utility
+#' 
+#' @examples
+#' degrees <- c(5, 10, 15, 100, 105, 110, 200, 300, 358);
+#' degrees
+#' spread_degrees(degrees);
+#' 
+#' degrees2 <- sample(degrees);
+#' degrees2
+#' spread_degrees(degrees2);
+#' 
+#' @export
+spread_degrees <- function
+(degrees,
+ min_degrees=10)
+{
+   if (length(degrees) == 1) {
+      return(degrees);
+   }
+   ddf <- data.frame(degrees,
+      order=seq_along(degrees))
+   ddf <- jamba::mixedSortDF(ddf)
+   #ddf <- rbind(ddf, head(ddf, 1));
+   #ddf[nrow(ddf),"order"] <- NA;
+   ddf$diff <- diff_degrees(c(ddf$degrees,
+      head(ddf$degrees, 1)));
+   
+   # if no angles are less the min_degrees, return input unchanged
+   if (!any(abs(ddf$diff) < min_degrees)) {
+      return(degrees);
+   }
+   
+   # if all angles are less than min_degrees, evenly space all angles
+   ddf$abs_diff <- ddf$diff %% 360;
+   if (all(abs(ddf$abs_diff) < min_degrees)) {
+      seqdegree <- head(
+         seq(from=degrees[1],
+            to=degrees[1] + 360,
+            length.out=length(degrees) + 1),
+         length(degrees)) %% 360;
+      return(seqdegree);
+   }
+   
+   # find contiguous sets of angles below min_degrees
+   ddf$fix <- abs(ddf$diff) < min_degrees;
+   fixrle <- rle(ddf$fix);
+   ddf$set <- rep(seq_along(fixrle$values),
+      fixrle$lengths)
+   if (head(ddf$fix, 1) && tail(ddf$fix, 1)) {
+      ddf[nrow(ddf),"set"] <- ddf[1,"set"];
+   }
+   
+   tfrows <- which(c(tail(ddf$fix, 1),
+      head(ddf$fix, -1)) & ddf$fix %in% FALSE);
+   ddf[tfrows,"set"] <- c(tail(ddf$set, 1), head(ddf$set, -1))[tfrows]
+   ddf[tfrows,"fix"] <- TRUE;
+   # subset rows to be adjusted
+   ddfsub <- subset(ddf, fix);
+   for (idf in split(ddfsub, ddfsub$set)) {
+      idf$diff_degrees <- diff_degrees(c(
+         tail(idf$degrees, 1),
+         idf$degrees));
+      idf$diff_sign <- sign(idf$diff_degrees);
+      idf <- jamba::mixedSortDF(idf,
+         byCols=c("diff_sign", "degrees"))
+      meandegree <- mean_degrees(idf$degrees);
+      startoffset <- meandegree - (nrow(idf) - 1) * min_degrees / 2;
+      seqdegree <- seq(startoffset,
+         by=min_degrees,
+         length=nrow(idf));
+      ddf[match(idf$order, ddf$order),"degrees"] <- seqdegree;
+   }
+   ddf <- jamba::mixedSortDF(ddf, byCols="order");
+   # repeat
+   #spread_degrees(ddf$degrees);
+   ddf$degrees;
+}
+
+#' Mean angle in degrees
+#' 
+#' Mean angle in degrees
+#' 
+#' Simple utility function to calculate the mean angle
+#' in degrees using vector directional logic. For
+#' each angle, a unit vector is created with radius 1,
+#' then the mean point is used to define the new angle.
+#' 
+#' A small random value is added to each input value to
+#' reduce the effect of having identical opposite angles.
+#' In that case, the output is a right angle to the
+#' input angles.
+#' 
+#' @return `numeric` angle in degrees representing the
+#'    mean angle of input angles in degrees from `x`.
+#'    An attribute `"radius"` included with the unit
+#'    radius from the mean unit vectors. This radius
+#'    may be useful as a sort of weight factor.
+#' 
+#' @param x `numeric` vector of angles in degrees.
+#' @param seed `numeric` value used as a random seed
+#'    for reproducibility. This seed affects the random
+#'    value added to `x` in the form `rnorm(length(x)) * 1e-6`.
+#' @param ... additional arguments are ignored.
+#' 
+#' @family venndir utility
+#' 
+#' @examples
+#' mean_degrees(c(355, 15))
+#' 
+#' mean_degrees(c(355, 15, 10))
+#' 
+#' mean_degrees(c(0, 180))
+#' 
+#' @export
+mean_degrees <- function
+(x,
+ seed=1,
+ ...)
+{
+   if (length(seed) == 1) {
+      set.seed(seed);
+   }
+   x <- x + rnorm(length(x)) * 1e-6;
+   xmean <- mean(cos(jamba::deg2rad(x)), na.rm=TRUE);
+   ymean <- mean(sin(jamba::deg2rad(x)), na.rm=TRUE);
+   degrees <- jamba::rad2deg(atan2(y=ymean, x=xmean)) %% 360;
+   radius <- sqrt(xmean^2 + ymean^2);
+   attr(degrees, "radius") <- radius;
+   return(degrees)
 }

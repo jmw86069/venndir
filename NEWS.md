@@ -1,4 +1,36 @@
 
+# venndir 0.0.8.900
+
+One more refactor is in progress. Label coordinates will
+be pre-calculated inside and outside each polygon, then
+labels can be toggled in or out (or moved to a custom
+location). The main driver is to be able to label the
+Venn circles on the perimeter of the diagram. For proportional
+circles, when a set is fully contained inside another
+set, there is no polygon with that set alone -- thus
+the defaul labeling fails.
+
+## new functions
+
+* `polygon_label_outside()` defines label placement outside
+a polygon, one of two methods: "label" positions outside
+using relative label positioning; "bbox" positions outside
+using relative polygon position within the bounding box.
+* `expand_range()` is a simple function to expand a numeric
+range by `expand_fraction`, mainly for R plots to have
+space to render labels outside a central Venn diagram.
+* `spread_degrees()` takes a vector of angles in degrees
+as input, and returns a vector where angles are separated
+by at least `min_degrees`.
+* `mean_degrees()` calculates the mean angle in degrees
+for an input vector of angles.
+* `diff_degrees()` takes a vector of angles in degrees,
+and returns the angular difference. Suitable for cases
+with angles like `c(355, 2, 12)` where the difference
+between `355` and `2` is `7`.
+* `sp_polylabelr()` is a simple wrapper function to
+`polylabelr::poi()` for `sp::SpatialPolygons` objects.
+
 # venndir 0.0.7.900
 
 Several refactoring processes being implemented, some

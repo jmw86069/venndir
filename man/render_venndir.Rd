@@ -11,6 +11,7 @@ render_venndir(
   asp = 1,
   xlim = NULL,
   ylim = NULL,
+  expand_fraction = 0,
   xpd = NA,
   font_cex = 1,
   item_cex = 0.9,
