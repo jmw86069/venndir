@@ -39,7 +39,7 @@ setlist <- overlaplist2setlist(av_overlap_list);
 # Venn diagram
 venndir(setlist,
    show_items="item",
-   item_angle=0,
+   item_degrees=0,
    item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)))
 
 # Proportional Venn (Euler) diagram
@@ -52,6 +52,7 @@ Other venndir conversion:
 \code{\link{im2list}()},
 \code{\link{im_value2list}()},
 \code{\link{list2im_opt}()},
-\code{\link{list2im_value}()}
+\code{\link{list2im_value}()},
+\code{\link{signed_counts2setlist}()}
 }
 \concept{venndir conversion}

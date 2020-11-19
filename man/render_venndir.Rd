@@ -19,11 +19,14 @@ render_venndir(
   show_label = NA,
   show_items = c(NA, "none", "sign item", "item", "sign"),
   show_zero = TRUE,
-  item_angle = -18,
+  show_segments = TRUE,
+  item_degrees = -18,
   display_counts = TRUE,
   max_items = 100,
   label_style = c("custom", "basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   fontfamily = "Arial",
+  segment_buffer = -0.2,
+  inside_percent_threshold = 5,
   plot_style = c("base", "gg"),
   ggtheme = ggplot2::theme_void,
   draw_buffer = FALSE,
@@ -118,6 +121,13 @@ which can be useful if Unicode characters are displayed as empty
 boxes instead of proper Unicode characters. This value may be
 device-dependent, for example fonts available for PDF output
 may differ from those for PNG.}
+
+\item{inside_percent_threshold}{\code{numeric} value indicating the percent
+threshold, below which a polygon label is moved outside the polygon
+by default. The threshold is calculated by area of the polygon
+divided by total area of the enclosing polygon, multiplied by 100.
+Therefore \code{inside_percent_threshold=5} will require a polygon to
+represent at least 5 percent of the total area.}
 
 \item{plot_style}{\code{character} string indicating the style
 of plot: \code{"base"} uses base R graphics; \code{"gg"} uses

@@ -11,10 +11,10 @@ label_polygon_fill(
   border = NA,
   fontsize = 10,
   cex = 1,
-  angle = -20,
+  degrees = -20,
   dither_cex = 0.04,
   dither_color = 0.07,
-  dither_angle = 0,
+  dither_degrees = 0,
   scale_width = -0.1,
   apply_n_scale = TRUE,
   buffer_w = 0,
@@ -49,7 +49,7 @@ each label.}
 \item{cex}{\code{numeric} value used to resize all text labels by
 multiplying the font size.}
 
-\item{angle}{\code{numeric} \code{vector} indicating the angle in degrees
+\item{degrees}{\code{numeric} \code{vector} indicating the angle in degrees
 to rotate each text label, where positive values rotate
 in clockwise direction.}
 
@@ -64,9 +64,9 @@ is use to adjust each \code{color} slightly lighter or darker
 via \code{jamba::makeColorDarker()}. The effect is to make adjacent
 labels visibly different but in a subtle way.}
 
-\item{dither_angle}{\code{numeric} or \code{NULL}, where a numeric value
+\item{dither_degrees}{\code{numeric} or \code{NULL}, where a numeric value
 is used to adjust the text angle slightly more or less that
-the \code{angle} value.}
+the \code{degrees} value.}
 
 \item{scale_width}{\code{numeric} value or \code{NULL}, where a numeric
 value indicates the relative size of the polygon to use as
@@ -139,7 +139,7 @@ anchor text labels. Currently this method does no
 overlap detection.
 
 The primary method to avoid overlap is to use
-\code{label_method="hexagon"} and \code{angle=20}, since hexagonal
+\code{label_method="hexagon"} and \code{degrees=20}, since hexagonal
 layout tends to have points at roughly 0 and 60 degrees
 from one another, and 20 degree rotation tends to allow
 text labels to nestle beside each other without much
@@ -154,10 +154,16 @@ words <- jamba::unvigrep("[0-9]",
       '[", _()<>:;/\n\t.@&=]+')))));
 words <- words[nchar(words) > 2];
 plot(sp, col="gold", border="gold4", lwd=2);
-label_polygon_fill(sp=sp, angle=-10, labels=words, dither_color=0.2, color="red2", cex=1.2)
+label_polygon_fill(sp=sp,
+   degrees=-10,
+   labels=words,
+   dither_color=0.2,
+   color="red2",
+   cex=1.2)
 
 plot(sp, col="gold", border="gold4", lwd=2);
-label_polygon_fill(sp=sp, angle=-10,
+label_polygon_fill(sp=sp,
+   degrees=-10,
    scale_width=-0.3,
    draw_buffer=TRUE,
    labels=words, dither_color=0.2, color="red2", cex=1.2)
@@ -205,16 +211,19 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
+\code{\link{display_angles}()},
 \code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_largest_polygon}()},
+\code{\link{get_sp_buffer}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
+\code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
 \code{\link{nudge_venndir_label}()},
@@ -228,6 +237,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
+\code{\link{sp_percent_area}()},
 \code{\link{sp_polylabelr}()},
 \code{\link{spread_degrees}()},
 \code{\link{union_polygons}()},

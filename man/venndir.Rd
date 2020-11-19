@@ -27,6 +27,8 @@ venndir(
   big.mark = ",",
   sep = "&",
   curate_df = NULL,
+  venn_sp = NULL,
+  inside_percent_threshold = NULL,
   plot_style = c("base", "gg"),
   do_plot = TRUE,
   verbose = FALSE,
@@ -109,9 +111,21 @@ the default is \code{"&"}.}
 
 \item{curate_df}{\code{data.frame} or \code{NULL} passed to \code{curate_venn_labels()}.}
 
+\item{venn_sp}{\code{NULL} or \code{sp::SpatialPolygons} that contains one
+polygon per entry in \code{setlist}. This argument is intended to
+allow custom Venn circles to be supplied. When \code{venn_sp} is
+\code{NULL}, then \code{get_venn_shapes()} is called.}
+
+\item{inside_percent_threshold}{\code{numeric} value indicating the percent
+threshold, below which a polygon label is moved outside the polygon
+by default. The threshold is calculated by area of the polygon
+divided by total area of the enclosing polygon, multiplied by 100.
+Therefore \code{inside_percent_threshold=5} will require a polygon to
+represent at least 5 percent of the total area.}
+
 \item{plot_style}{\code{character} indicating the style of graphics plot:
-\code{"gg"} uses ggplot2 and calls \code{ggrender_venndir()}; \code{"base"}
-uses base R graphics and calls \code{render_venndir()}.}
+\code{"gg"} uses ggplot2; \code{"base"}
+uses base R graphics. This argument is passed to \code{render_venndir()}.}
 
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
 }

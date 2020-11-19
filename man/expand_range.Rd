@@ -14,7 +14,13 @@ step will force the range to be in ascending order.}
 
 \item{expand_fraction}{\code{numeric} value indicating the
 fraction of the range defined by \code{diff(range(x, na.rm=TRUE))}
-to add to the total range.}
+to add to the total range. When \code{expand_fraction} has
+only one value, it is applied across the whole range,
+which means each side is extended by half the \code{expand_fraction}.
+When \code{expand_fraction} contains two values, it is
+applied in order to the low, then high side of the
+numeric range, and each full \code{expand_range} value is
+applied.}
 
 \item{minimum_range}{\code{numeric} value indicating the minimum
 range of the output, useful when the input has zero
@@ -48,13 +54,25 @@ This function is intended to be a simple technique to expand
 x-axis and y-axis ranges of a graphical plot.
 }
 \examples{
-x <- c(1, 10);
-expand_range(x, 0.1)
+x <- c(0, 10);
+
+# expand the total range by 0.1
+expand_range(x, 0.1);
+
+# the original range is 10 units
 diff(x);
+
+# the expanded range is 11 units
 diff(expand_range(x, 0.1));
+
+# expand one side but not the other
+expand_range(x, c(0.1, 0));
+# this new range is 11 units
+diff(expand_range(x, c(0.1, 0)))
 
 # input with no range is extended to some minimum value
 expand_range(1, minimum_range=1)
+expand_range(1, minimum_range=c(1, 0))
 
 # list input is iterated, for example xlim, ylim
 xlim <- c(1, 10)
@@ -67,9 +85,11 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
+\code{\link{display_angles}()},
 \code{\link{eulerr2polys}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_largest_polygon}()},
+\code{\link{get_sp_buffer}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
 \code{\link{label_polygon_fill}()},
@@ -77,6 +97,7 @@ Other venndir utility:
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
+\code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
 \code{\link{nudge_venndir_label}()},
@@ -90,6 +111,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
+\code{\link{sp_percent_area}()},
 \code{\link{sp_polylabelr}()},
 \code{\link{spread_degrees}()},
 \code{\link{union_polygons}()},

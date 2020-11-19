@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9.9000</span>
       </span>
     </div>
 
@@ -86,6 +86,18 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/venndir_gene_expression.html">Venndir with Gene Expression Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -127,21 +139,27 @@
   set_colors <span class='op'>=</span> <span class='cn'>NULL</span>,
   proportional <span class='op'>=</span> <span class='cn'>FALSE</span>,
   return_items <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  show_set <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"main"</span>, <span class='st'>"all"</span>, <span class='st'>"none"</span><span class='op'>)</span>,
   show_label <span class='op'>=</span> <span class='cn'>NA</span>,
   show_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='st'>"none"</span>, <span class='st'>"sign item"</span>, <span class='st'>"sign"</span>, <span class='st'>"item"</span><span class='op'>)</span>,
+  max_items <span class='op'>=</span> <span class='fl'>3000</span>,
   display_counts <span class='op'>=</span> <span class='cn'>TRUE</span>,
   show_zero <span class='op'>=</span> <span class='cn'>FALSE</span>,
   font_cex <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0.8</span><span class='op'>)</span>,
-  poly_alpha <span class='op'>=</span> <span class='fl'>0.5</span>,
+  poly_alpha <span class='op'>=</span> <span class='fl'>0.8</span>,
   alpha_by_counts <span class='op'>=</span> <span class='cn'>FALSE</span>,
   label_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"basic"</span>, <span class='st'>"fill"</span>, <span class='st'>"shaded"</span>, <span class='st'>"shaded_box"</span>, <span class='st'>"lite"</span>, <span class='st'>"lite_box"</span><span class='op'>)</span>,
   circle_nudge <span class='op'>=</span> <span class='cn'>NULL</span>,
   rotate_degrees <span class='op'>=</span> <span class='fl'>0</span>,
   unicode <span class='op'>=</span> <span class='cn'>TRUE</span>,
   big.mark <span class='op'>=</span> <span class='st'>","</span>,
+  sep <span class='op'>=</span> <span class='st'>"&amp;"</span>,
   curate_df <span class='op'>=</span> <span class='cn'>NULL</span>,
+  venn_sp <span class='op'>=</span> <span class='cn'>NULL</span>,
+  inside_percent_threshold <span class='op'>=</span> <span class='cn'>NULL</span>,
   plot_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"base"</span>, <span class='st'>"gg"</span><span class='op'>)</span>,
   do_plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -247,14 +265,35 @@ Unicode characters.</p></td>
       <td><p><code>character</code> passed to <code><a href='https://rdrr.io/r/base/format.html'>format()</a></code> for numeric labels.</p></td>
     </tr>
     <tr>
+      <th>sep</th>
+      <td><p><code>character</code> used as a delimiter between set names,
+the default is <code>"&amp;"</code>.</p></td>
+    </tr>
+    <tr>
       <th>curate_df</th>
       <td><p><code>data.frame</code> or <code>NULL</code> passed to <code><a href='curate_venn_labels.html'>curate_venn_labels()</a></code>.</p></td>
     </tr>
     <tr>
+      <th>venn_sp</th>
+      <td><p><code>NULL</code> or <code><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>sp::SpatialPolygons</a></code> that contains one
+polygon per entry in <code>setlist</code>. This argument is intended to
+allow custom Venn circles to be supplied. When <code>venn_sp</code> is
+<code>NULL</code>, then <code><a href='get_venn_shapes.html'>get_venn_shapes()</a></code> is called.</p></td>
+    </tr>
+    <tr>
+      <th>inside_percent_threshold</th>
+      <td><p><code>numeric</code> value indicating the percent
+threshold, below which a polygon label is moved outside the polygon
+by default. The threshold is calculated by area of the polygon
+divided by total area of the enclosing polygon, multiplied by 100.
+Therefore <code>inside_percent_threshold=5</code> will require a polygon to
+represent at least 5 percent of the total area.</p></td>
+    </tr>
+    <tr>
       <th>plot_style</th>
       <td><p><code>character</code> indicating the style of graphics plot:
-<code>"gg"</code> uses ggplot2 and calls <code><a href='ggrender_venndir.html'>ggrender_venndir()</a></code>; <code>"base"</code>
-uses base R graphics and calls <code><a href='render_venndir.html'>render_venndir()</a></code>.</p></td>
+<code>"gg"</code> uses ggplot2; <code>"base"</code>
+uses base R graphics. This argument is passed to <code><a href='render_venndir.html'>render_venndir()</a></code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -368,7 +407,7 @@ polygons.</p>
 
 <p>This function actually calls <code><a href='render_venndir.html'>render_venndir()</a></code> to display the
 diagram. The output from this function can be customized and
-passed to <code><a href='render_venndir.html'>render_venndir()</a></code> or <code><a href='ggrender_venndir.html'>ggrender_venndir()</a></code> to allow
+passed to <code><a href='render_venndir.html'>render_venndir()</a></code> or <code>ggrender_venndir()</code> to allow
 much more customized options.</p>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

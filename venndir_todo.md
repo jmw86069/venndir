@@ -4,11 +4,16 @@
 
 ## small features for roll-out
 
+* DONE: Some importer for signed overlaps. Given a known directional
+Venn, have a method to import to use venndir.
+
+    * `signed_counts2setlist()`
+
 * DONE: Bug: Fix `polylabelr::poi()` when there is one or more holes
 inside a polygon.
-* Yes: change all arguments with `angle` to use `degrees` for
+* DONE: change all arguments with `angle` to use `degrees` for
 consistency, and to make clear the type of angle.
-* Yes: refactor to handle `"set name"` separate from
+* Refactor to handle `"set name"` separate from
 `"main count"` in the count label, so the `"set name"` can
 be moved, for example to perimeter or outside the polygon,
 leaving the numeric count inside as needed.
@@ -26,41 +31,90 @@ leaving the numeric count inside as needed.
 
 * Maybe: new function `venndir_bender()` to modify a `venndir`
 result. resize, move, rotate venndir circles/ellipses.
-* Maybe: change default to `return_items=TRUE` for
+* DONE: change default to `return_items=TRUE` for
 `venndir()` and `signed_overlaps()`.
+
 
 ### refactor label position
 
-Design ideas:
+Design idea: Four label types: set, overlap, count, items
 
-* each label has focal point `polylabelr::poi()` inside the polygon
-* each label has outer point `polygon_label_outside()` outside the polygon
-* label can be `"inside"` or `"outside"`
-* label `x_offset,y_offset` can be defined upfront by
-`polygon_label_outside()` then may be modified as needed
-* labels now have three parts
+* set
 
-   1. `"set_name"`
-   2. main counts (total venn counts in each overlap set)
-   3. signed counts (directional counts in each overlap set)
+   * inside
+   * outside
+   * none
+   * ifhidden
+   
+* overlap
 
-* label coordinates in `label_df` contain `x,y` and `x_offset,y_offset`
+   * none
+   * inside
+   * outside
 
-   * it does not handle `"set_name"` differently than `"main counts"`
-   * it makes sense to allow `"set_name"` to be outside the polygon
-   but the counts inside the polygon
-   * maybe we need to store the Venn shapes (full circle) apart
-   from the overlap polygons?
+* count
+
+   * inside
+   * outside
+   * none
+
+* items
+
+   * none
+   * inside
+
+Data storage:
+
+* venn_spdf
+
+   * contains each Venn circle
+   * contains each Venn overlap polygon
+
+* label_df
+
+   * contains each overlap count label
+
+Progress:
+
+* COMPLETE for base R plots.
+* Still to-do for ggplot.
+* label styles need polishing. If overlap label is outside
+and count label is inside, how can they have two different styles?
 
 
-### update `polygon_label_outside()` for multiple labels
 
-* The idea is to position labels by angle relative to the
+### Combine left and right sides of each label into one cohesive label
+
+* calculate label width, combine to allow one border for each label set
+* also use grid graphics logic to use rescalable operations
+* requires knowledge about grid graphics I don't currently have,
+and was not yet easy to grok from online guides. I was able to
+proof-of-concept a method that used grob dimensions of a left label,
+to produce a right label with border and padding sufficient to
+encompass both sides. When trying to automate, it stopped working.
+Something in the circular logic, that a grob does not have a size
+until placed, so adjusting by size before placement has no usable
+value?
+
+
+### DONE: update `polygon_label_outside()` for multiple labels
+
+* DONE: The idea is to position labels by angle relative to the
 same central point, detect labels "too close" to one another,
 then spread them out evenly to assist with spacing between labels.
 * Labels would be defined mainly by center point and angle in degrees.
 * "Too close" would be defined by user-configurable minimum degrees,
 with some suitable default value.
+* return the point of label, and the point at the polygon so a line
+segment can be drawn
+* return the text adjust (`adj`) value so a text label can be placed
+at an appropriate side relative to the incoming line segment.
+
+### item labels
+
+* Option to allow "one column" of labels inside the polygon, which could
+be useful for things like a list of pathways between two experiments.
+
 
 
 ## features for wider roll-out
@@ -232,9 +286,18 @@ units, for example move main/signed labels to the left by
 * Return concordance for each overlap set
 
 
-### refactor venndir output
+## Completed items
 
-Most of the changes below are DONE.
+
+### DONE: option to move count labels outside the polygon
+
+* DONE: implement `x_offset,y_offset` for count labels
+
+   * Draw a line to polygon border if needed (`polygon_label_segment()`)
+
+### DONE: refactor venndir output
+
+The changes below are DONE.
 
 * each polygon is represented per row in `venn_spdf`
 
@@ -269,12 +332,3 @@ Most of the changes below are DONE.
       set `show_items=FALSE` and `show_label=TRUE`.
       * if both `show_labels=TRUE` and `show_items=TRUE` then display both,
       trust the user to adjust coordinates as needed.
-
-
-
-
-### DONE: option to move count labels outside the polygon
-
-* DONE: implement `x_offset,y_offset` for count labels
-
-   * Draw a line to polygon border if needed (`polygon_label_segment()`)

@@ -85,7 +85,7 @@ get_venn_shapes <- function
          radius <- c(2, 2, 2, 2);
          venn_sp <- sp_circles(xcenter, ycenter, setnames, radius);
       } else if (n == 4) {
-         xcenter <- c(3.4, 4.95, 5.3, 6.85);
+         xcenter <- c(3.4, 4.95+0.035, 5.30-0.035, 6.85);
          ycenter <- c(3.6, 4.5, 4.5, 3.6);
          xradius <- c(2, 2, 2, 2);
          yradius <- c(4, 4, 4, 4);

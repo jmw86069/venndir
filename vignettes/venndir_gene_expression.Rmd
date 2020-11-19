@@ -18,6 +18,16 @@ knitr::opts_chunk$set(
   collapse=TRUE,
   comment="#>"
 )
+ragg_png <- function(..., res=192) {
+  ragg::agg_png(...,
+    res=res,
+    units="in")
+}
+knitr::opts_chunk$set(dev="ragg_png",
+  fig.width=10,
+  fig.height=7,
+  fig.ext="png")
+options("warn"=-1);
 ```
 
 ```{r setup}
@@ -215,8 +225,10 @@ if (do_limma) {
   # display item labels
   venndir(limmalist2,
     sets=c(1, 2),
+    poly_alpha=0.3,
+    label_preset="main items",
     show_items="sign item",
-    item_cex=0.7,
+    item_cex=0.5,
     buffer_w=0.3,
     max_items=1000);
 }
@@ -239,6 +251,8 @@ Use argument `show_items="sign"`.
 if (do_limma) {
   venndir(limmalist2,
     sets=c(1, 2),
+    poly_alpha=0.3,
+    label_preset="main items",
     show_items="sign",
     item_cex=0.7,
     buffer_w=0.3,
@@ -278,7 +292,9 @@ if (do_limma) {
   })
   venndir(limmalist2g, sets=c(1, 2),
     show_items="sign item",
-    item_cex=0.7,
+    poly_alpha=0.3,
+    label_preset="main items",
+    item_cex=0.5,
     buffer_w=0.3,
     max_items=1000);
 }

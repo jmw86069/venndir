@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9.9000</span>
       </span>
     </div>
 
@@ -86,6 +86,18 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/venndir_gene_expression.html">Venndir with Gene Expression Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -127,10 +139,10 @@
   border <span class='op'>=</span> <span class='cn'>NA</span>,
   fontsize <span class='op'>=</span> <span class='fl'>10</span>,
   cex <span class='op'>=</span> <span class='fl'>1</span>,
-  angle <span class='op'>=</span> <span class='op'>-</span><span class='fl'>20</span>,
+  degrees <span class='op'>=</span> <span class='op'>-</span><span class='fl'>20</span>,
   dither_cex <span class='op'>=</span> <span class='fl'>0.04</span>,
   dither_color <span class='op'>=</span> <span class='fl'>0.07</span>,
-  dither_angle <span class='op'>=</span> <span class='fl'>0</span>,
+  dither_degrees <span class='op'>=</span> <span class='fl'>0</span>,
   scale_width <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.1</span>,
   apply_n_scale <span class='op'>=</span> <span class='cn'>TRUE</span>,
   buffer_w <span class='op'>=</span> <span class='fl'>0</span>,
@@ -143,6 +155,7 @@
   draw_points <span class='op'>=</span> <span class='cn'>FALSE</span>,
   draw_labels <span class='op'>=</span> <span class='cn'>TRUE</span>,
   seed <span class='op'>=</span> <span class='cn'>NULL</span>,
+  plot_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"base"</span>, <span class='st'>"gg"</span>, <span class='st'>"none"</span><span class='op'>)</span>,
   verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
@@ -179,7 +192,7 @@ each label.</p></td>
 multiplying the font size.</p></td>
     </tr>
     <tr>
-      <th>angle</th>
+      <th>degrees</th>
       <td><p><code>numeric</code> <code>vector</code> indicating the angle in degrees
 to rotate each text label, where positive values rotate
 in clockwise direction.</p></td>
@@ -200,10 +213,10 @@ via <code><a href='https://rdrr.io/pkg/jamba/man/makeColorDarker.html'>jamba::ma
 labels visibly different but in a subtle way.</p></td>
     </tr>
     <tr>
-      <th>dither_angle</th>
+      <th>dither_degrees</th>
       <td><p><code>numeric</code> or <code>NULL</code>, where a numeric value
 is used to adjust the text angle slightly more or less that
-the <code>angle</code> value.</p></td>
+the <code>degrees</code> value.</p></td>
     </tr>
     <tr>
       <th>scale_width</th>
@@ -267,6 +280,12 @@ passed to <code><a href='https://rdrr.io/r/base/Random.html'>set.seed()</a></cod
 Set <code>seed=NULL</code> to disable this step.</p></td>
     </tr>
     <tr>
+      <th>plot_style</th>
+      <td><p><code>character</code> string indicating the expected output
+plot style: <code>"base"</code> uses base R graphics, <code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code>;
+<code>"gg"</code> uses <code>ggplot2</code> style; <code>"none"</code> does not plot anything.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p><code>logical</code> indicating whether to print verbose output.</p></td>
     </tr>
@@ -277,7 +296,10 @@ Set <code>seed=NULL</code> to disable this step.</p></td>
     <p><code>list</code> that contains: <code>items_df</code> as a <code>data.frame</code> of item
 label coordinates; and <code>g_labels</code> as output from
 <code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code> whose coordinates are defined
-as <code>"native"</code>.</p>
+as <code>"native"</code>, or <code>g_labels=NULL</code> when <code>plot_style="gg"</code>;
+<code>scale_width</code> with the <code>numeric</code> value used; and
+<code>sp_buffer</code> with the <code><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>sp::SpatialPolygons</a></code> object representing
+the buffer region used for item labels.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function takes a vector of text labels, and will
@@ -288,7 +310,7 @@ inside a polygon, and these positions are used to
 anchor text labels. Currently this method does no
 overlap detection.</p>
 <p>The primary method to avoid overlap is to use
-<code>label_method="hexagon"</code> and <code>angle=20</code>, since hexagonal
+<code>label_method="hexagon"</code> and <code>degrees=20</code>, since hexagonal
 layout tends to have points at roughly 0 and 60 degrees
 from one another, and 20 degree rotation tends to allow
 text labels to nestle beside each other without much
@@ -297,17 +319,25 @@ overlap.</p>
 
     <div class='dont-index'><p>Other venndir utility: 
 <code><a href='curate_venn_labels.html'>curate_venn_labels</a>()</code>,
+<code><a href='degrees_to_adj.html'>degrees_to_adj</a>()</code>,
+<code><a href='diff_degrees.html'>diff_degrees</a>()</code>,
+<code><a href='display_angles.html'>display_angles</a>()</code>,
 <code><a href='eulerr2polys.html'>eulerr2polys</a>()</code>,
+<code><a href='expand_range.html'>expand_range</a>()</code>,
 <code><a href='find_vennpoly_overlaps.html'>find_vennpoly_overlaps</a>()</code>,
 <code><a href='get_largest_polygon.html'>get_largest_polygon</a>()</code>,
+<code><a href='get_sp_buffer.html'>get_sp_buffer</a>()</code>,
 <code><a href='get_venn_shapes.html'>get_venn_shapes</a>()</code>,
 <code><a href='intersect_polygons.html'>intersect_polygons</a>()</code>,
 <code><a href='make_color_contrast.html'>make_color_contrast</a>()</code>,
 <code><a href='make_venn_combn_df.html'>make_venn_combn_df</a>()</code>,
 <code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
 <code><a href='match_list.html'>match_list</a>()</code>,
+<code><a href='mean_degree_arc.html'>mean_degree_arc</a>()</code>,
+<code><a href='mean_degrees.html'>mean_degrees</a>()</code>,
 <code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
 <code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
+<code><a href='polygon_label_outside.html'>polygon_label_outside</a>()</code>,
 <code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
 <code><a href='print_color_df.html'>print_color_df</a>()</code>,
 <code><a href='rescale_coordinates.html'>rescale_coordinates</a>()</code>,
@@ -317,6 +347,9 @@ overlap.</p>
 <code><a href='shrink_df.html'>shrink_df</a>()</code>,
 <code><a href='sp_circles.html'>sp_circles</a>()</code>,
 <code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
+<code><a href='sp_percent_area.html'>sp_percent_area</a>()</code>,
+<code><a href='sp_polylabelr.html'>sp_polylabelr</a>()</code>,
+<code><a href='spread_degrees.html'>spread_degrees</a>()</code>,
 <code><a href='union_polygons.html'>union_polygons</a>()</code>,
 <code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
 
@@ -329,10 +362,16 @@ overlap.</p>
       <span class='st'>'[", _()&lt;&gt;:;/\n\t.@&amp;=]+'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>;
 <span class='va'>words</span> <span class='op'>&lt;-</span> <span class='va'>words</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/nchar.html'>nchar</a></span><span class='op'>(</span><span class='va'>words</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='fl'>2</span><span class='op'>]</span>;
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
-</div><div class='input'><span class='fu'>label_polygon_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>, angle<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>, labels<span class='op'>=</span><span class='va'>words</span>, dither_color<span class='op'>=</span><span class='fl'>0.2</span>, color<span class='op'>=</span><span class='st'>"red2"</span>, cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>
+</div><div class='input'><span class='fu'>label_polygon_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>,
+   degrees<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>,
+   labels<span class='op'>=</span><span class='va'>words</span>,
+   dither_color<span class='op'>=</span><span class='fl'>0.2</span>,
+   color<span class='op'>=</span><span class='st'>"red2"</span>,
+   cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>
 </div><div class='img'><img src='label_polygon_fill-1.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
-</div><div class='input'><span class='fu'>label_polygon_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>, angle<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>,
+</div><div class='input'><span class='fu'>label_polygon_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>,
+   degrees<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>,
    scale_width<span class='op'>=</span><span class='op'>-</span><span class='fl'>0.3</span>,
    draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>,
    labels<span class='op'>=</span><span class='va'>words</span>, dither_color<span class='op'>=</span><span class='fl'>0.2</span>, color<span class='op'>=</span><span class='st'>"red2"</span>, cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>

@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9.9000</span>
       </span>
     </div>
 
@@ -85,6 +85,18 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/venndir_gene_expression.html">Venndir with Gene Expression Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -114,6 +126,145 @@
       <small>Source: <a href='http://github.com/jmw86069/venndir/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="venndir-009900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.9.900">
+<a href="#venndir-009900" class="anchor"></a>venndir 0.0.9.900</h1>
+<p>Began adding <code>testthat</code> tests for various functions.</p>
+<div id="one-more-refactor" class="section level2">
+<h2 class="hasAnchor">
+<a href="#one-more-refactor" class="anchor"></a>one more refactor</h2>
+<p>Proportional Venn diagrams (Euler diagrams) warranted a refactor in order to label each set even when one set is fully contained inside another set.</p>
+</div>
+<div id="new-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions" class="anchor"></a>new functions</h2>
+<ul>
+<li>
+<code><a href="../reference/signed_counts2setlist.html">signed_counts2setlist()</a></code> is an import method similar to <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> but to allow importing directional overlaps.</li>
+<li>
+<code><a href="../reference/get_sp_buffer.html">get_sp_buffer()</a></code> applies a buffer width to the interior of a polygon, either with fixed width, or relative width based upon the minimum width required to make the polygon disappear. The relative value means <code>sp_buffer=0.5</code> can be used to create a buffer at half-width, for a polygon of any size. The purpose is to draw a line segment from outside the polygon to “just inside” the polygon, using an amount appropriate for the size and shape of the polygon. As <code><a href="https://rdrr.io/pkg/rgeos/man/misc-gBuffer.html">rgeos::gBuffer()</a></code> has no ability to scale relative to the polygon size and shape, <code><a href="../reference/get_sp_buffer.html">get_sp_buffer()</a></code> quickly runs a sweep to determine the <code>width</code> where an internal polygon is just barely non-zero, and defines that as <code>sp_buffer=-1</code>.</li>
+<li>
+<code><a href="../reference/mean_degrees.html">mean_degrees()</a></code> takes a vector of angles in degrees and returns the mean angle based upon the sum of unit vectors. It adds a small random bit to prevent vectors from exactly cancelling out, and an argument <code>seed</code> that makes the randomness reproducible.</li>
+<li>
+<code><a href="../reference/mean_degree_arc.html">mean_degree_arc()</a></code> is similar to <code><a href="../reference/mean_degrees.html">mean_degrees()</a></code> except it takes an ordered set of angles that define an arc, and returns the mean position along that arc. Use argument <code>do_plot=TRUE</code> to see a visual representation of the options. It turns out that spreading text labels along an arc only worked when the mean angle was fixed inside the arc. Otherwise occassionally the mean angle could be exactly 180 degrees off, when the angles span more than 180 degrees, and if multiple labels were present at each end. You’d think that would be rare, but it happened enough to notice the bug and to implement better logic.</li>
+<li>
+<code><a href="../reference/degrees_to_adj.html">degrees_to_adj()</a></code> is a helper function that takes an angle in degrees, and returns the text <code>adjx</code> and <code>adjy</code> values so a text label will be positioned outside the angle.</li>
+</ul>
+</div>
+<div id="functions-removed" class="section level2">
+<h2 class="hasAnchor">
+<a href="#functions-removed" class="anchor"></a>functions removed</h2>
+<ul>
+<li>
+<code>ggrender_venndir()</code> was removed, use <code><a href="../reference/render_venndir.html">render_venndir(plot_style="gg")</a></code> in its place. It made sense to keep the visualization logic inside one function.</li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>
+<code><a href="../reference/spread_degrees.html">spread_degrees()</a></code> was not properly maintaining the initial order of angles when it iteratively spread out a series of angles. For example one group of angles could be spread wide enough to overlap another existing angle, in which case that angle should be kept outside the initial group, instead of being placed into the middle. The telltale sign is that line segments wildly criss-crossed inside the polygon.</li>
+</ul>
+</div>
+<div id="changes-to-existing-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#changes-to-existing-functions" class="anchor"></a>changes to existing functions</h2>
+<ul>
+<li><p>New argument <code>inside_percent_threshold</code> added to <code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code>, and <code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> used to position labels outside a polygon when its size is below this percent of the total polygon size. It works as a reasonable alternative for determining if the label visually fits inside a polygon.</p></li>
+<li><p><code><a href="../reference/venndir.html">venndir()</a></code> can accept polygon shapes to use as input, instead of defining its own or using those from <code><a href="https://jolars.github.io/eulerr/reference/euler.html">eulerr::euler()</a></code>. New argument <code>venn_sp</code> accepts any <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html">sp::SpatialPolygons</a></code> compatible object, which must have at least as many polygons as there are sets in <code>setlist</code>.</p></li>
+<li><p><code><a href="../reference/venndir.html">venndir()</a></code> now adds the Venn shapes to the output <code>venn_spdf</code> with <code>type="set"</code>; all other polygons have <code>type="overlap"</code>. The shapes will serve as an anchor for set labels, in the event we want to label one or more circles – like when one circle is fully contained inside another.</p></li>
+<li><p><code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> now determines a reasonable text alignment <code>adj</code> based upon the angle offset, to help minimize label overlap with the line segment.</p></li>
+<li><p><code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> was updated to correct some internal use of coordinates. New argument <code>sp_buffer</code> to allow the line segment to end slightly inside each polygon.</p></li>
+<li><p><code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code> default 4-way Venn ellipses were slightly adjusted so the middle ellipses broke the outer ellipses into two polygons. This change helps the automated position of labels by <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> with certain settings.</p></li>
+<li><p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> was refactored to be able to position labels inside or outside the polygon, for four types of labels:</p></li>
+<li><p><code>"set"</code> - e.g. <code>"set_A"</code></p></li>
+<li><p><code>"overlap"</code> - e.g. <code>"set_A&amp;set_B"</code> normally this label is not shown</p></li>
+<li><p><code>"count"</code> - e.g. <code>10</code></p></li>
+<li><p><code>"items"</code> - e.g. <code><a href="https://rdrr.io/r/base/c.html">c("item1", "item3", "item9")</a></code> for each overlap set.</p></li>
+</ul>
+<p>It has some <code>label_preset</code> options, which help position set and count labels inside or outside.</p>
+</div>
+</div>
+    <div id="venndir-008900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.8.900">
+<a href="#venndir-008900" class="anchor"></a>venndir 0.0.8.900</h1>
+<p>One more refactor is in progress. Label coordinates will be pre-calculated inside and outside each polygon, then labels can be toggled in or out (or moved to a custom location). The main driver is to be able to label the Venn circles on the perimeter of the diagram. For proportional circles, when a set is fully contained inside another set, there is no polygon with that set alone – thus the defaul labeling fails.</p>
+<div id="new-functions-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions-1" class="anchor"></a>new functions</h2>
+<ul>
+<li>
+<code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> defines label placement outside a polygon, one of two methods: “label” positions outside using relative label positioning; “bbox” positions outside using relative polygon position within the bounding box.</li>
+<li>
+<code><a href="../reference/expand_range.html">expand_range()</a></code> is a simple function to expand a numeric range by <code>expand_fraction</code>, mainly for R plots to have space to render labels outside a central Venn diagram.</li>
+<li>
+<code><a href="../reference/spread_degrees.html">spread_degrees()</a></code> takes a vector of angles in degrees as input, and returns a vector where angles are separated by at least <code>min_degrees</code>.</li>
+<li>
+<code><a href="../reference/mean_degrees.html">mean_degrees()</a></code> calculates the mean angle in degrees for an input vector of angles.</li>
+<li>
+<code><a href="../reference/diff_degrees.html">diff_degrees()</a></code> takes a vector of angles in degrees, and returns the angular difference. Suitable for cases with angles like <code><a href="https://rdrr.io/r/base/c.html">c(355, 2, 12)</a></code> where the difference between <code>355</code> and <code>2</code> is <code>7</code>.</li>
+<li>
+<code><a href="../reference/sp_polylabelr.html">sp_polylabelr()</a></code> is a simple wrapper function to <code><a href="https://jolars.github.io/polylabelr//reference/poi.html">polylabelr::poi()</a></code> for <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html">sp::SpatialPolygons</a></code> objects.</li>
+</ul>
+</div>
+</div>
+    <div id="venndir-007900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.7.900">
+<a href="#venndir-007900" class="anchor"></a>venndir 0.0.7.900</h1>
+<p>Several refactoring processes being implemented, some further updates ad bugfixes may be necessary. Pushed this version for more testing on CentOS where the <code>gridtext</code> package was hard to install for GCC below version 5.3, but was installed with GCC 5.3.</p>
+<div id="new-dependencies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-dependencies" class="anchor"></a>new dependencies</h2>
+<ul>
+<li>
+<p>Added dependencies:</p>
+<ul>
+<li>
+<code>sf</code> package dependency for ggplot2 output</li>
+<li>
+<code>gridtext</code> and <code>ggtext</code> for label output</li>
+<li>
+<code>gridBase</code> for base R plotting</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="bug-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>
+<code><a href="../reference/render_venndir.html">render_venndir()</a></code> added <code>sp</code> prefix to <code>sp::plot()</code> for base R plotting.</li>
+<li>
+<code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> was updated to allow using <code>sep="|"</code>. Previous this delimited was used to make unique rownames, and needed to be parsed properly to prevent errors.</li>
+<li>
+<code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>sep</code> which is now properly passed to <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> and <code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code>.</li>
+<li>
+<code><a href="../reference/find_vennpoly_overlaps.html">find_vennpoly_overlaps()</a></code>, <code><a href="../reference/overlaplist2setlist.html">overlaplist2setlist()</a></code>, <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> now call <code><a href="https://rdrr.io/r/base/strsplit.html">strsplit(..., fixed=TRUE)</a></code> so the <code>sep</code> character is not treated like a regular expression, thus allowing delimiter <code>sep="|"</code> if specified.</li>
+</ul>
+</div>
+<div id="changes-to-existing-functions-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#changes-to-existing-functions-1" class="anchor"></a>changes to existing functions</h2>
+<ul>
+<li><p><code><a href="../reference/textvenn.html">textvenn()</a></code> new argument <code>sep</code> to allow customizing the delimiter between set names, for example the default <code>sep="&amp;"</code> creates overlap names like <code>set_A&amp;set_B</code>; but <code>sep=" | "</code> creates overlap names like <code>set_A | set_B</code>.</p></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>show_set</code> to customize display of each set name.</p>
+<ul>
+<li>
+<code>show_set="main"</code> displays only the set name for main sets</li>
+<li>
+<code>show_set="all"</code> displays all set names in each overlap</li>
+<li>
+<code>show_set="none"</code> displays no set name</li>
+<li>
+<code>show_set="boundary"</code> <em>not yet implemented</em> will display the set label for each circle/ellipse boundary</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
     <div id="venndir-006900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.6.900">
 <a href="#venndir-006900" class="anchor"></a>venndir 0.0.6.900</h1>
@@ -124,7 +275,7 @@
 <ul>
 <li>Fixed obscure bug where set names could fail if not provided in alphabetic order.</li>
 <li>Changed <code><a href="../reference/venndir.html">venndir()</a></code> default <code>show_zero=FALSE</code> to hide empty labels.</li>
-<li>Removed <code><a href="../reference/ggrender_venndir.html">ggrender_venndir()</a></code> from the exported functions list, this function needs to be included inside <code><a href="../reference/render_venndir.html">render_venndir()</a></code>.</li>
+<li>Removed <code>ggrender_venndir()</code> from the exported functions list, this function needs to be included inside <code><a href="../reference/render_venndir.html">render_venndir()</a></code>.</li>
 </ul>
 </div>
 <div id="refactoring-the-details" class="section level2">
@@ -160,9 +311,9 @@
     <div id="venndir-005900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.5.900">
 <a href="#venndir-005900" class="anchor"></a>venndir 0.0.5.900</h1>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/sp_ellipses.html">sp_ellipses()</a></code> argument renamed from <code>radius</code> to <code>xradius</code> and <code>yradius</code>.</li>
@@ -173,7 +324,7 @@
 <a href="#display-item-labels-inside-venn-polygons" class="anchor"></a>display item labels inside Venn polygons</h2>
 <ul>
 <li>
-<code><a href="../reference/ggrender_venndir.html">ggrender_venndir()</a></code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code> both allow optional display of items inside the Venn polygons. For relatively small sets (&lt;500) this works fairly well. You can configure the label to include the <code>"sign"</code>, and/or <code>"item"</code>. It works as an alternative or supplement to using proportional Venn diagrams.</li>
+<code>ggrender_venndir()</code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code> both allow optional display of items inside the Venn polygons. For relatively small sets (&lt;500) this works fairly well. You can configure the label to include the <code>"sign"</code>, and/or <code>"item"</code>. It works as an alternative or supplement to using proportional Venn diagrams.</li>
 </ul>
 </div>
 <div id="new-render-functions" class="section level2">
@@ -181,7 +332,7 @@
 <a href="#new-render-functions" class="anchor"></a>new render functions</h2>
 <ul>
 <li>
-<code><a href="../reference/ggrender_venndir.html">ggrender_venndir()</a></code> renders a venndir diagram using ggplot2. Note that this function requires the package <code>sf</code>, and in future other objects internal to venndir may be converted from <code>sp</code> to <code>sf</code>.</li>
+<code>ggrender_venndir()</code> renders a venndir diagram using ggplot2. Note that this function requires the package <code>sf</code>, and in future other objects internal to venndir may be converted from <code>sp</code> to <code>sf</code>.</li>
 <li>
 <code>label_polyogn_fill()</code> takes a <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html">sp::SpatialPolygons</a></code> object, a vector of labels, and returns coordinates to place labels inside the polygon. It has some adjustments to add buffer around polygon boundaries, but does not directly detect label overlaps. It either plots labels in base R graphics, or returns coordinates suitable for ggplot2.</li>
 </ul>
@@ -228,9 +379,9 @@
 <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> - convert vector of overlap counts to setlist, intended for compatibility with other packages like <code>eulerr</code>, <code>upsetr</code>, and <code>VennDiagram</code>.</li>
 </ul>
 </div>
-<div id="changes-to-existing-functions" class="section level2">
+<div id="changes-to-existing-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changes-to-existing-functions" class="anchor"></a>changes to existing functions</h2>
+<a href="#changes-to-existing-functions-2" class="anchor"></a>changes to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>alpha_by_counts</code> adjusts alpha transparency of each overlap based upon the number of counts. Implemented to evaluate the visual effect for now.</li>
@@ -240,9 +391,9 @@
     <div id="venndir-004900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.4.900">
 <a href="#venndir-004900" class="anchor"></a>venndir 0.0.4.900</h1>
-<div id="changes-to-existing-functions-1" class="section level2">
+<div id="changes-to-existing-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changes-to-existing-functions-1" class="anchor"></a>changes to existing functions</h2>
+<a href="#changes-to-existing-functions-3" class="anchor"></a>changes to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> no longer renders the plot, but calls <code><a href="../reference/render_venndir.html">render_venndir()</a></code> in order to offer more customized options. It also allows editing the source data as needed, like adjusting individual overlap settings.</li>
@@ -250,9 +401,9 @@
 <code><a href="../reference/textvenn.html">textvenn()</a></code> now supports directional Venn counts, even with <code>"each"</code> it uses two columns for all possible directions for the central 3-way overlaps.</li>
 </ul>
 </div>
-<div id="new-functions" class="section level2">
+<div id="new-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions" class="anchor"></a>new functions</h2>
+<a href="#new-functions-2" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/render_venndir.html">render_venndir()</a></code> renders a Venn or Euler diagram using the output format from <code><a href="../reference/venndir.html">venndir()</a></code>. It displays a warning at the bottom of the plot whenever a Venn overlap cannot be displayed, for example with proportional Venn (Euler) diagrams when an overlap cannot be represented. This label can be hidden, but by default is displayed so the information is not lost.</li>
@@ -262,9 +413,9 @@
     <div id="venndir-003900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.3.900">
 <a href="#venndir-003900" class="anchor"></a>venndir 0.0.3.900</h1>
-<div id="new-functions-1" class="section level2">
+<div id="new-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-1" class="anchor"></a>new functions</h2>
+<a href="#new-functions-3" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> the core visual function that displays either Venn diagram or a Euler diagram for proportional diagrams.</li>
@@ -281,9 +432,9 @@
 <li>400 genes overlap, 396 genes share the same direction. In this case, the overlap could be seen as highly similar between the two sets.</li>
 <li>400 genes overlap, only 4 genes share the same direction. In this case, the overlap could be see as nearly exactly opposite.</li>
 </ul>
-<div id="new-functions-2" class="section level2">
+<div id="new-functions-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-2" class="anchor"></a>new functions</h2>
+<a href="#new-functions-4" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/textvenn.html">textvenn()</a></code> prints a Venn diagram using console text output. It also supports directionality, the formatting is still being adjusted for best visual appeal.</li>

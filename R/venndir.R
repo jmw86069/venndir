@@ -169,9 +169,19 @@
 #'    Unicode characters.
 #' @param big.mark `character` passed to `format()` for numeric labels.
 #' @param curate_df `data.frame` or `NULL` passed to `curate_venn_labels()`.
+#' @param venn_sp `NULL` or `sp::SpatialPolygons` that contains one
+#'    polygon per entry in `setlist`. This argument is intended to
+#'    allow custom Venn circles to be supplied. When `venn_sp` is
+#'    `NULL`, then `get_venn_shapes()` is called.
+#' @param inside_percent_threshold `numeric` value indicating the percent
+#'    threshold, below which a polygon label is moved outside the polygon
+#'    by default. The threshold is calculated by area of the polygon
+#'    divided by total area of the enclosing polygon, multiplied by 100.
+#'    Therefore `inside_percent_threshold=5` will require a polygon to
+#'    represent at least 5 percent of the total area.
 #' @param plot_style `character` indicating the style of graphics plot:
-#'    `"gg"` uses ggplot2 and calls `ggrender_venndir()`; `"base"`
-#'    uses base R graphics and calls `render_venndir()`.
+#'    `"gg"` uses ggplot2; `"base"`
+#'    uses base R graphics. This argument is passed to `render_venndir()`.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
 #' @family venndir core
@@ -264,6 +274,8 @@ venndir <- function
  big.mark=",",
  sep="&",
  curate_df=NULL,
+ venn_sp=NULL,
+ inside_percent_threshold=NULL,
  plot_style=c("base", "gg"),
  do_plot=TRUE,
  verbose=FALSE,
@@ -312,6 +324,7 @@ venndir <- function
       set_color <- rep(set_colors,
          length.out=length(sets));
    }
+   names(set_color) <- names(setlist)[sets];
    
    # get overlap data
    sv <- signed_overlaps(setlist[sets],
@@ -337,6 +350,9 @@ venndir <- function
          NULL
       });
       gbase_signs <- NULL;
+      if (length(inside_percent_threshold) == 0) {
+         inside_percent_threshold <- 0.5;
+      }
    } else {
       gCounts <- lapply(jamba::nameVector(unique(sv$sets)), function(i){
          j <- subset(sv, sets %in% i);
@@ -347,20 +363,78 @@ venndir <- function
          jamba::nameVector(j$count, paste0(j$sets, "|", j[[overlap_type]]))
       });
       gbase_signs <- unlist(unname(gbase_signs_l));
+      if (length(inside_percent_threshold) == 0) {
+         inside_percent_threshold <- 5;
+      }
    }
    
    # get Venn circles
-   venn_sp <- get_venn_shapes(counts=nCounts,
-      proportional=proportional,
-      circle_nudge=circle_nudge,
-      sep=sep,
-      ...);
-   
-   # optionally rotate the shapes
-   if (length(rotate_degrees) > 0 && rotate_degrees != 0) {
-      venn_sp <- rescale_sp(sp=venn_sp,
-         share_center=TRUE,
-         rotate_degrees=rotate_degrees);
+   if (length(venn_sp) == 0) {
+      venn_sp <- get_venn_shapes(counts=nCounts,
+         proportional=proportional,
+         circle_nudge=circle_nudge,
+         sep=sep,
+         ...);
+      
+      # optionally rotate the shapes
+      if (length(rotate_degrees) > 0 && rotate_degrees != 0) {
+         venn_sp <- rescale_sp(sp=venn_sp,
+            share_center=TRUE,
+            rotate_degrees=rotate_degrees);
+      }
+   } else {
+      if ("SpatialPolygonsDataFrame" %in% class(venn_sp)) {
+         venn_sp_names <- rownames(data.frame(venn_sp));
+         if (length(venn_sp_names) == 0) {
+            if (nrow(venn_sp) == length(setlist)) {
+               rownames(data.frame(venn_sp)) <- names(setlist);
+            } else if (nrow(venn_sp) == length(nCounts)) {
+               rownames(data.frame(venn_sp)) <- names(nCounts);
+            } else {
+               errmsg <- paste0("nrow(venn_sp)=",
+                  nrow(venn_sp),
+                  " must equal length(setlist)=",
+                  length(setlist),
+                  " or length(nCounts)=",
+                  length(nCounts));
+               stop(errmsg);
+            }
+         }
+         vennmatch <- match(names(nCounts),
+            rownames(data.frame(venn_sp)));
+         venn_sp <- venn_sp[vennmatch,];
+      } else {
+         # SpatialPolygons
+         venn_sp_names <- names(venn_sp);
+         #print(venn_sp_names);
+         if (length(venn_sp_names) == 0 || !any(names(setlist)[sets] %in% venn_sp_names)) {
+            #print("Adding names to venn_sp");
+            if (length(venn_sp) == length(setlist)) {
+               for (i in seq_along(venn_sp@polygons)) {
+                  venn_sp@polygons[[i]]@ID <- names(setlist)[i];
+               }
+            } else if (length(venn_sp) == length(sets)) {
+               for (i in seq_along(venn_sp@polygons)) {
+                  venn_sp@polygons[[i]]@ID <- names(setlist)[sets][i];
+               }
+            } else {
+               errmsg <- paste0("length(venn_sp)=",
+                  length(venn_sp),
+                  " must equal length(setlist)=",
+                  length(setlist),
+                  " or length(nCounts)=",
+                  length(nCounts));
+               stop(errmsg);
+            }
+         }
+         vennmatch <- match(names(setlist)[sets],
+            names(venn_sp));
+         if (1 == 2) {
+            print(names(nCounts));
+            print(vennmatch);
+         }
+         venn_sp <- venn_sp[vennmatch];
+      }
    }
 
    # convert to venn overlap polygons
@@ -368,8 +442,79 @@ venndir <- function
       venn_counts=nCounts,
       venn_colors=set_color,
       sep=sep,
-      ...); # removed ...
+      ...);
    
+   # combine venn_sp with venn_spdf
+   #venn_sp <- sp::spChFIDs(venn_sp,
+   #   paste0(names(venn_sp), "|set"));
+   #   paste0(names(venn_sp), "|set"));
+   venn_sp_names <- jamba::nameVector(names(venn_sp));
+   venn_spdf1 <- sp::SpatialPolygonsDataFrame(
+      sp::spChFIDs(venn_sp,
+         names(venn_sp_names)),
+      data=data.frame(
+         check.names=FALSE,
+         stringsAsFactors=FALSE,
+         color="#00000000",
+         label=venn_sp_names))
+   venn_spdf$type <- "overlap";
+   venn_spdf1 <- sp::merge(venn_spdf1,
+      venn_spdf,
+      all.x=TRUE);
+   venn_spdf1$type <- "set";
+   venn_spdf1 <- sp::spChFIDs(venn_spdf1,
+      paste0(venn_spdf1$label, "|set"));
+   venn_spdf1$color <- set_color[venn_spdf1$label];
+   venn_spdf1$venn_color <- venn_spdf1$color;
+   # merge set and overlap polygons
+   venn_spdfs <- rbind(venn_spdf1[,colnames(data.frame(venn_spdf))],
+      venn_spdf);
+   
+   # generate default set label positions outside the polygons
+   whichset <- which(venn_spdfs$type %in% "set");
+   whichset <- match(unique(venn_spdfs$label), venn_spdfs$label);
+   #whichset <- (length(venn_spdfs$label) + 1) - match(unique(venn_spdfs$label), rev(venn_spdfs$label));
+   ploxy <- polygon_label_outside(sp=venn_spdfs,
+      which_sp=whichset,
+      ...);
+   venn_spdfs$x_offset <- 0;
+   venn_spdfs$y_offset <- 0;
+   venn_spdfs$x_label[whichset] <- sapply(ploxy, function(ixy){ixy["border",1]})
+   venn_spdfs$y_label[whichset] <- sapply(ploxy, function(ixy){ixy["border",2]})
+   
+
+   venn_spdfs$x_outside[whichset] <- sapply(ploxy, function(ixy){ixy["label",1]});
+   venn_spdfs$y_outside[whichset] <- sapply(ploxy, function(ixy){ixy["label",2]});
+   venn_spdfs$x_offset[whichset] <- sapply(ploxy, function(ixy){ixy["label",1]}) - venn_spdfs$x_label[whichset];
+   venn_spdfs$y_offset[whichset] <- sapply(ploxy, function(ixy){ixy["label",2]}) - venn_spdfs$y_label[whichset];
+   
+   venn_spdfs$vjust <- 0.5;
+   venn_spdfs$hjust <- 0.5;
+   venn_spdfs$vjust[whichset] <- sapply(ploxy, function(ixy){ixy["label","adjx"]});
+   venn_spdfs$hjust[whichset] <- sapply(ploxy, function(ixy){ixy["label","adjy"]});
+   
+   # show_set
+   if ("main" %in% show_set) {
+      nsets <- lengths(strsplit(as.character(venn_spdfs$label), split=sep));
+      dupelabel <- sapply(seq_along(venn_spdfs$label), function(i){
+         venn_spdfs$label[i] %in% venn_spdfs$label[-i]
+      });
+      venn_spdfs$show_set <- FALSE;
+      venn_spdfs$show_set[nsets == 1 & venn_spdfs$type %in% "set" & !dupelabel] <- TRUE;
+      venn_spdfs$show_set[nsets == 1 & venn_spdfs$type %in% "overlap"] <- TRUE;
+   } else if ("all" %in% show_set) {
+      nsets <- lengths(strsplit(as.character(venn_spdfs$label), split=sep));
+      dupelabel <- sapply(seq_along(venn_spdfs$label), function(i){
+         venn_spdfs$label[i] %in% venn_spdfs$label[-i]
+      });
+      venn_spdfs$show_set <- FALSE;
+      venn_spdfs$show_set[nsets == 1 & venn_spdfs$type %in% "set" & !dupelabel] <- TRUE;
+      venn_spdfs$show_set[nsets == 1 & venn_spdfs$type %in% "overlap"] <- TRUE;
+      venn_spdfs$show_set <- TRUE;
+   } else {
+      venn_spdfs$show_set <- FALSE;
+   }
+
    # generate labels from nCounts and gCounts
    nlabel_df <- data.frame(label=names(nCounts),
       venn_counts=nCounts,
@@ -386,25 +531,33 @@ venndir <- function
    nlabel_df$y_label <- unlist(jamba::rmNULL(nlabel_df$y_label, nullValue=NA))
    
    # Now add the main count labels
-   if ("main" %in% show_set) {
-      venn_text <- ifelse(grepl(sep, fixed=TRUE, x=nlabel_df$label),
-         jamba::formatInt(
-            jamba::rmNA(naValue=0,
-               nlabel_df$venn_counts)),
+   nlabel_df$show_set <- ifelse(
+      grepl(sep, fixed=TRUE, x=nlabel_df$label),
+      FALSE,
+      TRUE);
+   venn_text <- jamba::formatInt(
+      jamba::rmNA(naValue=0,
+         nlabel_df$venn_counts));
+   if (1 == 2) {
+      venn_text_old <- ifelse(
+         nlabel_df$show_set,
          paste0("**",
             nlabel_df$label,
-            "**<br>\n",
-            jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))));
-   } else if ("all" %in% show_set) {
-      venn_text <- paste0("**",
-         nlabel_df$label,
-         "**<br>\n",
-         jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts)));
-   } else {
-      venn_text <- jamba::formatInt(
-         jamba::rmNA(naValue=0,
-            nlabel_df$venn_counts));
+            "**",
+            ifelse(nlabel_df$venn_counts == 0,
+               "",
+               paste0("<br>\n",
+                  jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))
+               )
+            )
+            #jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))
+         ),
+         jamba::formatInt(
+            jamba::rmNA(naValue=0,
+               nlabel_df$venn_counts))
+      );
    }
+   
    x_main <- nlabel_df$x_label;
    y_main <- nlabel_df$y_label;
    vjust_main <- rep(0.5, length(x_main));
@@ -469,53 +622,25 @@ venndir <- function
    }
    
    ## label_style
-   label_fill_main <- rep(NA, length(x_main));
-   label_border_main <- rep(NA, length(x_main));
-   label_color_main <- jamba::setTextContrastColor(
-      jamba::alpha2col(nlabel_df$color,
-      alpha=poly_alpha));
-   label_fill_signed <- rep(NA, length(x_signed));
-   label_border_signed <- rep(NA, length(x_signed));
-   label_color_signed <- jamba::setTextContrastColor(
-      jamba::alpha2col(rep(nlabel_df$color, gCounts_len),
-         alpha=poly_alpha));
+   #label_fill_main <- rep(NA, length(x_main));
+   #label_border_main <- rep(NA, length(x_main));
+   #label_color_main <- jamba::setTextContrastColor(
+   #   jamba::alpha2col(nlabel_df$color,
+   #   alpha=poly_alpha));
+   #label_fill_signed <- rep(NA, length(x_signed));
+   #label_border_signed <- rep(NA, length(x_signed));
+   #label_color_signed <- jamba::setTextContrastColor(
+   #   jamba::alpha2col(rep(nlabel_df$color, gCounts_len),
+   #      alpha=poly_alpha));
    
-   ## replace or remove? 
-   # venndir_label_style() performs this function
-   if (grepl("_box", label_style)) {
-      label_border_main <- jamba::alpha2col(alpha=0.8,
-         jamba::makeColorDarker(nlabel_df$color,
-            darkFactor=1.2));
-      label_border_signed <- rep(label_border_main,
-         gCounts_len);
-   }
-   if (grepl("fill", label_style)) {
-      label_fill_main <- nlabel_df$color;
-      label_color_main <- jamba::setTextContrastColor(nlabel_df$color);
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   }
-   if (grepl("shaded", label_style)) {
-      label_fill_main <- jamba::alpha2col(nlabel_df$color,
-         alpha=0.5);
-      label_color_main <- jamba::setTextContrastColor(
-         jamba::alpha2col(nlabel_df$color,
-            alpha=mean(c(poly_alpha, 0.9))));
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   }
-   if (grepl("lite", label_style)) {
-      label_fill_main <- rep("#FFEEAABB", length(x_main));
-      label_color_main <- rep("#000000", length(x_main));
-      label_fill_signed <- rep(label_fill_main,
-         gCounts_len);
-      label_color_signed <- rep(label_color_main,
-         gCounts_len);
-   }
+   # venndir_label_style() now assigns these values
+   label_fill_main <- rep(NA, nrow(nlabel_df));
+   label_border_main <- rep(NA, nrow(nlabel_df));
+   label_color_main <- rep(NA, nrow(nlabel_df));
+   label_fill_signed <- rep(label_fill_main, gCounts_len);
+   label_border_signed <- rep(label_border_main, gCounts_len);
+   label_color_signed <- rep(label_color_main, gCounts_len);
+
 
    ## Hide zero if show_zero=FALSE
    show_main <- (!is.na(nlabel_df$x_label));
@@ -526,15 +651,28 @@ venndir <- function
    show_signed <- (show_signed & unlist(gCounts) != 0)
 
    ## Update other polygon display attributes
+   vset <- (venn_spdfs$type %in% "overlap")
+   venn_spdfs$alpha <- ifelse(vset,
+      poly_alpha,
+      0);
+   venn_spdfs$lwd <- 2;
+   venn_spdfs$lty <- 1;
+   venn_spdfs$border <- ifelse(vset,
+      jamba::makeColorDarker(
+         venn_spdfs$color,
+         darkFactor=1.2,
+         sFactor=1.2),
+      "#00000000");
    venn_spdf$alpha <- poly_alpha;
-   venn_spdf$lwd <- rep(2, nrow(venn_spdf));
-   venn_spdf$lty <- rep(1, nrow(venn_spdf));
+   venn_spdf$lwd <- 2;
+   venn_spdf$lty <- 1;
    venn_spdf$border <- jamba::makeColorDarker(
       venn_spdf$color,
       darkFactor=1.2,
       sFactor=1.2);
 
    ## Prepare label data.frame
+   #print(nlabel_df);
    label_n <- length(c(x_main, x_signed));
    label_df <- data.frame(
       x=c(x_main, x_signed),
@@ -545,7 +683,8 @@ venndir <- function
          rep(nlabel_df$label, gCounts_len)),
       type=rep(c("main", "signed"),
          c(length(x_main), length(x_signed))),
-      #show_label=c(show_main, show_signed),
+      x_offset=0,
+      y_offset=0,
       show_label=NA,
       vjust=c(vjust_main, vjust_signed),
       hjust=c(hjust_main, hjust_signed),
@@ -558,9 +697,11 @@ venndir <- function
       lty=rep(1, label_n),
       lwd=rep(1, label_n),
       fill=c(label_fill_main, label_fill_signed),
-      padding=rep(2, label_n),
+      padding=rep(c(4, 0),
+         c(length(x_main), length(x_signed))),
       padding_unit=rep("pt", label_n),
-      r=rep(2, label_n),
+      r=rep(c(4, 2),
+         c(length(x_main), length(x_signed))),
       r_unit=rep("pt", label_n),
       stringsAsFactors=FALSE,
       check.names=FALSE
@@ -584,29 +725,34 @@ venndir <- function
 
    ## remove or replace with venndir_label_style()
    ## Adjust signed color
-   g_update <- (label_df$type %in% "signed" &
-      label_df$show_label %in% c(NA,TRUE) & 
-      (!is.na(label_df$fill) |
-         (label_df$overlap_set %in% venn_spdf$label)));
-   if (any(g_update)) {
-      g_update_match <- match(label_df$overlap_set[g_update],
-         venn_spdf$label);
-      g_update_color <- label_df$color[g_update];
-      g_update_fill <- ifelse(is.na(label_df$fill[g_update]),
-         jamba::alpha2col(
-            venn_spdf$color[g_update_match],
-            alpha=venn_spdf$alpha[g_update_match]),
-         label_df$fill[g_update]);
-      label_df$color[g_update] <- make_color_contrast(g_update_color, g_update_fill);
+   if (1 == 2) {
+      g_update <- (label_df$type %in% "signed" &
+         label_df$show_label %in% c(NA,TRUE) & 
+         (!is.na(label_df$fill) |
+            (label_df$overlap_set %in% venn_spdf$label)));
+      if (any(g_update)) {
+         g_update_match <- match(label_df$overlap_set[g_update],
+            venn_spdf$label);
+         g_update_color <- label_df$color[g_update];
+         g_update_fill <- ifelse(is.na(label_df$fill[g_update]),
+            jamba::alpha2col(
+               venn_spdf$color[g_update_match],
+               alpha=venn_spdf$alpha[g_update_match]),
+            label_df$fill[g_update]);
+         label_df$color[g_update] <- make_color_contrast(g_update_color,
+            g_update_fill,
+            ...);
+      }
    }
+   
    ## remove or replace
    ## this logic is inside render_venndir()
-   if (!"overlap" %in% overlap_type && any(label_df$type %in% "signed")) {
+   if (1 == 2 && !"overlap" %in% overlap_type && any(label_df$type %in% "signed")) {
       ## Adjust signed labels for contrast
       is_signed <- label_df$type %in% "signed";
       poly_match <- match(label_df$overlap_set, venn_spdf$label);
       poly_fill <- jamba::alpha2col(
-         data.frame(venn_spdf)[poly_match,"color"],
+         as.character(data.frame(venn_spdf)[poly_match,"color"]),
          alpha=data.frame(venn_spdf)[poly_match,"alpha"]);
       label_fill <- ifelse(is.na(label_df$fill),
          poly_fill,
@@ -630,37 +776,42 @@ venndir <- function
       label_df$items <- I(sv$items[sv_match]);
    }
    
+   ## venndir_label_style()
+   vo <- venndir_label_style(list(
+      venn_spdf=venn_spdfs,
+      label_df=label_df),
+      label_style=label_style,
+      inside_percent_threshold=inside_percent_threshold,
+      ...);
+   label_df <- vo$label_df;
+   venn_spdf <- vo$venn_spdf;
+
    ## Call render_venndir()
    gg <- NULL;
-   if (!display_counts) {
+   if (display_counts %in% c(FALSE)) {
       #label_df$show_label <- FALSE;
       label_df$display_counts <- FALSE;
    }
+   retlist <- list(venn_spdf=venn_spdfs,
+      label_df=label_df);
    if (do_plot) {
-      if (any(c("gg", "base") %in% plot_style)) {
-         gg <- render_venndir(venn_spdf=venn_spdf,
-            label_df=label_df,
-            show_label=show_label,
-            show_items=show_items,
-            show_zero=show_zero,
-            display_counts=display_counts,
-            label_style=label_style,
-            plot_style=plot_style,
-            max_items=max_items,
-            ...);
-      } else {
-         gg <- ggrender_venndir(venn_spdf=venn_spdf,
-            label_df=label_df,
-            show_items=show_items,
-            display_counts=display_counts,
-            ...);
-         print(gg);
+      gg <- render_venndir(venn_spdf=venn_spdfs,
+         label_df=label_df,
+         show_label=show_label,
+         show_items=show_items,
+         show_zero=show_zero,
+         display_counts=display_counts,
+         label_style="custom",
+         plot_style=plot_style,
+         max_items=max_items,
+         inside_percent_threshold=inside_percent_threshold,
+         ...);
+         #label_df <- gg$label_df;
+      retlist$rv_label_df <- gg$label_df;
+      if ("gg" %in% plot_style) {
+         retlist$gg <- gg;
       }
    }
 
-   return(invisible(
-      list(
-         venn_spdf=venn_spdf,
-         label_df=label_df,
-         gg=gg)));
+   return(invisible(retlist));
 }

@@ -8,13 +8,19 @@ polygon_label_outside(
   sp,
   which_sp = NULL,
   center = NULL,
-  distance = 1,
+  distance = NULL,
+  distance_fraction = 0.05,
   center_method = c("label", "bbox"),
   vector_method = c("farthest", "label"),
-  segment_type = c("vector", "nearest"),
+  segment_method = c("nearest", "vector"),
+  offset_fraction = c(0, -0.05),
   min_degrees = 15,
-  debug = FALSE,
+  sp_buffer = 0,
+  relative = TRUE,
+  font_cex = 1,
   seed = 1,
+  debug = FALSE,
+  verbose = FALSE,
   ...
 )
 }
@@ -34,7 +40,13 @@ determined using a method defined by \code{center_method}.}
 \item{distance}{\code{numeric} value indicating the absolute coordinate
 distance away from the perimiter of \code{sp} to place labels.
 This value is effectively the same as buffer used in
-\code{rgeos::gBuffer()}.}
+\code{rgeos::gBuffer()}. A vector of values can be provided,
+to apply to each polygon in \code{which_sp}. When \code{distance=NULL}
+the \code{distance_fraction} is used.}
+
+\item{distance_fraction}{\code{numeric} which defines \code{distance} as
+a fraction of the x-axis and y-axis range. Note that
+\code{distance_fraction} is only used when \code{distance=NULL}.}
 
 \item{center_method}{\code{character} string indicating the method to
 determine the \code{center}: \code{"label"} uses the mean x,y coordinate
@@ -55,7 +67,7 @@ edge of each polygon. Using \code{vector_method="label"} works well
 when the polygon label is set based upon the interior open area
 of the polygon.}
 
-\item{segment_type}{\code{character} string indicating how to draw the
+\item{segment_method}{\code{character} string indicating how to draw the
 line segment from the outside label back to the polygon:
 \code{"vector"} defines the line segment by extending the line
 used by \code{vector_method} along the same direction; \code{"nearest"}
@@ -65,10 +77,26 @@ defines a new line to the nearest point on the polygon.}
 with the minimum angle in degrees for labels to be placed
 around the outside of a polygon.}
 
+\item{sp_buffer}{\code{numeric} value passed to \code{polygon_label_segment()}
+which defines a buffer when determining the line segment
+position at each polygon in \code{which_sp}. A negative value
+is recommended, which will create a buffer inside the polygon,
+causing the line segment to end slightly inside each polygon.
+This effect may be preferred when more than one polygon
+boundary is overlapping. An example value \code{sp_buffer=0.1}.
+Note that \code{sp_buffer} is applied to each polygon in \code{which_sp}
+and a vector of values can be provided.}
+
+\item{seed}{\code{numeric} value passed to \code{set.seed()} to ensure
+reproducible results, or \code{seed=NULL} to enable random
+results.}
+
 \item{debug}{\code{logical} indicating whether to plot the results
 using base R graphics. When \code{debug=2} it will also add some
 visual decorations showing the center point, the points
 determined by polygon boundaries.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
 
 \item{...}{additional arguments are ignored.}
 }
@@ -77,12 +105,89 @@ Polygon label outside
 }
 \details{
 This function takes a \code{sp::SpatialPolygons} object and
-determines an appropriate place for a label outside the
-polygon, with line segment drawn back to the outer border.
+determines an appropriate position for one or more labels
+outside the full polygon. For each label two coordinates
+are returned, one for the label and one for a line segment
+that is drawn to its relevant polygon border.
 
 The expected input is \code{sp::SpatialPolygonsDataFrame} which
 contains multiple polygons, and one of the polygons should
-be labeled.
+be labeled. However, the function should also work with
+\code{sp::SpatialPolygons}.
+
+This function differs from some other functions in that
+it places multiple labels in context of each other,
+to minimize overlapping labels. It also positions
+labels outside the full set of polygons, even when
+labeling one of the polygons in the input \code{sp}.
+For example \code{polygon_label_outside(sp, which_sp=2)}
+will generate a label position for the second polygon
+in \code{sp} and position it outside the full polygon set.
+
+To combine multiple \code{sp::SpatialPolygons} objects,
+use \code{sp::rbind(..., makeUniqueIDs=TRUE)}. To combine
+\code{sp::SpatialPolygonsDataFrame} with another spatial
+object, convert to generic \code{sp::SpatialPolygons} first
+using \code{sp::geometry()} then apply \code{sp::rbind()}.
+
+The basic workflow:
+\enumerate{
+\item A \code{center} point is either provided, or determined
+using the polygons in \code{sp} using the \code{center_method}.
+\item For each polygon in \code{which_sp} a directional vector
+is defined using \code{vector_method}, which effectively draws
+a line from the \code{center} through the chosen point
+for each polygon. The end result is an angle for each
+label.
+\itemize{
+\item \code{vector_method="farthest"} chooses the farthest
+point from the \code{center} for each polygon.
+\item \code{vector_method="label"} chooses the best polygon
+label position for each polygon, using
+\code{sp_polylabelr()} which calls \code{polylabelr::poi()}.
+}
+\item The chosen label angles are spread using \code{spread_degrees()}
+to ensure the angles are at least \code{min_degrees} apart
+from each other. Groups of labels are spaced around the
+mean angle for each set of labels that are too close together.
+This step defines the label position outside the full \code{sp}
+polygon.
+\item The last step is to define a line segment from the outer
+label position back to the corresponding polygon boundary,
+using \code{polygon_label_segment()}. This step has two approaches
+with subtle differences:
+\itemize{
+\item \code{segment_method="vector"} draws the line segment toward
+the reference coordinate for each polygon, as defined
+by \code{vector_method}. This method visually draws the line
+segment toward where a label might be expected inside
+the polygon, which may be visually most intuitive.
+However, if the label angles have been changed
+by \code{spread_degrees()} then sometimes this point is not
+the closest or most intuitive for the label.
+\item \code{segment_method="nearest"} draws the line segment
+toward the nearest polygon coordinate to the label
+position. Depending upon the polygon shape, the
+nearest point may or may not be preferred.
+}
+}
+
+Limitations:
+\itemize{
+\item This method does not
+limit labels within a plot boundary, therefore a plot
+may need to be re-drawn such that labels will fit inside
+the plot x-axis and y-axis ranges. When using \code{venndir()}
+the argument \code{expand_fraction} is intended for this purpose,
+for example try \code{venndir(..., expand_fraction=0.2)}.
+\item This method does not detect label size, nor label overlaps,
+when positioning labels around the plot. For example, one
+may ideally want larger \code{min_degrees} angles at the top
+and bottom, but smaller \code{min_degrees} on the left and right,
+to accommodate the flow of text. A workaround may be to use
+a vector of \code{distance} or \code{distance_fraction} values to alter
+the distance of certain labels after visual review.
+}
 }
 \examples{
 setlist <- list(A=letters, B=sample(letters, 4));
@@ -90,37 +195,58 @@ C <- sample(setdiff(letters, setlist$B), 4);
 setlist$C <- C;
 
 vo <- venndir(setlist, proportional=FALSE, expand_fraction=0.2);
-segment1 <- polygon_label_outside(sp=vo$venn_spdf)
-lines(segment1[[1]], col=vo$venn_spdf$border[1], lwd=2)
-jamba::drawLabels(txt=vo$venn_spdf$label[1],
-   labelCex=1.5,
-   x=segment1[[1]][2,1], y=segment1[[1]][2,2])
+segment1 <- polygon_label_outside(sp=vo$venn_spdf, sp_buffer=-0.1, debug=TRUE)
 
-i <- 5;
+# example drawing labels manually
+vo <- venndir(setlist, proportional=FALSE, expand_fraction=0.2);
+segment1 <- polygon_label_outside(sp=vo$venn_spdf, sp_buffer=-0.1)
+for (i in seq_along(segment1)) {
 lines(segment1[[i]], col=vo$venn_spdf$border[i], lwd=2)
+text(
+   x=segment1[[i]][2,1],
+   y=segment1[[i]][2,2],
+   labels=names(segment1)[i],
+   adj=c(segment1[[i]][1,"adjx"],
+      segment1[[i]][1,"adjy"])
+   )
+}
+# an alternative is to use jamba::drawLabels()
 jamba::drawLabels(txt=vo$venn_spdf$label[i],
+   boxColor=vo$venn_spdf$color[i],
    labelCex=1.5,
+   adjX=segment1[[i]][,"adjx"],
+   adjY=segment1[[i]][,"adjy"],
    x=segment1[[i]][2,1], y=segment1[[i]][2,2])
 
-par("xpd"=NA);
+D <- sample(letters, 4);
+setlist$D <- D;
+vo4 <- venndir(setlist, sets=1:4);
+polygon_label_outside(vo4$venn_spdf, debug=TRUE, sp_buffer=-0.1)
+
+par("xpd"=TRUE);
 par("mfrow"=c(4,2));
 st <- "nearest";
-for (cm in c("label", "bbox")) {
+vo <- venndir(setlist, proportional=TRUE, seed=1,
+   expand_fraction=0.2, do_plot=FALSE);
 for (vm in c("farthest", "label")) {
+for (cm in c("label", "bbox")) {
    for (st in c("vector", "nearest")) {
-      vo <- venndir(setlist, proportional=FALSE,
-         expand_fraction=0.2);
-      title(cex.main=1,
+      plot(vo$venn_spdf, xlim=c(-5, 5))
+      title(cex.main=0.8,
+         line=1.6,
          main=paste0("vector_method:", vm,
             "\ncenter_method:", cm,
-            "\nsegment_type:", st));
+            "\nsegment_method:", st));
       segmentxy <- polygon_label_outside(sp=vo$venn_spdf,
+         which_sp=2:length(vo$venn_spdf),
+         sp_buffer=-0.1,
          center_method=cm,
          vector_method=vm,
-         debug=2)
+         debug=TRUE)
    }
 }
 }
+par("mfrow"=c(1,1))
 
 par("mfrow"=c(1, 2));
 st <- "nearest";
@@ -133,7 +259,7 @@ for (vm in c("farthest", "label")) {
       title(cex.main=1,
          main=paste0("vector_method:", vm,
             "\ncenter_method:", cm,
-            "\nsegment_type:", st));
+            "\nsegment_method:", st));
       segmentxy <- polygon_label_outside(sp=vo$venn_spdf,
          center_method=cm,
          vector_method=vm,
@@ -148,9 +274,9 @@ segmentxy <- polygon_label_outside(sp=vo$venn_spdf, debug=2)
 set.seed(1)
 vo <- venndir(setlist, proportional=TRUE, expand_fraction=0.3);
 segmentxy <- polygon_label_outside(sp=vo$venn_spdf,
-   debug=TRUE, segment_type="nearest")
+   debug=TRUE, segment_method="nearest")
 segmentxy <- polygon_label_outside(sp=vo$venn_spdf, 
-   debug=TRUE, segment_type="vector")
+   debug=TRUE, segment_method="vector")
 
 }
 \seealso{
@@ -158,10 +284,12 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
+\code{\link{display_angles}()},
 \code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_largest_polygon}()},
+\code{\link{get_sp_buffer}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
 \code{\link{label_polygon_fill}()},
@@ -169,6 +297,7 @@ Other venndir utility:
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
+\code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
 \code{\link{nudge_venndir_label}()},
@@ -181,6 +310,7 @@ Other venndir utility:
 \code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
+\code{\link{sp_percent_area}()},
 \code{\link{sp_polylabelr}()},
 \code{\link{spread_degrees}()},
 \code{\link{union_polygons}()},

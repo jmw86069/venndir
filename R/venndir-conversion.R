@@ -94,7 +94,7 @@ counts2setlist <- function
 #' # Venn diagram
 #' venndir(setlist,
 #'    show_items="item",
-#'    item_angle=0,
+#'    item_degrees=0,
 #'    item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)))
 #' 
 #' # Proportional Venn (Euler) diagram
@@ -118,3 +118,91 @@ overlaplist2setlist <- function
    })
    return(set_values);
 }
+
+#' venndir conversion from signed overlap counts to setlist
+#' 
+#' venndir conversion from signed overlap counts to setlist
+#' 
+#' This function takes input in the form of a `list`
+#' whose names are set overlap labels, for example `"set_A"`,
+#' or `"set_A&set_B"`.
+#' 
+#' Each list element is an `integer` vector whose names
+#' are value overlaps, for example `"1"`, or `"-1_1"`,
+#' and whose `integer` values contain the overlap counts.
+#' 
+#' 
+#' 
+#' @return `list` where the list names are the names of each set,
+#'    and values of each list element is a vector of items.
+#'    The items are artificial labels used for convenience.
+#' 
+#' @family venndir conversion
+#' 
+#' @examples
+#' x <- list(
+#'    "set_A"=c(
+#'       "1"=80,
+#'       "-1"=95
+#'    ),
+#'    "set_B"=c(
+#'       "1"=15,
+#'       "-1"=30
+#'    ),
+#'    "set_A&set_B"=c(
+#'       "1_1"=100,
+#'       "-1_-1"=125,
+#'       "1_-1"=3,
+#'       "-1_1"=4
+#'    )
+#' )
+#' setlist <- signed_counts2setlist(x)
+#' vo <- venndir(setlist, "each")
+#' polygon_label_outside(vo$venn_spdf, 1, debug=TRUE, distance=diff(par("usr")[1:2]) * 0.05)
+#' venndir(setlist, "each", show_items="sign", item_degrees=-10)
+#' 
+#' vo <- venndir(setlist, proportional=TRUE, label_style="shaded_box", show_set="none")
+#' plo <- polygon_label_outside(vo$venn_spdf, NULL, debug=TRUE, distance=diff(par("usr")[1:2]) * 0.05)
+#' plo
+#' 
+#' @export
+signed_counts2setlist <- function
+(x,
+ sep="&",
+ value_sep="_",
+ ...)
+{
+   ## input is assumed to be a list named by set overlap
+   ## where each list element is a list named by value
+   ## overlap
+   combo_value_list <- unlist(recursive=FALSE, lapply(names(x), function(i){
+      j <- x[[i]];
+      unlist(recursive=FALSE, lapply(names(j), function(kname){
+         k <- j[[kname]];
+         inames <- strsplit(i, split=sep)[[1]];
+         knames <- strsplit(kname, split=value_sep)[[1]];
+         valuenames <- paste0(
+            rep(i, k),
+            "_",
+            kname,
+            "_",
+            seq_len(k))
+         unlist(recursive=FALSE,
+            lapply(seq_along(inames), function(m){
+               v <- list(jamba::nameVector(
+                  rep(knames[m], length(valuenames)),
+                  valuenames))
+               names(v) <- inames[m];
+               v
+            })
+         )
+      }))
+   }));
+   combo_value_list
+   set_names <- unique(names(combo_value_list));
+   set_values <- lapply(jamba::nameVector(set_names), function(i){
+      unlist(unname(combo_value_list[(names(combo_value_list) %in% i)]))
+   })
+   return(set_values);
+}
+

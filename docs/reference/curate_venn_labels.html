@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9.9000</span>
       </span>
     </div>
 
@@ -86,6 +86,18 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/venndir_gene_expression.html">Venndir with Gene Expression Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -184,9 +196,14 @@ before calling this function.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir utility: 
+<code><a href='degrees_to_adj.html'>degrees_to_adj</a>()</code>,
+<code><a href='diff_degrees.html'>diff_degrees</a>()</code>,
+<code><a href='display_angles.html'>display_angles</a>()</code>,
 <code><a href='eulerr2polys.html'>eulerr2polys</a>()</code>,
+<code><a href='expand_range.html'>expand_range</a>()</code>,
 <code><a href='find_vennpoly_overlaps.html'>find_vennpoly_overlaps</a>()</code>,
 <code><a href='get_largest_polygon.html'>get_largest_polygon</a>()</code>,
+<code><a href='get_sp_buffer.html'>get_sp_buffer</a>()</code>,
 <code><a href='get_venn_shapes.html'>get_venn_shapes</a>()</code>,
 <code><a href='intersect_polygons.html'>intersect_polygons</a>()</code>,
 <code><a href='label_polygon_fill.html'>label_polygon_fill</a>()</code>,
@@ -194,8 +211,11 @@ before calling this function.</p>
 <code><a href='make_venn_combn_df.html'>make_venn_combn_df</a>()</code>,
 <code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
 <code><a href='match_list.html'>match_list</a>()</code>,
+<code><a href='mean_degree_arc.html'>mean_degree_arc</a>()</code>,
+<code><a href='mean_degrees.html'>mean_degrees</a>()</code>,
 <code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
 <code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
+<code><a href='polygon_label_outside.html'>polygon_label_outside</a>()</code>,
 <code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
 <code><a href='print_color_df.html'>print_color_df</a>()</code>,
 <code><a href='rescale_coordinates.html'>rescale_coordinates</a>()</code>,
@@ -205,6 +225,9 @@ before calling this function.</p>
 <code><a href='shrink_df.html'>shrink_df</a>()</code>,
 <code><a href='sp_circles.html'>sp_circles</a>()</code>,
 <code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
+<code><a href='sp_percent_area.html'>sp_percent_area</a>()</code>,
+<code><a href='sp_polylabelr.html'>sp_polylabelr</a>()</code>,
+<code><a href='spread_degrees.html'>spread_degrees</a>()</code>,
 <code><a href='union_polygons.html'>union_polygons</a>()</code>,
 <code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
 
@@ -220,7 +243,7 @@ before calling this function.</p>
 <span class='fu'>jamba</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/jamba/man/printDebug.html'>printDebug</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>as.list</a></span><span class='op'>(</span><span class='fu'>curate_venn_labels</span><span class='op'>(</span><span class='va'>venn_labels</span>, <span class='st'>"sign"</span><span class='op'>)</span><span class='op'>)</span>,
    collapse<span class='op'>=</span><span class='st'>", "</span>,
    fgText<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>as.list</a></span><span class='op'>(</span><span class='fu'>curate_venn_labels</span><span class='op'>(</span><span class='va'>venn_labels</span>, <span class='st'>"color"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ##  (<span style='color: #00BBBB;font-weight: bold;'>12:27:22</span><span>) 22Oct2020:  </span><span style='color: #555555;'>-↑-↓</span><span>, </span><span style='color: #555555;'>↑↓</span><span>, </span><span style='color: #BB0000;'>↑↑↑</span><span>, </span><span style='color: #555555;'>X</span><span>, </span><span style='color: #0000BB;'>=</span><span>, </span><span style='color: #BB0000;'>↑↑--</span><span> </div><div class='input'>
+</div><div class='output co'>#&gt; ##  (<span style='color: #00BBBB;font-weight: bold;'>23:58:39</span><span>) 18Nov2020:  </span><span style='color: #555555;'>-↑-↓</span><span>, </span><span style='color: #555555;'>↑↓</span><span>, </span><span style='color: #BB0000;'>↑↑↑</span><span>, </span><span style='color: #555555;'>X</span><span>, </span><span style='color: #0000BB;'>=</span><span>, </span><span style='color: #BB0000;'>↑↑--</span><span> </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

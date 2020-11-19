@@ -1,4 +1,113 @@
 
+# venndir 0.0.9.900
+
+Began adding `testthat` tests for various functions.
+
+
+## one more refactor
+
+Proportional Venn diagrams (Euler diagrams) warranted a refactor
+in order to label each set even when one set is fully contained
+inside another set.
+
+
+## new functions
+
+* `signed_counts2setlist()` is an import method similar to
+`counts2setlist()` but to allow importing directional overlaps.
+* `get_sp_buffer()` applies a buffer width to the interior of
+a polygon, either with fixed width, or relative width based
+upon the minimum width required to make the polygon disappear.
+The relative value means `sp_buffer=0.5` can be used to
+create a buffer at half-width, for a polygon of any size.
+The purpose is to draw a line segment from outside the polygon
+to "just inside" the polygon, using an amount appropriate
+for the size and shape of the polygon.
+As `rgeos::gBuffer()` has no ability to scale relative
+to the polygon size and shape, `get_sp_buffer()` quickly
+runs a sweep to determine the `width` where an internal
+polygon is just barely non-zero, and defines that as
+`sp_buffer=-1`.
+* `mean_degrees()` takes a vector of angles in degrees and
+returns the mean angle based upon the sum of unit vectors.
+It adds a small random bit to prevent vectors from exactly
+cancelling out, and an argument `seed` that makes the randomness
+reproducible.
+* `mean_degree_arc()` is similar to `mean_degrees()` except
+it takes an ordered set of angles that define an arc, and
+returns the mean position along that arc. Use argument `do_plot=TRUE`
+to see a visual representation of the options.
+It turns out that spreading text labels along an arc only
+worked when the mean angle was fixed inside the arc. Otherwise
+occassionally the mean angle could be exactly 180 degrees
+off, when the angles span more than 180 degrees, and if
+multiple labels were present at each end. You'd think that
+would be rare, but it happened enough to notice the bug
+and to implement better logic.
+* `degrees_to_adj()` is a helper function that takes an
+angle in degrees, and returns the text `adjx` and `adjy`
+values so a text label will be positioned outside the angle.
+
+
+## functions removed
+
+* `ggrender_venndir()` was removed, use
+`render_venndir(plot_style="gg")` in its place. It made sense
+to keep the visualization logic inside one function.
+
+## bug fixes
+
+* `spread_degrees()` was not properly maintaining the initial
+order of angles when it iteratively spread out a series of
+angles. For example one group of angles could be spread
+wide enough to overlap another existing angle, in which
+case that angle should be kept outside the initial group,
+instead of being placed into the middle. The telltale
+sign is that line segments wildly criss-crossed inside
+the polygon.
+
+
+## changes to existing functions
+
+* New argument `inside_percent_threshold` added to
+`venndir()`, `render_venndir()`, and `venndir_label_style()`
+used to position labels outside a polygon when its size
+is below this percent of the total polygon size. It works
+as a reasonable alternative for determining if the label
+visually fits inside a polygon.
+* `venndir()` can accept polygon shapes to use as input,
+instead of defining its own or using those from
+`eulerr::euler()`. New argument `venn_sp` accepts any
+`sp::SpatialPolygons` compatible object, which must have
+at least as many polygons as there are sets in `setlist`.
+* `venndir()` now adds the Venn shapes to the output `venn_spdf`
+with `type="set"`; all other polygons have `type="overlap"`.
+The shapes will serve as an anchor for set labels, in the
+event we want to label one or more circles -- like when one
+circle is fully contained inside another.
+* `polygon_label_outside()` now determines a reasonable text
+alignment `adj` based upon the angle offset, to help minimize
+label overlap with the line segment.
+* `polygon_label_outside()` was updated to correct some internal
+use of coordinates. New argument `sp_buffer` to allow the
+line segment to end slightly inside each polygon.
+* `get_venn_shapes()` default 4-way Venn ellipses were slightly
+adjusted so the middle ellipses broke the outer ellipses
+into two polygons. This change helps the automated position
+of labels by `polygon_label_outside()` with certain settings.
+* `venndir_label_style()` was refactored to be able to
+position labels inside or outside the polygon, for four
+types of labels:
+
+* `"set"` - e.g. `"set_A"`
+* `"overlap"` - e.g. `"set_A&set_B"` normally this label is not shown
+* `"count"` - e.g. `10`
+* `"items"` - e.g. `c("item1", "item3", "item9")` for each overlap set.
+
+It has some `label_preset` options, which help position set and
+count labels inside or outside.
+
+
 # venndir 0.0.8.900
 
 One more refactor is in progress. Label coordinates will
