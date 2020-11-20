@@ -1,8 +1,72 @@
 
 # todo on venndir
 
+## enhancements
 
-## small features for roll-out
+### miscellaneous
+
+* DONE: Add warning message to ggplot2 output in `render_venndir()`.
+
+
+### add vignette showing more visual options
+
+* how to change Venn set colors
+* how to nudge a Venn circle
+* how to rotate the whole Venn diagram
+* how to adjust item label buffer, and view the buffer size
+* how to create custom curations with `curate_df`
+
+
+### make displaying items labels easier
+
+* make it "one step" to display items, when `show_items` is
+enabled in `venndir()` the default `label_preset` should include
+items.
+* Option to allow "one column" of labels inside the polygon, which could
+be useful for things like a list of pathways between two experiments.
+
+
+### polish label coordinates inside/outside
+
+* coordinates for inside/outside should really just be
+in `venn_spdf` then used by `label_df` when needed
+* label styles need polishing. If overlap label is outside
+and count label is inside, how can they have two different styles?
+
+
+### Combine individual labels into one cohesive label
+
+COMPLETE for base R plots.
+* TODO: for any label associated with a line segment,
+use `degree_to_adj()` to help place the label at the
+correct edge of the line segment.
+* one option is simply to create one label, but text
+alignment for two column output would be difficult.
+* prototype using one label for fill/border, and
+expand the buffer size so it includes the other labels.
+
+   * calculate label width/height (`grid::ascentDetails()`,
+   `grid::widthDetails()`
+   * also use grid graphics logic to use rescalable operations
+   * requires knowledge about grid graphics I don't currently have
+   and was not yet easy to grok from online guides. I was able to
+   proof-of-concept a method that used grob dimensions of a left label,
+   to produce a right label with border and padding sufficient to
+   encompass both sides. When trying to automate, it stopped working.
+   Something in the circular logic, that a grob does not have a size
+   until placed, so adjusting by size before placement has no usable
+   value?
+
+
+## DONE: Update Rmarkdown README.Rmd and venndir_gene_expression.Rmd
+
+* Use new recommended workflow and function arguments.
+* Beware errors in `venndir_gene_expression.Rmd` with unique errors
+related to `ragg_png`, see details and workaround suggested
+here: https://www.jumpingrivers.com/blog/r-knitr-markdown-png-pdf-graphics/
+
+
+## DONE: small features for version 0.0.9.9000
 
 * DONE: Some importer for signed overlaps. Given a known directional
 Venn, have a method to import to use venndir.
@@ -13,19 +77,19 @@ Venn, have a method to import to use venndir.
 inside a polygon.
 * DONE: change all arguments with `angle` to use `degrees` for
 consistency, and to make clear the type of angle.
-* Refactor to handle `"set name"` separate from
+* DONE: Refactor to handle `"set name"` separate from
 `"main count"` in the count label, so the `"set name"` can
 be moved, for example to perimeter or outside the polygon,
 leaving the numeric count inside as needed.
 
-   * Yes: Proportional diagram with one circle fully inside
+   * DONE: Proportional diagram with one circle fully inside
    another does not have set name displayed -- it must be.
    Consider choosing one internal polygon with fewest set overlaps
    with the largest area.
-   * need idea for where to store the set label coordinates,
+   * DONE: need idea for where to store the set label coordinates,
    since the Venn circle/ellipse shape does not have its own
    row.
-   * maybe venn shapes need to be stored in another `list`
+   * DONE: maybe venn shapes need to be stored in another `list`
    element returned by `venndir()`? It makes that output
    a bit too heavy imo.
 
@@ -35,7 +99,7 @@ result. resize, move, rotate venndir circles/ellipses.
 `venndir()` and `signed_overlaps()`.
 
 
-### refactor label position
+### DONE: refactor label position
 
 Design idea: Four label types: set, overlap, count, items
 
@@ -77,24 +141,8 @@ Data storage:
 Progress:
 
 * COMPLETE for base R plots.
-* Still to-do for ggplot.
-* label styles need polishing. If overlap label is outside
-and count label is inside, how can they have two different styles?
+* COMPLETE for ggplot.
 
-
-
-### Combine left and right sides of each label into one cohesive label
-
-* calculate label width, combine to allow one border for each label set
-* also use grid graphics logic to use rescalable operations
-* requires knowledge about grid graphics I don't currently have,
-and was not yet easy to grok from online guides. I was able to
-proof-of-concept a method that used grob dimensions of a left label,
-to produce a right label with border and padding sufficient to
-encompass both sides. When trying to automate, it stopped working.
-Something in the circular logic, that a grob does not have a size
-until placed, so adjusting by size before placement has no usable
-value?
 
 
 ### DONE: update `polygon_label_outside()` for multiple labels
@@ -109,11 +157,6 @@ with some suitable default value.
 segment can be drawn
 * return the text adjust (`adj`) value so a text label can be placed
 at an appropriate side relative to the incoming line segment.
-
-### item labels
-
-* Option to allow "one column" of labels inside the polygon, which could
-be useful for things like a list of pathways between two experiments.
 
 
 

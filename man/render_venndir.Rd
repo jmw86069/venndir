@@ -28,6 +28,7 @@ render_venndir(
   segment_buffer = -0.2,
   inside_percent_threshold = 5,
   plot_style = c("base", "gg"),
+  group_labels = TRUE,
   ggtheme = ggplot2::theme_void,
   draw_buffer = FALSE,
   ...
@@ -132,6 +133,11 @@ represent at least 5 percent of the total area.}
 \item{plot_style}{\code{character} string indicating the style
 of plot: \code{"base"} uses base R graphics; \code{"gg"} uses
 ggplot2 graphics (not yet implemented).}
+
+\item{group_labels}{\code{logical} to enable experimental feature that
+groups multiple \code{gridtext::richtext_grob()} elements together
+by overlap set and position, currently only implemented
+(partially) for base R plots.}
 
 \item{...}{additional arguments are passed to \code{plot()}
 when plotting \code{venn_spdf} which is expected to be a

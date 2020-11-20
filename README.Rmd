@@ -27,8 +27,11 @@ options(knitr.table.format='markdown')
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of venndir is to enable directional Venn overlap
-analysis and visualization.
+The `venndir` package provides Venn directional
+diagrams, that can optionally display item labels
+inside the overlap regions.
+
+The `pkgdown` reference: [jmw86069.github.io/venndir](https://jmw86069.github.io/venndir)
 
 
 ## Installation
@@ -41,40 +44,70 @@ remotes::install_github("jmw86069/venndir");
 ```
 
 
-## Brief Overview of venndir
+## Features of venndir
 
-The `venndir` package includes a utility function `make_venn_test()`
-to create test data.
+The core is `venndir()` which takes a `setlist` as
+input and produces a Venn diagram. When the `setlist`
+contains directionality (sign), the directional
+overlaps are also displayed.
 
-```{r venn_1}
+To illustrate the point, `make_venn_test()` is used
+to create test `setlist` data.
+
+```{r venn_setlist}
 library(venndir)
 setlist <- make_venn_test(100, 3)
+setlist
+```
+
+A `setlist` is a list of vectors. The names of the list,
+one for each vector, are the set names. Each vector contains
+items which are the subject of the Venn overlaps.
+
+Given a `setlist`, you can create a Venn diagram with `venndir()`:
+
+```{r venn_1}
 venndir(setlist)
 ```
 
 You can make a proportional Venn diagram,
 also known as a Euler diagram. More examples of proportional
-Venn diagrams are described below, with custom options to manipulate
-the position of circles and labels.
+Venn diagrams are described below, but for now the
+simplest approach is to add argument `proportional=TRUE`:
 
 ```{r venn_1e}
 venndir(setlist, proportional=TRUE)
 ```
 
-The default output is a base R plot, but you can use `ggplot2`
-with argument `plot_style="gg"`. The function returns the `ggplot`
+The default output use base R graphics, but you can
+use `ggplot2` with the argument `plot_style="gg"`:
+
+```{r venn_1g}
+venndir(setlist, proportional=TRUE, plot_style="gg")
+```
+
+The function invisibly returns the `ggplot`
 object which can be manipulated alongside other `grid`
 graphical objects.
 
-```{r venn_1g}
-venndir(setlist, plot_style="gg")
-```
-
 ## Venn Direction
 
-For a more interesting case, `make_venn_test()` can make
-sets where the items have directionality, encoded with `1` for up,
-or `-1` for down.
+For a more interesting case, `make_venn_test(..., do_signed=TRUE)`
+creates a `setlist` with directionality (sign), which means
+each item is associated with a numerical direction:
+
+* `+1` for up
+* `-1` for down
+
+In this case, each vector in the `setlist` is a named vector,
+whose **names** are the items, and whose **values** are
+the signed direction `+1` or `-1`. Take a look.
+
+```{r venn_setlist_signed}
+setlist_dir <- make_venn_test(100, 3, do_signed=TRUE)
+setlist_dir
+```
+
 
 For biological data, direction is important and relevant.
 Whether a gene is regulated up or down might be the difference
@@ -87,50 +120,72 @@ is defined `(agree - disagree) / (n)`. Thus, `concordance=0` means
 there are the same number that agree as disagree in direction,
 and `concordance=1` means every element agrees in direction.
 
-There are a few ways to think about "concordance" -- the measure
-of agreement in direction, and so there are few ways to display
-concordance inside a Venn diagram.
-The default argument
-`overlap_type="concordance"` displays
+There are a few ways to summarize directional overlaps,
+which vary by the amount of detail.
+
+* `overlap_type="overlap"` - This method ignores direction.
+* `overlap_type="agreement"` - This method displays agreement
+and disagreement, with no details about up/down direction.
+* `overlap_type="concordance"` - **(default)** This method displays
+concordant directions, up-up, down-down; all discordant
+combinations are grouped together as "discordant".
+* `overlap_type="each"` - This method displays each directional
+overlap.
+
+
+### overlap_type="concordance"
+
+Let's start with `overlap_type="concordance"` which displays
 the number `up-up`, and the number `down-down`, and everything else
-is considered  "discordant".
+is considered  "discordant". This approach is effective
+at conveying direction, without too many unhelpful details.
 
 ```{r venndir_1}
-setlist <- make_venn_test(1000, 3, do_signed=TRUE)
-venndir(setlist)
+venndir(setlist_dir)
 ```
 
-This style is effective for 3 or more sets, where the number
-of possible discordant combinations may be too many to display
-comfortably. In this case 
-it is still useful to see how many agree up, and how many agree down,
-the rest simply disagree.
+It is mostly helpful when you want to see how many overlaps
+agree up and down, and when the overlaps that disagree
+in direction are less interesting. For example, sometimes
+the overlaps are mostly `up-up` and rarely `down-down`,
+which can be very helpful to know.
 
 
-Another option `overlap_type="each"` shows the count for
-every combination. As said before, it works best for 2 or 3 sets.
+### overlap_type="each"
+
+The option `overlap_type="each"` shows the count for
+each directional combination. It works best when you
+want to see all the details, typically for only
+2 or 3 sets.
 
 ```{r venndir_each}
-venndir(setlist, overlap_type="each")
+venndir(setlist_dir, overlap_type="each")
 ```
 
 
-The option `overlap_type="agreement"` shows only
-"agreement" and "mixed", regardless of the direction.
+### overlap_type="agreement"
+
+The option `overlap_type="agreement"` shows the count
+for each overlap that agrees in direction, regardless
+of the direction; and the count for overlaps that
+disagree in direction.
+
 This option is especially good at summarizing the
-number that agree and disagree.
+number that agree and disagree, without including 
+potentially confusing details.
 
 ```{r venndir_agreement}
-venndir(setlist, overlap_type="agreement")
+venndir(setlist_dir, overlap_type="agreement")
 ```
 
-The last option simply turns off the display of
-direction, `overlap_type="overlap"`.
+### overlap_type="overlap"
+
+The option `overlap_type="overlap"` simply ignores
+directionality.
 
 ```{r venndir_overlap}
-venndir(setlist, overlap_type="overlap")
+venndir(setlist_dir, overlap_type="overlap")
 ```
-
 
 
 ## Proportional Venn Direction
@@ -140,8 +195,10 @@ a proportional Venn diagram, which uses the
 really nice `eulerr` R package.
 
 ```{r venndir_each_p}
-venndir(setlist, proportional=TRUE, distance=5, label_style="lite",
-   font_cex=c(1.3, 1))
+venndir(setlist_dir,
+   proportional=TRUE,
+   #distance=5, label_style="lite",
+   font_cex=c(1.3, 0.9))
 ```
 
 Labeling is often a challenge with proportional Venn

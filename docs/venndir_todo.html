@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
       </span>
     </div>
 
@@ -127,9 +127,75 @@
 
 <div id="todo-on-venndir" class="section level1">
 
-<div id="small-features-for-roll-out" class="section level2">
+<div id="enhancements" class="section level2">
 <h2 class="hasAnchor">
-<a href="#small-features-for-roll-out" class="anchor"></a>small features for roll-out</h2>
+<a href="#enhancements" class="anchor"></a>enhancements</h2>
+<div id="miscellaneous" class="section level3">
+<h3 class="hasAnchor">
+<a href="#miscellaneous" class="anchor"></a>miscellaneous</h3>
+<ul>
+<li>DONE: Add warning message to ggplot2 output in <code><a href="reference/render_venndir.html">render_venndir()</a></code>.</li>
+</ul>
+</div>
+<div id="add-vignette-showing-more-visual-options" class="section level3">
+<h3 class="hasAnchor">
+<a href="#add-vignette-showing-more-visual-options" class="anchor"></a>add vignette showing more visual options</h3>
+<ul>
+<li>how to change Venn set colors</li>
+<li>how to nudge a Venn circle</li>
+<li>how to rotate the whole Venn diagram</li>
+<li>how to adjust item label buffer, and view the buffer size</li>
+<li>how to create custom curations with <code>curate_df</code>
+</li>
+</ul>
+</div>
+<div id="make-displaying-items-labels-easier" class="section level3">
+<h3 class="hasAnchor">
+<a href="#make-displaying-items-labels-easier" class="anchor"></a>make displaying items labels easier</h3>
+<ul>
+<li>make it “one step” to display items, when <code>show_items</code> is enabled in <code><a href="reference/venndir.html">venndir()</a></code> the default <code>label_preset</code> should include items.</li>
+<li>Option to allow “one column” of labels inside the polygon, which could be useful for things like a list of pathways between two experiments.</li>
+</ul>
+</div>
+<div id="polish-label-coordinates-insideoutside" class="section level3">
+<h3 class="hasAnchor">
+<a href="#polish-label-coordinates-insideoutside" class="anchor"></a>polish label coordinates inside/outside</h3>
+<ul>
+<li>coordinates for inside/outside should really just be in <code>venn_spdf</code> then used by <code>label_df</code> when needed</li>
+<li>label styles need polishing. If overlap label is outside and count label is inside, how can they have two different styles?</li>
+</ul>
+</div>
+<div id="combine-individual-labels-into-one-cohesive-label" class="section level3">
+<h3 class="hasAnchor">
+<a href="#combine-individual-labels-into-one-cohesive-label" class="anchor"></a>Combine individual labels into one cohesive label</h3>
+<p>COMPLETE for base R plots.</p>
+<ul>
+<li><p>TODO: for any label associated with a line segment, use <code>degree_to_adj()</code> to help place the label at the correct edge of the line segment.</p></li>
+<li><p>one option is simply to create one label, but text alignment for two column output would be difficult.</p></li>
+<li>
+<p>prototype using one label for fill/border, and expand the buffer size so it includes the other labels.</p>
+<ul>
+<li>calculate label width/height (<code><a href="https://rdrr.io/r/grid/widthDetails.html">grid::ascentDetails()</a></code>, <code><a href="https://rdrr.io/r/grid/widthDetails.html">grid::widthDetails()</a></code>
+</li>
+<li>also use grid graphics logic to use rescalable operations</li>
+<li>requires knowledge about grid graphics I don’t currently have and was not yet easy to grok from online guides. I was able to proof-of-concept a method that used grob dimensions of a left label, to produce a right label with border and padding sufficient to encompass both sides. When trying to automate, it stopped working. Something in the circular logic, that a grob does not have a size until placed, so adjusting by size before placement has no usable value?</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="done-update-rmarkdown-readmermd-and-venndir_gene_expressionrmd" class="section level2">
+<h2 class="hasAnchor">
+<a href="#done-update-rmarkdown-readmermd-and-venndir_gene_expressionrmd" class="anchor"></a>DONE: Update Rmarkdown README.Rmd and venndir_gene_expression.Rmd</h2>
+<ul>
+<li>Use new recommended workflow and function arguments.</li>
+<li>Beware errors in <code>venndir_gene_expression.Rmd</code> with unique errors related to <code>ragg_png</code>, see details and workaround suggested here: <a href="https://www.jumpingrivers.com/blog/r-knitr-markdown-png-pdf-graphics/" class="uri">https://www.jumpingrivers.com/blog/r-knitr-markdown-png-pdf-graphics/</a>
+</li>
+</ul>
+</div>
+<div id="done-small-features-for-version-0099000" class="section level2">
+<h2 class="hasAnchor">
+<a href="#done-small-features-for-version-0099000" class="anchor"></a>DONE: small features for version 0.0.9.9000</h2>
 <ul>
 <li>
 <p>DONE: Some importer for signed overlaps. Given a known directional Venn, have a method to import to use venndir.</p>
@@ -140,19 +206,19 @@
 <li><p>DONE: Bug: Fix <code><a href="https://jolars.github.io/polylabelr//reference/poi.html">polylabelr::poi()</a></code> when there is one or more holes inside a polygon.</p></li>
 <li><p>DONE: change all arguments with <code>angle</code> to use <code>degrees</code> for consistency, and to make clear the type of angle.</p></li>
 <li>
-<p>Refactor to handle <code>"set name"</code> separate from <code>"main count"</code> in the count label, so the <code>"set name"</code> can be moved, for example to perimeter or outside the polygon, leaving the numeric count inside as needed.</p>
+<p>DONE: Refactor to handle <code>"set name"</code> separate from <code>"main count"</code> in the count label, so the <code>"set name"</code> can be moved, for example to perimeter or outside the polygon, leaving the numeric count inside as needed.</p>
 <ul>
-<li>Yes: Proportional diagram with one circle fully inside another does not have set name displayed – it must be. Consider choosing one internal polygon with fewest set overlaps with the largest area.</li>
-<li>need idea for where to store the set label coordinates, since the Venn circle/ellipse shape does not have its own row.</li>
-<li>maybe venn shapes need to be stored in another <code>list</code> element returned by <code><a href="reference/venndir.html">venndir()</a></code>? It makes that output a bit too heavy imo.</li>
+<li>DONE: Proportional diagram with one circle fully inside another does not have set name displayed – it must be. Consider choosing one internal polygon with fewest set overlaps with the largest area.</li>
+<li>DONE: need idea for where to store the set label coordinates, since the Venn circle/ellipse shape does not have its own row.</li>
+<li>DONE: maybe venn shapes need to be stored in another <code>list</code> element returned by <code><a href="reference/venndir.html">venndir()</a></code>? It makes that output a bit too heavy imo.</li>
 </ul>
 </li>
 <li><p>Maybe: new function <code>venndir_bender()</code> to modify a <code>venndir</code> result. resize, move, rotate venndir circles/ellipses.</p></li>
 <li><p>DONE: change default to <code>return_items=TRUE</code> for <code><a href="reference/venndir.html">venndir()</a></code> and <code><a href="reference/signed_overlaps.html">signed_overlaps()</a></code>.</p></li>
 </ul>
-<div id="refactor-label-position" class="section level3">
+<div id="done-refactor-label-position" class="section level3">
 <h3 class="hasAnchor">
-<a href="#refactor-label-position" class="anchor"></a>refactor label position</h3>
+<a href="#done-refactor-label-position" class="anchor"></a>DONE: refactor label position</h3>
 <p>Design idea: Four label types: set, overlap, count, items</p>
 <ul>
 <li>
@@ -207,17 +273,7 @@
 <p>Progress:</p>
 <ul>
 <li>COMPLETE for base R plots.</li>
-<li>Still to-do for ggplot.</li>
-<li>label styles need polishing. If overlap label is outside and count label is inside, how can they have two different styles?</li>
-</ul>
-</div>
-<div id="combine-left-and-right-sides-of-each-label-into-one-cohesive-label" class="section level3">
-<h3 class="hasAnchor">
-<a href="#combine-left-and-right-sides-of-each-label-into-one-cohesive-label" class="anchor"></a>Combine left and right sides of each label into one cohesive label</h3>
-<ul>
-<li>calculate label width, combine to allow one border for each label set</li>
-<li>also use grid graphics logic to use rescalable operations</li>
-<li>requires knowledge about grid graphics I don’t currently have, and was not yet easy to grok from online guides. I was able to proof-of-concept a method that used grob dimensions of a left label, to produce a right label with border and padding sufficient to encompass both sides. When trying to automate, it stopped working. Something in the circular logic, that a grob does not have a size until placed, so adjusting by size before placement has no usable value?</li>
+<li>COMPLETE for ggplot.</li>
 </ul>
 </div>
 <div id="done-update-polygon_label_outside-for-multiple-labels" class="section level3">
@@ -229,13 +285,6 @@
 <li>“Too close” would be defined by user-configurable minimum degrees, with some suitable default value.</li>
 <li>return the point of label, and the point at the polygon so a line segment can be drawn</li>
 <li>return the text adjust (<code>adj</code>) value so a text label can be placed at an appropriate side relative to the incoming line segment.</li>
-</ul>
-</div>
-<div id="item-labels" class="section level3">
-<h3 class="hasAnchor">
-<a href="#item-labels" class="anchor"></a>item labels</h3>
-<ul>
-<li>Option to allow “one column” of labels inside the polygon, which could be useful for things like a list of pathways between two experiments.</li>
 </ul>
 </div>
 </div>
@@ -309,9 +358,9 @@
 <li><p>This option is based upon <code>limma</code> package display of total genes in each set, displayed outside the main Venn circles.</p></li>
 </ul>
 </div>
-<div id="item-labels-1" class="section level3">
+<div id="item-labels" class="section level3">
 <h3 class="hasAnchor">
-<a href="#item-labels-1" class="anchor"></a>item labels</h3>
+<a href="#item-labels" class="anchor"></a>item labels</h3>
 <ul>
 <li>
 <p>It still sometimes fails to find enough labels inside the polygon, usually for large number of labels. Workaround might be for the user to change layout type to something like <code>"regular"</code> or <code>"nonaligned"</code> which could improve the search success rate.</p>

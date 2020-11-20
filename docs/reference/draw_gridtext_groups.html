@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Percent area for each polygon in SpatialPolygons — sp_percent_area • venndir</title>
+<title>Draw boundary around grouops of gridtext labels — draw_gridtext_groups • venndir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Percent area for each polygon in SpatialPolygons — sp_percent_area" />
-<meta property="og:description" content="Percent area for each polygon in SpatialPolygons" />
+<meta property="og:title" content="Draw boundary around grouops of gridtext labels — draw_gridtext_groups" />
+<meta property="og:description" content="Draw boundary around grouops of gridtext labels" />
 
 
 
@@ -123,55 +123,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Percent area for each polygon in SpatialPolygons</h1>
-    <small class="dont-index">Source: <a href='http://github.com/jmw86069/venndir/blob/master/R/venndir-sp.R'><code>R/venndir-sp.R</code></a></small>
-    <div class="hidden name"><code>sp_percent_area.Rd</code></div>
+    <h1>Draw boundary around grouops of gridtext labels</h1>
+    <small class="dont-index">Source: <a href='http://github.com/jmw86069/venndir/blob/master/R/venndir-labels.R'><code>R/venndir-labels.R</code></a></small>
+    <div class="hidden name"><code>draw_gridtext_groups.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Percent area for each polygon in SpatialPolygons</p>
+    <p>Draw boundary around grouops of gridtext labels</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sp_percent_area</span><span class='op'>(</span><span class='va'>sp</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>draw_gridtext_groups</span><span class='op'>(</span>
+  <span class='va'>g_labels</span>,
+  <span class='va'>gdf</span>,
+  segment_df <span class='op'>=</span> <span class='cn'>NULL</span>,
+  do_draw <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>g_labels</th>
+      <td><p><code>richtext_grob</code> class as returned by
+<code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>gdf</th>
+      <td><p><code>data.frame</code> with one row per <code>grob</code> in <code>g_labels</code>,
+with colnames <code>"x"</code>, <code>"y"</code>, <code>"overlap_set"</code>, <code>"r"</code>,
+<code>"r_unit"</code>, <code>"border_col"</code>, <code>"box_fill"</code>. The rows
+are grouped using <code><a href='https://rdrr.io/r/base/c.html'>c("x", "y", "overlap_set")</a></code>.
+The <code>"r"</code> and <code>"r_unit"</code> values are used to define
+the radius and radius unit for the rounded corner.
+The row in <code>gdf</code> with the highest <code>"r"</code> value is the
+reference row, for the <code>"r"</code> radius, and the <code>"border_col"</code>
+and <code>"box_fill"</code> values.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <div class='dont-index'><p>Other venndir utility: 
-<code><a href='curate_venn_labels.html'>curate_venn_labels</a>()</code>,
-<code><a href='degrees_to_adj.html'>degrees_to_adj</a>()</code>,
-<code><a href='diff_degrees.html'>diff_degrees</a>()</code>,
-<code><a href='display_angles.html'>display_angles</a>()</code>,
-<code><a href='eulerr2polys.html'>eulerr2polys</a>()</code>,
-<code><a href='expand_range.html'>expand_range</a>()</code>,
-<code><a href='find_vennpoly_overlaps.html'>find_vennpoly_overlaps</a>()</code>,
-<code><a href='get_largest_polygon.html'>get_largest_polygon</a>()</code>,
-<code><a href='get_sp_buffer.html'>get_sp_buffer</a>()</code>,
-<code><a href='get_venn_shapes.html'>get_venn_shapes</a>()</code>,
-<code><a href='intersect_polygons.html'>intersect_polygons</a>()</code>,
-<code><a href='label_polygon_fill.html'>label_polygon_fill</a>()</code>,
-<code><a href='make_color_contrast.html'>make_color_contrast</a>()</code>,
-<code><a href='make_venn_combn_df.html'>make_venn_combn_df</a>()</code>,
-<code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
-<code><a href='match_list.html'>match_list</a>()</code>,
-<code><a href='mean_degree_arc.html'>mean_degree_arc</a>()</code>,
-<code><a href='mean_degrees.html'>mean_degrees</a>()</code>,
-<code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
-<code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
-<code><a href='polygon_label_outside.html'>polygon_label_outside</a>()</code>,
-<code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
-<code><a href='print_color_df.html'>print_color_df</a>()</code>,
-<code><a href='rescale_coordinates.html'>rescale_coordinates</a>()</code>,
-<code><a href='rescale_ps.html'>rescale_ps</a>()</code>,
-<code><a href='rescale_p.html'>rescale_p</a>()</code>,
-<code><a href='rescale_sp.html'>rescale_sp</a>()</code>,
-<code><a href='shrink_df.html'>shrink_df</a>()</code>,
-<code><a href='sp_circles.html'>sp_circles</a>()</code>,
-<code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
-<code><a href='sp_polylabelr.html'>sp_polylabelr</a>()</code>,
-<code><a href='spread_degrees.html'>spread_degrees</a>()</code>,
-<code><a href='union_polygons.html'>union_polygons</a>()</code>,
-<code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
+    <p>This function is a helper function used to take individual
+labels defined by <code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code>, and creating
+<code><a href='https://rdrr.io/r/grid/grid.roundrect.html'>grid::roundrectGrob()</a></code> objects that cover each group of
+labels with one rounded rectangular boundary.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

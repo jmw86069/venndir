@@ -1,4 +1,30 @@
 
+# venndir 0.0.10.900
+
+## updates to existing functions
+
+* `render_venndir()` by default groups gridtext labels
+together, and draws one contiguous background and border
+around them all. It currently only works for R base plots,
+since it needs to know the grob sizes upfront.
+That said, at this point the base R plot looks
+substantially better than ggplot2 when labels are placed on 
+the outside of the Venn circles. Hopefully I will
+figure out how to do the same for ggplot2 output.
+
+
+## new functions
+
+* `draw_gridtext_groups()` does the work for grouping
+multiple `gridtext::richtext_grob()` labels together,
+using `x, y, overlap_set` to define the grouping.
+This method also aligns text relative to a line segment
+if present, by using `degrees_to_adj()`. A by-product
+of the approach is that labels are now centered by
+the label width, instead of having left/right
+components which may differ in width.
+
+
 # venndir 0.0.9.900
 
 Began adding `testthat` tests for various functions.

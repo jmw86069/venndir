@@ -7,8 +7,11 @@
 
 <!-- badges: end -->
 
-The goal of venndir is to enable directional Venn overlap analysis and
-visualization.
+The `venndir` package provides Venn directional diagrams, that can
+optionally display item labels inside the overlap regions.
+
+The `pkgdown` reference:
+[jmw86069.github.io/venndir](https://jmw86069.github.io/venndir)
 
 ## Installation
 
@@ -19,22 +22,53 @@ The development version of venndir can be installed with:
 remotes::install_github("jmw86069/venndir");
 ```
 
-## Brief Overview of venndir
+## Features of venndir
 
-The `venndir` package includes a utility function `make_venn_test()` to
-create test data.
+The core is `venndir()` which takes a `setlist` as input and produces a
+Venn diagram. When the `setlist` contains directionality (sign), the
+directional overlaps are also displayed.
+
+To illustrate the point, `make_venn_test()` is used to create test
+`setlist` data.
 
 ``` r
 library(venndir)
 setlist <- make_venn_test(100, 3)
+setlist
+#> $set_A
+#>  [1] "item_067" "item_042" "item_050" "item_043" "item_014" "item_025"
+#>  [7] "item_090" "item_091" "item_069" "item_093" "item_057" "item_009"
+#> [13] "item_072" "item_026" "item_007" "item_099" "item_089" "item_083"
+#> [19] "item_036" "item_078" "item_097" "item_076" "item_015" "item_032"
+#> [25] "item_086" "item_084" "item_041" "item_023" "item_027" "item_060"
+#> [31] "item_053" "item_079"
+#> 
+#> $set_B
+#>  [1] "item_053" "item_027" "item_096" "item_038" "item_089" "item_034"
+#>  [7] "item_093" "item_069" "item_072" "item_076" "item_063" "item_013"
+#> [13] "item_082" "item_025" "item_097" "item_021"
+#> 
+#> $set_C
+#>  [1] "item_079" "item_041" "item_047" "item_090" "item_060" "item_095"
+#>  [7] "item_016" "item_006" "item_072" "item_086" "item_091" "item_039"
+#> [13] "item_031" "item_081" "item_050"
+```
+
+A `setlist` is a list of vectors. The names of the list, one for each
+vector, are the set names. Each vector contains items which are the
+subject of the Venn overlaps.
+
+Given a `setlist`, you can create a Venn diagram with `venndir()`:
+
+``` r
 venndir(setlist)
 ```
 
 <img src="man/figures/README-venn_1-1.png" width="100%" />
 
 You can make a proportional Venn diagram, also known as a Euler diagram.
-More examples of proportional Venn diagrams are described below, with
-custom options to manipulate the position of circles and labels.
+More examples of proportional Venn diagrams are described below, but for
+now the simplest approach is to add argument `proportional=TRUE`:
 
 ``` r
 venndir(setlist, proportional=TRUE)
@@ -42,21 +76,56 @@ venndir(setlist, proportional=TRUE)
 
 <img src="man/figures/README-venn_1e-1.png" width="100%" />
 
-The default output is a base R plot, but you can use `ggplot2` with
-argument `plot_style="gg"`. The function returns the `ggplot` object
-which can be manipulated alongside other `grid` graphical objects.
+The default output use base R graphics, but you can use `ggplot2` with
+the argument `plot_style="gg"`:
 
 ``` r
-venndir(setlist, plot_style="gg")
-#> ##  (23:40:13) 18Nov2020:  xlim:1.7,8.3, ylim:1.7,8.3
+venndir(setlist, proportional=TRUE, plot_style="gg")
 ```
 
 <img src="man/figures/README-venn_1g-1.png" width="100%" />
 
+The function invisibly returns the `ggplot` object which can be
+manipulated alongside other `grid` graphical objects.
+
 ## Venn Direction
 
-For a more interesting case, `make_venn_test()` can make sets where the
-items have directionality, encoded with `1` for up, or `-1` for down.
+For a more interesting case, `make_venn_test(..., do_signed=TRUE)`
+creates a `setlist` with directionality (sign), which means each item is
+associated with a numerical direction:
+
+  - `+1` for up
+  - `-1` for down
+
+In this case, each vector in the `setlist` is a named vector, whose
+**names** are the items, and whose **values** are the signed direction
+`+1` or `-1`. Take a look.
+
+``` r
+setlist_dir <- make_venn_test(100, 3, do_signed=TRUE)
+setlist_dir
+#> $set_A
+#> item_067 item_042 item_050 item_043 item_014 item_025 item_090 item_091 
+#>       -1        1        1       -1       -1        1       -1       -1 
+#> item_069 item_093 item_057 item_009 item_072 item_026 item_007 item_099 
+#>       -1        1        1       -1        1        1       -1       -1 
+#> item_089 item_083 item_036 item_078 item_097 item_076 item_015 item_032 
+#>       -1        1        1        1        1        1       -1        1 
+#> item_086 item_084 item_041 item_023 item_027 item_060 item_053 item_079 
+#>        1        1       -1        1       -1        1        1       -1 
+#> 
+#> $set_B
+#> item_053 item_027 item_096 item_038 item_089 item_034 item_093 item_069 
+#>        1       -1        1       -1       -1       -1        1       -1 
+#> item_072 item_076 item_063 item_013 item_082 item_025 item_097 item_021 
+#>        1        1        1        1        1       -1       -1       -1 
+#> 
+#> $set_C
+#> item_079 item_041 item_047 item_090 item_060 item_095 item_016 item_006 
+#>       -1       -1        1       -1        1        1        1       -1 
+#> item_072 item_086 item_091 item_039 item_031 item_081 item_050 
+#>        1        1        1        1       -1        1       -1
+```
 
 For biological data, direction is important and relevant. Whether a gene
 is regulated up or down might be the difference between disease and
@@ -69,48 +138,69 @@ treatment.
 > disagree in direction, and `concordance=1` means every element agrees
 > in direction.
 
-There are a few ways to think about “concordance” – the measure of
-agreement in direction, and so there are few ways to display concordance
-inside a Venn diagram. The default argument `overlap_type="concordance"`
-displays the number `up-up`, and the number `down-down`, and everything
-else is considered “discordant”.
+There are a few ways to summarize directional overlaps, which vary by
+the amount of detail.
+
+  - `overlap_type="overlap"` - This method ignores direction.
+  - `overlap_type="agreement"` - This method displays agreement and
+    disagreement, with no details about up/down direction.
+  - `overlap_type="concordance"` - **(default)** This method displays
+    concordant directions, up-up, down-down; all discordant combinations
+    are grouped together as “discordant”.
+  - `overlap_type="each"` - This method displays each directional
+    overlap.
+
+### overlap\_type=“concordance”
+
+Let’s start with `overlap_type="concordance"` which displays the number
+`up-up`, and the number `down-down`, and everything else is considered
+“discordant”. This approach is effective at conveying direction,
+without too many unhelpful details.
 
 ``` r
-setlist <- make_venn_test(1000, 3, do_signed=TRUE)
-venndir(setlist)
+venndir(setlist_dir)
 ```
 
 <img src="man/figures/README-venndir_1-1.png" width="100%" />
 
-This style is effective for 3 or more sets, where the number of possible
-discordant combinations may be too many to display comfortably. In this
-case it is still useful to see how many agree up, and how many agree
-down, the rest simply disagree.
+It is mostly helpful when you want to see how many overlaps agree up and
+down, and when the overlaps that disagree in direction are less
+interesting. For example, sometimes the overlaps are mostly `up-up` and
+rarely `down-down`, which can be very helpful to know.
 
-Another option `overlap_type="each"` shows the count for every
-combination. As said before, it works best for 2 or 3 sets.
+### overlap\_type=“each”
+
+The option `overlap_type="each"` shows the count for each directional
+combination. It works best when you want to see all the details,
+typically for only 2 or 3 sets.
 
 ``` r
-venndir(setlist, overlap_type="each")
+venndir(setlist_dir, overlap_type="each")
 ```
 
 <img src="man/figures/README-venndir_each-1.png" width="100%" />
 
-The option `overlap_type="agreement"` shows only “agreement” and
-“mixed”, regardless of the direction. This option is especially good
-at summarizing the number that agree and disagree.
+### overlap\_type=“agreement”
+
+The option `overlap_type="agreement"` shows the count for each overlap
+that agrees in direction, regardless of the direction; and the count for
+overlaps that disagree in direction.
+
+This option is especially good at summarizing the number that agree and
+disagree, without including potentially confusing details.
 
 ``` r
-venndir(setlist, overlap_type="agreement")
+venndir(setlist_dir, overlap_type="agreement")
 ```
 
 <img src="man/figures/README-venndir_agreement-1.png" width="100%" />
 
-The last option simply turns off the display of direction,
-`overlap_type="overlap"`.
+### overlap\_type=“overlap”
+
+The option `overlap_type="overlap"` simply ignores directionality.
 
 ``` r
-venndir(setlist, overlap_type="overlap")
+venndir(setlist_dir, overlap_type="overlap")
 ```
 
 <img src="man/figures/README-venndir_overlap-1.png" width="100%" />
@@ -121,8 +211,10 @@ As shown above, you can switch output to a proportional Venn diagram,
 which uses the really nice `eulerr` R package.
 
 ``` r
-venndir(setlist, proportional=TRUE, distance=5, label_style="lite",
-   font_cex=c(1.3, 1))
+venndir(setlist_dir,
+   proportional=TRUE,
+   #distance=5, label_style="lite",
+   font_cex=c(1.3, 0.9))
 ```
 
 <img src="man/figures/README-venndir_each_p-1.png" width="100%" />
@@ -178,41 +270,41 @@ setlist <- make_venn_test(1000, 3, do_signed=FALSE)
 vo <- venndir(setlist, proportional=TRUE, do_plot=FALSE);
 
 print(head(vo$label_df));
-#>                      x         y text venn_counts overlap_set type  x_offset
-#> set_A       -8.7294794 -1.522097   31          31       set_A main  0.000000
-#> set_B        8.8551704 -4.377014  390         390       set_B main  0.000000
-#> set_C       -4.6615851  9.950110   71          71       set_C main  0.000000
-#> set_A&set_B -4.1398360 -2.239633   27          27 set_A&set_B main  0.000000
-#> set_A&set_C -6.5909700  2.588698    6           6 set_A&set_C main -3.292144
-#> set_B&set_C  0.1167125  4.733025   76          76 set_B&set_C main  0.000000
-#>             y_offset show_label vjust hjust halign rot     color fontsize
-#> set_A       0.000000         NA   0.5   0.5    0.5   0 #D9D9D9FF       14
-#> set_B       0.000000         NA   0.5   0.5    0.5   0 #262626FF       14
-#> set_C       0.000000         NA   0.5   0.5    0.5   0 #D9D9D9FF       14
-#> set_A&set_B 0.000000         NA   0.5   0.5    0.5   0 #262626FF       14
-#> set_A&set_C 1.422392         NA   0.5   0.5    0.5   0 #262626FF       14
-#> set_B&set_C 0.000000         NA   0.5   0.5    0.5   0 #262626FF       14
-#>             border lty lwd fill padding padding_unit r r_unit      overlap_sign
-#> set_A           NA   1   1   NA       4           pt 4     pt       set_A|1 0 0
-#> set_B           NA   1   1   NA       4           pt 4     pt       set_B|0 1 0
-#> set_C           NA   1   1   NA       4           pt 4     pt       set_C|0 0 1
-#> set_A&set_B     NA   1   1   NA       4           pt 4     pt set_A&set_B|1 1 0
-#> set_A&set_C     NA   1   1   NA       4           pt 4     pt set_A&set_C|1 0 1
-#> set_B&set_C     NA   1   1   NA       4           pt 4     pt set_B&set_C|0 1 1
-#>                    items overlap   count show_items hjust_outside hjust_inside
-#> set_A       item_052....  inside  inside       none           0.5          0.5
-#> set_B       item_011....  inside  inside       none           0.5          0.5
-#> set_C       item_059....  inside  inside       none           0.5          0.5
-#> set_A&set_B item_019....    none  inside       none           0.5          0.5
-#> set_A&set_C item_093....    none outside       none           1.0          0.5
-#> set_B&set_C item_060....    none  inside       none           0.5          0.5
-#>             vjust_outside vjust_inside
-#> set_A                 0.5          1.0
-#> set_B                 0.5          1.0
-#> set_C                 0.5          1.0
-#> set_A&set_B           0.5          0.5
-#> set_A&set_C           0.0          0.5
-#> set_B&set_C           0.5          0.5
+#>                  x     y text venn_counts overlap_set type x_offset y_offset
+#> set_A       -8.729 -1.52   31          31       set_A main     0.00     0.00
+#> set_B        8.855 -4.38  390         390       set_B main     0.00     0.00
+#> set_C       -4.662  9.95   71          71       set_C main     0.00     0.00
+#> set_A&set_B -4.140 -2.24   27          27 set_A&set_B main     0.00     0.00
+#> set_A&set_C -6.591  2.59    6           6 set_A&set_C main    -3.29     1.42
+#> set_B&set_C  0.117  4.73   76          76 set_B&set_C main     0.00     0.00
+#>             show_label vjust hjust halign rot     color fontsize border lty lwd
+#> set_A               NA   0.5   0.5    0.5   0 #D9D9D9FF       14     NA   1   1
+#> set_B               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
+#> set_C               NA   0.5   0.5    0.5   0 #D9D9D9FF       14     NA   1   1
+#> set_A&set_B         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
+#> set_A&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
+#> set_B&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
+#>             fill padding padding_unit r r_unit      overlap_sign        items
+#> set_A         NA       4           pt 4     pt       set_A|1 0 0 item_052....
+#> set_B         NA       4           pt 4     pt       set_B|0 1 0 item_011....
+#> set_C         NA       4           pt 4     pt       set_C|0 0 1 item_059....
+#> set_A&set_B   NA       4           pt 4     pt set_A&set_B|1 1 0 item_019....
+#> set_A&set_C   NA       4           pt 4     pt set_A&set_C|1 0 1 item_093....
+#> set_B&set_C   NA       4           pt 4     pt set_B&set_C|0 1 1 item_060....
+#>             overlap   count show_items hjust_outside hjust_inside vjust_outside
+#> set_A        inside  inside       none           0.5          0.5           0.5
+#> set_B        inside  inside       none           0.5          0.5           0.5
+#> set_C        inside  inside       none           0.5          0.5           0.5
+#> set_A&set_B    none  inside       none           0.5          0.5           0.5
+#> set_A&set_C    none outside       none           1.0          0.5           0.0
+#> set_B&set_C    none  inside       none           0.5          0.5           0.5
+#>             vjust_inside
+#> set_A                1.0
+#> set_B                1.0
+#> set_C                1.0
+#> set_A&set_B          0.5
+#> set_A&set_C          0.5
+#> set_B&set_C          0.5
 
 vo$label_df[1:3,"border"] <- c("red4", "darkorange", "blue4");
 vo$label_df[1:3,"fill"] <- c("red3", "darkorange2", "blue3");

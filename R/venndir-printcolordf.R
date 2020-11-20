@@ -172,9 +172,9 @@ print_color_df <- function
 #' @export
 make_color_contrast <- function
 (x,
- y,
+ y=NULL,
  bg="white",
- L_threshold=55,
+ L_threshold=65,
  C_floor=130,
  L_hi=100,
  L_lo=40,
@@ -189,15 +189,37 @@ make_color_contrast <- function
    if (length(x) < length(y)) {
       x <- rep(x, length.out=length(y));
    }
+   if (length(y) == 0) {
+      y <- bg;
+   }
    if (length(y) < length(x)) {
       y <- rep(y, length.out=length(x));
    }
+   #y <- c("#FF0000FF", "#FF0000CC", "#FF0000AA", "#FF000099", "#FF000066", "#FF000033");
+   bg <- rep(bg, length.out=length(y));
+   y_alpha <- jamba::col2alpha(y);
+   # adjust alpha
+   y_alpha_adj <- y_alpha ^ (0.95)
+   y1 <- jamba::alpha2col(y, alpha=y_alpha_adj);
+   new_bg <- jamba::alpha2col(bg, alpha=1 - y_alpha_adj);
+   ybg_list <- as.list(as.data.frame(t(cbind(y1, new_bg))));
+   new_y <- colorjam::blend_colors(ybg_list);
    x_hcl <- jamba::col2hcl(x);
-   y_hcl <- jamba::col2hcl(y);
-   lite_bg <- grepl("white|#[FEfe]{6}",
-      jamba::setTextContrastColor(y,
-         hclCutoff=L_threshold,
-         bg=bg));
+   y_hcl <- jamba::col2hcl(new_y);
+   
+   # honestly not sure what I was thinking here
+   if (1 == 2) {
+      lite_bg <- grepl("white|#[FEfe]{6}",
+         jamba::setTextContrastColor(new_y,
+            hclCutoff=L_threshold,
+            useGrey=0,
+            bg=bg));
+   } else {
+      lite_bg <- ifelse(y_hcl["L",] < L_threshold,
+         TRUE,
+         FALSE);
+   }
+   
    x_hcl["L",] <- ifelse(lite_bg,
       jamba::noiseFloor(x_hcl["L",], minimum=L_hi),
       jamba::noiseFloor(x_hcl["L",], ceiling=L_lo))
@@ -216,6 +238,7 @@ make_color_contrast <- function
          cex=cex,
          col=c(x, x2));
    }
-   return(invisible(x2));
+   #return(invisible(x2));
+   return(x2);
 }
 

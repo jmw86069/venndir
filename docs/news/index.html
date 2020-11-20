@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
       </span>
     </div>
 
@@ -126,6 +126,26 @@
       <small>Source: <a href='http://github.com/jmw86069/venndir/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="venndir-0010900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.10.900">
+<a href="#venndir-0010900" class="anchor"></a>venndir 0.0.10.900</h1>
+<div id="updates-to-existing-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#updates-to-existing-functions" class="anchor"></a>updates to existing functions</h2>
+<ul>
+<li>
+<code><a href="../reference/render_venndir.html">render_venndir()</a></code> by default groups gridtext labels together, and draws one contiguous background and border around them all. It currently only works for R base plots, since it needs to know the grob sizes upfront. That said, at this point the base R plot looks substantially better than ggplot2 when labels are placed on the outside of the Venn circles. Hopefully I will figure out how to do the same for ggplot2 output.</li>
+</ul>
+</div>
+<div id="new-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions" class="anchor"></a>new functions</h2>
+<ul>
+<li>
+<code><a href="../reference/draw_gridtext_groups.html">draw_gridtext_groups()</a></code> does the work for grouping multiple <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html">gridtext::richtext_grob()</a></code> labels together, using <code>x, y, overlap_set</code> to define the grouping. This method also aligns text relative to a line segment if present, by using <code><a href="../reference/degrees_to_adj.html">degrees_to_adj()</a></code>. A by-product of the approach is that labels are now centered by the label width, instead of having left/right components which may differ in width.</li>
+</ul>
+</div>
+</div>
     <div id="venndir-009900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.9.900">
 <a href="#venndir-009900" class="anchor"></a>venndir 0.0.9.900</h1>
@@ -135,9 +155,9 @@
 <a href="#one-more-refactor" class="anchor"></a>one more refactor</h2>
 <p>Proportional Venn diagrams (Euler diagrams) warranted a refactor in order to label each set even when one set is fully contained inside another set.</p>
 </div>
-<div id="new-functions" class="section level2">
+<div id="new-functions-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions" class="anchor"></a>new functions</h2>
+<a href="#new-functions-1" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/signed_counts2setlist.html">signed_counts2setlist()</a></code> is an import method similar to <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> but to allow importing directional overlaps.</li>
@@ -190,9 +210,9 @@
 <h1 class="page-header" data-toc-text="0.0.8.900">
 <a href="#venndir-008900" class="anchor"></a>venndir 0.0.8.900</h1>
 <p>One more refactor is in progress. Label coordinates will be pre-calculated inside and outside each polygon, then labels can be toggled in or out (or moved to a custom location). The main driver is to be able to label the Venn circles on the perimeter of the diagram. For proportional circles, when a set is fully contained inside another set, there is no polygon with that set alone – thus the defaul labeling fails.</p>
-<div id="new-functions-1" class="section level2">
+<div id="new-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-1" class="anchor"></a>new functions</h2>
+<a href="#new-functions-2" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> defines label placement outside a polygon, one of two methods: “label” positions outside using relative label positioning; “bbox” positions outside using relative polygon position within the bounding box.</li>
@@ -401,9 +421,9 @@
 <code><a href="../reference/textvenn.html">textvenn()</a></code> now supports directional Venn counts, even with <code>"each"</code> it uses two columns for all possible directions for the central 3-way overlaps.</li>
 </ul>
 </div>
-<div id="new-functions-2" class="section level2">
+<div id="new-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-2" class="anchor"></a>new functions</h2>
+<a href="#new-functions-3" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/render_venndir.html">render_venndir()</a></code> renders a Venn or Euler diagram using the output format from <code><a href="../reference/venndir.html">venndir()</a></code>. It displays a warning at the bottom of the plot whenever a Venn overlap cannot be displayed, for example with proportional Venn (Euler) diagrams when an overlap cannot be represented. This label can be hidden, but by default is displayed so the information is not lost.</li>
@@ -413,9 +433,9 @@
     <div id="venndir-003900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.3.900">
 <a href="#venndir-003900" class="anchor"></a>venndir 0.0.3.900</h1>
-<div id="new-functions-3" class="section level2">
+<div id="new-functions-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-3" class="anchor"></a>new functions</h2>
+<a href="#new-functions-4" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> the core visual function that displays either Venn diagram or a Euler diagram for proportional diagrams.</li>
@@ -432,9 +452,9 @@
 <li>400 genes overlap, 396 genes share the same direction. In this case, the overlap could be seen as highly similar between the two sets.</li>
 <li>400 genes overlap, only 4 genes share the same direction. In this case, the overlap could be see as nearly exactly opposite.</li>
 </ul>
-<div id="new-functions-4" class="section level2">
+<div id="new-functions-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-4" class="anchor"></a>new functions</h2>
+<a href="#new-functions-5" class="anchor"></a>new functions</h2>
 <ul>
 <li>
 <code><a href="../reference/textvenn.html">textvenn()</a></code> prints a Venn diagram using console text output. It also supports directionality, the formatting is still being adjusted for best visual appeal.</li>

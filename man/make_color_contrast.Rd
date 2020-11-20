@@ -6,9 +6,9 @@
 \usage{
 make_color_contrast(
   x,
-  y,
+  y = NULL,
   bg = "white",
-  L_threshold = 55,
+  L_threshold = 65,
   C_floor = 130,
   L_hi = 100,
   L_lo = 40,

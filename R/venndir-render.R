@@ -95,6 +95,10 @@
 #' @param plot_style `character` string indicating the style
 #'    of plot: `"base"` uses base R graphics; `"gg"` uses
 #'    ggplot2 graphics (not yet implemented).
+#' @param group_labels `logical` to enable experimental feature that
+#'    groups multiple `gridtext::richtext_grob()` elements together
+#'    by overlap set and position, currently only implemented
+#'    (partially) for base R plots.
 #' @param ... additional arguments are passed to `plot()`
 #'    when plotting `venn_spdf` which is expected to be a
 #'    `sp::SpatialPolygonsDataFrame`.
@@ -171,6 +175,7 @@ render_venndir <- function
  segment_buffer=-0.2,
  inside_percent_threshold=5,
  plot_style=c("base", "gg"),
+ group_labels=TRUE,
  ggtheme=ggplot2::theme_void,
  draw_buffer=FALSE,
  ...)
@@ -298,103 +303,8 @@ render_venndir <- function
       # - if x,y + x_offset,y_offset is outside the polygon, allow
       #   show_label=NA --> show_label=TRUE when show_items=TRUE
       
-      if (1 == 2) {
-         show_label <- rep(show_label, length.out=nrow(label_df));
-         show_items <- rep(show_items, length.out=nrow(label_df));
-         # build show_items
-         show_items <- ifelse(
-            is.na(show_items),
-            label_df$show_items,
-            show_items);
-         if (!"items" %in% colnames(label_df)) {
-            show_items <- rep(FALSE, length(show_items));
-         } else {
-            show_items <- ifelse(label_df$overlap_set %in% venn_spdf$label,
-               show_items,
-               FALSE);
-            # max_items requires grouping by overlap_set
-            items_by_set <- tapply(label_df$items, label_df$overlap_set, function(ldi){
-               sum(lengths(ldi))
-            });
-            show_items <- ifelse(
-               lengths(label_df$items) == 0 |
-                  items_by_set[label_df$overlap_set] > max_items,
-               FALSE,
-               show_items);
-         }
-         # show_items grouped by overlap_set
-         show_items_by_set <- tapply(show_items, label_df$overlap_set, function(ldi){
-            any(!ldi %in% c(NA, FALSE, "none"))
-         })[label_df$overlap_set];
-         
-         # determine if label coordinates are inside the polygon
-         sp_index <- match(label_df$overlap_set,
-            venn_spdf$label);
-         label_overlaps_poly <- sapply(seq_len(nrow(label_df)), function(i){
-            if (is.na(sp_index[i])) {
-               return(NA);
-            }
-            ixy <- cbind(
-               sum(c(label_df$x[i],
-                  label_df$x_offset[i])),
-               sum(c(label_df$y[i],
-                  label_df$y_offset[i])));
-            if (any(is.na(ixy))) {
-               return(NA);
-            }
-            spt <- sp::SpatialPoints(ixy);
-            rgeos::gContains(venn_spdf[sp_index[i],], spt);
-         });
-         
-         # build use_show_label
-         show_label <- ifelse(
-            show_label %in% NA,
-            label_df$show_label,
-            show_label);
-         # if no x,y coordinates we cannot display the label
-         show_label <- ifelse(
-            is.na(label_df$x) | 
-               is.na(label_df$y),
-            FALSE,
-            show_label);
-         # if show_label=NA, show_items=TRUE -> show_label=FALSE
-         # if show_label=NA, show_items=FALSE -> show_label=FALSE
-         show_label <- ifelse(
-            show_label %in% NA,
-            ifelse(
-               !show_items_by_set %in% c(FALSE,NA) & label_overlaps_poly,
-               FALSE,
-               TRUE),
-            show_label);
-         # hide zero label when show_zero=FALSE and venn_counts=0
-         show_label <- ifelse(
-            show_label %in% TRUE & 
-               show_zero %in% FALSE & 
-               label_df$venn_counts == 0,
-            FALSE,
-            show_label);
-         
-         # adjust remaining show_items=NA to FALSE
-         show_items <- ifelse(
-            show_items %in% NA,
-            FALSE,
-            show_items);
-         # replace TRUE with "sign item" as a default
-         show_items <- ifelse(
-            show_items %in% TRUE,
-            "sign item",
-            show_items);
-         show_items <- ifelse(
-            label_df$type %in% "main" &
-               !show_items %in% c(NA, FALSE),
-            gsub("[ ]*sign[ ]*", "", show_items),
-            show_items);
-         label_df$show_label <- show_label;
-         label_df$show_items <- show_items;
-      } else {
-         #show_items <- (label_df$show_items %in% "inside");
-         show_label <- (label_df$overlap %in% c("outside", "inside") | label_df$count %in% c("outside", "inside"));
-      }
+      show_label <- (label_df$overlap %in% c("outside", "inside") |
+            label_df$count %in% c("outside", "inside"));
 
       
       # warn about hidden non-zero labels
@@ -543,7 +453,7 @@ render_venndir <- function
          labels <- gsub("^[ ]+|[ ]+$", "", labels);
          bg <- jamba::alpha2col(vdf$color, vdf$alpha)
          color <- make_color_contrast(color1,
-            bg,
+            y=bg,
             ...);
          
          lpf <- label_polygon_fill(sp=venn_spdf[vi,],
@@ -580,10 +490,10 @@ render_venndir <- function
       is_left <- (label_df$type %in% "main") * 1;
       gdf <- data.frame(
          overlap_set=c(
-            overlap_set[show_overlap_outside],
-            overlap_set[show_overlap_inside],
-            overlap_set[show_count_outside],
-            overlap_set[show_count_inside]),
+            label_df$overlap_set[show_overlap_outside],
+            label_df$overlap_set[show_overlap_inside],
+            label_df$overlap_set[show_count_outside],
+            label_df$overlap_set[show_count_inside]),
          text=c(
             overlap_set[show_overlap_outside],
             overlap_set[show_overlap_inside],
@@ -599,11 +509,51 @@ render_venndir <- function
             label_df$y[show_overlap_inside],
             label_df$y[show_count_outside] + label_df$y_offset[show_count_outside],
             label_df$y[show_count_inside]),
+         vjust=c(
+            1 - label_df$vjust_outside[show_overlap_outside],
+            1 - label_df$vjust_inside[show_overlap_inside],
+            label_df$vjust_outside[show_count_outside],
+            label_df$vjust_inside[show_count_inside]),
+         hjust=c(
+            label_df$hjust_outside[show_overlap_outside],
+            label_df$hjust_inside[show_overlap_inside],
+            label_df$hjust_outside[show_count_outside],
+            label_df$hjust_inside[show_count_inside]),
+         halign=c(
+            label_df$halign[show_overlap_outside],
+            label_df$halign[show_overlap_inside],
+            label_df$halign[show_count_outside],
+            label_df$halign[show_count_inside]),
+         rot=c(
+            label_df$rot[show_overlap_outside],
+            label_df$rot[show_overlap_inside],
+            label_df$rot[show_count_outside],
+            label_df$rot[show_count_inside]),
+         padding=c(
+            label_df$padding[show_overlap_outside],
+            label_df$padding[show_overlap_inside],
+            label_df$padding[show_count_outside],
+            label_df$padding[show_count_inside]),
+         r=c(
+            label_df$r[show_overlap_outside],
+            label_df$r[show_overlap_inside],
+            label_df$r[show_count_outside],
+            label_df$r[show_count_inside]),
+         r_unit=c(
+            label_df$r_unit[show_overlap_outside],
+            label_df$r_unit[show_overlap_inside],
+            label_df$r_unit[show_count_outside],
+            label_df$r_unit[show_count_inside]),
          label_col=c(
             label_df$color[show_overlap_outside],
             label_df$color[show_overlap_inside],
             label_df$color[show_count_outside],
             label_df$color[show_count_inside]),
+         fontsize=c(
+            label_df$fontsize[show_overlap_outside],
+            label_df$fontsize[show_overlap_inside],
+            label_df$fontsize[show_count_outside],
+            label_df$fontsize[show_count_inside]) * font_cex,
          border_col=c(
             label_df$border[show_overlap_outside],
             label_df$border[show_overlap_inside],
@@ -614,17 +564,23 @@ render_venndir <- function
             label_df$fill[show_overlap_inside],
             label_df$fill[show_count_outside],
             label_df$fill[show_count_inside]),
-         vjust=c(
-            1 - label_df$vjust_outside[show_overlap_outside],
-            1 - label_df$vjust_inside[show_overlap_inside],
-            label_df$vjust_outside[show_count_outside],
-            label_df$vjust_inside[show_count_inside]),
-         hjust=c(
-            label_df$hjust_outside[show_overlap_outside],
-            label_df$hjust_inside[show_overlap_inside],
-            label_df$hjust_outside[show_count_outside],
-            label_df$hjust_inside[show_count_inside])
+         box_lty=c(
+            label_df$lty[show_overlap_outside],
+            label_df$lty[show_overlap_inside],
+            label_df$lty[show_count_outside],
+            label_df$lty[show_count_inside]),
+         bow_lwd=c(
+            label_df$lwd[show_overlap_outside]*2,
+            label_df$lwd[show_overlap_inside],
+            label_df$lwd[show_count_outside]*2,
+            label_df$lwd[show_count_inside]),
+         padding_unit=c(
+            label_df$padding_unit[show_overlap_outside],
+            label_df$padding_unit[show_overlap_inside],
+            label_df$padding_unit[show_count_outside],
+            label_df$padding_unit[show_count_inside])
       );
+      
    }
 
    ## Determine suitable xlim and ylim
@@ -733,27 +689,10 @@ render_venndir <- function
                lwd=1)
          );
          if (length(dev.list()) > 0) {
-            if (length(vps) == 0) {
-               vps <- gridBase::baseViewports();
-               grid::pushViewport(vps$inner, vps$figure, vps$plot);
-            }
+            vps <- gridBase::baseViewports();
+            grid::pushViewport(vps$inner, vps$figure, vps$plot);
             grid::grid.draw(g_warning);
-            #grid::popViewport(3);
-         }
-         # previous method using jamba::drawLabels()
-         if (1 == 2) {
-            jamba::drawLabels(
-               x=cp$x,
-               y=cp$y,
-               adjX=cp$adjX,
-               adjY=0.5,
-               #preset="bottom",
-               txt=warning_label,
-               labelCex=1,
-               xpd=NA,
-               boxColor="#FFFFFFAA",
-               boxBorderColor="#999999AA",
-            );
+            grid::popViewport(3);
          }
       }
       # display count/set labels
@@ -765,163 +704,57 @@ render_venndir <- function
          show_count_inside <- (label_df$count %in% "inside" & !is.na(label_df$x));
          overlap_set <- paste0("**", label_df$overlap_set, "**");
          is_left <- (label_df$type %in% "main") * 1;
-         gdf <- data.frame(
-            text=c(
-               overlap_set[show_overlap_outside],
-               overlap_set[show_overlap_inside],
-               label_df$text[show_count_outside],
-               label_df$text[show_count_inside]),
-            x=c(
-               label_df$x[show_overlap_outside] + label_df$x_offset[show_overlap_outside],
-               label_df$x[show_overlap_inside],
-               label_df$x[show_count_outside] + label_df$x_offset[show_count_outside],
-               label_df$x[show_count_inside]),
-            y=c(
-               label_df$y[show_overlap_outside] + label_df$y_offset[show_overlap_outside],
-               label_df$y[show_overlap_inside],
-               label_df$y[show_count_outside] + label_df$y_offset[show_count_outside],
-               label_df$y[show_count_inside]),
-            label_col=c(
-               label_df$color[show_overlap_outside],
-               label_df$color[show_overlap_inside],
-               label_df$color[show_count_outside],
-               label_df$color[show_count_inside]),
-            border_col=c(
-               label_df$border[show_overlap_outside],
-               label_df$border[show_overlap_inside],
-               label_df$border[show_count_outside],
-               label_df$border[show_count_inside]),
-            box_fill=c(
-               label_df$fill[show_overlap_outside],
-               label_df$fill[show_overlap_inside],
-               label_df$fill[show_count_outside],
-               label_df$fill[show_count_inside]),
-            vjust=c(
-               label_df$vjust_outside[show_overlap_outside],
-               label_df$vjust_inside[show_overlap_inside],
-               label_df$vjust_outside[show_count_outside],
-               label_df$vjust_inside[show_count_inside]),
-            hjust=c(
-               label_df$hjust_outside[show_overlap_outside],
-               label_df$hjust_inside[show_overlap_inside],
-               label_df$hjust_outside[show_count_outside],
-               label_df$hjust_inside[show_count_inside])
-         );
-         if (1 == 2) {
-            print(gdf);
-            jamba::printDebug(c(
-               sum(show_overlap_outside),
-               sum(show_overlap_inside),
-               sum(show_count_outside),
-               sum(show_count_inside)));
-         }
+
          g_labels <- gridtext::richtext_grob(
             default.units="native",
-            text=c(
-               overlap_set[show_overlap_outside],
-               overlap_set[show_overlap_inside],
-               label_df$text[show_count_outside],
-               label_df$text[show_count_inside]),
-            x=grid::unit(c(
-               label_df$x[show_overlap_outside] + label_df$x_offset[show_overlap_outside],
-               label_df$x[show_overlap_inside],
-               label_df$x[show_count_outside] + label_df$x_offset[show_count_outside],
-               label_df$x[show_count_inside]), "native"),
-            y=grid::unit(c(
-               label_df$y[show_overlap_outside] + label_df$y_offset[show_overlap_outside],
-               label_df$y[show_overlap_inside],
-               label_df$y[show_count_outside] + label_df$y_offset[show_count_outside],
-               label_df$y[show_count_inside]), "native"),
-            vjust=c(
-               1 - label_df$vjust_outside[show_overlap_outside],
-               1 - label_df$vjust_inside[show_overlap_inside],
-               label_df$vjust_outside[show_count_outside],
-               label_df$vjust_inside[show_count_inside]),
-            hjust=c(
-               label_df$hjust_outside[show_overlap_outside],
-               label_df$hjust_inside[show_overlap_inside],
-               label_df$hjust_outside[show_count_outside],
-               label_df$hjust_inside[show_count_inside]),
-            #vjust=label_df$vjust[show_label],
-            #hjust=label_df$hjust[show_label],
-            halign=c(
-               label_df$halign[show_overlap_outside],
-               label_df$halign[show_overlap_inside],
-               label_df$halign[show_count_outside],
-               label_df$halign[show_count_inside]),
-            rot=c(
-               label_df$rot[show_overlap_outside],
-               label_df$rot[show_overlap_inside],
-               label_df$rot[show_count_outside],
-               label_df$rot[show_count_inside]),
-            padding=grid::unit(c(
-               label_df$padding[show_overlap_outside],
-               label_df$padding[show_overlap_inside],
-               label_df$padding[show_count_outside],
-               label_df$padding[show_count_inside]),
-               c(
-                  label_df$padding_unit[show_overlap_outside],
-                  label_df$padding_unit[show_overlap_inside],
-                  label_df$padding_unit[show_count_outside],
-                  label_df$padding_unit[show_count_inside])
-            ),
-            r=grid::unit(c(
-               label_df$r[show_overlap_outside],
-               label_df$r[show_overlap_inside],
-               label_df$r[show_count_outside],
-               label_df$r[show_count_inside]),
-               c(
-                  label_df$r_unit[show_overlap_outside],
-                  label_df$r_unit[show_overlap_inside],
-                  label_df$r_unit[show_count_outside],
-                  label_df$r_unit[show_count_inside])
-            ),
+            text=gdf$text,
+            x=grid::unit(gdf$x, "native"),
+            y=grid::unit(gdf$y, "native"),
+            vjust=gdf$vjust,
+            hjust=gdf$hjust,
+            halign=gdf$halign,
+            rot=gdf$rot,
+            padding=grid::unit(gdf$padding,
+               gdf$padding_unit),
+            r=grid::unit(gdf$r,
+               gdf$r_unit),
             gp=grid::gpar(
                fontfamily=fontfamily,
-               col=c(
-                  label_df$color[show_overlap_outside],
-                  label_df$color[show_overlap_inside],
-                  label_df$color[show_count_outside],
-                  label_df$color[show_count_inside]),
-               fontsize=c(
-                  label_df$fontsize[show_overlap_outside],
-                  label_df$fontsize[show_overlap_inside],
-                  label_df$fontsize[show_count_outside],
-                  label_df$fontsize[show_count_inside]) * font_cex
+               col=gdf$label_col,
+               fontsize=gdf$fontsize
             ),
             box_gp=grid::gpar(
-               col=c(
-                  label_df$border[show_overlap_outside],
-                  label_df$border[show_overlap_inside],
-                  label_df$border[show_count_outside],
-                  label_df$border[show_count_inside]),
-               fill=c(
-                  label_df$fill[show_overlap_outside],
-                  label_df$fill[show_overlap_inside],
-                  label_df$fill[show_count_outside],
-                  label_df$fill[show_count_inside]),
-               lty=c(
-                  label_df$lty[show_overlap_outside],
-                  label_df$lty[show_overlap_inside],
-                  label_df$lty[show_count_outside],
-                  label_df$lty[show_count_inside]),
-               lwd=c(
-                  label_df$lwd[show_overlap_outside]*2,
-                  label_df$lwd[show_overlap_inside],
-                  label_df$lwd[show_count_outside]*2,
-                  label_df$lwd[show_count_inside]))
+               #col=NA,
+               col=if(group_labels){NA}else{gdf$border_col},
+               #col=gdf$border_col, # used when draw_gridtext_groups() is not used
+               #fill=NA,
+               fill=if(group_labels){NA}else{gdf$box_fill},
+               #fill=gdf$box_fill, # used when draw_gridtext_groups() is not used
+               lty=gdf$box_lty,
+               lwd=gdf$box_lwd)
          );
-         if (length(dev.list()) > 0) {
-            if (length(vps) == 0) {
-               vps <- gridBase::baseViewports();
-               grid::pushViewport(vps$inner, vps$figure, vps$plot);
-            }
-            grid::grid.draw(g_labels);
-            #grid::popViewport(3);
+         # draw grouped label background
+         if (group_labels) {
+            g_labels <- tryCatch({
+               dgg <- draw_gridtext_groups(
+                  g_labels=g_labels,
+                  gdf=gdf,
+                  segment_df=segment_df,
+                  do_draw=TRUE,
+                  verbose=FALSE)
+               dgg$g_labels;
+            }, error=function(e){
+               print(e);
+               g_labels;
+            });
          }
-      }
-      if (length(vps) > 0) {
-         grid::popViewport(3);
+         
+         if (length(dev.list()) > 0) {
+            vps <- gridBase::baseViewports();
+            grid::pushViewport(vps$inner, vps$figure, vps$plot);
+            grid::grid.draw(g_labels);
+            grid::popViewport(3);
+         }
       }
       # display item labels if available
       g_labels_items <- NULL;
@@ -940,6 +773,8 @@ render_venndir <- function
             }
          }
          # display items
+         #item_color <- make_color_contrast(itemlabels_df$color,
+         #   bg=
          g_labels_items <- gridtext::richtext_grob(
             x=itemlabels_df$x,
             y=itemlabels_df$y,
@@ -992,63 +827,40 @@ render_venndir <- function
                color=color)
          );
       }
+      # warning label
+      if (length(warning_label) > 0) {
+         warning_df <- data.frame(check.names=FALSE,
+            stringsAsFactors=FALSE,
+            label=gsub(": ", ":<br>", warning_label),
+            x=-Inf,
+            y=-Inf,
+            hjust=-0.02,
+            vjust=-0.1
+         );
+         ggv <- ggv + ggtext::geom_textbox(
+            data=warning_df,
+            inherit.aes=FALSE,
+            ggplot2::aes(x=x,
+               y=y,
+               family=fontfamily,
+               hjust=hjust,
+               vjust=vjust,
+               label=label
+            ),
+            text.colour="#444444",
+            fill="#FFFFFF00",
+            box.colour="#FFFFFF00",
+            size=12 * 5/14 * font_cex,
+            box.padding=grid::unit(2, "pt"),
+            box.r=grid::unit(2, "pt"),
+            width=grid::unit(1, "npc"),
+            maxwidth=grid::unit(0.95, "npc"),
+            show.legend=FALSE
+         );
+      }
+      
       # count labels
       if (any(show_label)) {
-         show_overlap_outside <- which(label_df$overlap %in% "outside" & !is.na(label_df$x));
-         show_overlap_inside <- which(label_df$overlap %in% "inside" & !is.na(label_df$x));
-         show_count_outside <- which(label_df$count %in% "outside" & !is.na(label_df$x));
-         show_count_inside <- which(label_df$count %in% "inside" & !is.na(label_df$x));
-         overlap_set <- paste0("**", label_df$overlap_set, "**");
-         is_left <- (label_df$type %in% "main") * 1;
-         # generate data.frame of label coordinates
-         gdf <- data.frame(
-            overlap_set=c(
-               overlap_set[show_overlap_outside],
-               overlap_set[show_overlap_inside],
-               overlap_set[show_count_outside],
-               overlap_set[show_count_inside]),
-            text=c(
-               overlap_set[show_overlap_outside],
-               overlap_set[show_overlap_inside],
-               label_df$text[show_count_outside],
-               label_df$text[show_count_inside]),
-            x=c(
-               label_df$x[show_overlap_outside] + label_df$x_offset[show_overlap_outside],
-               label_df$x[show_overlap_inside],
-               label_df$x[show_count_outside] + label_df$x_offset[show_count_outside],
-               label_df$x[show_count_inside]),
-            y=c(
-               label_df$y[show_overlap_outside] + label_df$y_offset[show_overlap_outside],
-               label_df$y[show_overlap_inside],
-               label_df$y[show_count_outside] + label_df$y_offset[show_count_outside],
-               label_df$y[show_count_inside]),
-            label_col=c(
-               label_df$color[show_overlap_outside],
-               label_df$color[show_overlap_inside],
-               label_df$color[show_count_outside],
-               label_df$color[show_count_inside]),
-            border_col=c(
-               label_df$border[show_overlap_outside],
-               label_df$border[show_overlap_inside],
-               label_df$border[show_count_outside],
-               label_df$border[show_count_inside]),
-            box_fill=c(
-               label_df$fill[show_overlap_outside],
-               label_df$fill[show_overlap_inside],
-               label_df$fill[show_count_outside],
-               label_df$fill[show_count_inside]),
-            vjust=c(
-               1 - label_df$vjust_outside[show_overlap_outside],
-               1 - label_df$vjust_inside[show_overlap_inside],
-               label_df$vjust_outside[show_count_outside],
-               label_df$vjust_inside[show_count_inside]),
-            hjust=c(
-               label_df$hjust_outside[show_overlap_outside],
-               label_df$hjust_inside[show_overlap_inside],
-               label_df$hjust_outside[show_count_outside],
-               label_df$hjust_inside[show_count_inside])
-         );
-
          #show_label_df <- subset(label_df, show_label %in% c(TRUE));
          ggv <- ggv + ggtext::geom_richtext(
             data=gdf,
@@ -1064,38 +876,17 @@ render_venndir <- function
                text.colour=label_col,
                fill=box_fill,
                label.colour=border_col),
-            label.padding=grid::unit(c(
-               label_df$padding[show_overlap_outside],
-               label_df$padding[show_overlap_inside],
-               label_df$padding[show_count_outside],
-               label_df$padding[show_count_inside]),
-               c(
-                  label_df$padding_unit[show_overlap_outside],
-                  label_df$padding_unit[show_overlap_inside],
-                  label_df$padding_unit[show_count_outside],
-                  label_df$padding_unit[show_count_inside])
-            ),
-            label.r=grid::unit(c(
-               label_df$r[show_overlap_outside],
-               label_df$r[show_overlap_inside],
-               label_df$r[show_count_outside],
-               label_df$r[show_count_inside]),
-               c(
-                  label_df$r_unit[show_overlap_outside],
-                  label_df$r_unit[show_overlap_inside],
-                  label_df$r_unit[show_count_outside],
-                  label_df$r_unit[show_count_inside])
-            ),
-            size=c(
-               label_df$fontsize[show_overlap_outside],
-               label_df$fontsize[show_overlap_inside],
-               label_df$fontsize[show_count_outside],
-               label_df$fontsize[show_count_inside]) * 5/14 * font_cex
+            label.padding=grid::unit(
+               gdf$padding,
+               gdf$padding_unit),
+            label.r=grid::unit(
+               gdf$r,
+               gdf$r_unit),
+            size=gdf$fontsize * 5/14
          )
       }
       # optional xlim, ylim
       if (length(xlim) > 0 & length(ylim) > 0) {
-         jamba::printDebug("xlim:", xlim, ", ylim:", ylim);
          ggv <- ggv + ggplot2::coord_sf(xlim=xlim, ylim=ylim);
       }
       # optional item labels
@@ -1137,6 +928,8 @@ render_venndir <- function
    
    return(invisible(list(venn_spdf=venn_spdf,
       label_df=label_df,
+      gdf=gdf,
+      segment_df=segment_df,
       g_labels=g_labels)));
 }
 
@@ -1328,7 +1121,7 @@ venndir_label_style <- function
       count <- "none";
       signed <- "none";
       items <- "inside";
-   } else if ("main items" %in% label_preset) {
+   } else if ("main count items" %in% label_preset) {
       set <- "outside";
       overlap <- "none";
       count <- "outside";

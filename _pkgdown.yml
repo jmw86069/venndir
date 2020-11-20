@@ -18,3 +18,7 @@ reference:
   desc: Helpful utility functions
   contents:
   - has_concept("venndir utility")
+- title: venndir Label Functions
+  desc: Helpful label functions
+  contents:
+  - has_concept("venndir label")
