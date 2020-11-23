@@ -3,7 +3,30 @@
 
 ## enhancements
 
+### bugs
+
+* Showing a few hundred item labels is still painfully
+slow. Consider `text()` as an alternative. Or test options
+that remove the dither options for color/degrees/cex in
+case that somehow triggers non-vectorized rendering.
+
+
 ### miscellaneous
+
+* Option to display concordance score below the signed values.
+* For `overlap_type="agreement"` hide the signed values for
+single-set overlaps, they always "agree" and are not informative.
+
+
+## fixed bugs version 0.0.11.9000
+
+* FIXED: `show_zero=TRUE` is not working properly, it is always hidden.
+* FIXED: `alpha_by_counts` appears to be mis-aligned.
+* FIXED: Fix issue where directional label colors apply
+`make_color_contrast()` without using the correct
+`alpha` value. See with `venndir(make_venn_test(100, 3), poly_alpha=0)`
+
+
 
 * DONE: Add warning message to ggplot2 output in `render_venndir()`.
 

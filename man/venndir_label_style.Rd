@@ -19,7 +19,7 @@ venndir_label_style(
   items = c("none", "inside"),
   inside_percent_threshold = 5,
   label_types = c("main", "signed"),
-  show_zero = FALSE,
+  show_zero = TRUE,
   sep = "&",
   useGrey = 15,
   verbose = FALSE,

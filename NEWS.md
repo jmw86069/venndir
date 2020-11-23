@@ -1,4 +1,15 @@
 
+# venndir 0.0.11.900
+
+## bug fixes
+
+* FIXED: `show_zero=TRUE` was not working, zeros were always hidden.
+* FIXED: `alpha_by_counts` appears to be mis-aligned.
+* FIXED: Fix issue where directional label colors apply
+`make_color_contrast()` without using the correct
+`alpha` value. See with `venndir(make_venn_test(100, 3), poly_alpha=0)`
+
+
 # venndir 0.0.10.900
 
 ## updates to existing functions

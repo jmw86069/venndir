@@ -614,13 +614,6 @@ venndir <- function
    hjust_signed <- rep(0, length(x_signed));
    halign_signed <- rep(0, length(x_signed));
    
-   if (alpha_by_counts) {
-      poly_alpha <- jamba::normScale(sqrt(nlabel_df$venn_counts),
-         low=0,
-         from=0,
-         to=1);
-   }
-   
    ## label_style
    #label_fill_main <- rep(NA, length(x_main));
    #label_border_main <- rep(NA, length(x_main));
@@ -671,6 +664,22 @@ venndir <- function
       darkFactor=1.2,
       sFactor=1.2);
 
+   # optionally apply alpha by venn_counts
+   if (alpha_by_counts) {
+      venn_spdf$alpha <- jamba::normScale(
+         sqrt(
+            jamba::rmNA(naValue=0, venn_spdf$venn_counts)),
+         low=0,
+         from=0.02,
+         to=1);
+      venn_spdfs$alpha <- jamba::normScale(
+         sqrt(
+            jamba::rmNA(naValue=0, venn_spdfs$venn_counts)),
+         low=0,
+         from=0.02,
+         to=1);
+   }
+   
    ## Prepare label data.frame
    #print(nlabel_df);
    label_n <- length(c(x_main, x_signed));
@@ -781,6 +790,7 @@ venndir <- function
       venn_spdf=venn_spdfs,
       label_df=label_df),
       label_style=label_style,
+      show_zero=show_zero,
       inside_percent_threshold=inside_percent_threshold,
       ...);
    label_df <- vo$label_df;

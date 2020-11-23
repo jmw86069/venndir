@@ -202,6 +202,7 @@ render_venndir <- function
          list(venn_spdf=venn_spdf, label_df=label_df),
          label_style=label_style,
          inside_percent_threshold=inside_percent_threshold,
+         show_zero=show_zero,
          ...);
       venn_spdf <- venndir_output$venn_spdf;
       label_df <- venndir_output$label_df;
@@ -280,7 +281,7 @@ render_venndir <- function
          show_items <- "none";
       }
       if (length(show_zero) == 0) {
-         show_zero <- TRUE;
+         show_zero <- eval(formals(render_venndir)$show_zero);
       }
       if (length(max_items) == 0) {
          max_items <- Inf;
@@ -338,25 +339,21 @@ render_venndir <- function
          }
       }
       
-      # display labels
+      # prepare line segments for labels outside their respective polygons
       g_labels <- NULL;
       segment_df <- NULL;
       if (any(show_label)) {
          label_outside <- (label_df$overlap %in% "outside" | label_df$count %in% "outside");
+         
          # Determine if any offset labels require line segment
          has_offset <- label_outside & (label_df$x_offset != 0 | label_df$y_offset != 0);
-         #has_offset <- (label_df$x_offset != 0 | label_df$y_offset != 0);
          if (any(show_label & has_offset)) {
             use_offset <- (show_label & has_offset);
             offset_sets <- label_df$overlap_set[use_offset];
             sp_index <- match(offset_sets, venn_spdf$label);
             segment_buffer <- ifelse(label_df$items %in% "inside",
-               label_df$segment_buffer / 5,
+               label_df$segment_buffer / 2,
                label_df$segment_buffer);
-            #segment_buffer <- ifelse(show_items_by_set %in% c(NA, FALSE),
-            #   (label_df$segment_buffer + -1) / 3,
-            #   label_df$segment_buffer);
-            #segment_buffer <- label_df$segment_buffer;
             test_xy <- data.frame(
                x0=label_df$x[use_offset] + label_df$x_offset[use_offset],
                x1=label_df$x[use_offset],
@@ -412,7 +409,7 @@ render_venndir <- function
       }
    }
    
-   ## Draw item labels
+   ## Prepare item labels
    itemlabels_df <- NULL;
    #if (any(!show_items %in% FALSE)) {
    if (any(label_df$show_items %in% "inside")) {
@@ -580,7 +577,12 @@ render_venndir <- function
             label_df$padding_unit[show_count_outside],
             label_df$padding_unit[show_count_inside])
       );
-      
+      if (1 == 2) {
+         jamba::printDebug("label data.frame gdf:");
+         print(gdf);
+         jamba::printDebug("label data.frame label_df:");
+         print(label_df);
+      }
    }
 
    ## Determine suitable xlim and ylim
@@ -698,13 +700,7 @@ render_venndir <- function
       # display count/set labels
       g_labels <- NULL;
       if (any(show_label)) {
-         show_overlap_outside <- (label_df$overlap %in% "outside" & !is.na(label_df$x))
-         show_overlap_inside <- (label_df$overlap %in% "inside" & !is.na(label_df$x))
-         show_count_outside <- (label_df$count %in% "outside" & !is.na(label_df$x))
-         show_count_inside <- (label_df$count %in% "inside" & !is.na(label_df$x));
-         overlap_set <- paste0("**", label_df$overlap_set, "**");
-         is_left <- (label_df$type %in% "main") * 1;
-
+         #
          g_labels <- gridtext::richtext_grob(
             default.units="native",
             text=gdf$text,
@@ -1067,7 +1063,7 @@ venndir_label_style <- function
     "inside"),
  inside_percent_threshold=5,
  label_types=c("main", "signed"),
- show_zero=FALSE,
+ show_zero=TRUE,
  sep="&",
  useGrey=15,
  verbose=FALSE,
@@ -1340,7 +1336,10 @@ venndir_label_style <- function
    # label_bg is the background color when the label is inside
    label_bg <- ifelse(is.na(xy_overlaps),
       rep(bg, length.out=length(xy_overlaps)),
-      venndir_output$venn_spdf$color[xy_overlaps]);
+      jamba::alpha2col(
+         venndir_output$venn_spdf$color[xy_overlaps],
+         alpha=venndir_output$venn_spdf$alpha[xy_overlaps])
+      );
 
    # box is darker version of polygon color with alpha=0.8
    venndir_output$label_df$border[toupdate] <- ifelse(
