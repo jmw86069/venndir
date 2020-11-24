@@ -4,7 +4,7 @@
 \alias{im2list}
 \title{Incidence matrix to list}
 \usage{
-im2list(x, empty = c(NA, "", 0), ...)
+im2list(x, empty = c(NA, "", 0, FALSE), ...)
 }
 \description{
 Incidence matrix to list

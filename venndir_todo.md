@@ -20,6 +20,9 @@ single-set overlaps, they always "agree" and are not informative.
 
 ## fixed bugs version 0.0.11.9000
 
+* FIXED: `im2list()` with logical matrix input was incorrectly
+assigning all values. The `empty` argument will match the class
+of the input `x` to account for this mismatch.
 * FIXED: `show_zero=TRUE` is not working properly, it is always hidden.
 * FIXED: `alpha_by_counts` appears to be mis-aligned.
 * FIXED: Fix issue where directional label colors apply

@@ -232,14 +232,15 @@ im_value2list <- function
 #' @export
 im2list <- function
 (x,
- empty=c(NA, "", 0),
+ empty=c(NA, "", 0, FALSE),
  ...)
 {
    # the reciprocal of list2im()
    x_rows <- rownames(x);
    x_cols <- colnames(x);
    l <- lapply(jamba::nameVector(x_cols), function(i){
-      has_value <- (!x[,i] %in% empty);
+      i_empty <- as(empty, class(x[,i]));
+      has_value <- (!x[,i] %in% i_empty);
       x_rows[has_value];
    });
    return(l);
