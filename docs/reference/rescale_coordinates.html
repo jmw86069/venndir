@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -215,117 +215,38 @@ range is equivalent to using the mean of the bounding box <code><a href='https:/
 for Spatial objects.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other venndir utility: 
-<code><a href='curate_venn_labels.html'>curate_venn_labels</a>()</code>,
+    <div class='dont-index'><p>Other venndir spatial: 
 <code><a href='degrees_to_adj.html'>degrees_to_adj</a>()</code>,
 <code><a href='diff_degrees.html'>diff_degrees</a>()</code>,
 <code><a href='display_angles.html'>display_angles</a>()</code>,
-<code><a href='eulerr2polys.html'>eulerr2polys</a>()</code>,
-<code><a href='expand_range.html'>expand_range</a>()</code>,
-<code><a href='find_vennpoly_overlaps.html'>find_vennpoly_overlaps</a>()</code>,
 <code><a href='get_largest_polygon.html'>get_largest_polygon</a>()</code>,
 <code><a href='get_sp_buffer.html'>get_sp_buffer</a>()</code>,
-<code><a href='get_venn_shapes.html'>get_venn_shapes</a>()</code>,
 <code><a href='intersect_polygons.html'>intersect_polygons</a>()</code>,
-<code><a href='label_polygon_fill.html'>label_polygon_fill</a>()</code>,
-<code><a href='make_color_contrast.html'>make_color_contrast</a>()</code>,
-<code><a href='make_venn_combn_df.html'>make_venn_combn_df</a>()</code>,
-<code><a href='make_venn_test.html'>make_venn_test</a>()</code>,
-<code><a href='match_list.html'>match_list</a>()</code>,
 <code><a href='mean_degree_arc.html'>mean_degree_arc</a>()</code>,
 <code><a href='mean_degrees.html'>mean_degrees</a>()</code>,
 <code><a href='nudge_sp.html'>nudge_sp</a>()</code>,
-<code><a href='nudge_venndir_label.html'>nudge_venndir_label</a>()</code>,
-<code><a href='polygon_label_outside.html'>polygon_label_outside</a>()</code>,
-<code><a href='polygon_label_segment.html'>polygon_label_segment</a>()</code>,
-<code><a href='print_color_df.html'>print_color_df</a>()</code>,
-<code><a href='rescale_ps.html'>rescale_ps</a>()</code>,
-<code><a href='rescale_p.html'>rescale_p</a>()</code>,
 <code><a href='rescale_sp.html'>rescale_sp</a>()</code>,
-<code><a href='shrink_df.html'>shrink_df</a>()</code>,
 <code><a href='sp_circles.html'>sp_circles</a>()</code>,
 <code><a href='sp_ellipses.html'>sp_ellipses</a>()</code>,
-<code><a href='sp_percent_area.html'>sp_percent_area</a>()</code>,
-<code><a href='sp_polylabelr.html'>sp_polylabelr</a>()</code>,
 <code><a href='spread_degrees.html'>spread_degrees</a>()</code>,
-<code><a href='union_polygons.html'>union_polygons</a>()</code>,
-<code><a href='venndir_label_style.html'>venndir_label_style</a>()</code></p></div>
+<code><a href='union_polygons.html'>union_polygons</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='va'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sp_ellipses.html'>sp_ellipses</a></span><span class='op'>(</span>xcenter<span class='op'>=</span><span class='fl'>2</span>, ycenter<span class='op'>=</span><span class='fl'>3</span>, xradius<span class='op'>=</span><span class='fl'>3</span>, yradius<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>;
 
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"#FF000077"</span>, border<span class='op'>=</span><span class='st'>"#FF0000"</span>, asp<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>;
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"#FF000077"</span>, border<span class='op'>=</span><span class='st'>"#FF0000"</span><span class='op'>)</span>;
+</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/axis.html'>axis</a></span><span class='op'>(</span><span class='fl'>1</span>, las<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>; <span class='fu'><a href='https://rdrr.io/r/graphics/axis.html'>axis</a></span><span class='op'>(</span><span class='fl'>2</span>, las<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
 </div><div class='img'><img src='rescale_coordinates-1.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>sp</span><span class='op'>@</span><span class='va'>polygons</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>@</span><span class='va'>Polygons</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>@</span><span class='va'>coords</span>;
 
 <span class='fu'>jamba</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/jamba/man/nullPlot.html'>nullPlot</a></span><span class='op'>(</span>doBoxes<span class='op'>=</span><span class='cn'>FALSE</span>, xlim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>3</span>, <span class='fl'>9</span><span class='op'>)</span>, ylim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>2</span>, <span class='fl'>10</span><span class='op'>)</span>, asp<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>;
-</div><div class='input'><span class='fu'>rescale_coordinates</span><span class='op'>(</span><span class='va'>x</span>,
+</div><div class='input'><span class='va'>xnew</span> <span class='op'>&lt;-</span> <span class='fu'>rescale_coordinates</span><span class='op'>(</span><span class='va'>x</span>,
    shift<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span><span class='op'>)</span>,
    rotate_degrees<span class='op'>=</span><span class='fl'>30</span>,
    scale<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.5</span>, <span class='fl'>2.5</span><span class='op'>)</span>,
    plot_debug<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='img'><img src='rescale_coordinates-2.png' alt='' width='768' height='768' /></div><div class='output co'>#&gt;              [,1]      [,2]
-#&gt;  [1,]  4.25000000 6.1650635
-#&gt;  [2,]  4.65051174 5.9180140
-#&gt;  [3,]  5.03294013 5.6499504
-#&gt;  [4,]  5.39309520 5.3638095
-#&gt;  [5,]  5.72703102 5.0627265
-#&gt;  [6,]  6.03108891 4.7500000
-#&gt;  [7,]  6.30193757 4.4290564
-#&gt;  [8,]  6.53660950 4.1034119
-#&gt;  [9,]  6.73253360 3.7766344
-#&gt; [10,]  6.88756328 3.4523042
-#&gt; [11,]  7.00000000 3.1339746
-#&gt; [12,]  7.06861189 2.8251334
-#&gt; [13,]  7.09264721 2.5291643
-#&gt; [14,]  7.07184263 2.2493099
-#&gt; [15,]  7.00642610 1.9886365
-#&gt; [16,]  6.89711432 1.7500000
-#&gt; [17,]  6.74510494 1.5360150
-#&gt; [18,]  6.55206341 1.3490259
-#&gt; [19,]  6.32010472 1.1910814
-#&gt; [20,]  6.05177028 1.0639121
-#&gt; [21,]  5.75000000 0.9689111
-#&gt; [22,]  5.41810015 0.9071194
-#&gt; [23,]  5.05970708 0.8792139
-#&gt; [24,]  4.67874743 0.8855004
-#&gt; [25,]  4.27939508 0.9259100
-#&gt; [26,]  3.86602540 1.0000000
-#&gt; [27,]  3.44316737 1.1069586
-#&gt; [28,]  3.01545391 1.2456140
-#&gt; [29,]  2.58757113 1.4144470
-#&gt; [30,]  2.16420700 1.6116079
-#&gt; [31,]  1.75000000 1.8349365
-#&gt; [32,]  1.34948826 2.0819860
-#&gt; [33,]  0.96705987 2.3500496
-#&gt; [34,]  0.60690480 2.6361905
-#&gt; [35,]  0.27296898 2.9372735
-#&gt; [36,] -0.03108891 3.2500000
-#&gt; [37,] -0.30193757 3.5709436
-#&gt; [38,] -0.53660950 3.8965881
-#&gt; [39,] -0.73253360 4.2233656
-#&gt; [40,] -0.88756328 4.5476958
-#&gt; [41,] -1.00000000 4.8660254
-#&gt; [42,] -1.06861189 5.1748666
-#&gt; [43,] -1.09264721 5.4708357
-#&gt; [44,] -1.07184263 5.7506901
-#&gt; [45,] -1.00642610 6.0113635
-#&gt; [46,] -0.89711432 6.2500000
-#&gt; [47,] -0.74510494 6.4639850
-#&gt; [48,] -0.55206341 6.6509741
-#&gt; [49,] -0.32010472 6.8089186
-#&gt; [50,] -0.05177028 6.9360879
-#&gt; [51,]  0.25000000 7.0310889
-#&gt; [52,]  0.58189985 7.0928806
-#&gt; [53,]  0.94029292 7.1207861
-#&gt; [54,]  1.32125257 7.1144996
-#&gt; [55,]  1.72060492 7.0740900
-#&gt; [56,]  2.13397460 7.0000000
-#&gt; [57,]  2.55683263 6.8930414
-#&gt; [58,]  2.98454609 6.7543860
-#&gt; [59,]  3.41242887 6.5855530
-#&gt; [60,]  3.83579300 6.3883921
-#&gt; [61,]  4.25000000 6.1650635</div><div class='input'>   
+</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/axis.html'>axis</a></span><span class='op'>(</span><span class='fl'>1</span>, las<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>; <span class='fu'><a href='https://rdrr.io/r/graphics/axis.html'>axis</a></span><span class='op'>(</span><span class='fl'>2</span>, las<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
+</div><div class='img'><img src='rescale_coordinates-2.png' alt='' width='768' height='768' /></div><div class='input'>   
 <span class='co'># example using SpatialPolygons</span>
 <span class='va'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sp_ellipses.html'>sp_ellipses</a></span><span class='op'>(</span>xcenter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>4</span><span class='op'>)</span>,
    ycenter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>2</span><span class='op'>)</span>,
@@ -350,7 +271,7 @@ for Spatial objects.</p>
 <span class='co'># same as before but apply 180 degree rotation</span>
 <span class='va'>sp_3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rescale_sp.html'>rescale_sp</a></span><span class='op'>(</span><span class='va'>sp</span>,
    shift<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span><span class='op'>)</span>,
-   rotate_degrees<span class='op'>=</span><span class='fl'>180</span>,
+   rotate_degrees<span class='op'>=</span><span class='fl'>160</span>,
    scale<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span><span class='op'>)</span>,
    share_center<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='st'>"mfrow"</span><span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>;

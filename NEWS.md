@@ -1,4 +1,30 @@
 
+# venndir 0.0.12.900
+
+## updates to existing functions
+
+* Added new function categories: "spatial", "label",
+"conversion", "plotly".
+* Several functions were updated with newer examples.
+* Renamed function `label_polygon_fill()` to `polygon_label_fill()`
+to be consistent with `polygon_label_outside()` and
+`polygon_label_segment()` -- also before anyone happens to start
+using this function!
+* Fixed issue where `fontfamily` was not being used with item labels,
+breaking display of unicode characters in some sessions.
+
+## new functions (experimental for plotly)
+
+* `to_basic.GeomRichText()` and `to_basic.GeomTextBox()` were added
+for rudimentary compatibility when using `plotly::ggplotly()`
+with `ggtext::geom_richtext()` and `ggtext::geom_textbox()`. These
+functions do display text inside plotly figure, however: (1) they
+do not cleanly use text positioning, even with `textposition`;
+(2) plotly does not interpret markdown, so any markdown text is
+displayed as-is. Ultimately plotly support will probably be added
+to `render_venndir()` via `plot_style="plotly"` then using
+`plotly::plot_ly()` commands in native form.
+
 # venndir 0.0.11.900
 
 ## bug fixes

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -312,41 +312,30 @@ of various aspects of the figure.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
-<span class='va'>venndir_output</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, overlap_type<span class='op'>=</span><span class='st'>"each"</span>, do_plot<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>;
-<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>venndir_output</span><span class='op'>)</span>;
-</div><div class='img'><img src='render_venndir-1.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>venndir_output</span>, plot_style<span class='op'>=</span><span class='st'>"gg"</span><span class='op'>)</span>;
+<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, overlap_type<span class='op'>=</span><span class='st'>"each"</span>, do_plot<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>;
+<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span><span class='op'>)</span>;
+</div><div class='img'><img src='render_venndir-1.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span>, plot_style<span class='op'>=</span><span class='st'>"gg"</span><span class='op'>)</span>;
 </div><div class='img'><img src='render_venndir-2.png' alt='' width='768' height='768' /></div><div class='img'><img src='render_venndir-3.png' alt='' width='768' height='768' /></div><div class='input'>
-<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, overlap_type<span class='op'>=</span><span class='st'>"each"</span>, do_plot<span class='op'>=</span><span class='cn'>FALSE</span>, show_items<span class='op'>=</span><span class='st'>"sign item"</span>, show_set<span class='op'>=</span><span class='st'>"all"</span><span class='op'>)</span>;
-<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nudge_venndir_label.html'>nudge_venndir_label</a></span><span class='op'>(</span><span class='va'>vo</span>, set<span class='op'>=</span><span class='st'>"set_A"</span>,
-   label_type<span class='op'>=</span><span class='st'>"main"</span>,
-   x_offset<span class='op'>=</span><span class='op'>-</span><span class='fl'>0.5</span>, y_offset<span class='op'>=</span><span class='fl'>1.5</span><span class='op'>)</span>
-<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nudge_venndir_label.html'>nudge_venndir_label</a></span><span class='op'>(</span><span class='va'>vo</span>, set<span class='op'>=</span><span class='st'>"set_B"</span>,
-   label_type<span class='op'>=</span><span class='st'>"main"</span>,
-   x_offset<span class='op'>=</span><span class='fl'>0.5</span>, y_offset<span class='op'>=</span><span class='fl'>1.5</span><span class='op'>)</span>
-<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nudge_venndir_label.html'>nudge_venndir_label</a></span><span class='op'>(</span><span class='va'>vo</span>, set<span class='op'>=</span><span class='st'>"set_A&amp;set_B"</span>,
-   label_type<span class='op'>=</span><span class='st'>"main"</span>,
-   x_offset<span class='op'>=</span><span class='fl'>0</span>, y_offset<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>vo</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>$</span><span class='va'>hjust</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fl'>0.5</span>;
-<span class='va'>vo</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>$</span><span class='va'>vjust</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0.5</span><span class='op'>)</span>;
-<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span>, show_set<span class='op'>=</span><span class='st'>"all"</span>, show_items<span class='op'>=</span><span class='st'>"sign item"</span>, draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>, buffer_w<span class='op'>=</span><span class='fl'>0.3</span><span class='op'>)</span>
-</div><div class='img'><img src='render_venndir-4.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span>, show_set<span class='op'>=</span><span class='st'>"all"</span>,
+<span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, overlap_type<span class='op'>=</span><span class='st'>"each"</span>, do_plot<span class='op'>=</span><span class='cn'>FALSE</span>,
+   label_preset<span class='op'>=</span><span class='st'>"main items"</span>,
+   show_items<span class='op'>=</span><span class='st'>"sign item"</span><span class='op'>)</span>;
+<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span>,
+   show_items<span class='op'>=</span><span class='st'>"sign"</span>,
+   draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>, buffer_w<span class='op'>=</span><span class='fl'>0.2</span><span class='op'>)</span>
+</div><div class='img'><img src='render_venndir-4.png' alt='' width='768' height='768' /></div><div class='input'>   
+<span class='co'># turn off line segments, increase item inside buffer width</span>
+<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span>,
+   show_segments<span class='op'>=</span><span class='cn'>FALSE</span>,
+   label_preset<span class='op'>=</span><span class='st'>"main items"</span>,
    label_style<span class='op'>=</span><span class='st'>"lite_box"</span>,
-   show_items<span class='op'>=</span><span class='st'>"sign item"</span>, draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>, buffer_w<span class='op'>=</span><span class='fl'>0.3</span><span class='op'>)</span>
+   show_items<span class='op'>=</span><span class='st'>"sign item"</span>,
+   buffer_w<span class='op'>=</span><span class='fl'>0.5</span><span class='op'>)</span>
 </div><div class='img'><img src='render_venndir-5.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>vo</span>, plot_style<span class='op'>=</span><span class='st'>"gg"</span>, show_set<span class='op'>=</span><span class='st'>"all"</span>,
+   expand_fraction<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>0.2</span><span class='op'>)</span>,
+   label_preset<span class='op'>=</span><span class='st'>"main items"</span>,
    label_style<span class='op'>=</span><span class='st'>"lite_box"</span>,
-   show_items<span class='op'>=</span><span class='st'>"sign item"</span>, draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>, buffer_w<span class='op'>=</span><span class='fl'>0.3</span><span class='op'>)</span>
+   show_items<span class='op'>=</span><span class='st'>"sign item"</span>, buffer_w<span class='op'>=</span><span class='fl'>0.5</span><span class='op'>)</span>
 </div><div class='img'><img src='render_venndir-6.png' alt='' width='768' height='768' /></div><div class='img'><img src='render_venndir-7.png' alt='' width='768' height='768' /></div><div class='input'>
-<span class='va'>venndir_output</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>[</span><span class='fl'>1</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2.5</span>, <span class='fl'>6.5</span><span class='op'>)</span>;
-<span class='va'>venndir_output</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>[</span><span class='fl'>2</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>7.5</span>, <span class='fl'>6.5</span><span class='op'>)</span>;
-<span class='va'>venndir_output</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>[</span><span class='fl'>2</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"hjust"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>)</span>;
-<span class='va'>venndir_output</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"vjust"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>;
-<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>venndir_output</span>, font_cex<span class='op'>=</span><span class='fl'>1.5</span><span class='op'>)</span>;
-</div><div class='img'><img src='render_venndir-8.png' alt='' width='768' height='768' /></div><div class='input'>
-<span class='va'>venndir_output</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>[</span><span class='fl'>1</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>6</span><span class='op'>)</span>;
-<span class='va'>venndir_output</span><span class='op'>$</span><span class='va'>label_df</span><span class='op'>[</span><span class='fl'>2</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>8.3</span>, <span class='fl'>6</span><span class='op'>)</span>;
-<span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>venndir_output</span><span class='op'>)</span>;
-</div><div class='img'><img src='render_venndir-9.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'>render_venndir</span><span class='op'>(</span><span class='va'>venndir_output</span>, xpd<span class='op'>=</span><span class='cn'>NA</span>, xlim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>9</span><span class='op'>)</span><span class='op'>)</span>;
-</div><div class='img'><img src='render_venndir-10.png' alt='' width='768' height='768' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

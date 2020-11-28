@@ -1,15 +1,20 @@
 
 #' Optimized list to incidence matrix
 #' 
-#' Optimized list to incidence matrix
+#' Optimized conversion of list to incidence matrix
 #' 
 #' This function rapidly converts a list of vectors into
-#' an incidence matrix with value of `1` for each entry
-#' (row) present in each input list (column).
+#' an incidence matrix whose rownames are items, and colnames
+#' are the names of the input list. The default output 
+#' `do_sparse=TRUE` returns a `logical` matrix class `ngCMatrix`
+#' from the `Matrix` package. When `do_sparse=FALSE` the
+#' output is a `matrix` class with `numeric` values `0` and `1`.
 #' 
 #' Note that the rows in the output matrix are not sorted,
-#' since this step can take several seconds when working with
-#' a list whose vectors contain millions of rows.
+#' since the step of sorting item names may take several
+#' seconds when working with a list whose vectors contain
+#' millions of items. For sorted rows, the best remedy is
+#' to run this function, the re-order rownames afterward.
 #' 
 #' @family venndir conversion
 #' 
@@ -24,6 +29,13 @@
 #' @param do_sparse `logical` indicating whether to coerce the output
 #'    to sparse matrix class `"ngCMatrix"` from the Matrix package.
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' setlist <- list(A=c("one", "two", "three"),
+#'    b=c("two", "one", "four", "five"));
+#' list2im_opt(setlist);
+#' 
+#' list2im_opt(setlist, do_sparse=FALSE);
 #' 
 #' @export
 list2im_opt <- function
@@ -53,28 +65,34 @@ list2im_opt <- function
 }
 
 
-#' Optimized list to signed incidence matrix
+#' Convert list to a value incidence matrix
 #' 
-#' Optimized list to signed incidence matrix
+#' Optimized conversion of list to a value incidence matrix
 #' 
 #' This function converts a list of named vectors into
 #' an incidence matrix with value for each entry
-#' (row) present in each input list (column). The rows
-#' are defined by the vector names, and values are
-#' defined by the vector values.
+#' (row) present in each input list (column). This output
+#' is called a "value incidence matrix" because the
+#' value itself is included in the matrix as opposed to
+#' a true incidence matrix that represents only `TRUE`
+#' or `FALSE` (`1` or `0`) at each position.
 #' 
-#' Note that this function will store zero `0` when the input
-#' vector value is zero. When this is not the desired behavior,
-#' the argument `empty` can be used to distinguish missing data
-#' from data that is zero, for example by setting `empty=NA`.
-#' In this way a value of zero `0` indicates "present but zero",
-#' and a value `NA` indicates "not present at all". This
-#' distinction is helpful when comparing entities which are not
-#' tested in each scenario. For example if "geneA" is present
-#' and the value is `1` in one list; "geneA" is not tested in
-#' the second list; therefore the absence of "geneA" of a non-zero
-#' value in the second list is not counted as "non-overlapping"
-#' because it was not possible for it to have a non-zero value.
+#' The rownames of the output matrix represent items,
+#' encoded by the vector names. The colnames of the output
+#' matrix represent the list names.
+#' 
+#' The default value in the output matrix is `0` for
+#' a numeric matrix, and `""` for a character matrix,
+#' based on the input vector classes.
+#' 
+#' To override this behavior, use the argument `empty`.
+#' For example, it may be useful to encode missing entries
+#' as `NA`, which means "this entry was not observed", and
+#' store true values of `0` to indicate "this entry was observed
+#' and its value was `0` zero". In this case use `empty=NA`.
+#' 
+#' This behavior can be useful with gene expression data,
+#' when a particular gene may not be observed in all data sets.
 #' 
 #' @family venndir conversion
 #' 
@@ -101,6 +119,20 @@ list2im_opt <- function
 #' # convert back to list
 #' im_value2list(imv);
 #' 
+#' # example showing empty=NA
+#' setlist2 <- make_venn_test(20, 3, sizes=c(12, 14, 8), do_signed=TRUE)
+#' setlist2 <- lapply(setlist2, function(i){
+#'    i[] <- sample(c(-1, 0, 1),
+#'       replace=TRUE,
+#'       size=length(i));
+#'    i
+#' })
+#' imv2 <- list2im_value(setlist2, empty=NA, do_sparse=FALSE);
+#' imv2;
+#' 
+#' # to convert back to list, define empty=NA so 0 is not considered as empty
+#' im_value2list(imv2, empty=NA);
+#' 
 #' # make a simple character vector list
 #' setlistv <- lapply(setlist, function(i){
 #'    j <- letters[i+3];
@@ -109,6 +141,8 @@ list2im_opt <- function
 #' })
 #' imv <- list2im_value(setlistv);
 #' print(head(imv));
+#' 
+#' # convert back to list of character vectors
 #' im_value2list(imv);
 #' 
 #' @export

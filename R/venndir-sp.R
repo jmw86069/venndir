@@ -339,11 +339,19 @@ find_vennpoly_overlaps <- function
 #' 
 #' @return object `sp::SpatialPolygons`
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param sp `list` object that contains one or more
 #'    `sp::SpatialPolygons`.
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' circles <- get_venn_shapes(c(A=1, B=1, C=1))
+#' col3 <- c("#FF000077", "#DDDD0088", "#0000FF77")
+#' sp::plot(circles, col=col3)
+#' 
+#' circle_intersect <- intersect_polygons(circles);
+#' plot(circle_intersect, add=TRUE, col="gold", lwd=3);
 #' 
 #' @export
 intersect_polygons <- function
@@ -378,11 +386,19 @@ intersect_polygons <- function
 #' 
 #' @return object `sp::SpatialPolygons`
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param sp `list` object that contains one or more
 #'    `sp::SpatialPolygons`.
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' circles <- get_venn_shapes(c(A=1, B=1, C=1))
+#' col3 <- c("#FF000077", "#DDDD0088", "#0000FF77")
+#' sp::plot(circles, col=col3)
+#' 
+#' circle_union <- union_polygons(circles);
+#' plot(circle_union, add=TRUE, col="#FFDD0088", lwd=3);
 #' 
 #' @export
 union_polygons <- function
@@ -477,11 +493,26 @@ match_list <- function
 #' which creates one `sp::SpatialPolygons` object
 #' for each individual polygon in the source object.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param sp object with class `sp::SpatialPolygons` that may
 #'    contain one or more closed polygons.
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' circles <- get_venn_shapes(c(A=1, B=2, "A&B"=3), proportional=TRUE)
+#' col3 <- c("#FF000077", "#0000FF77")
+#' sp::plot(circles)
+#' 
+#' circles_u12 <- union_polygons(circles[1:2]);
+#' circles_i12 <- intersect_polygons(circles[1:2]);
+#' 
+#' # one SpatialPolygons object with multiple polygon pieces
+#' circles_d12 <- rgeos::gDifference(circles_u12, circles_i12)
+#' plot(circles_d12, add=TRUE, col="gold", lwd=3)
+#' 
+#' circles_d12_largest <- get_largest_polygon(circles_d12);
+#' plot(circles_d12_largest, add=TRUE, border="red", lwd=5);
 #' 
 #' @export
 get_largest_polygon <- function
@@ -508,7 +539,7 @@ get_largest_polygon <- function
 #' This function creates one or more circles as
 #' `sp::SpatialPolygons` objects.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @return object `sp::SpatialPolygons` with a number of circles
 #'    defined by `length(xcenter)`.
@@ -523,6 +554,12 @@ get_largest_polygon <- function
 #' @param n `integer` value indicating the number of subdivisions to
 #'    use in the circle.
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' sp <- sp_circles(c(3, 2), c(2, 3))
+#' plot(sp, col=c("#FF000077", "#FFDD0077"));
+#' axis(1, las=2); axis(2, las=2);
+#' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
 #' 
 #' @export
 sp_circles <- function
@@ -539,7 +576,7 @@ sp_circles <- function
          length.out=n+1),
       n);
    if (length(setnames) == 0) {
-      setnames <- seq_along(x);
+      setnames <- seq_along(xcenter);
    }
    xvals <- sin(angle_seq);
    yvals <- cos(angle_seq);
@@ -565,7 +602,7 @@ sp_circles <- function
 #' This function creates one or more ellipses as
 #' `sp::SpatialPolygons` objects.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @return object `sp::SpatialPolygons` with a number of ellipses
 #'    defined by `length(xcenter)`.
@@ -584,6 +621,14 @@ sp_circles <- function
 #' @param n `integer` value indicating the number of subdivisions to
 #'    use in the circle.
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' sp <- sp_ellipses(c(3, 2), c(2, 3),
+#'    xradius=c(1, 4),
+#'    yradius=c(5, 2))
+#' plot(sp, col=c("#FF000077", "#FFDD0077"));
+#' axis(1, las=2); axis(2, las=2);
+#' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
 #' 
 #' @export
 sp_ellipses <- function
@@ -655,7 +700,7 @@ sp_ellipses <- function
 #' It differs from `rescale_sp()` because `rescale_sp()` manipulates
 #' all contained polygons together.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @return object `sp::SpatialPolygons`.
 #' 
@@ -666,6 +711,27 @@ sp_ellipses <- function
 #'    rotate the `sp` object and all contained polygons. (Not yet
 #'    implemented.)
 #' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' sp <- sp_ellipses(c(3, 2), c(2, 3),
+#'    xradius=c(1, 4),
+#'    yradius=c(5, 2))
+#' opar <- par("mfrow"=c(1,2));
+#' on.exit(par(opar));
+#' plot(sp, col=c("#FF000077", "#FFDD0077"),
+#'    xlim=c(-2, 9));
+#' axis(1, las=2); axis(2, las=2);
+#' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
+#' 
+#' sp2 <- nudge_sp(sp,
+#'    sp_nudge=list("2"=c(3, -2))
+#' )
+#' plot(sp2, col=c("#FF000077", "#FFDD0077"),
+#'    xlim=c(-2, 9));
+#' plot(sp[2], border="blue", lty="dotted", add=TRUE);
+#' axis(1, las=2); axis(2, las=2);
+#' arrows(x0=2, x1=5, y0=3, y1=1)
+#' points(x=c(3, 5), y=c(2, 1), pch=c("1", "2"), add=TRUE);
 #' 
 #' @export
 nudge_sp <- function
@@ -697,7 +763,21 @@ nudge_sp <- function
             shift=i_nudge);
       }
    }
-
+   
+   ## update bbox - should probably be its own function
+   bbox_m <- jamba::rbindList(lapply(seq_along(sp::geometry(sp)), function(i){
+      as.vector(sp::bbox(sp::geometry(sp)[i]))
+   }));
+   colnames(bbox_m) <- c("xmin", "ymin", "xmax", "ymax");
+   bbox_v <- matrix(ncol=2,
+      c(min(bbox_m[,1]),
+      min(bbox_m[,2]),
+      max(bbox_m[,3]),
+      max(bbox_m[,4])))
+   colnames(bbox_v) <- c("min", "max");
+   rownames(bbox_v) <- c("x", "y");
+   sp@bbox <- bbox_v;
+      
    return(invisible(sp));
 }
 
@@ -793,7 +873,7 @@ nudge_sp <- function
 #'    `sp_buffer` with the `sp::SpatialPolygons` object representing
 #'    the buffer region used for item labels.
 #' 
-#' @family venndir utility
+#' @family venndir label
 #' 
 #' @examples
 #' sp <- sp_ellipses(3, 3, xradius=1.2, yradius=3, rotation_degrees=15)
@@ -804,7 +884,7 @@ nudge_sp <- function
 #'       '[", _()<>:;/\n\t.@&=]+')))));
 #' words <- words[nchar(words) > 2];
 #' plot(sp, col="gold", border="gold4", lwd=2);
-#' label_polygon_fill(sp=sp,
+#' polygon_label_fill(sp=sp,
 #'    degrees=-10,
 #'    labels=words,
 #'    dither_color=0.2,
@@ -812,7 +892,7 @@ nudge_sp <- function
 #'    cex=1.2)
 #' 
 #' plot(sp, col="gold", border="gold4", lwd=2);
-#' label_polygon_fill(sp=sp,
+#' polygon_label_fill(sp=sp,
 #'    degrees=-10,
 #'    scale_width=-0.3,
 #'    draw_buffer=TRUE,
@@ -827,7 +907,7 @@ nudge_sp <- function
 #' for (i in seq_len(nrow(venn_spdf))) {
 #'    j <- match(venn_spdf$label[i], label_df$overlap_set);
 #'    if (length(unlist(label_df[j,"items"])) > 0) {
-#'    label_polygon_fill(sp=venn_spdf[i,],
+#'    polygon_label_fill(sp=venn_spdf[i,],
 #'       ref_sp=venn_spdf,
 #'       color=venn_spdf$border[i],
 #'       scale_width=-0.1,
@@ -837,7 +917,7 @@ nudge_sp <- function
 #' }
 #' 
 #' # same example as above but using proportional circles
-#' vo <- venndir(setlist, return_items=TRUE, font_cex=0.01, proportional=TRUE);
+#' vo <- venndir(setlist, font_cex=0.01, proportional=TRUE);
 #' 
 #' # labels inside each venn overlap polygon
 #' venn_spdf <- vo$venn_spdf;
@@ -845,7 +925,7 @@ nudge_sp <- function
 #' for (i in seq_len(nrow(venn_spdf))) {
 #'    j <- match(venn_spdf$label[i], label_df$overlap_set);
 #'    if (length(unlist(label_df[j,"items"])) > 0) {
-#'    label_polygon_fill(sp=venn_spdf[i,],
+#'    polygon_label_fill(sp=venn_spdf[i,],
 #'       ref_sp=venn_spdf,
 #'       color=venn_spdf$border[i],
 #'       scale_width=-0.1,
@@ -856,7 +936,7 @@ nudge_sp <- function
 #' 
 #' 
 #' @export
-label_polygon_fill <- function
+polygon_label_fill <- function
 (sp,
  labels,
  color="black",
@@ -936,10 +1016,10 @@ label_polygon_fill <- function
    if (length(apply_n_scale) > 0 && apply_n_scale) {
       n_scale <- 1 - 1 / (n*2);
       if (verbose) {
-         jamba::printDebug("label_polygon_fill(): ",
+         jamba::printDebug("polygon_label_fill(): ",
             "n_scale:",
             format(digits=2, n_scale));
-         jamba::printDebug("label_polygon_fill(): ",
+         jamba::printDebug("polygon_label_fill(): ",
             "scale_width (before):",
             format(digits=2, scale_width));
       }
@@ -948,7 +1028,7 @@ label_polygon_fill <- function
    
    ## Apply polygon buffer
    if (verbose) {
-      jamba::printDebug("label_polygon_fill(): ",
+      jamba::printDebug("polygon_label_fill(): ",
          "scale_width:",
          format(digits=2, scale_width));
    }
@@ -973,10 +1053,10 @@ label_polygon_fill <- function
    buffer_ws <- unique(c(0, buffer_w * c(-1, -0.5, 0.5, 1)));
    buffer_hs <- unique(c(0, buffer_h * c(-1, -0.5, 0.5, 1)));
    if (verbose) {
-      jamba::printDebug("label_polygon_fill(): ",
+      jamba::printDebug("polygon_label_fill(): ",
          "buffer_ws:",
          format(digits=2, buffer_ws));
-      jamba::printDebug("label_polygon_fill(): ",
+      jamba::printDebug("polygon_label_fill(): ",
          "buffer_hs:",
          format(digits=2, buffer_hs));
    }
@@ -1144,7 +1224,7 @@ label_polygon_fill <- function
 #' `rescale_ps` on each `sp::Polygons` object contained in
 #' the `sp` input.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @return object `sp::SpatialPolygons`
 #' 
@@ -1156,6 +1236,43 @@ label_polygon_fill <- function
 #'    adjust everything collectively, and `share_center=FALSE` will
 #'    adjust each polygon independently relative to its own center
 #'    coordinate.
+#' 
+#' @examples
+#' sp <- sp_ellipses(c(3, 2), c(2, 3),
+#'    xradius=c(1, 4),
+#'    yradius=c(5, 2))
+#' sp1 <- intersect_polygons(sp);
+#' sp2 <- rgeos::gDifference(sp[1], sp[2]);
+#' sp3 <- rgeos::gDifference(sp[2], sp[1]);
+#' sp123 <- sp::rbind.SpatialPolygons(sp1, sp2, sp3, makeUniqueIDs=TRUE);
+#' sp123a <- rescale_sp(sp123,
+#'    scale=c(1.5, 1.5),
+#'    share_center=TRUE);
+#' sp123b <- rescale_sp(sp123,
+#'    scale=c(1.5, 1.5));
+#' col3 <- c("#FF000077", "#FFDD0077", "#0000DD77");
+#' par("mfrow"=c(2, 2));
+#' plot(sp123, col=col3,
+#'    main="original polygons",
+#'    xlim=c(-10, 15), ylim=c(-5, 10));
+#' axis(1, las=2); axis(2, las=2);
+#' plot(sp123a, col=col3,
+#'    main="share_center=TRUE",
+#'    xlim=c(-10, 15), ylim=c(-5, 10));
+#' axis(1, las=2); axis(2, las=2);
+#' plot(sp123[1:2], col=col3[1:2],
+#'    main="share_center=FALSE\nrescaling only the blue polygon",
+#'    xlim=c(-10, 15), ylim=c(-5, 10));
+#' axis(1, las=2); axis(2, las=2);
+#' plot(sp123b[3], col=col3[3],
+#'    add=TRUE);
+#' plot(sp123[2:3], col=col3[2:3],
+#'    main="share_center=FALSE\nrescaling only the red polygon",
+#'    xlim=c(-10, 15), ylim=c(-5, 10));
+#' axis(1, las=2); axis(2, las=2);
+#' plot(sp123b[1], col=col3[1],
+#'    add=TRUE);
+#' par("mfrow"=c(1, 1));
 #' 
 #' @export
 rescale_sp <- function
@@ -1327,21 +1444,23 @@ rescale_p <- function
 #' 
 #' @return `matrix` with `numeric` values after processing.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @examples
 #' sp <- sp_ellipses(xcenter=2, ycenter=3, xradius=3, yradius=1);
 #' 
-#' plot(sp, col="#FF000077", border="#FF0000", asp=1);
+#' plot(sp, col="#FF000077", border="#FF0000");
+#' axis(1, las=2); axis(2, las=2);
 #' 
 #' x <- sp@polygons[[1]]@Polygons[[1]]@coords;
 #' 
 #' jamba::nullPlot(doBoxes=FALSE, xlim=c(-3, 9), ylim=c(-2, 10), asp=1);
-#' rescale_coordinates(x,
+#' xnew <- rescale_coordinates(x,
 #'    shift=c(1, 1),
 #'    rotate_degrees=30,
 #'    scale=c(1.5, 2.5),
 #'    plot_debug=TRUE)
+#' axis(1, las=2); axis(2, las=2);
 #'    
 #' # example using SpatialPolygons
 #' sp <- sp_ellipses(xcenter=c(2, 4),
@@ -1367,7 +1486,7 @@ rescale_p <- function
 #' # same as before but apply 180 degree rotation
 #' sp_3 <- rescale_sp(sp,
 #'    shift=c(1, 1),
-#'    rotate_degrees=180,
+#'    rotate_degrees=160,
 #'    scale=c(1, 1),
 #'    share_center=TRUE)
 #' par("mfrow"=c(1,2));
@@ -1557,7 +1676,7 @@ rescale_coordinates <- function
 #'    Note that when there is no second point, the
 #'    `sp::SpatialLines` object will only have one point.
 #' 
-#' @family venndir utility
+#' @family venndir label
 #' 
 #' @examples
 #' x0 <- 0;x1 <- 1;y0 <- 0; y1 <- 1;
@@ -1915,7 +2034,7 @@ polygon_label_segment <- function
 #' y coordinate, and `dist` with distance to the enclosing
 #' polygon.
 #' 
-#' @family venndir utility
+#' @family venndir label
 #' 
 #' @param sp `sp::SpatialPolygons` object
 #' @param apply_holes `logical` indicating whether to apply any
@@ -1929,6 +2048,14 @@ polygon_label_segment <- function
 #' plot(sp, col="gold")
 #' xy <- sp_polylabelr(sp);
 #' points(xy, pch=20, cex=4, col="navy")
+#' 
+#' # example with a hole inside
+#' sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+#' sp_hole <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.2, yradius=0.5);
+#' sp_donut <- rgeos::gDifference(sp, sp_hole);
+#' plot(sp_donut, col="gold")
+#' spt <- sp_polylabelr(sp_donut);
+#' text(x=spt$x, y=spt$y, add=TRUE, labels="label")
 #' 
 #' @export
 sp_polylabelr <- function
@@ -2035,7 +2162,7 @@ sp_polylabelr <- function
 #' a vector of `distance` or `distance_fraction` values to alter
 #' the distance of certain labels after visual review.
 #' 
-#' @family venndir utility
+#' @family venndir label
 #' 
 #' @examples
 #' setlist <- list(A=letters, B=sample(letters, 4));
@@ -2561,7 +2688,7 @@ sp_percent_area <- function
 #' into a polygon, without drawing it to the center point of
 #' the polygon, where a text label may already be positioned.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param sp `sp::SpatialPolygons` or equivalent object as
 #'    input.
@@ -2582,6 +2709,8 @@ sp_percent_area <- function
 #' plot(sp_inside, col="cornsilk", lty="dotted", add=TRUE);
 #' 
 #' # by default relative=TRUE
+#' sp1 <- sp_ellipses(c(3.5, 2), c(2, 3), xradius=c(2, 3), yradius=c(3, 1))
+#' sp <- rgeos::gDifference(sp1[1], sp1[2]);
 #' opar <- par("mfrow"=c(2,2));
 #' on.exit(par(opar));
 #' for (i in -c(0.9, 0.75, 0.5, 0.25)) {
@@ -2590,6 +2719,7 @@ sp_percent_area <- function
 #'    plot(get_sp_buffer(sp, i, relative=TRUE),
 #'       col="cornsilk", lty="dotted", add=TRUE);
 #' }
+#' par(opar);
 #' 
 #' @export
 get_sp_buffer <- function

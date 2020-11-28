@@ -94,11 +94,16 @@ counts2setlist <- function
 #' # Venn diagram
 #' venndir(setlist,
 #'    show_items="item",
+#'    label_preset="items",
 #'    item_degrees=0,
 #'    item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)))
 #' 
 #' # Proportional Venn (Euler) diagram
-#' venndir(setlist, proportional=TRUE)
+#' venndir(setlist,
+#'    show_items="item",
+#'    label_preset="items",
+#'    item_degrees=0,
+#'    proportional=TRUE)
 #' 
 #' @export
 overlaplist2setlist <- function

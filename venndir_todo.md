@@ -1,14 +1,30 @@
 
 # todo on venndir
 
+
 ## enhancements
 
 ### bugs
+
+* `render_venndir()` argument `max_items` is being ignored.
+For overlaps with too many items, desired behavior is to
+display the counts instead of item labels.
+* `polygon_label_outside()` is glitchy for weird proportional
+cases, for example 4 sets and `shape="ellipse"` might
+warrant different default settings. Alternative method
+would involve taking boundary point, expanding the
+boundary, find nearest point on that boundary, then
+proceeding with `spread_degrees()`.
+
+### performance
 
 * Showing a few hundred item labels is still painfully
 slow. Consider `text()` as an alternative. Or test options
 that remove the dither options for color/degrees/cex in
 case that somehow triggers non-vectorized rendering.
+* `polygon_label_outside()` for 5-way Venn overlaps sometimes
+moves labels to weird positions. Workaround with `min_degrees=8`
+but not sure why.
 
 
 ### miscellaneous
@@ -16,6 +32,17 @@ case that somehow triggers non-vectorized rendering.
 * Option to display concordance score below the signed values.
 * For `overlap_type="agreement"` hide the signed values for
 single-set overlaps, they always "agree" and are not informative.
+
+
+### prepare for R-shiny
+
+* make `ggtext::geom_textbox()` and `ggtext::geom_richtext()`
+work for `plotly::ggplotly()`, by adding `to_basic.*()` functions.
+For example, in the package `splicejam` to make `ggforce::geom_shape()`
+work, I added the function `to_basic.GeomShape()`.
+
+   * `to_basic.GeomRichText()`
+   * `to_basic.GeomTextBox()`
 
 
 ## fixed bugs version 0.0.11.9000
@@ -34,6 +61,17 @@ of the input `x` to account for this mismatch.
 * DONE: Add warning message to ggplot2 output in `render_venndir()`.
 
 
+## vignettes
+
+
+### interfacing with VennDetail
+
+* follow VennDetail vignette, show alternative with directional changes
+
+
+### interfacing with DESeq2/edgeR
+
+
 ### add vignette showing more visual options
 
 * how to change Venn set colors
@@ -41,6 +79,8 @@ of the input `x` to account for this mismatch.
 * how to rotate the whole Venn diagram
 * how to adjust item label buffer, and view the buffer size
 * how to create custom curations with `curate_df`
+* how to handle gene data in a dataset with multiple probes
+per gene
 
 
 ### make displaying items labels easier

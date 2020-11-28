@@ -24,16 +24,29 @@ contains \code{logical} values. When \code{do_sparse=FALSE} the returned
 object is \code{matrix} with values \code{c(0, 1)}.
 }
 \description{
-Optimized list to incidence matrix
+Optimized conversion of list to incidence matrix
 }
 \details{
 This function rapidly converts a list of vectors into
-an incidence matrix with value of \code{1} for each entry
-(row) present in each input list (column).
+an incidence matrix whose rownames are items, and colnames
+are the names of the input list. The default output
+\code{do_sparse=TRUE} returns a \code{logical} matrix class \code{ngCMatrix}
+from the \code{Matrix} package. When \code{do_sparse=FALSE} the
+output is a \code{matrix} class with \code{numeric} values \code{0} and \code{1}.
 
 Note that the rows in the output matrix are not sorted,
-since this step can take several seconds when working with
-a list whose vectors contain millions of rows.
+since the step of sorting item names may take several
+seconds when working with a list whose vectors contain
+millions of items. For sorted rows, the best remedy is
+to run this function, the re-order rownames afterward.
+}
+\examples{
+setlist <- list(A=c("one", "two", "three"),
+   b=c("two", "one", "four", "five"));
+list2im_opt(setlist);
+
+list2im_opt(setlist, do_sparse=FALSE);
+
 }
 \seealso{
 Other venndir conversion: 

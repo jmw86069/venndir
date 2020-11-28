@@ -280,7 +280,7 @@ print(head(vo$label_df));
 #>             show_label vjust hjust halign rot     color fontsize border lty lwd
 #> set_A               NA   0.5   0.5    0.5   0 #D9D9D9FF       14     NA   1   1
 #> set_B               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#> set_C               NA   0.5   0.5    0.5   0 #D9D9D9FF       14     NA   1   1
+#> set_C               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_A&set_B         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_A&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_B&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -323,7 +323,7 @@
 <h4 class="hasAnchor">
 <a href="#comments-on-converting-probe-to-gene" class="anchor"></a>Comments on converting probe to gene</h4>
 <p>When converting probes to genes, I usually run a quick test to see if any genes have statistically significant probes that are “up” and “down” – I call these “bi-directional genes”. If there are no bi-directional genes, then choosing one entry per gene is reasonable. I leave this evaluation to the scientist, but please post an issue if you have specific questions.</p>
-<p>For RNA-seq data, the input data matrix may already contain gene expression values – as when using <code>tximport::tximport()</code> with the argument <code>tx2gene</code>; or when importing <code>featureCounts</code> data where each row represents one gene identifier. In those cases, no conversion is required.</p>
+<p>For RNA-seq data, the input data matrix may already contain gene expression values – as when using <code><a href="https://rdrr.io/pkg/tximport/man/tximport.html">tximport::tximport()</a></code> with the argument <code>tx2gene</code>; or when importing <code>featureCounts</code> data where each row represents one gene identifier. In those cases, no conversion is required.</p>
 </div>
 </div>
 <div id="interesting-examples-and-how-to-interpret-them" class="section level3">

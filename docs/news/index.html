@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -126,12 +126,49 @@
       <small>Source: <a href='http://github.com/jmw86069/venndir/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="venndir-0010900" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.10.900">
-<a href="#venndir-0010900" class="anchor"></a>venndir 0.0.10.900</h1>
+    <div id="venndir-0012900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.12.900">
+<a href="#venndir-0012900" class="anchor"></a>venndir 0.0.12.900</h1>
 <div id="updates-to-existing-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#updates-to-existing-functions" class="anchor"></a>updates to existing functions</h2>
+<ul>
+<li>Added new function categories: “spatial”, “label”, “conversion”, “plotly”.</li>
+<li>Several functions were updated with newer examples.</li>
+<li>Renamed function <code>label_polygon_fill()</code> to <code><a href="../reference/polygon_label_fill.html">polygon_label_fill()</a></code> to be consistent with <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> and <code><a href="../reference/polygon_label_segment.html">polygon_label_segment()</a></code> – also before anyone happens to start using this function!</li>
+<li>Fixed issue where <code>fontfamily</code> was not being used with item labels, breaking display of unicode characters in some sessions.</li>
+</ul>
+</div>
+<div id="new-functions-experimental-for-plotly" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions-experimental-for-plotly" class="anchor"></a>new functions (experimental for plotly)</h2>
+<ul>
+<li>
+<code><a href="../reference/to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code> and <code><a href="../reference/to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code> were added for rudimentary compatibility when using <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html">plotly::ggplotly()</a></code> with <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> and <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">ggtext::geom_textbox()</a></code>. These functions do display text inside plotly figure, however: (1) they do not cleanly use text positioning, even with <code>textposition</code>;</li>
+</ul>
+<p>(2) plotly does not interpret markdown, so any markdown text is displayed as-is. Ultimately plotly support will probably be added to <code><a href="../reference/render_venndir.html">render_venndir()</a></code> via <code>plot_style="plotly"</code> then using <code><a href="https://rdrr.io/pkg/plotly/man/plot_ly.html">plotly::plot_ly()</a></code> commands in native form.</p>
+</div>
+</div>
+    <div id="venndir-0011900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.11.900">
+<a href="#venndir-0011900" class="anchor"></a>venndir 0.0.11.900</h1>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>FIXED: <code>show_zero=TRUE</code> was not working, zeros were always hidden.</li>
+<li>FIXED: <code>alpha_by_counts</code> appears to be mis-aligned.</li>
+<li>FIXED: Fix issue where directional label colors apply <code><a href="../reference/make_color_contrast.html">make_color_contrast()</a></code> without using the correct <code>alpha</code> value. See with <code><a href="../reference/venndir.html">venndir(make_venn_test(100, 3), poly_alpha=0)</a></code>
+</li>
+</ul>
+</div>
+</div>
+    <div id="venndir-0010900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.10.900">
+<a href="#venndir-0010900" class="anchor"></a>venndir 0.0.10.900</h1>
+<div id="updates-to-existing-functions-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#updates-to-existing-functions-1" class="anchor"></a>updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/render_venndir.html">render_venndir()</a></code> by default groups gridtext labels together, and draws one contiguous background and border around them all. It currently only works for R base plots, since it needs to know the grob sizes upfront. That said, at this point the base R plot looks substantially better than ggplot2 when labels are placed on the outside of the Venn circles. Hopefully I will figure out how to do the same for ggplot2 output.</li>
@@ -179,9 +216,9 @@
 <code>ggrender_venndir()</code> was removed, use <code><a href="../reference/render_venndir.html">render_venndir(plot_style="gg")</a></code> in its place. It made sense to keep the visualization logic inside one function.</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/spread_degrees.html">spread_degrees()</a></code> was not properly maintaining the initial order of angles when it iteratively spread out a series of angles. For example one group of angles could be spread wide enough to overlap another existing angle, in which case that angle should be kept outside the initial group, instead of being placed into the middle. The telltale sign is that line segments wildly criss-crossed inside the polygon.</li>
@@ -250,9 +287,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/render_venndir.html">render_venndir()</a></code> added <code>sp</code> prefix to <code>sp::plot()</code> for base R plotting.</li>
@@ -314,9 +351,9 @@
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
 <li>
-<code><a href="../reference/label_polygon_fill.html">label_polygon_fill()</a></code> new arguments <code>dither_cex</code> and <code>dither_color</code> which slightly adjust the <code>cex</code> and <code>color</code> values. The <code>cex</code> is uniformly distributed +/- the <code>dither_cex</code> value, as a fraction of the <code>cex</code>, the default is roughly 4% variation in <code>cex</code>. The <code>dither_color</code> is similar, it adds some heterogeneity to <code>darkFactor</code> and <code>sFactor</code> and calls <code><a href="https://rdrr.io/pkg/jamba/man/makeColorDarker.html">jamba::makeColorDarker()</a></code> to adjust brightness and saturation.</li>
+<code>label_polygon_fill()</code> new arguments <code>dither_cex</code> and <code>dither_color</code> which slightly adjust the <code>cex</code> and <code>color</code> values. The <code>cex</code> is uniformly distributed +/- the <code>dither_cex</code> value, as a fraction of the <code>cex</code>, the default is roughly 4% variation in <code>cex</code>. The <code>dither_color</code> is similar, it adds some heterogeneity to <code>darkFactor</code> and <code>sFactor</code> and calls <code><a href="https://rdrr.io/pkg/jamba/man/makeColorDarker.html">jamba::makeColorDarker()</a></code> to adjust brightness and saturation.</li>
 <li>
-<code><a href="../reference/label_polygon_fill.html">label_polygon_fill()</a></code> can plot the polygon buffer behind the labels, to review the effect of adjusting <code>scale_width</code> for each polygon.</li>
+<code>label_polygon_fill()</code> can plot the polygon buffer behind the labels, to review the effect of adjusting <code>scale_width</code> for each polygon.</li>
 <li>
 <code>label_df</code> uses <code>show_label</code> and <code>show_items</code> to control visibility of the count label, and item labels, respectively. When the values are <code>NA</code> it applied default rules, which favors showing count label, unless the count label is moved outside the polygon.</li>
 <li>
@@ -331,9 +368,9 @@
     <div id="venndir-005900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.5.900">
 <a href="#venndir-005900" class="anchor"></a>venndir 0.0.5.900</h1>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/sp_ellipses.html">sp_ellipses()</a></code> argument renamed from <code>radius</code> to <code>xradius</code> and <code>yradius</code>.</li>

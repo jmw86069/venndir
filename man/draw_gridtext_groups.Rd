@@ -36,4 +36,11 @@ labels defined by \code{gridtext::richtext_grob()}, and creating
 \code{grid::roundrectGrob()} objects that cover each group of
 labels with one rounded rectangular boundary.
 }
+\seealso{
+Other venndir label: 
+\code{\link{polygon_label_fill}()},
+\code{\link{polygon_label_outside}()},
+\code{\link{polygon_label_segment}()},
+\code{\link{sp_polylabelr}()}
+}
 \concept{venndir label}

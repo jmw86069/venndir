@@ -41,42 +41,20 @@ plot(sp, col="gold")
 xy <- sp_polylabelr(sp);
 points(xy, pch=20, cex=4, col="navy")
 
+# example with a hole inside
+sp <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.5, yradius=1);
+sp_hole <- sp_ellipses(xcenter=1, ycenter=1, xradius=0.2, yradius=0.5);
+sp_donut <- rgeos::gDifference(sp, sp_hole);
+plot(sp_donut, col="gold")
+spt <- sp_polylabelr(sp_donut);
+text(x=spt$x, y=spt$y, add=TRUE, labels="label")
+
 }
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
-\code{\link{degrees_to_adj}()},
-\code{\link{diff_degrees}()},
-\code{\link{display_angles}()},
-\code{\link{eulerr2polys}()},
-\code{\link{expand_range}()},
-\code{\link{find_vennpoly_overlaps}()},
-\code{\link{get_largest_polygon}()},
-\code{\link{get_sp_buffer}()},
-\code{\link{get_venn_shapes}()},
-\code{\link{intersect_polygons}()},
-\code{\link{label_polygon_fill}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
-\code{\link{match_list}()},
-\code{\link{mean_degree_arc}()},
-\code{\link{mean_degrees}()},
-\code{\link{nudge_sp}()},
-\code{\link{nudge_venndir_label}()},
+Other venndir label: 
+\code{\link{draw_gridtext_groups}()},
+\code{\link{polygon_label_fill}()},
 \code{\link{polygon_label_outside}()},
-\code{\link{polygon_label_segment}()},
-\code{\link{print_color_df}()},
-\code{\link{rescale_coordinates}()},
-\code{\link{rescale_ps}()},
-\code{\link{rescale_p}()},
-\code{\link{rescale_sp}()},
-\code{\link{shrink_df}()},
-\code{\link{sp_circles}()},
-\code{\link{sp_ellipses}()},
-\code{\link{sp_percent_area}()},
-\code{\link{spread_degrees}()},
-\code{\link{union_polygons}()},
-\code{\link{venndir_label_style}()}
+\code{\link{polygon_label_segment}()}
 }
-\concept{venndir utility}
+\concept{venndir label}

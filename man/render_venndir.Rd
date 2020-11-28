@@ -153,40 +153,29 @@ of various aspects of the figure.
 }
 \examples{
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
-venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
-render_venndir(venndir_output);
-render_venndir(venndir_output, plot_style="gg");
+vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
+render_venndir(vo);
+render_venndir(vo, plot_style="gg");
 
-vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE, show_items="sign item", show_set="all");
-vo <- nudge_venndir_label(vo, set="set_A",
-   label_type="main",
-   x_offset=-0.5, y_offset=1.5)
-vo <- nudge_venndir_label(vo, set="set_B",
-   label_type="main",
-   x_offset=0.5, y_offset=1.5)
-vo <- nudge_venndir_label(vo, set="set_A&set_B",
-   label_type="main",
-   x_offset=0, y_offset=2)
-vo$label_df$hjust[1:3] <- 0.5;
-vo$label_df$vjust[1:3] <- c(0, 0, 0.5);
-render_venndir(vo, show_set="all", show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
-render_venndir(vo, show_set="all",
+vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE,
+   label_preset="main items",
+   show_items="sign item");
+render_venndir(vo,
+   show_items="sign",
+   draw_buffer=TRUE, buffer_w=0.2)
+   
+# turn off line segments, increase item inside buffer width
+render_venndir(vo,
+   show_segments=FALSE,
+   label_preset="main items",
    label_style="lite_box",
-   show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
+   show_items="sign item",
+   buffer_w=0.5)
 render_venndir(vo, plot_style="gg", show_set="all",
+   expand_fraction=c(0, 0.2, 0, 0.2),
+   label_preset="main items",
    label_style="lite_box",
-   show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
-
-venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
-venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);
-venndir_output$label_df[2,c("hjust")] <- c(0);
-venndir_output$label_df[1:2,c("vjust")] <- c(0, 0);
-render_venndir(venndir_output, font_cex=1.5);
-
-venndir_output$label_df[1,c("x", "y")] <- c(2, 6);
-venndir_output$label_df[2,c("x", "y")] <- c(8.3, 6);
-render_venndir(venndir_output);
-render_venndir(venndir_output, xpd=NA, xlim=c(2, 9));
+   show_items="sign item", buffer_w=0.5)
 
 }
 \seealso{

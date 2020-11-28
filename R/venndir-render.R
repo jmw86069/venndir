@@ -105,40 +105,29 @@
 #'    
 #' @examples
 #' setlist <- make_venn_test(100, 3, do_signed=TRUE);
-#' venndir_output <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
-#' render_venndir(venndir_output);
-#' render_venndir(venndir_output, plot_style="gg");
+#' vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE);
+#' render_venndir(vo);
+#' render_venndir(vo, plot_style="gg");
 #' 
-#' vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE, show_items="sign item", show_set="all");
-#' vo <- nudge_venndir_label(vo, set="set_A",
-#'    label_type="main",
-#'    x_offset=-0.5, y_offset=1.5)
-#' vo <- nudge_venndir_label(vo, set="set_B",
-#'    label_type="main",
-#'    x_offset=0.5, y_offset=1.5)
-#' vo <- nudge_venndir_label(vo, set="set_A&set_B",
-#'    label_type="main",
-#'    x_offset=0, y_offset=2)
-#' vo$label_df$hjust[1:3] <- 0.5;
-#' vo$label_df$vjust[1:3] <- c(0, 0, 0.5);
-#' render_venndir(vo, show_set="all", show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
-#' render_venndir(vo, show_set="all",
+#' vo <- venndir(setlist, 1:2, overlap_type="each", do_plot=FALSE,
+#'    label_preset="main items",
+#'    show_items="sign item");
+#' render_venndir(vo,
+#'    show_items="sign",
+#'    draw_buffer=TRUE, buffer_w=0.2)
+#'    
+#' # turn off line segments, increase item inside buffer width
+#' render_venndir(vo,
+#'    show_segments=FALSE,
+#'    label_preset="main items",
 #'    label_style="lite_box",
-#'    show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
+#'    show_items="sign item",
+#'    buffer_w=0.5)
 #' render_venndir(vo, plot_style="gg", show_set="all",
+#'    expand_fraction=c(0, 0.2, 0, 0.2),
+#'    label_preset="main items",
 #'    label_style="lite_box",
-#'    show_items="sign item", draw_buffer=TRUE, buffer_w=0.3)
-#' 
-#' venndir_output$label_df[1,c("x", "y")] <- c(2.5, 6.5);
-#' venndir_output$label_df[2,c("x", "y")] <- c(7.5, 6.5);
-#' venndir_output$label_df[2,c("hjust")] <- c(0);
-#' venndir_output$label_df[1:2,c("vjust")] <- c(0, 0);
-#' render_venndir(venndir_output, font_cex=1.5);
-#' 
-#' venndir_output$label_df[1,c("x", "y")] <- c(2, 6);
-#' venndir_output$label_df[2,c("x", "y")] <- c(8.3, 6);
-#' render_venndir(venndir_output);
-#' render_venndir(venndir_output, xpd=NA, xlim=c(2, 9));
+#'    show_items="sign item", buffer_w=0.5)
 #' 
 #' @export
 render_venndir <- function
@@ -355,6 +344,8 @@ render_venndir <- function
                label_df$segment_buffer / 2,
                label_df$segment_buffer);
             test_xy <- data.frame(
+               check.names=FALSE,
+               stringsAsFactors=FALSE,
                x0=label_df$x[use_offset] + label_df$x_offset[use_offset],
                x1=label_df$x[use_offset],
                y0=label_df$y[use_offset] + label_df$y_offset[use_offset],
@@ -396,6 +387,8 @@ render_venndir <- function
                   head(sc2, 1)
                });
                segment_df <- data.frame(
+                  check.names=FALSE,
+                  stringsAsFactors=FALSE,
                   x=as.vector(rbind(test_xy$x0[has_segment], new_xy[,1][has_segment])),
                   y=as.vector(rbind(test_xy$y0[has_segment], new_xy[,2][has_segment])),
                   group=rep(venn_spdf$label[test_xy$sp_index[has_segment]], each=2),
@@ -411,9 +404,7 @@ render_venndir <- function
    
    ## Prepare item labels
    itemlabels_df <- NULL;
-   #if (any(!show_items %in% FALSE)) {
    if (any(label_df$show_items %in% "inside")) {
-   #if (!all(label_df$show_items %in% c(NA,"none"))) {
       items_dfs <- subset(label_df, label_df$show_items %in% "inside");
       items_dfs <- split(items_dfs, items_dfs$overlap_set);
       
@@ -429,7 +420,9 @@ render_venndir <- function
          color1 <- rep(items_df1$color, lengths(items_df1$items));
          vis <- which(data.frame(venn_spdf)$label %in% items_df1$overlap_set);
          vi <- tail(which(data.frame(venn_spdf)$label %in% items_df1$overlap_set), 1);
-         vdf <- data.frame(venn_spdf)[vi,,drop=FALSE];
+         vdf <- data.frame(venn_spdf,
+            check.names=FALSE,
+            stringsAsFactors=FALSE)[vi,,drop=FALSE];
          prefixes <- rep(
             gsub(":.+", "", items_df1$text),
             lengths(items_df1$items));
@@ -453,7 +446,7 @@ render_venndir <- function
             y=bg,
             ...);
          
-         lpf <- label_polygon_fill(sp=venn_spdf[vi,],
+         lpf <- polygon_label_fill(sp=venn_spdf[vi,],
             ref_sp=venn_spdf,
             color=color,
             cex=items_df1$item_cex[1],
@@ -486,6 +479,8 @@ render_venndir <- function
       overlap_set <- paste0("**", label_df$overlap_set, "**");
       is_left <- (label_df$type %in% "main") * 1;
       gdf <- data.frame(
+         check.names=FALSE,
+         stringsAsFactors=FALSE,
          overlap_set=c(
             label_df$overlap_set[show_overlap_outside],
             label_df$overlap_set[show_overlap_inside],
@@ -577,12 +572,6 @@ render_venndir <- function
             label_df$padding_unit[show_count_outside],
             label_df$padding_unit[show_count_inside])
       );
-      if (1 == 2) {
-         jamba::printDebug("label data.frame gdf:");
-         print(gdf);
-         jamba::printDebug("label data.frame label_df:");
-         print(label_df);
-      }
    }
 
    ## Determine suitable xlim and ylim
@@ -645,6 +634,8 @@ render_venndir <- function
          segment_df2 <- subset(segment_df, point_order %in% 2);
          # make unique data.frame to avoid overplotting the same line
          segment_wide <- unique(data.frame(
+            check.names=FALSE,
+            stringsAsFactors=FALSE,
             x0=segment_df1$x,
             x1=segment_df2$x,
             y0=segment_df1$y,
@@ -783,6 +774,7 @@ render_venndir <- function
             hjust=0.5,
             halign=0.5,
             gp=grid::gpar(
+               fontfamily=fontfamily,
                col=itemlabels_df$color,
                fontsize=itemlabels_df$fontsize
             ),
@@ -825,7 +817,8 @@ render_venndir <- function
       }
       # warning label
       if (length(warning_label) > 0) {
-         warning_df <- data.frame(check.names=FALSE,
+         warning_df <- data.frame(
+            check.names=FALSE,
             stringsAsFactors=FALSE,
             label=gsub(": ", ":<br>", warning_label),
             x=-Inf,
@@ -881,10 +874,6 @@ render_venndir <- function
             size=gdf$fontsize * 5/14
          )
       }
-      # optional xlim, ylim
-      if (length(xlim) > 0 & length(ylim) > 0) {
-         ggv <- ggv + ggplot2::coord_sf(xlim=xlim, ylim=ylim);
-      }
       # optional item labels
       if (length(itemlabels_df) > 0) {
          if (draw_buffer) {
@@ -906,6 +895,7 @@ render_venndir <- function
             ggplot2::aes(x=x,
                y=y,
                label=text,
+               family=fontfamily,
                #group=group,
                angle=-rot,
                hjust=0.5,
@@ -917,6 +907,12 @@ render_venndir <- function
             size=itemlabels_df$fontsize * 5/14);
          ggv <- ggv + ggitems;
       }
+      
+      # optional xlim, ylim
+      if (length(xlim) > 0 & length(ylim) > 0) {
+         ggv <- ggv + ggplot2::coord_sf(xlim=xlim, ylim=ylim);
+      }
+      
       print(ggv);
       return(ggv);
    }
@@ -1156,10 +1152,8 @@ venndir_label_style <- function
    if (!"none" %in% set) {
       set_is_hidden <- (label_is_set & is.na(venndir_output$label_df$x) & label_has_shape);
       set_is_not_hidden <- (label_is_set & !is.na(venndir_output$label_df$x) & label_has_shape);
-      #print(data.frame(venndir_output$label_df$overlap_set, set_is_hidden, set_is_not_hidden, label_nsets));
       if (any(set_is_hidden)) {
          set_hidden <- venndir_output$label_df$overlap_set[set_is_hidden];
-         #jamba::printDebug("set_hidden:", set_hidden);
          set_hidden_match <- match(set_hidden,
             venndir_output$venn_spdf$label);
          venndir_output$label_df[set_is_hidden, c("x", "y", "x_offset", "y_offset")] <- 

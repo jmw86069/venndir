@@ -29,41 +29,37 @@ This function calls a helper function \code{sp::disaggregate()}
 which creates one \code{sp::SpatialPolygons} object
 for each individual polygon in the source object.
 }
+\examples{
+circles <- get_venn_shapes(c(A=1, B=2, "A&B"=3), proportional=TRUE)
+col3 <- c("#FF000077", "#0000FF77")
+sp::plot(circles)
+
+circles_u12 <- union_polygons(circles[1:2]);
+circles_i12 <- intersect_polygons(circles[1:2]);
+
+# one SpatialPolygons object with multiple polygon pieces
+circles_d12 <- rgeos::gDifference(circles_u12, circles_i12)
+plot(circles_d12, add=TRUE, col="gold", lwd=3)
+
+circles_d12_largest <- get_largest_polygon(circles_d12);
+plot(circles_d12_largest, add=TRUE, border="red", lwd=5);
+
+}
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
+Other venndir spatial: 
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
 \code{\link{display_angles}()},
-\code{\link{eulerr2polys}()},
-\code{\link{expand_range}()},
-\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_sp_buffer}()},
-\code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
-\code{\link{label_polygon_fill}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
-\code{\link{match_list}()},
 \code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
-\code{\link{nudge_venndir_label}()},
-\code{\link{polygon_label_outside}()},
-\code{\link{polygon_label_segment}()},
-\code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
-\code{\link{rescale_ps}()},
-\code{\link{rescale_p}()},
 \code{\link{rescale_sp}()},
-\code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
-\code{\link{sp_percent_area}()},
-\code{\link{sp_polylabelr}()},
 \code{\link{spread_degrees}()},
-\code{\link{union_polygons}()},
-\code{\link{venndir_label_style}()}
+\code{\link{union_polygons}()}
 }
-\concept{venndir utility}
+\concept{venndir spatial}

@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -173,8 +173,8 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-set-and-incidence-matrix-functions" class="hasAnchor"><a href="#section-set-and-incidence-matrix-functions" class="anchor"></a>Set and Incidence Matrix Functions</h2>
-          <p class="section-desc"><p>Functions that manipulate sets, list, and incidence matrices.</p></p>
+          <h2 id="section-import-and-conversion-functions" class="hasAnchor"><a href="#section-import-and-conversion-functions" class="anchor"></a>Import and Conversion Functions</h2>
+          <p class="section-desc"><p>Functions to help import and convert data</p></p>
         </th>
       </tr>
       
@@ -211,7 +211,7 @@
         <td>
           <p><code><a href="list2im_value.html">list2im_value()</a></code> </p>
         </td>
-        <td><p>Optimized list to signed incidence matrix</p></td>
+        <td><p>Convert list to a value incidence matrix</p></td>
       </tr><tr>
         
         <td>
@@ -228,8 +228,8 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-venndir-utility-functions" class="hasAnchor"><a href="#section-venndir-utility-functions" class="anchor"></a>venndir Utility Functions</h2>
-          <p class="section-desc"><p>Helpful utility functions</p></p>
+          <h2 id="section-venndir-spatial-functions" class="hasAnchor"><a href="#section-venndir-spatial-functions" class="anchor"></a>venndir Spatial Functions</h2>
+          <p class="section-desc"><p>Functions for spatial objects and polygon manipulation</p></p>
         </th>
       </tr>
       
@@ -238,12 +238,6 @@
       
       
       <tr>
-        
-        <td>
-          <p><code><a href="curate_venn_labels.html">curate_venn_labels()</a></code> </p>
-        </td>
-        <td><p>Curate Venn labels</p></td>
-      </tr><tr>
         
         <td>
           <p><code><a href="degrees_to_adj.html">degrees_to_adj()</a></code> </p>
@@ -261,6 +255,140 @@
           <p><code><a href="display_angles.html">display_angles()</a></code> </p>
         </td>
         <td><p>Display degree angles around a unit circle</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_largest_polygon.html">get_largest_polygon()</a></code> </p>
+        </td>
+        <td><p>Largest polygon in a SpatialPolygons object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_sp_buffer.html">get_sp_buffer()</a></code> </p>
+        </td>
+        <td><p>Get SpatialPolygons after applying buffer width</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="intersect_polygons.html">intersect_polygons()</a></code> </p>
+        </td>
+        <td><p>Intersect one or more polygons</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mean_degree_arc.html">mean_degree_arc()</a></code> </p>
+        </td>
+        <td><p>Mean arc angle in degrees</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mean_degrees.html">mean_degrees()</a></code> </p>
+        </td>
+        <td><p>Mean angle in degrees</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="nudge_sp.html">nudge_sp()</a></code> </p>
+        </td>
+        <td><p>Nudge SpatialPolygons</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="rescale_coordinates.html">rescale_coordinates()</a></code> </p>
+        </td>
+        <td><p>Scale, rotate, and shift numeric coordinates</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="rescale_sp.html">rescale_sp()</a></code> </p>
+        </td>
+        <td><p>Rescale a SpatialPolygons object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sp_circles.html">sp_circles()</a></code> </p>
+        </td>
+        <td><p>Make SpatialPolygons circles</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sp_ellipses.html">sp_ellipses()</a></code> </p>
+        </td>
+        <td><p>Make SpatialPolygons ellipses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spread_degrees.html">spread_degrees()</a></code> </p>
+        </td>
+        <td><p>Spread angles to minimum degrees difference</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="union_polygons.html">union_polygons()</a></code> </p>
+        </td>
+        <td><p>Union one or more polygons</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-venndir-label-functions" class="hasAnchor"><a href="#section-venndir-label-functions" class="anchor"></a>venndir Label Functions</h2>
+          <p class="section-desc"><p>Helpful label functions</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="draw_gridtext_groups.html">draw_gridtext_groups()</a></code> </p>
+        </td>
+        <td><p>Draw boundary around grouops of gridtext labels</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="polygon_label_fill.html">polygon_label_fill()</a></code> </p>
+        </td>
+        <td><p>Arrange text labels inside a polygon</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="polygon_label_outside.html">polygon_label_outside()</a></code> </p>
+        </td>
+        <td><p>Polygon label outside</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="polygon_label_segment.html">polygon_label_segment()</a></code> </p>
+        </td>
+        <td><p>Define a polygon label line segment</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sp_polylabelr.html">sp_polylabelr()</a></code> </p>
+        </td>
+        <td><p>Get SpatialPolygons polylabelr coordinate</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-venndir-utility-functions" class="hasAnchor"><a href="#section-venndir-utility-functions" class="anchor"></a>venndir Utility Functions</h2>
+          <p class="section-desc"><p>Internal venndir utility functions</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="curate_venn_labels.html">curate_venn_labels()</a></code> </p>
+        </td>
+        <td><p>Curate Venn labels</p></td>
       </tr><tr>
         
         <td>
@@ -282,33 +410,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="get_largest_polygon.html">get_largest_polygon()</a></code> </p>
-        </td>
-        <td><p>Largest polygon in a SpatialPolygons object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_sp_buffer.html">get_sp_buffer()</a></code> </p>
-        </td>
-        <td><p>Get SpatialPolygons after applying buffer width</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="get_venn_shapes.html">get_venn_shapes()</a></code> </p>
         </td>
         <td><p>Get Venn shapes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="intersect_polygons.html">intersect_polygons()</a></code> </p>
-        </td>
-        <td><p>Intersect one or more polygons</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="label_polygon_fill.html">label_polygon_fill()</a></code> </p>
-        </td>
-        <td><p>Arrange text labels inside a polygon</p></td>
       </tr><tr>
         
         <td>
@@ -336,51 +440,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="mean_degree_arc.html">mean_degree_arc()</a></code> </p>
-        </td>
-        <td><p>Mean arc angle in degrees</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mean_degrees.html">mean_degrees()</a></code> </p>
-        </td>
-        <td><p>Mean angle in degrees</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="nudge_sp.html">nudge_sp()</a></code> </p>
-        </td>
-        <td><p>Nudge SpatialPolygons</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="nudge_venndir_label.html">nudge_venndir_label()</a></code> </p>
         </td>
         <td><p>Nudge venndir label</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="polygon_label_outside.html">polygon_label_outside()</a></code> </p>
-        </td>
-        <td><p>Polygon label outside</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="polygon_label_segment.html">polygon_label_segment()</a></code> </p>
-        </td>
-        <td><p>Define a polygon label line segment</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="print_color_df.html">print_color_df()</a></code> </p>
         </td>
         <td><p>Print colorized text table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rescale_coordinates.html">rescale_coordinates()</a></code> </p>
-        </td>
-        <td><p>Scale, rotate, and shift numeric coordinates</p></td>
       </tr><tr>
         
         <td>
@@ -396,51 +464,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="rescale_sp.html">rescale_sp()</a></code> </p>
-        </td>
-        <td><p>Rescale a SpatialPolygons object</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="shrink_df.html">shrink_df()</a></code> </p>
         </td>
         <td><p>Shrink data.frame by group</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="sp_circles.html">sp_circles()</a></code> </p>
-        </td>
-        <td><p>Make SpatialPolygons circles</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sp_ellipses.html">sp_ellipses()</a></code> </p>
-        </td>
-        <td><p>Make SpatialPolygons ellipses</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="sp_percent_area.html">sp_percent_area()</a></code> </p>
         </td>
         <td><p>Percent area for each polygon in SpatialPolygons</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sp_polylabelr.html">sp_polylabelr()</a></code> </p>
-        </td>
-        <td><p>Get SpatialPolygons polylabelr coordinate</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="spread_degrees.html">spread_degrees()</a></code> </p>
-        </td>
-        <td><p>Spread angles to minimum degrees difference</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="union_polygons.html">union_polygons()</a></code> </p>
-        </td>
-        <td><p>Union one or more polygons</p></td>
       </tr><tr>
         
         <td>
@@ -451,8 +483,8 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-venndir-label-functions" class="hasAnchor"><a href="#section-venndir-label-functions" class="anchor"></a>venndir Label Functions</h2>
-          <p class="section-desc"><p>Helpful label functions</p></p>
+          <h2 id="section-venndir-plotly-functions-experimental-" class="hasAnchor"><a href="#section-venndir-plotly-functions-experimental-" class="anchor"></a>venndir plotly functions (experimental)</h2>
+          <p class="section-desc"><p>Functions for plotly compatibility (experimental)</p></p>
         </th>
       </tr>
       
@@ -463,9 +495,15 @@
       <tr>
         
         <td>
-          <p><code><a href="draw_gridtext_groups.html">draw_gridtext_groups()</a></code> </p>
+          <p><code><a href="to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code> </p>
         </td>
-        <td><p>Draw boundary around grouops of gridtext labels</p></td>
+        <td><p>Basic function for GeomRichText compatibility with ggplotly</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code> </p>
+        </td>
+        <td><p>Basic function for GeomTextBox compatibility with ggplotly</p></td>
       </tr>
     </tbody>
     </table>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Optimized list to signed incidence matrix — list2im_value • venndir</title>
+<title>Convert list to a value incidence matrix — list2im_value • venndir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Optimized list to signed incidence matrix — list2im_value" />
-<meta property="og:description" content="Optimized list to signed incidence matrix" />
+<meta property="og:title" content="Convert list to a value incidence matrix — list2im_value" />
+<meta property="og:description" content="Optimized conversion of list to a value incidence matrix" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -123,13 +123,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimized list to signed incidence matrix</h1>
+    <h1>Convert list to a value incidence matrix</h1>
     <small class="dont-index">Source: <a href='http://github.com/jmw86069/venndir/blob/master/R/venndir-im.R'><code>R/venndir-im.R</code></a></small>
     <div class="hidden name"><code>list2im_value.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Optimized list to signed incidence matrix</p>
+    <p>Optimized conversion of list to a value incidence matrix</p>
     </div>
 
     <pre class="usage"><span class='fu'>list2im_value</span><span class='op'>(</span><span class='va'>setlist</span>, empty <span class='op'>=</span> <span class='cn'>NULL</span>, do_sparse <span class='op'>=</span> <span class='cn'>TRUE</span>, force_sign <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -173,21 +173,24 @@ as <code><a href='https://rdrr.io/r/base/c.html'>c(-1, 0, 1)</a></code> values.<
 
     <p>This function converts a list of named vectors into
 an incidence matrix with value for each entry
-(row) present in each input list (column). The rows
-are defined by the vector names, and values are
-defined by the vector values.</p>
-<p>Note that this function will store zero <code>0</code> when the input
-vector value is zero. When this is not the desired behavior,
-the argument <code>empty</code> can be used to distinguish missing data
-from data that is zero, for example by setting <code>empty=NA</code>.
-In this way a value of zero <code>0</code> indicates "present but zero",
-and a value <code>NA</code> indicates "not present at all". This
-distinction is helpful when comparing entities which are not
-tested in each scenario. For example if "geneA" is present
-and the value is <code>1</code> in one list; "geneA" is not tested in
-the second list; therefore the absence of "geneA" of a non-zero
-value in the second list is not counted as "non-overlapping"
-because it was not possible for it to have a non-zero value.</p>
+(row) present in each input list (column). This output
+is called a "value incidence matrix" because the
+value itself is included in the matrix as opposed to
+a true incidence matrix that represents only <code>TRUE</code>
+or <code>FALSE</code> (<code>1</code> or <code>0</code>) at each position.</p>
+<p>The rownames of the output matrix represent items,
+encoded by the vector names. The colnames of the output
+matrix represent the list names.</p>
+<p>The default value in the output matrix is <code>0</code> for
+a numeric matrix, and <code>""</code> for a character matrix,
+based on the input vector classes.</p>
+<p>To override this behavior, use the argument <code>empty</code>.
+For example, it may be useful to encode missing entries
+as <code>NA</code>, which means "this entry was not observed", and
+store true values of <code>0</code> to indicate "this entry was observed
+and its value was <code>0</code> zero". In this case use <code>empty=NA</code>.</p>
+<p>This behavior can be useful with gene expression data,
+when a particular gene may not be observed in all data sets.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir conversion: 
@@ -234,6 +237,53 @@ because it was not possible for it to have a non-zero value.</p>
 #&gt; item_047 item_095 item_016 item_006 item_039 item_031 item_081 
 #&gt;        1        1        1       -1        1       -1        1 
 #&gt; </div><div class='input'>
+<span class='co'># example showing empty=NA</span>
+<span class='va'>setlist2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>20</span>, <span class='fl'>3</span>, sizes<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>12</span>, <span class='fl'>14</span>, <span class='fl'>8</span><span class='op'>)</span>, do_signed<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='va'>setlist2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>setlist2</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span><span class='op'>{</span>
+   <span class='va'>i</span><span class='op'>[</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>,
+      replace<span class='op'>=</span><span class='cn'>TRUE</span>,
+      size<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span><span class='op'>)</span>;
+   <span class='va'>i</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>imv2</span> <span class='op'>&lt;-</span> <span class='fu'>list2im_value</span><span class='op'>(</span><span class='va'>setlist2</span>, empty<span class='op'>=</span><span class='cn'>NA</span>, do_sparse<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>;
+<span class='va'>imv2</span>;
+</div><div class='output co'>#&gt;         set_A set_B set_C
+#&gt; item_15     0     1    -1
+#&gt; item_19     1    -1     0
+#&gt; item_14     1     1    NA
+#&gt; item_03    -1    -1    NA
+#&gt; item_10     0    -1     1
+#&gt; item_02     0    NA    NA
+#&gt; item_06    -1    NA    NA
+#&gt; item_11     0     0    NA
+#&gt; item_05    -1     1    NA
+#&gt; item_04    -1    -1    NA
+#&gt; item_18     0     0     1
+#&gt; item_09     1     0     0
+#&gt; item_08    NA     0    NA
+#&gt; item_07    NA     1     1
+#&gt; item_17    NA     1    NA
+#&gt; item_01    NA     0    NA
+#&gt; item_12    NA    NA     0
+#&gt; item_13    NA    NA     1</div><div class='input'>
+<span class='co'># to convert back to list, define empty=NA so 0 is not considered as empty</span>
+<span class='fu'><a href='im_value2list.html'>im_value2list</a></span><span class='op'>(</span><span class='va'>imv2</span>, empty<span class='op'>=</span><span class='cn'>NA</span><span class='op'>)</span>;
+</div><div class='output co'>#&gt; $set_A
+#&gt; item_15 item_19 item_14 item_03 item_10 item_02 item_06 item_11 item_05 item_04 
+#&gt;       0       1       1      -1       0       0      -1       0      -1      -1 
+#&gt; item_18 item_09 
+#&gt;       0       1 
+#&gt; 
+#&gt; $set_B
+#&gt; item_15 item_19 item_14 item_03 item_10 item_11 item_05 item_04 item_18 item_09 
+#&gt;       1      -1       1      -1      -1       0       1      -1       0       0 
+#&gt; item_08 item_07 item_17 item_01 
+#&gt;       0       1       1       0 
+#&gt; 
+#&gt; $set_C
+#&gt; item_15 item_19 item_10 item_18 item_09 item_07 item_12 item_13 
+#&gt;      -1       0       1       1       0       1       0       1 
+#&gt; </div><div class='input'>
 <span class='co'># make a simple character vector list</span>
 <span class='va'>setlistv</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>setlist</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span><span class='op'>{</span>
    <span class='va'>j</span> <span class='op'>&lt;-</span> <span class='va'>letters</span><span class='op'>[</span><span class='va'>i</span><span class='op'>+</span><span class='fl'>3</span><span class='op'>]</span>;
@@ -248,7 +298,9 @@ because it was not possible for it to have a non-zero value.</p>
 #&gt; item_050 "d"   ""    "b"  
 #&gt; item_043 "b"   ""    ""   
 #&gt; item_014 "b"   ""    ""   
-#&gt; item_025 "d"   "b"   ""   </div><div class='input'><span class='fu'><a href='im_value2list.html'>im_value2list</a></span><span class='op'>(</span><span class='va'>imv</span><span class='op'>)</span>;
+#&gt; item_025 "d"   "b"   ""   </div><div class='input'>
+<span class='co'># convert back to list of character vectors</span>
+<span class='fu'><a href='im_value2list.html'>im_value2list</a></span><span class='op'>(</span><span class='va'>imv</span><span class='op'>)</span>;
 </div><div class='output co'>#&gt; $set_A
 #&gt; item_067 item_042 item_050 item_043 item_014 item_025 item_090 item_091 
 #&gt;      "b"      "d"      "d"      "b"      "b"      "d"      "b"      "b" 

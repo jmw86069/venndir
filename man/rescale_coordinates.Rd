@@ -73,16 +73,18 @@ for Spatial objects.
 \examples{
 sp <- sp_ellipses(xcenter=2, ycenter=3, xradius=3, yradius=1);
 
-plot(sp, col="#FF000077", border="#FF0000", asp=1);
+plot(sp, col="#FF000077", border="#FF0000");
+axis(1, las=2); axis(2, las=2);
 
 x <- sp@polygons[[1]]@Polygons[[1]]@coords;
 
 jamba::nullPlot(doBoxes=FALSE, xlim=c(-3, 9), ylim=c(-2, 10), asp=1);
-rescale_coordinates(x,
+xnew <- rescale_coordinates(x,
    shift=c(1, 1),
    rotate_degrees=30,
    scale=c(1.5, 2.5),
    plot_debug=TRUE)
+axis(1, las=2); axis(2, las=2);
    
 # example using SpatialPolygons
 sp <- sp_ellipses(xcenter=c(2, 4),
@@ -108,7 +110,7 @@ par("mfrow"=c(1,1));
 # same as before but apply 180 degree rotation
 sp_3 <- rescale_sp(sp,
    shift=c(1, 1),
-   rotate_degrees=180,
+   rotate_degrees=160,
    scale=c(1, 1),
    share_center=TRUE)
 par("mfrow"=c(1,2));
@@ -120,40 +122,20 @@ par("mfrow"=c(1,1));
 
 }
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
+Other venndir spatial: 
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
 \code{\link{display_angles}()},
-\code{\link{eulerr2polys}()},
-\code{\link{expand_range}()},
-\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_largest_polygon}()},
 \code{\link{get_sp_buffer}()},
-\code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
-\code{\link{label_polygon_fill}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
-\code{\link{match_list}()},
 \code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
-\code{\link{nudge_venndir_label}()},
-\code{\link{polygon_label_outside}()},
-\code{\link{polygon_label_segment}()},
-\code{\link{print_color_df}()},
-\code{\link{rescale_ps}()},
-\code{\link{rescale_p}()},
 \code{\link{rescale_sp}()},
-\code{\link{shrink_df}()},
 \code{\link{sp_circles}()},
 \code{\link{sp_ellipses}()},
-\code{\link{sp_percent_area}()},
-\code{\link{sp_polylabelr}()},
 \code{\link{spread_degrees}()},
-\code{\link{union_polygons}()},
-\code{\link{venndir_label_style}()}
+\code{\link{union_polygons}()}
 }
-\concept{venndir utility}
+\concept{venndir spatial}

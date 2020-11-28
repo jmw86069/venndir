@@ -14,7 +14,7 @@
 #' the nearest adjacent angle, then all angles are equally
 #' spaced around 360 degrees.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @examples
 #' degrees <- c(5, 10, 15, 100, 105, 110, 200, 300, 358);
@@ -268,7 +268,7 @@ spread_degrees <- function
 #'    value added to `x` in the form `rnorm(length(x)) * 1e-6`.
 #' @param ... additional arguments are ignored.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @examples
 #' mean_degrees(c(355, 15))
@@ -310,7 +310,7 @@ mean_degrees <- function
 #' function calculates the difference of each pair in `degree1`,
 #' in the order supplied.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param degree1 `numeric` vector that contains angles in degrees.
 #' @param degree2 `numeric` vector that contains angles in degrees,
@@ -365,7 +365,7 @@ diff_degrees <- function
 #' that the arc does not cover more than 360 degrees, and for angles
 #' whose numeric values are increasing.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param x `numeric` vector of angles in degrees.
 #' @param use_range `logical` indicating whether to return the
@@ -514,7 +514,7 @@ mean_degree_arc <- function
 #' 
 #' Display degree angles around a unit circle
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @export
 display_angles <- function
@@ -587,7 +587,7 @@ display_angles <- function
 #' for text plotting, which arranges text relative
 #' to the angle in degrees.
 #' 
-#' @family venndir utility
+#' @family venndir spatial
 #' 
 #' @param degrees `numeric` value for angles in degrees
 #' @param top `numeric` value indicating the angle at the

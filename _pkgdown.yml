@@ -10,15 +10,23 @@ reference:
   desc: Core functions for venndir
   contents:
   - has_concept("venndir core")
-- title: Set and Incidence Matrix Functions
-  desc: Functions that manipulate sets, list, and incidence matrices.
+- title: Import and Conversion Functions
+  desc: Functions to help import and convert data
   contents:
   - has_concept("venndir conversion")
-- title: venndir Utility Functions
-  desc: Helpful utility functions
+- title: venndir Spatial Functions
+  desc: Functions for spatial objects and polygon manipulation
   contents:
-  - has_concept("venndir utility")
+  - has_concept("venndir spatial")
 - title: venndir Label Functions
   desc: Helpful label functions
   contents:
   - has_concept("venndir label")
+- title: venndir Utility Functions
+  desc: Internal venndir utility functions
+  contents:
+  - has_concept("venndir utility")
+- title: venndir plotly functions (experimental)
+  desc: Functions for plotly compatibility (experimental)
+  contents:
+  - has_concept("venndir plotly")

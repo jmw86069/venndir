@@ -33,41 +33,28 @@ Make SpatialPolygons circles
 This function creates one or more circles as
 \code{sp::SpatialPolygons} objects.
 }
+\examples{
+sp <- sp_circles(c(3, 2), c(2, 3))
+plot(sp, col=c("#FF000077", "#FFDD0077"));
+axis(1, las=2); axis(2, las=2);
+points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
+
+}
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
+Other venndir spatial: 
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
 \code{\link{display_angles}()},
-\code{\link{eulerr2polys}()},
-\code{\link{expand_range}()},
-\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_largest_polygon}()},
 \code{\link{get_sp_buffer}()},
-\code{\link{get_venn_shapes}()},
 \code{\link{intersect_polygons}()},
-\code{\link{label_polygon_fill}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
-\code{\link{match_list}()},
 \code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
 \code{\link{nudge_sp}()},
-\code{\link{nudge_venndir_label}()},
-\code{\link{polygon_label_outside}()},
-\code{\link{polygon_label_segment}()},
-\code{\link{print_color_df}()},
 \code{\link{rescale_coordinates}()},
-\code{\link{rescale_ps}()},
-\code{\link{rescale_p}()},
 \code{\link{rescale_sp}()},
-\code{\link{shrink_df}()},
 \code{\link{sp_ellipses}()},
-\code{\link{sp_percent_area}()},
-\code{\link{sp_polylabelr}()},
 \code{\link{spread_degrees}()},
-\code{\link{union_polygons}()},
-\code{\link{venndir_label_style}()}
+\code{\link{union_polygons}()}
 }
-\concept{venndir utility}
+\concept{venndir spatial}

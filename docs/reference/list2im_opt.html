@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Optimized list to incidence matrix — list2im_opt" />
-<meta property="og:description" content="Optimized list to incidence matrix" />
+<meta property="og:description" content="Optimized conversion of list to incidence matrix" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.10.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
       </span>
     </div>
 
@@ -129,7 +129,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Optimized list to incidence matrix</p>
+    <p>Optimized conversion of list to incidence matrix</p>
     </div>
 
     <pre class="usage"><span class='fu'>list2im_opt</span><span class='op'>(</span><span class='va'>setlist</span>, empty <span class='op'>=</span> <span class='fl'>0</span>, do_sparse <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -166,11 +166,16 @@ object is <code>matrix</code> with values <code><a href='https://rdrr.io/r/base/
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function rapidly converts a list of vectors into
-an incidence matrix with value of <code>1</code> for each entry
-(row) present in each input list (column).</p>
+an incidence matrix whose rownames are items, and colnames
+are the names of the input list. The default output
+<code>do_sparse=TRUE</code> returns a <code>logical</code> matrix class <code>ngCMatrix</code>
+from the <code>Matrix</code> package. When <code>do_sparse=FALSE</code> the
+output is a <code>matrix</code> class with <code>numeric</code> values <code>0</code> and <code>1</code>.</p>
 <p>Note that the rows in the output matrix are not sorted,
-since this step can take several seconds when working with
-a list whose vectors contain millions of rows.</p>
+since the step of sorting item names may take several
+seconds when working with a list whose vectors contain
+millions of items. For sorted rows, the best remedy is
+to run this function, the re-order rownames afterward.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other venndir conversion: 
@@ -181,6 +186,25 @@ a list whose vectors contain millions of rows.</p>
 <code><a href='overlaplist2setlist.html'>overlaplist2setlist</a>()</code>,
 <code><a href='signed_counts2setlist.html'>signed_counts2setlist</a>()</code></p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>A<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"one"</span>, <span class='st'>"two"</span>, <span class='st'>"three"</span><span class='op'>)</span>,
+   b<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"two"</span>, <span class='st'>"one"</span>, <span class='st'>"four"</span>, <span class='st'>"five"</span><span class='op'>)</span><span class='op'>)</span>;
+<span class='fu'>list2im_opt</span><span class='op'>(</span><span class='va'>setlist</span><span class='op'>)</span>;
+</div><div class='output co'>#&gt; 5 x 2 sparse Matrix of class "ngCMatrix"
+#&gt;       A b
+#&gt; one   | |
+#&gt; two   | |
+#&gt; three | .
+#&gt; four  . |
+#&gt; five  . |</div><div class='input'>
+<span class='fu'>list2im_opt</span><span class='op'>(</span><span class='va'>setlist</span>, do_sparse<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>;
+</div><div class='output co'>#&gt;       A b
+#&gt; one   1 1
+#&gt; two   1 1
+#&gt; three 1 0
+#&gt; four  0 1
+#&gt; five  0 1</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
