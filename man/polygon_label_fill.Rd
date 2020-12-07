@@ -11,7 +11,7 @@ polygon_label_fill(
   border = NA,
   fontsize = 10,
   cex = 1,
-  degrees = -20,
+  degrees = 0,
   dither_cex = 0.04,
   dither_color = 0.07,
   dither_degrees = 0,
@@ -21,6 +21,7 @@ polygon_label_fill(
   buffer_h = 0,
   label_method = c("hexagonal", "nonaligned", "regular", "random", "stratified",
     "clustered"),
+  layout_degrees = -20,
   draw_buffer = FALSE,
   buffer_fill = "#FFFFFF77",
   buffer_border = "red",
@@ -160,6 +161,48 @@ polygon_label_fill(sp=sp,
    dither_color=0.2,
    color="red2",
    cex=1.2)
+
+plot(sp, col="gold", border="gold4", lwd=2);
+polygon_label_fill(sp=sp,
+   degrees=0,
+   draw_buffer=FALSE,
+   layout_degrees=45/2,
+   buffer_w=0.4,
+   label_method="regular",
+   labels=jamba::mixedSort(words),
+   dither_color=0.2,
+   dither_cex=0.2,
+   dither_degrees=0,
+   color="red2",
+   cex=1.2)
+
+# iterate various options for reducing label overlap
+par("mfrow"=c(2, 4));
+for (lm in c("hexagonal", "regular")) {
+for (ld in c(0, -45/2, -30, -45)) {
+plot(sp, col="gold", border="gold4", lwd=2);
+id <- ifelse(ld == 0, -20,
+   ifelse(ld == -45, 15, 0));
+polygon_label_fill(sp=sp,
+   degrees=id,
+   layout_degrees=ld,
+   buffer_w=0.4,
+   label_method=lm,
+   #labels=seq_along(words),
+   #labels=rep("word", length(words)),
+   labels=paste0("word", seq_along(words)),
+   dither_color=0,
+   dither_cex=0,
+   dither_degrees=0,
+   color="navy",
+   cex=0.7)
+title(main=paste0("layout_degrees=",
+   format(ld, digits=2),
+   "\nlabel_method='", lm, "'",
+   "\ndegrees=", id));
+}
+}
+par("mfrow"=c(1, 1));
 
 plot(sp, col="gold", border="gold4", lwd=2);
 polygon_label_fill(sp=sp,

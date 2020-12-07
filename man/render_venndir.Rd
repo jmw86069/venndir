@@ -18,14 +18,13 @@ render_venndir(
   plot_warning = TRUE,
   show_label = NA,
   show_items = c(NA, "none", "sign item", "item", "sign"),
+  item_degrees = 0,
+  max_items = 100,
   show_zero = TRUE,
   show_segments = TRUE,
-  item_degrees = -18,
-  display_counts = TRUE,
-  max_items = 100,
+  segment_buffer = -0.2,
   label_style = c("custom", "basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   fontfamily = "Arial",
-  segment_buffer = -0.2,
   inside_percent_threshold = 5,
   plot_style = c("base", "gg"),
   group_labels = TRUE,
@@ -93,12 +92,26 @@ as proper circles.}
 When \code{xlim} or \code{ylim} are \code{NULL}, values are derived from the
 coordinates from \code{venn_spdf} and \code{label_df}.}
 
+\item{expand_fraction}{\code{numeric} vector expanded to length 4,
+used to expand the \code{xlim} and \code{ylim} ranges, where the vector
+corresponds to: bottom, left, top, right.}
+
 \item{xpd}{see \code{graphics::par()}, when \code{xpd=FALSE} it clips text
 labels and polygons to the plot boundary; when \code{xpd=TRUE} it
 clips to the figure region, and when \code{xpd=NA} it is clipped
 to the full device region. This option is mainly helpful
 as \code{xpd=NA} ensures labels are displayed even when they overlap
 the plot boundary.}
+
+\item{font_cex}{\code{numeric} value used to resize text font used in
+Venn overlap labels overall. A value \code{font_cex=1.2} will make
+text labels 20\% larger than normal.}
+
+\item{item_cex}{\code{numeric} value used to resize item labels,
+used when \code{show_items} is used. This value can be supplied as
+a vector, in which case it will be applied to each polygon
+in the order they are drawn, typically the order presented
+in \code{label_df}.}
 
 \item{plot_warning}{\code{logical} indicating whether to draw a text
 label on the bottom of the plot whenever a non-zero overlap
@@ -107,8 +120,49 @@ occurs when a proportional Venn (Euler) diagram does not
 or cannot represent every possible overlap, causing some
 overlaps to be hidden from the plot.}
 
+\item{show_items}{\code{character} indicating how to display item labels,
+relevant when items are contained in \code{label_df} and when a
+relevant label preset is used that includes item display,
+for example \code{label_preset="main items"} and \code{show_items="item"}.
+The \code{show_items} character string can include \code{"item"} and/or
+\code{"sign"} as substrings, for example \code{show_items="sign item"}
+or \code{show_items="item sign"} or \code{show_items="sign'"}.}
+
+\item{item_degrees}{\code{numeric} value used to adjust the angle of
+item labels within each polygon. It can be useful to adjust
+the angle of text as a method of reducing label overlaps.
+Another alternative is to pass argument \code{layout_degrees}
+through \code{...} to \code{polygon_label_fill()}, which adjusts the
+angle of the label points inside each polygon.}
+
+\item{max_items}{\code{numeric} value indicating the maximum number
+of item labels to display in each polygon, after which the
+only the count summary is displayed. (This argument is not
+yet implemented.)}
+
+\item{show_zero}{\code{logical} indicating whether to display \code{0} zero
+in overlap regions that contain no items. For some diagrams
+it can look cleaner not to display the zero, with
+\code{show_zero=FALSE}.}
+
+\item{show_segments}{\code{logical} indicating whether to draw a line
+segment from labels outside their respective polygons into
+the polygon.}
+
+\item{segment_buffer}{\code{numeric} value indicating the buffer size
+inside a polygon when drawing a line segment, when
+\code{show_segments=TRUE}. A value \code{segment_buffer=-0.5} will create
+an internal polygon buffer half the size it would take to remove
+the polygon, and the line segment will be drawn to this border.
+A value \code{segment_buffer=-1} will draw the line segment very near
+the center of the polygon. A value \code{segment_buffer=0} will
+draw the line segment to the border of the polygon, however
+in some cases two polygon borders can be near each other, or
+overlap, so this setting can be adjusted accordingly.}
+
 \item{label_style}{\code{character} string indicating the style of label
-to display. The values \verb{"basic","none","shaded","lite","fill"}
+to display, passed to \code{venndir_label_style()}.
+The values \verb{"basic","none","shaded","lite","fill"}
 style the label background fill, while presence of \code{"box"} in
 the string will draw a border around the label:
 \code{"basic"} or \code{"none"} uses no background fill,
@@ -125,7 +179,10 @@ may differ from those for PNG.}
 
 \item{inside_percent_threshold}{\code{numeric} value indicating the percent
 threshold, below which a polygon label is moved outside the polygon
-by default. The threshold is calculated by area of the polygon
+by default. When a count label is automatically positioned outside
+or inside a polygon, this argument defines the threshold for that
+decision.
+The threshold is calculated by area of the polygon
 divided by total area of the enclosing polygon, multiplied by 100.
 Therefore \code{inside_percent_threshold=5} will require a polygon to
 represent at least 5 percent of the total area.}
@@ -134,10 +191,21 @@ represent at least 5 percent of the total area.}
 of plot: \code{"base"} uses base R graphics; \code{"gg"} uses
 ggplot2 graphics (not yet implemented).}
 
-\item{group_labels}{\code{logical} to enable experimental feature that
+\item{group_labels}{\code{logical} to enable a relatively new feature that
 groups multiple \code{gridtext::richtext_grob()} elements together
-by overlap set and position, currently only implemented
-(partially) for base R plots.}
+by overlap set and position, so there is one border and fill
+color for the set of labels. This feature is currently only
+implemented for base R plots, and not yet available for
+\code{plot_style="gg"} using ggplot2.}
+
+\item{ggtheme}{\code{function} that outputs class \verb{"theme", "gg"},
+compatible with output from \code{ggplot2::theme_void()}. This argument
+is used to define the ggplot2 theme, when \code{plot_style="gg"}.}
+
+\item{draw_buffer}{\code{logical} indicating whether to draw the item
+buffer used to determine item label positions inside each
+polygon, only relevant when \code{label_preset} includes items,
+and \code{show_items} is active.}
 
 \item{...}{additional arguments are passed to \code{plot()}
 when plotting \code{venn_spdf} which is expected to be a

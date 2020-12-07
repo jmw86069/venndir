@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.9000</span>
       </span>
     </div>
 
@@ -146,14 +146,13 @@
   plot_warning <span class='op'>=</span> <span class='cn'>TRUE</span>,
   show_label <span class='op'>=</span> <span class='cn'>NA</span>,
   show_items <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='st'>"none"</span>, <span class='st'>"sign item"</span>, <span class='st'>"item"</span>, <span class='st'>"sign"</span><span class='op'>)</span>,
+  item_degrees <span class='op'>=</span> <span class='fl'>0</span>,
+  max_items <span class='op'>=</span> <span class='fl'>100</span>,
   show_zero <span class='op'>=</span> <span class='cn'>TRUE</span>,
   show_segments <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  item_degrees <span class='op'>=</span> <span class='op'>-</span><span class='fl'>18</span>,
-  display_counts <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  max_items <span class='op'>=</span> <span class='fl'>100</span>,
+  segment_buffer <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.2</span>,
   label_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"custom"</span>, <span class='st'>"basic"</span>, <span class='st'>"fill"</span>, <span class='st'>"shaded"</span>, <span class='st'>"shaded_box"</span>, <span class='st'>"lite"</span>, <span class='st'>"lite_box"</span><span class='op'>)</span>,
   fontfamily <span class='op'>=</span> <span class='st'>"Arial"</span>,
-  segment_buffer <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.2</span>,
   inside_percent_threshold <span class='op'>=</span> <span class='fl'>5</span>,
   plot_style <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"base"</span>, <span class='st'>"gg"</span><span class='op'>)</span>,
   group_labels <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -231,6 +230,12 @@ When <code>xlim</code> or <code>ylim</code> are <code>NULL</code>, values are de
 coordinates from <code>venn_spdf</code> and <code>label_df</code>.</p></td>
     </tr>
     <tr>
+      <th>expand_fraction</th>
+      <td><p><code>numeric</code> vector expanded to length 4,
+used to expand the <code>xlim</code> and <code>ylim</code> ranges, where the vector
+corresponds to: bottom, left, top, right.</p></td>
+    </tr>
+    <tr>
       <th>xpd</th>
       <td><p>see <code><a href='https://rdrr.io/r/graphics/par.html'>graphics::par()</a></code>, when <code>xpd=FALSE</code> it clips text
 labels and polygons to the plot boundary; when <code>xpd=TRUE</code> it
@@ -238,6 +243,20 @@ clips to the figure region, and when <code>xpd=NA</code> it is clipped
 to the full device region. This option is mainly helpful
 as <code>xpd=NA</code> ensures labels are displayed even when they overlap
 the plot boundary.</p></td>
+    </tr>
+    <tr>
+      <th>font_cex</th>
+      <td><p><code>numeric</code> value used to resize text font used in
+Venn overlap labels overall. A value <code>font_cex=1.2</code> will make
+text labels 20% larger than normal.</p></td>
+    </tr>
+    <tr>
+      <th>item_cex</th>
+      <td><p><code>numeric</code> value used to resize item labels,
+used when <code>show_items</code> is used. This value can be supplied as
+a vector, in which case it will be applied to each polygon
+in the order they are drawn, typically the order presented
+in <code>label_df</code>.</p></td>
     </tr>
     <tr>
       <th>plot_warning</th>
@@ -249,9 +268,62 @@ or cannot represent every possible overlap, causing some
 overlaps to be hidden from the plot.</p></td>
     </tr>
     <tr>
+      <th>show_items</th>
+      <td><p><code>character</code> indicating how to display item labels,
+relevant when items are contained in <code>label_df</code> and when a
+relevant label preset is used that includes item display,
+for example <code>label_preset="main items"</code> and <code>show_items="item"</code>.
+The <code>show_items</code> character string can include <code>"item"</code> and/or
+<code>"sign"</code> as substrings, for example <code>show_items="sign item"</code>
+or <code>show_items="item sign"</code> or <code>show_items="sign'"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>item_degrees</th>
+      <td><p><code>numeric</code> value used to adjust the angle of
+item labels within each polygon. It can be useful to adjust
+the angle of text as a method of reducing label overlaps.
+Another alternative is to pass argument <code>layout_degrees</code>
+through <code>...</code> to <code><a href='polygon_label_fill.html'>polygon_label_fill()</a></code>, which adjusts the
+angle of the label points inside each polygon.</p></td>
+    </tr>
+    <tr>
+      <th>max_items</th>
+      <td><p><code>numeric</code> value indicating the maximum number
+of item labels to display in each polygon, after which the
+only the count summary is displayed. (This argument is not
+yet implemented.)</p></td>
+    </tr>
+    <tr>
+      <th>show_zero</th>
+      <td><p><code>logical</code> indicating whether to display <code>0</code> zero
+in overlap regions that contain no items. For some diagrams
+it can look cleaner not to display the zero, with
+<code>show_zero=FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>show_segments</th>
+      <td><p><code>logical</code> indicating whether to draw a line
+segment from labels outside their respective polygons into
+the polygon.</p></td>
+    </tr>
+    <tr>
+      <th>segment_buffer</th>
+      <td><p><code>numeric</code> value indicating the buffer size
+inside a polygon when drawing a line segment, when
+<code>show_segments=TRUE</code>. A value <code>segment_buffer=-0.5</code> will create
+an internal polygon buffer half the size it would take to remove
+the polygon, and the line segment will be drawn to this border.
+A value <code>segment_buffer=-1</code> will draw the line segment very near
+the center of the polygon. A value <code>segment_buffer=0</code> will
+draw the line segment to the border of the polygon, however
+in some cases two polygon borders can be near each other, or
+overlap, so this setting can be adjusted accordingly.</p></td>
+    </tr>
+    <tr>
       <th>label_style</th>
       <td><p><code>character</code> string indicating the style of label
-to display. The values <code>"basic","none","shaded","lite","fill"</code>
+to display, passed to <code><a href='venndir_label_style.html'>venndir_label_style()</a></code>.
+The values <code>"basic","none","shaded","lite","fill"</code>
 style the label background fill, while presence of <code>"box"</code> in
 the string will draw a border around the label:
 <code>"basic"</code> or <code>"none"</code> uses no background fill,
@@ -272,7 +344,10 @@ may differ from those for PNG.</p></td>
       <th>inside_percent_threshold</th>
       <td><p><code>numeric</code> value indicating the percent
 threshold, below which a polygon label is moved outside the polygon
-by default. The threshold is calculated by area of the polygon
+by default. When a count label is automatically positioned outside
+or inside a polygon, this argument defines the threshold for that
+decision.
+The threshold is calculated by area of the polygon
 divided by total area of the enclosing polygon, multiplied by 100.
 Therefore <code>inside_percent_threshold=5</code> will require a polygon to
 represent at least 5 percent of the total area.</p></td>
@@ -285,10 +360,25 @@ ggplot2 graphics (not yet implemented).</p></td>
     </tr>
     <tr>
       <th>group_labels</th>
-      <td><p><code>logical</code> to enable experimental feature that
+      <td><p><code>logical</code> to enable a relatively new feature that
 groups multiple <code><a href='https://wilkelab.org/gridtext/reference/richtext_grob.html'>gridtext::richtext_grob()</a></code> elements together
-by overlap set and position, currently only implemented
-(partially) for base R plots.</p></td>
+by overlap set and position, so there is one border and fill
+color for the set of labels. This feature is currently only
+implemented for base R plots, and not yet available for
+<code>plot_style="gg"</code> using ggplot2.</p></td>
+    </tr>
+    <tr>
+      <th>ggtheme</th>
+      <td><p><code>function</code> that outputs class <code>"theme", "gg"</code>,
+compatible with output from <code><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>ggplot2::theme_void()</a></code>. This argument
+is used to define the ggplot2 theme, when <code>plot_style="gg"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>draw_buffer</th>
+      <td><p><code>logical</code> indicating whether to draw the item
+buffer used to determine item label positions inside each
+polygon, only relevant when <code>label_preset</code> includes items,
+and <code>show_items</code> is active.</p></td>
     </tr>
     <tr>
       <th>...</th>

@@ -60,20 +60,66 @@
 #' @param xlim,ylim `numeric` range for x- and y-axis, respectively.
 #'    When `xlim` or `ylim` are `NULL`, values are derived from the
 #'    coordinates from `venn_spdf` and `label_df`.
+#' @param expand_fraction `numeric` vector expanded to length 4,
+#'    used to expand the `xlim` and `ylim` ranges, where the vector
+#'    corresponds to: bottom, left, top, right.
 #' @param xpd see `graphics::par()`, when `xpd=FALSE` it clips text
 #'    labels and polygons to the plot boundary; when `xpd=TRUE` it
 #'    clips to the figure region, and when `xpd=NA` it is clipped
 #'    to the full device region. This option is mainly helpful
 #'    as `xpd=NA` ensures labels are displayed even when they overlap
 #'    the plot boundary.
+#' @param font_cex `numeric` value used to resize text font used in
+#'    Venn overlap labels overall. A value `font_cex=1.2` will make
+#'    text labels 20% larger than normal.
+#' @param item_cex `numeric` value used to resize item labels,
+#'    used when `show_items` is used. This value can be supplied as
+#'    a vector, in which case it will be applied to each polygon
+#'    in the order they are drawn, typically the order presented
+#'    in `label_df`.
 #' @param plot_warning `logical` indicating whether to draw a text
 #'    label on the bottom of the plot whenever a non-zero overlap
 #'    count cannot be displayed given the `label_df` data. This
 #'    occurs when a proportional Venn (Euler) diagram does not
 #'    or cannot represent every possible overlap, causing some
 #'    overlaps to be hidden from the plot.
+#' @param show_items `character` indicating how to display item labels,
+#'    relevant when items are contained in `label_df` and when a
+#'    relevant label preset is used that includes item display,
+#'    for example `label_preset="main items"` and `show_items="item"`.
+#'    The `show_items` character string can include `"item"` and/or
+#'    `"sign"` as substrings, for example `show_items="sign item"`
+#'    or `show_items="item sign"` or `show_items="sign'"`.
+#' @param item_degrees `numeric` value used to adjust the angle of
+#'    item labels within each polygon. It can be useful to adjust
+#'    the angle of text as a method of reducing label overlaps.
+#'    Another alternative is to pass argument `layout_degrees`
+#'    through `...` to `polygon_label_fill()`, which adjusts the
+#'    angle of the label points inside each polygon.
+#' @param max_items `numeric` value indicating the maximum number
+#'    of item labels to display in each polygon, after which the
+#'    only the count summary is displayed. (This argument is not
+#'    yet implemented.)
+#' @param show_zero `logical` indicating whether to display `0` zero
+#'    in overlap regions that contain no items. For some diagrams
+#'    it can look cleaner not to display the zero, with
+#'    `show_zero=FALSE`.
+#' @param show_segments `logical` indicating whether to draw a line
+#'    segment from labels outside their respective polygons into
+#'    the polygon.
+#' @param segment_buffer `numeric` value indicating the buffer size
+#'    inside a polygon when drawing a line segment, when
+#'    `show_segments=TRUE`. A value `segment_buffer=-0.5` will create
+#'    an internal polygon buffer half the size it would take to remove
+#'    the polygon, and the line segment will be drawn to this border.
+#'    A value `segment_buffer=-1` will draw the line segment very near
+#'    the center of the polygon. A value `segment_buffer=0` will
+#'    draw the line segment to the border of the polygon, however
+#'    in some cases two polygon borders can be near each other, or
+#'    overlap, so this setting can be adjusted accordingly.
 #' @param label_style `character` string indicating the style of label
-#'    to display. The values `"basic","none","shaded","lite","fill"`
+#'    to display, passed to `venndir_label_style()`.
+#'    The values `"basic","none","shaded","lite","fill"`
 #'    style the label background fill, while presence of `"box"` in
 #'    the string will draw a border around the label:
 #'    `"basic"` or `"none"` uses no background fill,
@@ -88,17 +134,29 @@
 #'    may differ from those for PNG.
 #' @param inside_percent_threshold `numeric` value indicating the percent
 #'    threshold, below which a polygon label is moved outside the polygon
-#'    by default. The threshold is calculated by area of the polygon
+#'    by default. When a count label is automatically positioned outside
+#'    or inside a polygon, this argument defines the threshold for that
+#'    decision.
+#'    The threshold is calculated by area of the polygon
 #'    divided by total area of the enclosing polygon, multiplied by 100.
 #'    Therefore `inside_percent_threshold=5` will require a polygon to
 #'    represent at least 5 percent of the total area.
 #' @param plot_style `character` string indicating the style
 #'    of plot: `"base"` uses base R graphics; `"gg"` uses
 #'    ggplot2 graphics (not yet implemented).
-#' @param group_labels `logical` to enable experimental feature that
+#' @param group_labels `logical` to enable a relatively new feature that
 #'    groups multiple `gridtext::richtext_grob()` elements together
-#'    by overlap set and position, currently only implemented
-#'    (partially) for base R plots.
+#'    by overlap set and position, so there is one border and fill
+#'    color for the set of labels. This feature is currently only
+#'    implemented for base R plots, and not yet available for
+#'    `plot_style="gg"` using ggplot2.
+#' @param ggtheme `function` that outputs class `"theme", "gg"`,
+#'    compatible with output from `ggplot2::theme_void()`. This argument
+#'    is used to define the ggplot2 theme, when `plot_style="gg"`.
+#' @param draw_buffer `logical` indicating whether to draw the item
+#'    buffer used to determine item label positions inside each
+#'    polygon, only relevant when `label_preset` includes items,
+#'    and `show_items` is active.
 #' @param ... additional arguments are passed to `plot()`
 #'    when plotting `venn_spdf` which is expected to be a
 #'    `sp::SpatialPolygonsDataFrame`.
@@ -148,11 +206,11 @@ render_venndir <- function
     "sign item",
     "item",
     "sign"),
+ item_degrees=0,
+ max_items=100,
  show_zero=TRUE,
  show_segments=TRUE,
- item_degrees=-18,
- display_counts=TRUE,
- max_items=100,
+ segment_buffer=-0.2,
  label_style=c("custom",
     "basic",
     "fill",
@@ -161,7 +219,6 @@ render_venndir <- function
     "lite",
     "lite_box"),
  fontfamily="Arial",
- segment_buffer=-0.2,
  inside_percent_threshold=5,
  plot_style=c("base", "gg"),
  group_labels=TRUE,

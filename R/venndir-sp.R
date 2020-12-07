@@ -468,7 +468,9 @@ match_list <- function
 {
    sapply(x, function(i){
       for(j in seq_along(y)) {
-         if (all(i %in% y[[j]]) && all(y[[j]] %in% i)) {
+         if (all(i %in% y[[j]]) &&
+               all(y[[j]] %in% i) &&
+               length(y[[j]]) == length(i)) {
             return(j)
          }
       }
@@ -893,6 +895,48 @@ nudge_sp <- function
 #' 
 #' plot(sp, col="gold", border="gold4", lwd=2);
 #' polygon_label_fill(sp=sp,
+#'    degrees=0,
+#'    draw_buffer=FALSE,
+#'    layout_degrees=45/2,
+#'    buffer_w=0.4,
+#'    label_method="regular",
+#'    labels=jamba::mixedSort(words),
+#'    dither_color=0.2,
+#'    dither_cex=0.2,
+#'    dither_degrees=0,
+#'    color="red2",
+#'    cex=1.2)
+#' 
+#' # iterate various options for reducing label overlap
+#' par("mfrow"=c(2, 4));
+#' for (lm in c("hexagonal", "regular")) {
+#' for (ld in c(0, -45/2, -30, -45)) {
+#' plot(sp, col="gold", border="gold4", lwd=2);
+#' id <- ifelse(ld == 0, -20,
+#'    ifelse(ld == -45, 15, 0));
+#' polygon_label_fill(sp=sp,
+#'    degrees=id,
+#'    layout_degrees=ld,
+#'    buffer_w=0.4,
+#'    label_method=lm,
+#'    #labels=seq_along(words),
+#'    #labels=rep("word", length(words)),
+#'    labels=paste0("word", seq_along(words)),
+#'    dither_color=0,
+#'    dither_cex=0,
+#'    dither_degrees=0,
+#'    color="navy",
+#'    cex=0.7)
+#' title(main=paste0("layout_degrees=",
+#'    format(ld, digits=2),
+#'    "\nlabel_method='", lm, "'",
+#'    "\ndegrees=", id));
+#' }
+#' }
+#' par("mfrow"=c(1, 1));
+#' 
+#' plot(sp, col="gold", border="gold4", lwd=2);
+#' polygon_label_fill(sp=sp,
 #'    degrees=-10,
 #'    scale_width=-0.3,
 #'    draw_buffer=TRUE,
@@ -943,7 +987,7 @@ polygon_label_fill <- function
  border=NA,
  fontsize=10,
  cex=1,
- degrees=-20,
+ degrees=0,
  dither_cex=0.04,
  dither_color=0.07,
  dither_degrees=0,
@@ -957,6 +1001,7 @@ polygon_label_fill <- function
     "random",
     "stratified",
     "clustered"),
+ layout_degrees=-20,
  draw_buffer=FALSE,
  buffer_fill="#FFFFFF77",
  buffer_border="red",
@@ -1093,6 +1138,7 @@ polygon_label_fill <- function
     offset=c(0.5, 0.5),
     tries=100,
     singlet_polylabelr=TRUE,
+    rotate_degrees=0,
     ...)
    {
       if (n == 0) {
@@ -1108,23 +1154,41 @@ polygon_label_fill <- function
             return(pt_m[,1:2,drop=FALSE]);
          }
       }
+      # optionally rotate sp before finding points
+      # then un-rotate the points back
+      if (length(rotate_degrees) != 1) {
+         rotate_degrees <- 0;
+      }
+      if (rotate_degrees != 0) {
+         sp_center <- rowMeans(sp::bbox(sp));
+         sp <- rescale_sp(sp=sp,
+            rotate_degrees=rotate_degrees,
+            center=sp_center);
+      }
+      
       try_step <- ceiling(n/200);
       for (k in (seq_len(tries)-1)*try_step) {
          if (n + k == 1 && "hexagonal" %in% type) {
             type <- "regular";
          }
          for (offset_i in seq(from=0, to=0.99, by=0.2)) {
-            label_xy <- tryCatch({
-               sp::coordinates(
-                  sp::spsample(sp,
-                     n=n + k,
-                     type=type,
-                     offset=(offset + offset_i) %% 1,
-                     iter=iter));
+            spts <- tryCatch({
+               spts <- sp::spsample(sp,
+                  n=n + k,
+                  type=type,
+                  offset=(offset + offset_i) %% 1,
+                  iter=iter);
             }, error=function(e){
                NULL;
             });
-            if (length(label_xy) > 0 && nrow(label_xy) >= n) {
+            if (length(spts) >= n) {
+               # optionally un-rotate points
+               if (rotate_degrees != 0) {
+                  label_xy <- rescale_coordinates(spts@coords,
+                     rotate_degrees=-rotate_degrees);
+               } else {
+                  label_xy <- sp::coordinates(spts);
+               }
                # sort coordinates top to bottom
                label_xy <- jamba::mixedSortDF(label_xy,
                   byCols=c(-2, 1));
@@ -1141,6 +1205,7 @@ polygon_label_fill <- function
          n,
          type=label_method,
          iter=50,
+         rotate_degrees=layout_degrees,
          singlet_polylabelr=TRUE,
          ...);
    }, error=function(e){

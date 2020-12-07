@@ -3,6 +3,7 @@ context("venndir utility")
 library(venndir)
 
 test_that("expand_range", {
+   x <- c(0, 10);
    expect_equal(expand_range(x, 0.1), c(-0.5, 10.5))
    expect_equal(expand_range(x, c(0.1, 0)), c(-1, 10))
    expect_equal(expand_range(1, minimum_range=1), c(0.5, 1.5))
@@ -12,10 +13,118 @@ test_that("expand_range", {
       list(xlim=c(0.55, 10.45), ylim=c(-3.95, 104.95)))
 })
 
-test_that("degrees_to_adj", {
-   df <- data.frame(adjx=c(0, 0.5, 1, 0.5, 0),
-      adjy=c(0.5, 0, 0.5, 1, 0.5));
+test_that("venn_shapes", {
    expect_equal(
-      degrees_to_adj(c(0, 90, 180, 270, 361)),
-      df)
+      length(get_venn_shapes(c(A=1))),
+      1)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1))),
+      2)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1, C=1))),
+      3)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1, C=1, D=1))),
+      4)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1, C=1, D=1, E=1))),
+      5)
+})
+
+test_that("eulerr_shapes", {
+   expect_equal(
+      length(get_venn_shapes(c(A=1),
+         proportional=TRUE)),
+      1)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1),
+         proportional=TRUE)),
+      2)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1, C=1),
+         proportional=TRUE)),
+      3)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1, C=1, D=1),
+         proportional=TRUE)),
+      4)
+   expect_equal(
+      length(get_venn_shapes(c(A=1, B=1, C=1, D=1, E=1,
+         `A&B`=1, `A&C`=1, `B&D`=1, `D&E`=1),
+         proportional=TRUE)),
+      5)
+})
+
+test_that("find_vennpoly_overlaps", {
+   # test 5-way Euler diagram has 9 overlap polygons
+   countlist <- c(A=1, B=1, C=1, D=1, E=1,
+      `A&B`=1, `A&C`=1, `B&D`=1, `D&E`=1);
+   sp <- get_venn_shapes(countlist,
+      proportional=TRUE);
+   fpo <- find_vennpoly_overlaps(sp=sp,
+      venn_counts=countlist)
+   length(fpo)
+   expect_equal(
+      length(fpo),
+      9)
+})
+
+test_that("make_venn_combn_df", {
+   cdf3 <- make_venn_combn_df(letters[c(1,2,3)]);
+   expect_equal(
+      nrow(cdf3),
+      7)
+   expect_equal(
+      ncol(cdf3),
+      3)
+   cdf5 <- make_venn_combn_df(letters[c(1,2,3,4,5)]);
+   expect_equal(
+      nrow(cdf5),
+      31)
+   expect_equal(
+      ncol(cdf5),
+      5)
+   cdf6z <- make_venn_combn_df(letters[c(1,2,3,4,5,6)],
+      include_zero=TRUE);
+   expect_equal(
+      nrow(cdf6z),
+      64)
+   expect_equal(
+      ncol(cdf6z),
+      6)
+})
+
+test_that("make_color_contrast", {
+   mcc <- make_color_contrast(c("red", "blue"), c("red", "blue"),
+      L_hi=80, L_lo=40, L_threshold=65);
+   expect_equal(
+      mcc,
+      c("#FF9090", "#B5B5FF"))
+})
+
+test_that("match_list", {
+   l1 <- list(A=c(1,5,7,9),
+      B=letters[c(3,5,7,8)],
+      C=c(1,2,9));
+   l2 <- list(
+      E=letters[c(3,5,7,8)],
+      F=c(1,9,2),
+      F2=c(1,2,9,9),
+      D=c(1,5,7,9),
+      G=c(9))
+   testthat::expect_equal(
+      match_list(l2, l1),
+      c(E=2, F=3, F2=NA, D=1, G=NA))
+   testthat::expect_equal(
+      match_list(l1, l2),
+      c(A=4, B=1, C=2))
+})
+
+test_that("sp_percent_area", {
+   sp <- get_venn_shapes(c(A=1, B=2));
+   sp <- find_vennpoly_overlaps(sp)
+   sp_percent_area(sp)
+   expect_equal(
+      round(sp_percent_area(sp)),
+      c(38, 38, 24))
 })

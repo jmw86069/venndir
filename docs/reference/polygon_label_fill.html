@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.12.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.9000</span>
       </span>
     </div>
 
@@ -139,7 +139,7 @@
   border <span class='op'>=</span> <span class='cn'>NA</span>,
   fontsize <span class='op'>=</span> <span class='fl'>10</span>,
   cex <span class='op'>=</span> <span class='fl'>1</span>,
-  degrees <span class='op'>=</span> <span class='op'>-</span><span class='fl'>20</span>,
+  degrees <span class='op'>=</span> <span class='fl'>0</span>,
   dither_cex <span class='op'>=</span> <span class='fl'>0.04</span>,
   dither_color <span class='op'>=</span> <span class='fl'>0.07</span>,
   dither_degrees <span class='op'>=</span> <span class='fl'>0</span>,
@@ -149,6 +149,7 @@
   buffer_h <span class='op'>=</span> <span class='fl'>0</span>,
   label_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"hexagonal"</span>, <span class='st'>"nonaligned"</span>, <span class='st'>"regular"</span>, <span class='st'>"random"</span>, <span class='st'>"stratified"</span>,
     <span class='st'>"clustered"</span><span class='op'>)</span>,
+  layout_degrees <span class='op'>=</span> <span class='op'>-</span><span class='fl'>20</span>,
   draw_buffer <span class='op'>=</span> <span class='cn'>FALSE</span>,
   buffer_fill <span class='op'>=</span> <span class='st'>"#FFFFFF77"</span>,
   buffer_border <span class='op'>=</span> <span class='st'>"red"</span>,
@@ -341,11 +342,53 @@ overlap.</p>
 </div><div class='img'><img src='polygon_label_fill-1.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
 </div><div class='input'><span class='fu'>polygon_label_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>,
+   degrees<span class='op'>=</span><span class='fl'>0</span>,
+   draw_buffer<span class='op'>=</span><span class='cn'>FALSE</span>,
+   layout_degrees<span class='op'>=</span><span class='fl'>45</span><span class='op'>/</span><span class='fl'>2</span>,
+   buffer_w<span class='op'>=</span><span class='fl'>0.4</span>,
+   label_method<span class='op'>=</span><span class='st'>"regular"</span>,
+   labels<span class='op'>=</span><span class='fu'>jamba</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/jamba/man/mixedSort.html'>mixedSort</a></span><span class='op'>(</span><span class='va'>words</span><span class='op'>)</span>,
+   dither_color<span class='op'>=</span><span class='fl'>0.2</span>,
+   dither_cex<span class='op'>=</span><span class='fl'>0.2</span>,
+   dither_degrees<span class='op'>=</span><span class='fl'>0</span>,
+   color<span class='op'>=</span><span class='st'>"red2"</span>,
+   cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>
+</div><div class='img'><img src='polygon_label_fill-2.png' alt='' width='768' height='768' /></div><div class='input'>
+<span class='co'># iterate various options for reducing label overlap</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='st'>"mfrow"</span><span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>;
+<span class='kw'>for</span> <span class='op'>(</span><span class='va'>lm</span> <span class='kw'>in</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"hexagonal"</span>, <span class='st'>"regular"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'>for</span> <span class='op'>(</span><span class='va'>ld</span> <span class='kw'>in</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='op'>-</span><span class='fl'>45</span><span class='op'>/</span><span class='fl'>2</span>, <span class='op'>-</span><span class='fl'>30</span>, <span class='op'>-</span><span class='fl'>45</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
+<span class='va'>id</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>ld</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>-</span><span class='fl'>20</span>,
+   <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>ld</span> <span class='op'>==</span> <span class='op'>-</span><span class='fl'>45</span>, <span class='fl'>15</span>, <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span>;
+<span class='fu'>polygon_label_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>,
+   degrees<span class='op'>=</span><span class='va'>id</span>,
+   layout_degrees<span class='op'>=</span><span class='va'>ld</span>,
+   buffer_w<span class='op'>=</span><span class='fl'>0.4</span>,
+   label_method<span class='op'>=</span><span class='va'>lm</span>,
+   <span class='co'>#labels=seq_along(words),</span>
+   <span class='co'>#labels=rep("word", length(words)),</span>
+   labels<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"word"</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span><span class='op'>(</span><span class='va'>words</span><span class='op'>)</span><span class='op'>)</span>,
+   dither_color<span class='op'>=</span><span class='fl'>0</span>,
+   dither_cex<span class='op'>=</span><span class='fl'>0</span>,
+   dither_degrees<span class='op'>=</span><span class='fl'>0</span>,
+   color<span class='op'>=</span><span class='st'>"navy"</span>,
+   cex<span class='op'>=</span><span class='fl'>0.7</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/title.html'>title</a></span><span class='op'>(</span>main<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"layout_degrees="</span>,
+   <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='va'>ld</span>, digits<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>,
+   <span class='st'>"\nlabel_method='"</span>, <span class='va'>lm</span>, <span class='st'>"'"</span>,
+   <span class='st'>"\ndegrees="</span>, <span class='va'>id</span><span class='op'>)</span><span class='op'>)</span>;
+<span class='op'>}</span>
+<span class='op'>}</span>
+</div><div class='img'><img src='polygon_label_fill-3.png' alt='' width='768' height='768' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='st'>"mfrow"</span><span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>;
+
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span>, col<span class='op'>=</span><span class='st'>"gold"</span>, border<span class='op'>=</span><span class='st'>"gold4"</span>, lwd<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>;
+</div><div class='input'><span class='fu'>polygon_label_fill</span><span class='op'>(</span>sp<span class='op'>=</span><span class='va'>sp</span>,
    degrees<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>,
    scale_width<span class='op'>=</span><span class='op'>-</span><span class='fl'>0.3</span>,
    draw_buffer<span class='op'>=</span><span class='cn'>TRUE</span>,
    labels<span class='op'>=</span><span class='va'>words</span>, dither_color<span class='op'>=</span><span class='fl'>0.2</span>, color<span class='op'>=</span><span class='st'>"red2"</span>, cex<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span>
-</div><div class='img'><img src='polygon_label_fill-2.png' alt='' width='768' height='768' /></div><div class='input'>
+</div><div class='img'><img src='polygon_label_fill-4.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='va'>setlist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_venn_test.html'>make_venn_test</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>3</span><span class='op'>)</span>;
 <span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, return_items<span class='op'>=</span><span class='cn'>TRUE</span>, font_cex<span class='op'>=</span><span class='fl'>0.01</span>, proportional<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>;
 </div><div class='input'>
@@ -363,7 +406,7 @@ overlap.</p>
       labels<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>label_df</span><span class='op'>[</span><span class='va'>j</span>,<span class='st'>"items"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>;
    <span class='op'>}</span>
 <span class='op'>}</span>
-</div><div class='img'><img src='polygon_label_fill-3.png' alt='' width='768' height='768' /></div><div class='input'>
+</div><div class='img'><img src='polygon_label_fill-5.png' alt='' width='768' height='768' /></div><div class='input'>
 <span class='co'># same example as above but using proportional circles</span>
 <span class='va'>vo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='venndir.html'>venndir</a></span><span class='op'>(</span><span class='va'>setlist</span>, font_cex<span class='op'>=</span><span class='fl'>0.01</span>, proportional<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>;
 </div><div class='input'>
@@ -381,7 +424,7 @@ overlap.</p>
       labels<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>label_df</span><span class='op'>[</span><span class='va'>j</span>,<span class='st'>"items"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>;
    <span class='op'>}</span>
 <span class='op'>}</span>
-</div><div class='img'><img src='polygon_label_fill-4.png' alt='' width='768' height='768' /></div><div class='input'>
+</div><div class='img'><img src='polygon_label_fill-6.png' alt='' width='768' height='768' /></div><div class='input'>
 
 </div></pre>
   </div>

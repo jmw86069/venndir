@@ -1,4 +1,23 @@
 
+# venndir 0.0.13.900
+
+## updates to existing functions
+
+* `label_polygon_fill()` new argument `layout_degrees` allows
+rotating the label placement, relevant mostly for
+`label_method="regular"` which produces square point grid,
+and `label_method="hexagonal"` which produces a hexagonal
+point grid. It can be useful to rotate those points so text
+labels have less overlap. As a result `degrees=0` is the new
+default, as `layout_degrees=-22` is also the new default.
+See the new set of examples which includes visual representation
+of methods to reduce text label overlaps.
+* `render_venndir()` default is changed to `item_degrees=0`.
+* `match_list()` was updated to require both list elements to
+have the same length, to account for duplicate items.
+* Added more tests, still many more to add.
+
+
 # venndir 0.0.12.900
 
 ## updates to existing functions
