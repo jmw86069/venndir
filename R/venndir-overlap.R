@@ -84,6 +84,14 @@
 #' # agreement overlap counts
 #' signed_overlaps(setlist, "agreement");
 #' 
+#' # test to ensure factor input is handled properly
+#' inputlist <- list(setA=factor(c("A", "B", "D")),
+#'    setB=factor(c("A", "C", "E", "F")))
+#' signed_overlaps(inputlist, return_items=TRUE)
+#' 
+#' # check to verify
+#' signed_overlaps(inputlist, return_items=TRUE)$items
+#' 
 #' @export
 signed_overlaps <- function
 (setlist,
@@ -112,8 +120,11 @@ signed_overlaps <- function
             if (is.numeric(i)) {
                warning("signed_overlaps(): input list contains vector with un-named numeric values.");
             }
+            if (is.factor(i)) {
+               warning("signed_overlaps(): input list contains factor values which will be coerced to character.");
+            }
             i <- jamba::nameVector(rep(1, length(i)),
-               i,
+               as.character(i),
                makeNamesFunc=c);
          }
          i

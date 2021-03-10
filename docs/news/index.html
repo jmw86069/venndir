@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.9000</span>
       </span>
     </div>
 
@@ -126,6 +126,75 @@
       <small>Source: <a href='http://github.com/jmw86069/venndir/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="venndir-0015900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.15.900">
+<a href="#venndir-0015900" class="anchor"></a>venndir 0.0.15.900</h1>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>
+<code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> was not handling <code>factor</code> vectors as input, they were getting coerced to <code>integer</code> values instead of <code>character</code> values. This issue was caused by handling duplicate entries, in this case the duplicate entries were not renamed to unique entries by calling <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> for the <code>makeNamesFunc</code> part of <code><a href="https://rdrr.io/pkg/jamba/man/makeNames.html">jamba::makeNames()</a></code>. The base R assignment <code>names(x) &lt;- c(y)</code> coerces <code>factor</code> values in <code>y</code> to <code>integer</code> values, which in this case breaks the expected behavior. This seems like an edge case, but certainly one that <code>venndir</code> should handle without issue - it is not always clear when values are stored as factors instead of character, and the expected behavior in all cases is for <code>venndir</code> to treat <code>factor</code> as <code>character</code> values. (Thank you Dr. Ashley Brooks for bringing my attention to this issue!)</li>
+</ul>
+</div>
+<div id="changes-to-existing-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#changes-to-existing-functions" class="anchor"></a>changes to existing functions</h2>
+<ul>
+<li>
+<code><a href="../reference/list2im_value.html">list2im_value()</a></code> was also updated to handle <code>factor</code> values by coercing to <code>character</code> instead of allowing the base R <code>matrix</code> coersion which by default coerces to <code>integer</code>.</li>
+<li>
+<code><a href="../reference/list2im_value.html">list2im_value()</a></code> was also updated to handle <code>empty</code> which is a user-defined value to use in the resulting incidence matrix for empty entries. This argument is not used by <code>venndir</code> but is available for general conversion of value list to value incidence matrix.</li>
+<li>
+<code><a href="../reference/list2im_value.html">list2im_value()</a></code> was also updated to use a consistent default <code>empty</code> based upon whether the input <code>setlist</code> contains any <code>character</code> or <code>factor</code> values. The previous behavior handled each column independently. The rule is that when any column contains <code>character</code> or <code>factor</code> values, the default is <code>empty=""</code> across all columns; if all values are <code>numeric</code> the default is <code>empty=0</code>. The result is a consistently formatted value incidence matrix. This is a rare edge case that is not expected for common use of <code>venndir</code> but may arise from the conversion functions from value list to value incidence matrix.</li>
+</ul>
+</div>
+<div id="new-unit-tests" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-unit-tests" class="anchor"></a>new unit tests</h2>
+<ul>
+<li>unit tests were added to confirm the behavior of <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> with named <code>factor</code> vectors as input.</li>
+</ul>
+</div>
+</div>
+    <div id="venndir-0014900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.14.900">
+<a href="#venndir-0014900" class="anchor"></a>venndir 0.0.14.900</h1>
+<div id="new-function" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-function" class="anchor"></a>new function</h2>
+<ul>
+<li>
+<code><a href="../reference/venn_meme.html">venn_meme()</a></code> is a wrapper function to help create “Venn Memes” also known as “Concept Venns”. These have text inside each overlap but no other counts or labels. Input is expected to be an overlap list, which is converted to setlist using <code><a href="../reference/overlaplist2setlist.html">overlaplist2setlist()</a></code>. See examples.</li>
+</ul>
+</div>
+<div id="updates" class="section level2">
+<h2 class="hasAnchor">
+<a href="#updates" class="anchor"></a>updates</h2>
+<ul>
+<li>
+<code><a href="../reference/venndir.html">venndir()</a></code> argument <code>font_cex</code> was updated to accept length 3 which is applied to (1) main set labels, (2) main count labels, (3) directional count labels. It is sometimes useful to have main set labels larger than the main count labels, which prompted this change. Now it is possible to place main set labels outside the diagram, and have smaller count labels inside the diagram, for example to fit inside proportional Euler diagram shapes. This change adds <code>fontsize</code> to the <code>venn_spdf</code> output object, thus storing the set label font size separate from the count label font size.</li>
+<li>
+<code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> new argument option <code>label_preset="custom"</code> will not modify any label position settings. This option is intended when labels are manually adjusted and should not be changed, and where the user wants to apply <code>label_style</code> to affect the label color, fill, and box outline.</li>
+<li>Updated dependency on <code>colorjam</code> to version <code>0.0.18.900</code> to fix error with <code>rad2deg()</code> when blending colors.</li>
+</ul>
+</div>
+<div id="bug-fixed" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixed" class="anchor"></a>bug fixed</h2>
+<ul>
+<li>
+<code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> now recognizes when items cannot be displayed inside proportional diagrams, and sets <code>show_items="none"</code> for those entries in <code>label_df</code>. This change prevents trying to place labels inside a NULL overlap polygon.</li>
+</ul>
+</div>
+<div id="testthat" class="section level2">
+<h2 class="hasAnchor">
+<a href="#testthat" class="anchor"></a>testthat</h2>
+<ul>
+<li>Added more tests, covering <code>venndir converters</code> like <code>im2list_opt()</code>, <code>list2im()</code>, <code><a href="../reference/im_value2list.html">im_value2list()</a></code>, and <code><a href="../reference/list2im_value.html">list2im_value()</a></code>.</li>
+</ul>
+</div>
+</div>
     <div id="venndir-0013900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.13.900">
 <a href="#venndir-0013900" class="anchor"></a>venndir 0.0.13.900</h1>
@@ -161,17 +230,17 @@
 <a href="#new-functions-experimental-for-plotly" class="anchor"></a>new functions (experimental for plotly)</h2>
 <ul>
 <li>
-<code><a href="../reference/to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code> and <code><a href="../reference/to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code> were added for rudimentary compatibility when using <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html">plotly::ggplotly()</a></code> with <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> and <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">ggtext::geom_textbox()</a></code>. These functions do display text inside plotly figure, however: (1) they do not cleanly use text positioning, even with <code>textposition</code>;</li>
+<code><a href="../reference/to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code> and <code><a href="../reference/to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code> were added for rudimentary compatibility when using <code><a href="https://docs.ropensci.org/plotly/reference/ggplotly.html">plotly::ggplotly()</a></code> with <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> and <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">ggtext::geom_textbox()</a></code>. These functions do display text inside plotly figure, however: (1) they do not cleanly use text positioning, even with <code>textposition</code>;</li>
 </ul>
-<p>(2) plotly does not interpret markdown, so any markdown text is displayed as-is. Ultimately plotly support will probably be added to <code><a href="../reference/render_venndir.html">render_venndir()</a></code> via <code>plot_style="plotly"</code> then using <code><a href="https://rdrr.io/pkg/plotly/man/plot_ly.html">plotly::plot_ly()</a></code> commands in native form.</p>
+<p>(2) plotly does not interpret markdown, so any markdown text is displayed as-is. Ultimately plotly support will probably be added to <code><a href="../reference/render_venndir.html">render_venndir()</a></code> via <code>plot_style="plotly"</code> then using <code><a href="https://docs.ropensci.org/plotly/reference/plot_ly.html">plotly::plot_ly()</a></code> commands in native form.</p>
 </div>
 </div>
     <div id="venndir-0011900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.11.900">
 <a href="#venndir-0011900" class="anchor"></a>venndir 0.0.11.900</h1>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>FIXED: <code>show_zero=TRUE</code> was not working, zeros were always hidden.</li>
 <li>FIXED: <code>alpha_by_counts</code> appears to be mis-aligned.</li>
@@ -233,17 +302,17 @@
 <code>ggrender_venndir()</code> was removed, use <code><a href="../reference/render_venndir.html">render_venndir(plot_style="gg")</a></code> in its place. It made sense to keep the visualization logic inside one function.</li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/spread_degrees.html">spread_degrees()</a></code> was not properly maintaining the initial order of angles when it iteratively spread out a series of angles. For example one group of angles could be spread wide enough to overlap another existing angle, in which case that angle should be kept outside the initial group, instead of being placed into the middle. The telltale sign is that line segments wildly criss-crossed inside the polygon.</li>
 </ul>
 </div>
-<div id="changes-to-existing-functions" class="section level2">
+<div id="changes-to-existing-functions-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changes-to-existing-functions" class="anchor"></a>changes to existing functions</h2>
+<a href="#changes-to-existing-functions-1" class="anchor"></a>changes to existing functions</h2>
 <ul>
 <li><p>New argument <code>inside_percent_threshold</code> added to <code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code>, and <code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> used to position labels outside a polygon when its size is below this percent of the total polygon size. It works as a reasonable alternative for determining if the label visually fits inside a polygon.</p></li>
 <li><p><code><a href="../reference/venndir.html">venndir()</a></code> can accept polygon shapes to use as input, instead of defining its own or using those from <code><a href="https://jolars.github.io/eulerr/reference/euler.html">eulerr::euler()</a></code>. New argument <code>venn_sp</code> accepts any <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html">sp::SpatialPolygons</a></code> compatible object, which must have at least as many polygons as there are sets in <code>setlist</code>.</p></li>
@@ -304,9 +373,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/render_venndir.html">render_venndir()</a></code> added <code>sp</code> prefix to <code>sp::plot()</code> for base R plotting.</li>
@@ -318,9 +387,9 @@
 <code><a href="../reference/find_vennpoly_overlaps.html">find_vennpoly_overlaps()</a></code>, <code><a href="../reference/overlaplist2setlist.html">overlaplist2setlist()</a></code>, <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> now call <code><a href="https://rdrr.io/r/base/strsplit.html">strsplit(..., fixed=TRUE)</a></code> so the <code>sep</code> character is not treated like a regular expression, thus allowing delimiter <code>sep="|"</code> if specified.</li>
 </ul>
 </div>
-<div id="changes-to-existing-functions-1" class="section level2">
+<div id="changes-to-existing-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changes-to-existing-functions-1" class="anchor"></a>changes to existing functions</h2>
+<a href="#changes-to-existing-functions-2" class="anchor"></a>changes to existing functions</h2>
 <ul>
 <li><p><code><a href="../reference/textvenn.html">textvenn()</a></code> new argument <code>sep</code> to allow customizing the delimiter between set names, for example the default <code>sep="&amp;"</code> creates overlap names like <code>set_A&amp;set_B</code>; but <code>sep=" | "</code> creates overlap names like <code>set_A | set_B</code>.</p></li>
 <li>
@@ -385,9 +454,9 @@
     <div id="venndir-005900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.5.900">
 <a href="#venndir-005900" class="anchor"></a>venndir 0.0.5.900</h1>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/sp_ellipses.html">sp_ellipses()</a></code> argument renamed from <code>radius</code> to <code>xradius</code> and <code>yradius</code>.</li>
@@ -453,9 +522,9 @@
 <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> - convert vector of overlap counts to setlist, intended for compatibility with other packages like <code>eulerr</code>, <code>upsetr</code>, and <code>VennDiagram</code>.</li>
 </ul>
 </div>
-<div id="changes-to-existing-functions-2" class="section level2">
+<div id="changes-to-existing-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changes-to-existing-functions-2" class="anchor"></a>changes to existing functions</h2>
+<a href="#changes-to-existing-functions-3" class="anchor"></a>changes to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>alpha_by_counts</code> adjusts alpha transparency of each overlap based upon the number of counts. Implemented to evaluate the visual effect for now.</li>
@@ -465,9 +534,9 @@
     <div id="venndir-004900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.4.900">
 <a href="#venndir-004900" class="anchor"></a>venndir 0.0.4.900</h1>
-<div id="changes-to-existing-functions-3" class="section level2">
+<div id="changes-to-existing-functions-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changes-to-existing-functions-3" class="anchor"></a>changes to existing functions</h2>
+<a href="#changes-to-existing-functions-4" class="anchor"></a>changes to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> no longer renders the plot, but calls <code><a href="../reference/render_venndir.html">render_venndir()</a></code> in order to offer more customized options. It also allows editing the source data as needed, like adjusting individual overlap settings.</li>

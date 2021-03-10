@@ -7,7 +7,7 @@
 venndir_label_style(
   venndir_output,
   label_preset = c("none", "main inside", "main outside", "outside", "all outside",
-    "concept", "meme", "items", "main items", "main count items"),
+    "concept", "meme", "items", "main items", "main count items", "custom"),
   label_style = c("basic", "box", "fill", "fill_box", "shaded", "shaded_box", "lite",
     "lite_box"),
   lite = "#FFEEAABB",

@@ -17,7 +17,7 @@ venndir(
   max_items = 3000,
   display_counts = TRUE,
   show_zero = FALSE,
-  font_cex = c(1, 0.8),
+  font_cex = c(1, 1, 0.8),
   poly_alpha = 0.8,
   alpha_by_counts = FALSE,
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
@@ -78,10 +78,15 @@ by space, sent to \code{curate_venn_labels(..., type="sign")}.}
 are labeled with zero \code{0} when \code{show_zero=TRUE}, or are
 blank when \code{show_zero=FALSE}.}
 
-\item{font_cex}{\code{numeric} \code{vector} length 2, indicating relative
-font size for the main label, and directional label, respectively.
-The default \code{c(1, 0.8)} defines the main label with 1x size,
-and the directional labels with 80\% that size.}
+\item{font_cex}{\code{numeric} \code{vector} with length up to 3,
+to specify the relative font size for: (1) main set label,
+(2) the main count label, (3) the directional count label.
+The default \code{c(1, 1, 0.8)} defines the main set label
+with 1x size, the main count label with 1x size,
+and the directional labels with 80\% that size. It is usually
+helpful to make the directional count labels slightly smaller
+than the main count labels, but probably depends upon the
+figure.}
 
 \item{poly_alpha}{\code{numeric} value between 0 and 1, indicating the
 alpha transparency of the polygon backgroun color, where
@@ -308,7 +313,7 @@ curate_df <- data.frame(
    stringsAsFactors=FALSE)
 vo <- venndir(setlistv,
    overlap_type="each",
-   font_cex=c(1.5, 0.9), 
+   font_cex=c(1.5, 1.5, 0.9), 
    curate_df=curate_df,
    show_zero=TRUE);
 
@@ -318,6 +323,7 @@ vo <- venndir(setlistv,
 Other venndir core: 
 \code{\link{render_venndir}()},
 \code{\link{signed_overlaps}()},
-\code{\link{textvenn}()}
+\code{\link{textvenn}()},
+\code{\link{venn_meme}()}
 }
 \concept{venndir core}

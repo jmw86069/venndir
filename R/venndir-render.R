@@ -535,6 +535,14 @@ render_venndir <- function
       show_count_inside <- (label_df$count %in% "inside" & !is.na(label_df$x));
       overlap_set <- paste0("**", label_df$overlap_set, "**");
       is_left <- (label_df$type %in% "main") * 1;
+      # enhancement to apply fontsize from venn_spdf to main set labels
+      label_df$overlap_fontsize <- label_df$fontsize;
+      if ("fontsize" %in% names(venn_spdf)) {
+         setmatch <- match(label_df$overlap_set, venn_spdf$label);
+         setmatchupdate <- !is.na(setmatch);
+         label_df$overlap_fontsize[setmatchupdate] <- venn_spdf$fontsize[setmatch[setmatchupdate]];
+      }
+      # gdf is the expanded data.frame of label coordinates
       gdf <- data.frame(
          check.names=FALSE,
          stringsAsFactors=FALSE,
@@ -599,8 +607,8 @@ render_venndir <- function
             label_df$color[show_count_outside],
             label_df$color[show_count_inside]),
          fontsize=c(
-            label_df$fontsize[show_overlap_outside],
-            label_df$fontsize[show_overlap_inside],
+            label_df$overlap_fontsize[show_overlap_outside],
+            label_df$overlap_fontsize[show_overlap_inside],
             label_df$fontsize[show_count_outside],
             label_df$fontsize[show_count_inside]) * font_cex,
          border_col=c(
@@ -1089,7 +1097,8 @@ venndir_label_style <- function
     "concept", "meme",
     "items",
     "main items",
-    "main count items"),
+    "main count items",
+    "custom"),
  label_style=c("basic",
     "box",
     "fill",
@@ -1189,7 +1198,10 @@ venndir_label_style <- function
    sp_index <- (n - 
          match(venndir_output$label_df$overlap_set,
             rev(venndir_output$venn_spdf$label)));
-
+   sp_index2 <- (
+      match(venndir_output$label_df$overlap_set,
+         (venndir_output$venn_spdf$label)));
+   
    # handle label preset
    # check if any set label is hidden
    label_nsets <- lengths(strsplit(venndir_output$label_df$overlap_set, split=sep));
@@ -1197,76 +1209,83 @@ venndir_label_style <- function
    # make sure each set has a shape to use, otherwise skip it
    label_has_shape <- (venndir_output$label_df$overlap_set %in% venndir_output$venn_spdf$label);
 
-   # overlap labels
-   if (any(c("none", "inside", "outside") %in% overlap)) {
-      venndir_output$label_df$overlap <- ifelse(
-         venndir_output$label_df$type %in% "main",
-         overlap,
-         "none");
-   }
-
-   # set labels
-   if (!"none" %in% set) {
-      set_is_hidden <- (label_is_set & is.na(venndir_output$label_df$x) & label_has_shape);
-      set_is_not_hidden <- (label_is_set & !is.na(venndir_output$label_df$x) & label_has_shape);
-      if (any(set_is_hidden)) {
-         set_hidden <- venndir_output$label_df$overlap_set[set_is_hidden];
-         set_hidden_match <- match(set_hidden,
-            venndir_output$venn_spdf$label);
-         venndir_output$label_df[set_is_hidden, c("x", "y", "x_offset", "y_offset")] <- 
-            data.frame(venndir_output$venn_spdf)[set_hidden_match, c("x_label", "x_label", "x_offset", "y_offset")];
-         venndir_output$label_df$overlap[set_is_hidden] <- "outside";
-         if (verbose) {
-            jamba::printDebug("venndir_label_style(): ",
-               "moved hidden set label outside:",
-               set_hidden);
+   # update label positions only when label_preset is not "custom"
+   if (!"custom" %in% label_preset) {
+   
+      # overlap labels
+      if (any(c("none", "inside", "outside") %in% overlap)) {
+         venndir_output$label_df$overlap <- ifelse(
+            venndir_output$label_df$type %in% "main",
+            overlap,
+            "none");
+      }
+   
+      # set labels
+      if (!"none" %in% set) {
+         set_is_hidden <- (label_is_set & is.na(venndir_output$label_df$x) & label_has_shape);
+         set_is_not_hidden <- (label_is_set & !is.na(venndir_output$label_df$x) & label_has_shape);
+         if (any(set_is_hidden)) {
+            set_hidden <- venndir_output$label_df$overlap_set[set_is_hidden];
+            set_hidden_match <- match(set_hidden,
+               venndir_output$venn_spdf$label);
+            venndir_output$label_df[set_is_hidden, c("x", "y", "x_offset", "y_offset")] <- 
+               data.frame(venndir_output$venn_spdf)[set_hidden_match, c("x_label", "x_label", "x_offset", "y_offset")];
+            venndir_output$label_df$overlap[set_is_hidden] <- "outside";
+            if (verbose) {
+               jamba::printDebug("venndir_label_style(): ",
+                  "moved hidden set label outside:",
+                  set_hidden);
+            }
+         }
+         if (any(set_is_not_hidden)) {
+            venndir_output$label_df$overlap[set_is_not_hidden] <- set;
          }
       }
-      if (any(set_is_not_hidden)) {
-         venndir_output$label_df$overlap[set_is_not_hidden] <- set;
+      
+      # count labels
+      venndir_output$label_df$count <- ifelse(
+         venndir_output$label_df$type %in% "main",
+         ifelse(
+            venndir_output$label_df$venn_counts > 0 | show_zero,
+            count,
+            "none"),
+         ifelse(
+            venndir_output$label_df$venn_counts > 0 | show_zero,
+            signed,
+            "none"));
+      if (any(c("none", "inside") %in% items)) {
+         # make sure there are venn_counts to be displayed
+         # there is a valid x coordinate which means a suitable polygon exists
+         venndir_output$label_df$show_items <- ifelse(
+            venndir_output$label_df$venn_counts > 0 &
+               !is.na(venndir_output$label_df$x),
+            items,
+            "none");
       }
-   }
-   
-   # count labels
-   venndir_output$label_df$count <- ifelse(
-      venndir_output$label_df$type %in% "main",
-      ifelse(
-         venndir_output$label_df$venn_counts > 0 | show_zero,
-         count,
-         "none"),
-      ifelse(
-         venndir_output$label_df$venn_counts > 0 | show_zero,
-         signed,
-         "none"));
-   if (any(c("none", "inside") %in% items)) {
-      venndir_output$label_df$show_items <- items;
-   }
-   
-   # check for inside area threshold
-   sp_index2 <- (
-         match(venndir_output$label_df$overlap_set,
-            (venndir_output$venn_spdf$label)));
-   sp_pct_area <- sp_percent_area(venndir_output$venn_spdf);
-   poly_pct_area <- jamba::rmNA(sp_pct_area[sp_index],
-      naValue=0);
-   if (length(inside_percent_threshold) > 0 && any(poly_pct_area <= inside_percent_threshold)) {
-      for (itype in c("count", "overlap")) {
-         venndir_output$label_df[[itype]] <- ifelse(
-            (poly_pct_area <= inside_percent_threshold &
-               venndir_output$label_df[[itype]] %in% "inside"),
-            "outside",
-            venndir_output$label_df[[itype]]);
+      
+      # check for inside area threshold
+      sp_pct_area <- sp_percent_area(venndir_output$venn_spdf);
+      poly_pct_area <- jamba::rmNA(sp_pct_area[sp_index],
+         naValue=0);
+      if (length(inside_percent_threshold) > 0 && any(poly_pct_area <= inside_percent_threshold)) {
+         for (itype in c("count", "overlap")) {
+            venndir_output$label_df[[itype]] <- ifelse(
+               (poly_pct_area <= inside_percent_threshold &
+                  venndir_output$label_df[[itype]] %in% "inside"),
+               "outside",
+               venndir_output$label_df[[itype]]);
+         }
       }
-   }
-
-   # update offset coordinates
-   has_outside <- (venndir_output$label_df$overlap %in% "outside" |
-         venndir_output$label_df$count %in% "outside");
-   if (any(has_outside)) {
-      venndir_output$label_df$x_offset[has_outside] <- (venndir_output$venn_spdf$x_outside[sp_index2[has_outside]] - 
-            venndir_output$label_df$x[has_outside]);
-      venndir_output$label_df$y_offset[has_outside] <- (venndir_output$venn_spdf$y_outside[sp_index2[has_outside]] - 
-            venndir_output$label_df$y[has_outside]);
+   
+      # update offset coordinates
+      has_outside <- (venndir_output$label_df$overlap %in% "outside" |
+            venndir_output$label_df$count %in% "outside");
+      if (any(has_outside)) {
+         venndir_output$label_df$x_offset[has_outside] <- (venndir_output$venn_spdf$x_outside[sp_index2[has_outside]] - 
+               venndir_output$label_df$x[has_outside]);
+         venndir_output$label_df$y_offset[has_outside] <- (venndir_output$venn_spdf$y_outside[sp_index2[has_outside]] - 
+               venndir_output$label_df$y[has_outside]);
+      }
    }
    
    # group labels
@@ -1426,7 +1445,9 @@ venndir_label_style <- function
       ifelse(
          venndir_output$label_df$type %in% "main",
          jamba::rmNA(naValue="black",
-            jamba::setTextContrastColor(venndir_output$venn_spdf$color[sp_index],
+            jamba::setTextContrastColor(
+               jamba::alpha2col(venndir_output$venn_spdf$color[sp_index],
+                  alpha=venndir_output$venn_spdf$alpha[sp_index]),
                useGrey=useGrey)),
          make_color_contrast(
             x=venndir_output$label_df$color,
@@ -1438,8 +1459,13 @@ venndir_label_style <- function
          ifelse(
             venndir_output$label_df$type %in% "main",
             jamba::rmNA(naValue="black",
-               jamba::setTextContrastColor(venndir_output$label_df$fill,
-                  useGrey=useGrey)),
+               make_color_contrast("black",
+                  venndir_output$label_df$fill,
+                  bg=jamba::alpha2col(venndir_output$venn_spdf$color[sp_index],
+                     alpha=venndir_output$venn_spdf$alpha[sp_index])),
+               #jamba::setTextContrastColor(venndir_output$label_df$fill,
+               #   useGrey=useGrey)
+            ),
             make_color_contrast(
                x=venndir_output$label_df$color,
                y=venndir_output$label_df$fill,

@@ -250,6 +250,7 @@ render_venndir(vo, plot_style="gg", show_set="all",
 Other venndir core: 
 \code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
+\code{\link{venn_meme}()},
 \code{\link{venndir}()}
 }
 \concept{venndir core}

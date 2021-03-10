@@ -1,4 +1,92 @@
 
+# venndir 0.0.15.900
+
+## bug fixes
+
+* `signed_overlaps()` was not handling `factor` vectors as input,
+they were getting coerced to `integer` values instead of `character`
+values. This issue was caused by handling duplicate entries,
+in this case the duplicate entries were not renamed to unique entries
+by calling `c()` for the `makeNamesFunc` part of `jamba::makeNames()`.
+The base R assignment `names(x) <- c(y)` coerces `factor` values in
+`y` to `integer` values, which in this case breaks the expected behavior.
+This seems like an edge case, but certainly one that `venndir`
+should handle without issue - it is not always clear when values
+are stored as factors instead of character, and the expected
+behavior in all cases is for `venndir` to treat `factor` as
+`character` values. (Thank you Dr. Ashley Brooks for bringing my
+attention to this issue!)
+
+## changes to existing functions
+
+* `list2im_value()` was also updated to handle `factor` values by
+coercing to `character` instead of allowing the base R `matrix`
+coersion which by default coerces to `integer`.
+* `list2im_value()` was also updated to handle `empty` which is
+a user-defined value to use in the resulting incidence matrix for
+empty entries. This argument is not used by `venndir` but is
+available for general conversion of value list to value incidence
+matrix.
+* `list2im_value()` was also updated to use a consistent default
+`empty` based upon whether the input `setlist` contains any
+`character` or `factor` values. The previous behavior
+handled each column independently.
+The rule is that when any column contains `character`
+or `factor` values, the default is `empty=""` across all columns;
+if all values are `numeric` the default is `empty=0`.
+The result is a consistently formatted value incidence matrix.
+This is a rare edge case that is not expected for common use of
+`venndir` but may arise from the conversion functions from value
+list to value incidence matrix.
+
+## new unit tests
+
+* unit tests were added to confirm the behavior of `signed_overlaps()`
+with named `factor` vectors as input.
+
+
+# venndir 0.0.14.900
+
+## new function
+
+* `venn_meme()` is a wrapper function to help create "Venn Memes"
+also known as "Concept Venns". These have text inside each overlap
+but no other counts or labels. Input is expected to be an
+overlap list, which is converted to setlist using `overlaplist2setlist()`.
+See examples.
+
+## updates
+
+* `venndir()` argument `font_cex` was updated to accept length 3
+which is applied to (1) main set labels, (2) main count labels, (3) directional
+count labels. It is sometimes useful to have main set labels larger
+than the main count labels, which prompted this change. Now
+it is possible to place main set labels outside the diagram,
+and have smaller count labels inside the diagram, for example to
+fit inside proportional Euler diagram shapes. This change adds
+`fontsize` to the `venn_spdf` output object, thus storing the
+set label font size separate from the count label font size.
+* `venndir_label_style()` new argument option `label_preset="custom"`
+will not modify any label position settings. This option is intended
+when labels are manually adjusted and should not be changed, and
+where the user wants to apply `label_style` to affect the label
+color, fill, and box outline.
+* Updated dependency on `colorjam` to version `0.0.18.900` to
+fix error with `rad2deg()` when blending colors.
+
+## bug fixed
+
+* `venndir_label_style()` now recognizes when items cannot be displayed
+inside proportional diagrams, and sets `show_items="none"` for those
+entries in `label_df`. This change prevents trying to place labels
+inside a NULL overlap polygon.
+
+## testthat
+
+* Added more tests, covering `venndir converters` like `im2list_opt()`,
+`list2im()`, `im_value2list()`, and `list2im_value()`.
+
+
 # venndir 0.0.13.900
 
 ## updates to existing functions

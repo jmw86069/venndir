@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.9000</span>
       </span>
     </div>
 
@@ -226,25 +226,25 @@ and prints colorized text output.</p>
 <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/grDevices/colors.html'>colors</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='fl'>151</span><span class='op'>)</span>, <span class='fl'>12</span><span class='op'>)</span>, ncol<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>;
 <span class='va'>dfinvert</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>FALSE</span>, <span class='cn'>FALSE</span>, <span class='cn'>TRUE</span><span class='op'>)</span>, <span class='fl'>12</span>, replace<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>, ncol<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>;
 <span class='fu'>print_color_df</span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>df</span>, <span class='va'>dfinvert</span><span class='op'>)</span>;
-</div><div class='output co'>#&gt;  <span style='color: #BBBBBB;background-color: #000000;'>  darkolivegreen  </span><span style='color: #BB0000;'>   darkorange3   </span><span style='color: #0000BB;'>  dodgerblue3  </span><span> 
-#&gt;  </span><span style='color: #000000;background-color: #BBBBBB;'>  antiquewhite3   </span><span style='color: #BBBBBB;background-color: #0000BB;'>  deepskyblue4   </span><span style='color: #00BB00;'>  chartreuse3  </span><span> 
-#&gt;  </span><span style='color: #BB0000;'>    firebrick3    </span><span style='color: #555555;'>   burlywood4    </span><span style='color: #BB00BB;'>  darkviolet   </span><span> 
-#&gt;  </span><span style='color: #555555;'>      azure4      </span><span style='color: #BBBB00;'>  darkgoldenrod  </span><span style='color: #BB0000;'>  chocolate3   </span><span> </div><div class='input'>
+</div><div class='output co'>#&gt;  <span style='color: #E4E4E4;background-color: #5F875F;'>  darkolivegreen  </span><span style='color: #D78700;'>   darkorange3   </span><span style='color: #0087D7;'>  dodgerblue3  </span><span> 
+#&gt;  </span><span style='color: #080808;background-color: #B2B2B2;'>  antiquewhite3   </span><span style='color: #E4E4E4;background-color: #0087AF;'>  deepskyblue4   </span><span style='color: #87D700;'>  chartreuse3  </span><span> 
+#&gt;  </span><span style='color: #D70000;'>    firebrick3    </span><span style='color: #AF875F;'>   burlywood4    </span><span style='color: #AF00D7;'>  darkviolet   </span><span> 
+#&gt;  </span><span style='color: #808080;'>      azure4      </span><span style='color: #D7AF00;'>  darkgoldenrod  </span><span style='color: #D78700;'>  chocolate3   </span><span> </div><div class='input'>
 <span class='fu'>print_color_df</span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>df</span>, <span class='va'>dfinvert</span>, padding<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>;
-</div><div class='output co'>#&gt;  </span><span style='color: #BBBBBB;background-color: #000000;'> darkolivegreen </span><span style='color: #BB0000;'>  darkorange3  </span><span style='color: #0000BB;'> dodgerblue3 </span><span> 
-#&gt;  </span><span style='color: #000000;background-color: #BBBBBB;'> antiquewhite3  </span><span style='color: #BBBBBB;background-color: #0000BB;'> deepskyblue4  </span><span style='color: #00BB00;'> chartreuse3 </span><span> 
-#&gt;  </span><span style='color: #BB0000;'>   firebrick3   </span><span style='color: #555555;'>  burlywood4   </span><span style='color: #BB00BB;'> darkviolet  </span><span> 
-#&gt;  </span><span style='color: #555555;'>     azure4     </span><span style='color: #BBBB00;'> darkgoldenrod </span><span style='color: #BB0000;'> chocolate3  </span><span> </div><div class='input'>
+</div><div class='output co'>#&gt;  </span><span style='color: #E4E4E4;background-color: #5F875F;'> darkolivegreen </span><span style='color: #D78700;'>  darkorange3  </span><span style='color: #0087D7;'> dodgerblue3 </span><span> 
+#&gt;  </span><span style='color: #080808;background-color: #B2B2B2;'> antiquewhite3  </span><span style='color: #E4E4E4;background-color: #0087AF;'> deepskyblue4  </span><span style='color: #87D700;'> chartreuse3 </span><span> 
+#&gt;  </span><span style='color: #D70000;'>   firebrick3   </span><span style='color: #AF875F;'>  burlywood4   </span><span style='color: #AF00D7;'> darkviolet  </span><span> 
+#&gt;  </span><span style='color: #808080;'>     azure4     </span><span style='color: #D7AF00;'> darkgoldenrod </span><span style='color: #D78700;'> chocolate3  </span><span> </div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"left"</span>, <span class='st'>"centre"</span>, <span class='st'>"right"</span><span class='op'>)</span>;
 <span class='fu'>print_color_df</span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>df</span>, <span class='va'>dfinvert</span>,
    header<span class='op'>=</span><span class='cn'>TRUE</span>,
    padding<span class='op'>=</span><span class='fl'>4</span>,
    dfjustify<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"left"</span>, <span class='st'>"centre"</span>, <span class='st'>"right"</span><span class='op'>)</span><span class='op'>)</span>;
-</div><div class='output co'>#&gt;  </span><span style='color: #555555;'>    left                     centre                  right    </span><span> 
-#&gt;  </span><span style='color: #BBBBBB;background-color: #000000;'>    darkolivegreen    </span><span style='color: #BB0000;'>     darkorange3     </span><span style='color: #0000BB;'>    dodgerblue3    </span><span> 
-#&gt;  </span><span style='color: #000000;background-color: #BBBBBB;'>    antiquewhite3     </span><span style='color: #BBBBBB;background-color: #0000BB;'>    deepskyblue4     </span><span style='color: #00BB00;'>    chartreuse3    </span><span> 
-#&gt;  </span><span style='color: #BB0000;'>    firebrick3        </span><span style='color: #555555;'>     burlywood4      </span><span style='color: #BB00BB;'>     darkviolet    </span><span> 
-#&gt;  </span><span style='color: #555555;'>    azure4            </span><span style='color: #BBBB00;'>    darkgoldenrod    </span><span style='color: #BB0000;'>     chocolate3    </span><span> </div><div class='input'>
+</div><div class='output co'>#&gt;  </span><span style='color: #767676;'>    left                     centre                  right    </span><span> 
+#&gt;  </span><span style='color: #E4E4E4;background-color: #5F875F;'>    darkolivegreen    </span><span style='color: #D78700;'>     darkorange3     </span><span style='color: #0087D7;'>    dodgerblue3    </span><span> 
+#&gt;  </span><span style='color: #080808;background-color: #B2B2B2;'>    antiquewhite3     </span><span style='color: #E4E4E4;background-color: #0087AF;'>    deepskyblue4     </span><span style='color: #87D700;'>    chartreuse3    </span><span> 
+#&gt;  </span><span style='color: #D70000;'>    firebrick3        </span><span style='color: #AF875F;'>     burlywood4      </span><span style='color: #AF00D7;'>     darkviolet    </span><span> 
+#&gt;  </span><span style='color: #808080;'>    azure4            </span><span style='color: #D7AF00;'>    darkgoldenrod    </span><span style='color: #D78700;'>     chocolate3    </span><span> </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

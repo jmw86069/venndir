@@ -107,11 +107,20 @@ signed_overlaps(setlist, "concordance");
 # agreement overlap counts
 signed_overlaps(setlist, "agreement");
 
+# test to ensure factor input is handled properly
+inputlist <- list(setA=factor(c("A", "B", "D")),
+   setB=factor(c("A", "C", "E", "F")))
+signed_overlaps(inputlist, return_items=TRUE)
+
+# check to verify
+signed_overlaps(inputlist, return_items=TRUE)$items
+
 }
 \seealso{
 Other venndir core: 
 \code{\link{render_venndir}()},
 \code{\link{textvenn}()},
+\code{\link{venn_meme}()},
 \code{\link{venndir}()}
 }
 \concept{venndir core}

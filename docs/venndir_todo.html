@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.9000</span>
       </span>
     </div>
 
@@ -127,12 +127,44 @@
 
 <div id="todo-on-venndir" class="section level1">
 
+<div id="bugs" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugs" class="anchor"></a>bugs</h2>
+<ul>
+<li>If input contains <code>factor</code> values, they are coerced to <code>integer</code> which is incorrect. It needs to convert to <code>character</code> then follow the proper steps.</li>
+</ul>
+</div>
+<div id="vignette-on-fonts" class="section level2">
+<h2 class="hasAnchor">
+<a href="#vignette-on-fonts" class="anchor"></a>vignette on fonts</h2>
+<p>From user testing and feedback, there are issues around font display. For example, <code><a href="https://rdrr.io/r/grDevices/pdf.html">pdf()</a></code> output sometimes displays no text labels, while <code><a href="https://rdrr.io/r/grDevices/png.html">png()</a></code> does display the text labels. We think this issue is due to the <code>fontfamily</code> argument and/or <code>family</code> parameter referencing a font that is not present on the user environment.</p>
+<p>R fonts are sort of a nightmare. There are fonts for several different output devices, and they are not always consistent.</p>
+<p>Choosing a font that does not represent Unicode characters will result in directional arrows being shown as blank squares, something like <code>[]</code>. This issue is usually caused by one or two issues:</p>
+<ul>
+<li>Font does not include Unicode symbols at all.</li>
+<li>R locale does not permit Unicode characters.</li>
+</ul>
+<p>Both the above must be valid for Unicode arrows to be displayed.</p>
+<p>The vignette should describe several different scenarios and potential workarounds. Include example with Cairo package and <code>CairoFonts()</code>.</p>
+</div>
 <div id="enhancements" class="section level2">
 <h2 class="hasAnchor">
 <a href="#enhancements" class="anchor"></a>enhancements</h2>
-<div id="bugs" class="section level3">
+<div id="visual-issue" class="section level3">
 <h3 class="hasAnchor">
-<a href="#bugs" class="anchor"></a>bugs</h3>
+<a href="#visual-issue" class="anchor"></a>visual issue</h3>
+<p>Currently the main count label font is always the same color as the main set label font, even when the main set label is outside and the main count label is inside the polygon. Visually this is only a problem when the polygon fill is a dark color, and the outside background is a light color (usually white). When this happens, the count label inside the polygon is black on a dark color, and is very difficult to read.</p>
+<p>The best current workaround is to use <code>poly_alpha=0.2</code> which should force the Venn fill to be pale enough that black labels are clearly visible.</p>
+<p>A refactor is required to store the main set name label color separate from the main count label. This change can be done two ways:</p>
+<ol>
+<li>adding a row in <code>label_df</code>, which will also allow specifying the set name fill and box independent from the count fill and box.</li>
+<li>adding a column to <code>venn_spdf</code> for font color, note this step does not allow the outside set name label to have different fill and box outline than the inside count label, if desired.</li>
+</ol>
+<p>Looks like option 1 is preferable.</p>
+</div>
+<div id="bugs-1" class="section level3">
+<h3 class="hasAnchor">
+<a href="#bugs-1" class="anchor"></a>bugs</h3>
 <ul>
 <li>
 <code><a href="reference/render_venndir.html">render_venndir()</a></code> argument <code>max_items</code> is being ignored. For overlaps with too many items, desired behavior is to display the counts instead of item labels.</li>
@@ -162,7 +194,7 @@
 <a href="#prepare-for-r-shiny" class="anchor"></a>prepare for R-shiny</h3>
 <ul>
 <li>
-<p>make <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">ggtext::geom_textbox()</a></code> and <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> work for <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html">plotly::ggplotly()</a></code>, by adding <code>to_basic.*()</code> functions. For example, in the package <code>splicejam</code> to make <code><a href="https://ggforce.data-imaginist.com/reference/geom_shape.html">ggforce::geom_shape()</a></code> work, I added the function <code>to_basic.GeomShape()</code>.</p>
+<p>make <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">ggtext::geom_textbox()</a></code> and <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> work for <code><a href="https://docs.ropensci.org/plotly/reference/ggplotly.html">plotly::ggplotly()</a></code>, by adding <code>to_basic.*()</code> functions. For example, in the package <code>splicejam</code> to make <code><a href="https://ggforce.data-imaginist.com/reference/geom_shape.html">ggforce::geom_shape()</a></code> work, I added the function <code>to_basic.GeomShape()</code>.</p>
 <ul>
 <li><code><a href="reference/to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code></li>
 <li><code><a href="reference/to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code></li>
@@ -386,7 +418,7 @@
 <h3 class="hasAnchor">
 <a href="#make-output-compatible-with-plotly-or-something-interactive" class="anchor"></a>make output compatible with plotly (or something interactive)</h3>
 <ul>
-<li>Currently <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> is not compatible with <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html">plotly::ggplotly()</a></code> but probably just lacks the <code>to_basic</code> wrapper function. (See <code><a href="https://rdrr.io/pkg/splicejam/man/to_basic.GeomShape.html">splicejam::to_basic.GeomShape()</a></code> for an example workaround.)</li>
+<li>Currently <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html">ggtext::geom_richtext()</a></code> is not compatible with <code><a href="https://docs.ropensci.org/plotly/reference/ggplotly.html">plotly::ggplotly()</a></code> but probably just lacks the <code>to_basic</code> wrapper function. (See <code><a href="https://rdrr.io/pkg/splicejam/man/to_basic.GeomShape.html">splicejam::to_basic.GeomShape()</a></code> for an example workaround.)</li>
 <li>This feature may require text labels at 0 or 90 degrees.</li>
 </ul>
 </div>

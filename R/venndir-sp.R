@@ -1105,7 +1105,7 @@ polygon_label_fill <- function
          "buffer_hs:",
          format(digits=2, buffer_hs));
    }
-   for (w1 in unique(c(0, buffer_w * c(-1, -0.5, 0.5, 1)))) {
+   for (w1 in buffer_ws) {
       for (h1 in buffer_hs) {
          if (h1 != 0 || w1 != 0) {
             sp_buffer_x <- rescale_sp(sp, shift=c(w1, h1));
@@ -1209,6 +1209,7 @@ polygon_label_fill <- function
          singlet_polylabelr=TRUE,
          ...);
    }, error=function(e){
+      print("Error in get_poly_points()");
       print(e);
       NULL;
    });

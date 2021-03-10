@@ -99,6 +99,7 @@ textvenn(setlist, sets=c(1,2,3), "each")
 Other venndir core: 
 \code{\link{render_venndir}()},
 \code{\link{signed_overlaps}()},
+\code{\link{venn_meme}()},
 \code{\link{venndir}()}
 }
 \concept{venndir core}

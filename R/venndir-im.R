@@ -156,26 +156,41 @@ list2im_value <- function
    setnames <- lapply(setlist, names);
    setnamesunion <- Reduce("union", setnames);
    
+   # check for any character or factor input
+   # so the resulting im will use consistent empty values
+   setlist_hascharacter <- any(sapply(setlist, function(i){
+      is.character(i) | is.factor(i)
+   }))
+   
    # define empty when not defined
    if (length(empty) == 0) {
-      #empty <- NA;
+      if (setlist_hascharacter) {
+         empty <- ""
+      } else {
+         empty <- 0
+      }
    } else {
       empty <- head(empty, 1);
    }
+   
    setlistim <- do.call(cbind, lapply(setlist, function(i){
       i_match <- match(names(i), setnamesunion);
       j <- rep(NA, length(setnamesunion));
       if (force_sign) {
+         if (!is.numeric(i)) {
+            stop("force_sign=TRUE but data is not numeric.")
+         }
          j[i_match] <- sign(i);
       } else {
-         j[i_match] <- i;
-      }
-      if (any(is.na(j)) && length(empty) == 0) {
-         if (is.character(j)) {
-            j[is.na(j)] <- "";
+         if (is.factor(i)) {
+            warning("list2im_value() coerced some input values from factor to character.")
+            j[i_match] <- as.character(i);
          } else {
-            j[is.na(j)] <- 0;
+            j[i_match] <- i;
          }
+      }
+      if (any(is.na(j))) {
+         j[is.na(j)] <- empty;
       }
       j;
    }))

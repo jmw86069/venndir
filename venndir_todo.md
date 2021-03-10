@@ -1,8 +1,64 @@
 
 # todo on venndir
 
+## bugs
+
+* If input contains `factor` values, they are coerced to `integer`
+which is incorrect. It needs to convert to `character` then
+follow the proper steps.
+
+## vignette on fonts
+
+From user testing and feedback, there are issues around font display.
+For example, `pdf()` output sometimes displays no text labels,
+while `png()` does display the text labels. We think this issue
+is due to the `fontfamily` argument and/or `family` parameter
+referencing a font that is not present on the user environment.
+
+R fonts are sort of a nightmare. There are fonts for several
+different output devices, and they are not always consistent.
+
+Choosing a font that does not represent Unicode characters
+will result in directional arrows being shown as blank squares,
+something like `[]`. This issue is usually caused by one or two
+issues:
+
+* Font does not include Unicode symbols at all.
+* R locale does not permit Unicode characters.
+
+Both the above must be valid for Unicode arrows to be displayed.
+
+The vignette should describe several different scenarios and
+potential workarounds. Include example with Cairo package
+and `CairoFonts()`.
+
 
 ## enhancements
+
+### visual issue
+
+Currently the main count label font is always the same color
+as the main set label font, even when the main set label is outside
+and the main count label is inside the polygon. Visually this
+is only a problem when the polygon fill is a dark color, and
+the outside background is a light color (usually white).
+When this happens, the count label inside the polygon is black
+on a dark color, and is very difficult to read.
+
+The best current workaround is to use `poly_alpha=0.2` which should
+force the Venn fill to be pale enough that black labels are clearly
+visible.
+
+A refactor is required to store the main set name label color
+separate from the main count label. This change can be done two ways:
+
+1. adding a row in `label_df`, which will also allow specifying
+the set name fill and box independent from the count fill and box.
+2. adding a column to `venn_spdf` for font color, note this step
+does not allow the outside set name label to have different fill
+and box outline than the inside count label, if desired.
+
+Looks like option 1 is preferable.
 
 ### bugs
 

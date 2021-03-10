@@ -146,10 +146,15 @@
 #' @param show_zero `logical` indicating whether empty overlaps
 #'    are labeled with zero `0` when `show_zero=TRUE`, or are
 #'    blank when `show_zero=FALSE`.
-#' @param font_cex `numeric` `vector` length 2, indicating relative
-#'    font size for the main label, and directional label, respectively.
-#'    The default `c(1, 0.8)` defines the main label with 1x size,
-#'    and the directional labels with 80% that size.
+#' @param font_cex `numeric` `vector` with length up to 3,
+#'    to specify the relative font size for: (1) main set label,
+#'    (2) the main count label, (3) the directional count label.
+#'    The default `c(1, 1, 0.8)` defines the main set label
+#'    with 1x size, the main count label with 1x size,
+#'    and the directional labels with 80% that size. It is usually
+#'    helpful to make the directional count labels slightly smaller
+#'    than the main count labels, but probably depends upon the
+#'    figure.
 #' @param poly_alpha `numeric` value between 0 and 1, indicating the
 #'    alpha transparency of the polygon backgroun color, where
 #'    `poly_alpha=1` is completely 100% opaque (no transparency), and
@@ -240,7 +245,7 @@
 #'    stringsAsFactors=FALSE)
 #' vo <- venndir(setlistv,
 #'    overlap_type="each",
-#'    font_cex=c(1.5, 0.9), 
+#'    font_cex=c(1.5, 1.5, 0.9), 
 #'    curate_df=curate_df,
 #'    show_zero=TRUE);
 #' 
@@ -259,7 +264,7 @@ venndir <- function
  max_items=3000,
  display_counts=TRUE,
  show_zero=FALSE,
- font_cex=c(1, 0.8),
+ font_cex=c(1, 1, 0.8),
  poly_alpha=0.8,
  alpha_by_counts=FALSE,
  label_style=c("basic",
@@ -301,12 +306,17 @@ venndir <- function
       return_items <- TRUE;
    }
 
-   if (length(font_cex) < 2) {
-      if (length(font_cex) == 0) {
-         font_cex <- c(1, 0.8);
-      }
-      font_cex <- rep(font_cex, length.out=2);
+   # validate font_cex input
+   if (length(font_cex) == 0) {
+      font_cex <- c(1, 1, 0.8);
    }
+   if (length(font_cex) == 2) {
+      font_cex <- font_cex[c(1, 2, 2)];
+   }
+   if (length(font_cex) != 3) {
+      font_cex <- rep(font_cex, length.out=3)
+   }
+   
    if (length(sets) == 0) {
       sets <- seq_along(setlist);
    } else if ("character" %in% class(sets)) {
@@ -656,6 +666,8 @@ venndir <- function
          darkFactor=1.2,
          sFactor=1.2),
       "#00000000");
+   venn_spdfs$fontsize <- 14 * font_cex[1];
+   
    venn_spdf$alpha <- poly_alpha;
    venn_spdf$lwd <- 2;
    venn_spdf$lty <- 1;
@@ -663,7 +675,8 @@ venndir <- function
       venn_spdf$color,
       darkFactor=1.2,
       sFactor=1.2);
-
+   venn_spdf$fontsize <- 14 * font_cex[1];
+   
    # optionally apply alpha by venn_counts
    if (alpha_by_counts) {
       venn_spdf$alpha <- jamba::normScale(
@@ -700,7 +713,7 @@ venndir <- function
       halign=c(halign_main, halign_signed),
       rot=rep(0, label_n),
       color=unlist(c(label_color_main, gbase_colors)),
-      fontsize=rep(c(14, 14) * font_cex,
+      fontsize=rep(c(14 * font_cex[2], 14 * font_cex[3]),
          c(length(x_main), length(x_signed))),
       border=c(label_border_main, label_border_signed),
       lty=rep(1, label_n),
@@ -732,52 +745,6 @@ venndir <- function
       }
    }
 
-   ## remove or replace with venndir_label_style()
-   ## Adjust signed color
-   if (1 == 2) {
-      g_update <- (label_df$type %in% "signed" &
-         label_df$show_label %in% c(NA,TRUE) & 
-         (!is.na(label_df$fill) |
-            (label_df$overlap_set %in% venn_spdf$label)));
-      if (any(g_update)) {
-         g_update_match <- match(label_df$overlap_set[g_update],
-            venn_spdf$label);
-         g_update_color <- label_df$color[g_update];
-         g_update_fill <- ifelse(is.na(label_df$fill[g_update]),
-            jamba::alpha2col(
-               venn_spdf$color[g_update_match],
-               alpha=venn_spdf$alpha[g_update_match]),
-            label_df$fill[g_update]);
-         label_df$color[g_update] <- make_color_contrast(g_update_color,
-            g_update_fill,
-            ...);
-      }
-   }
-   
-   ## remove or replace
-   ## this logic is inside render_venndir()
-   if (1 == 2 && !"overlap" %in% overlap_type && any(label_df$type %in% "signed")) {
-      ## Adjust signed labels for contrast
-      is_signed <- label_df$type %in% "signed";
-      poly_match <- match(label_df$overlap_set, venn_spdf$label);
-      poly_fill <- jamba::alpha2col(
-         as.character(data.frame(venn_spdf)[poly_match,"color"]),
-         alpha=data.frame(venn_spdf)[poly_match,"alpha"]);
-      label_fill <- ifelse(is.na(label_df$fill),
-         poly_fill,
-         label_df$fill);
-      bg_fill <- ifelse(is.na(label_df$fill),
-         "white",
-         poly_fill);
-      label_col1 <- label_df$color;
-      label_col <- make_color_contrast(
-         x=label_df$color,
-         y=label_fill,
-         bg=bg_fill,
-         ...);
-      label_df$color[is_signed] <- label_col[is_signed];
-   }
-   
    ## Optionally return items
    if (return_items) {
       sv_label <- paste0(sv$sets, "|", sv[[overlap_type]]);
