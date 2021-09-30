@@ -6,7 +6,7 @@
 \usage{
 signed_overlaps(
   setlist,
-  overlap_type = c("each", "overlap", "concordance", "agreement"),
+  overlap_type = c("detect", "each", "overlap", "concordance", "agreement"),
   return_items = FALSE,
   return_item_labels = return_items,
   sep = "&",
@@ -74,6 +74,18 @@ item overlaps alongside the directionality of each item.
 The directional counts can be summarized in slightly different
 ways, defined by the argument \code{overlap_type}:
 \itemize{
+\item \code{overlap_type="detect"} - default behavior: each vector in \code{setlist}
+is handled independently:
+\itemize{
+\item a vector with no names will use the vector
+values as items after converting them to \code{character};
+\item a named vector with \code{character} or \code{factor} values
+will will use the vector names as items,
+and character values as item values;
+\item a named vector with \code{numeric} or \code{integer} values
+will use vector names as items, and will convert
+numeric values to \code{sign()}.
+}
 \item \code{overlap_type="each"} - this option returns all possible
 directions individually counted.
 \item \code{overlap_type="concordance"} - this option returns the counts
@@ -91,6 +103,12 @@ overlap counts.
 that agree and returns them as \code{"concordant"}, all others are
 returned as \code{"mixed"}.
 }
+
+Note that \code{overlap_type="agreement"} and \code{overlap_type="concordance"}
+will not convert \code{numeric} values to \code{sign()}, so if the input
+contains \code{numeric} values such as \code{1.2435} they should probably be
+converted to \code{sign()} before calling \code{signed_overlaps()}, for example:
+\code{signed_overlaps(lapply(setlist, sign))}
 }
 \examples{
 setlist <- make_venn_test(100, 2, do_signed=TRUE);

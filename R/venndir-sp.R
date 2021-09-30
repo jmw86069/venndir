@@ -810,6 +810,10 @@ nudge_sp <- function
 #'    color of each label.
 #' @param border `vector` or `NA` with colors to define the border around
 #'    each label.
+#' @param ref_sp object `sp::SpatialPolygons` used as a reference to
+#'    compare the size of `sp` when `apply_n_scale=TRUE`. In general,
+#'    fewer labels are placed more toward the center; also in general,
+#'    this effect is applied less for smaller polygons.
 #' @param fontsize `numeric` value indicating the font size in points.
 #' @param cex `numeric` value used to resize all text labels by
 #'    multiplying the font size.
@@ -985,13 +989,14 @@ polygon_label_fill <- function
  labels,
  color="black",
  border=NA,
+ ref_sp=NULL,
  fontsize=10,
  cex=1,
  degrees=0,
  dither_cex=0.04,
  dither_color=0.07,
  dither_degrees=0,
- scale_width=-0.1,
+ scale_width=-0.2,
  apply_n_scale=TRUE,
  buffer_w=0,
  buffer_h=0,
@@ -1059,14 +1064,23 @@ polygon_label_fill <- function
    
    ## apply additional scaling based upon n
    if (length(apply_n_scale) > 0 && apply_n_scale) {
-      n_scale <- 1 - 1 / (n*2);
+      # sp_pct is an adjustment for smaller polygons
+      # which reduces the effect of n on the n_scale
+      # starting at about 1/3 polygon area to total area
+      if (length(ref_sp) > 0) {
+         sp_pct1 <- head(sp_percent_area(rbind(sp, ref_sp)), 1) / 100;
+         sp_pct <- jamba::noiseFloor(sp_pct1 * 3, ceiling=1);
+      } else {
+         sp_pct <- 1;
+      }
+      n_scale <- 1 - (1 / (sqrt(n)*2)) * sp_pct;
       if (verbose) {
          jamba::printDebug("polygon_label_fill(): ",
             "n_scale:",
-            format(digits=2, n_scale));
+            format(digits=4, n_scale));
          jamba::printDebug("polygon_label_fill(): ",
             "scale_width (before):",
-            format(digits=2, scale_width));
+            format(digits=4, scale_width));
       }
       scale_width <- (scale_width + 1) * (1 - (1 - n_scale) * 1.1) - 1;
    }
@@ -1074,8 +1088,8 @@ polygon_label_fill <- function
    ## Apply polygon buffer
    if (verbose) {
       jamba::printDebug("polygon_label_fill(): ",
-         "scale_width:",
-         format(digits=2, scale_width));
+         "scale_width  (after):",
+         format(digits=4, scale_width));
    }
    if (scale_width != 0) {
       for (sw in unique(seq(from=scale_width, to=0, length.out=5))) {
@@ -1126,10 +1140,12 @@ polygon_label_fill <- function
    }
    ## gArea(ellYesDiffDis[i]);
    
-   ## item coordinates
-   ## note that it sometimes requires iterations with increasing
-   ## number of labels for the procedure to return at least
-   ## that many label positions
+   
+   ###################################################################
+   # item coordinates
+   # note that it sometimes requires iterations with increasing
+   # number of labels for the procedure to return at least
+   # that many label positions
    get_poly_points <- function
    (sp,
     n,
@@ -1185,6 +1201,7 @@ polygon_label_fill <- function
                # optionally un-rotate points
                if (rotate_degrees != 0) {
                   label_xy <- rescale_coordinates(spts@coords,
+                     center=sp_center,
                      rotate_degrees=-rotate_degrees);
                } else {
                   label_xy <- sp::coordinates(spts);
@@ -1200,6 +1217,7 @@ polygon_label_fill <- function
       stop(paste0("spsample failed to return ", n, " points, ", nrow(label_xy),
          ", k:", k));
    }
+   
    label_xy <- tryCatch({
       get_poly_points(sp_buffer,
          n,

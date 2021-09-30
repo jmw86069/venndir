@@ -1,11 +1,166 @@
 
 # todo on venndir
 
+## 28sep2021
+
+* I cannot ever remember how to add item labels! If I cannot remember,
+nobody else can remember. It needs to be easy to enable.
+
+* Some option to word wrap super long set labels, otherwise the
+label is 10x wider than the plot size.
+
+* COMPLETE: Implement `max_items` so item labels are hidden in sections with
+too many labels.
+
+* COMPLETE: Item labels should use `text()` or `geom_text()` and not the
+`gridtext()` and `geom_gridtext()` counterparts - they are extremely
+slow for even moderate (20 to 50) labels on one figure. The gridtext
+feature is mostly useful for markdown support, which can be optional.
+
+* It is hard to adjust placement of labels outside the circle.
+
+   * `offset` is intended to help push labels in one direction,
+   but does not work reliably, especially for proportional Euler diagrams.
+   One option is to scale proportional coordinates to typical
+   dimensions used by fixed layouts.
+   * Revisit the workflow to nudge or move label positions.
+
+* COMPLETE: `polygon_label_fill()` argument `apply_n_scale=TRUE` should also
+adjust polygons by relative size of the polygon compared to the
+size of the overall Venn diagram. Smaller polygons with
+fewer labels should not be adjusted as much as larger polygons.
+
+   * In general, proportional diagrams should use the same buffer
+   for each polygon, since the polygon is already proportional
+   to the number of item labels.
+
+* `polygon_label_outside()` should adjust relative buffer consistent
+with `polygon_label_fill()`, based upon the plot size.
+* More arguments should be added to `venndir()` so these options
+are not "hidden" features:
+
+   * shape="ellipse" is used for proportional Euler diagrams
+   and allows elliptical ovals instead of circles.
+   * `scale_width` is passed to `polygon_label_fill()` when items
+   are being displayed.
+   * `draw_buffer` - shows item polygon buffer
+   * `segment_buffer` - adjusts segment from outside labels to respective
+   internal polygon.
+   * `apply_n_scale` - adjusts item polygon buffer by number of labels.
+   * `center_method`, `vector_method`, `segment_method` passed to
+   `polygon_label_outside()` to position labels around the Venn polygons.
+
+* Longer term, I might need to adjust the "optimization settings" used
+by the `eulerr` package. It appears to perform a solver minimization
+function that maximizes the total overlap count represented.
+I think it could be penalized when a set overlap is not represented
+to "encourage" it not to skip a potential overlap.
+
+### Venn section labeling bugs
+
+* Problem: sometimes an outside label points to wrong polygon
+inside the Venn diagram. Seems limited to proportional Euler diagrams.
+* It appears the priority in selecting a polygon is sorted wrong,
+for example, it should pick the subsection with fewest overlapping
+sets. It seems to choose the whole Venn circle instead of a subsection.
+
+   * A main set label outside may have a segment that
+   points to some arbitrary location.
+   * Sometimes an overlap count appears in a random location,
+   and it appears to be "buggy". Sometimes the overlap count
+   should be hidden; other times the overlap count is in the
+   wrong location.
+
+* Change `render_venndir()` to draw each Venn set border
+after the individual polygons have been drawn, but before the
+labels have been added. The goal is for the Venn set borders
+to match `set_colors`.
+
+   * Currently when a Venn circle is fully inside another circle,
+   the two set colors are blended to produce the polygon fill
+   and polygon border. In this case, the border does not match
+   any value in `set_colors`.
+
+
+
+## 25jun2021
+
+* when input character vectors happen to have names, `signed_overlaps()`
+should not assume directional overlap unless specifically requested,
+otherwise it takes ages! Workaround is to use `overlap_type="overlap"`.
+
+
+## usability of custom changes
+
+* document using `offset` so outside labels can be
+influenced up or down, left or right in a figure.
+
+
+## low usability for item labeling
+
+* It's too confusing to add item labels to the diagram,
+it needs to be more "automatic" so that when `show_items`
+is enabled, `label_preset` is updated consistently.
+Also `label_preset` needs to be visible in `venndir()`
+and `render_venndir()` instead of being passed via `...`.
+* Item labels using `ggtext` and `gridtext` are PAINFULLY
+slow to render more than 100 or so labels. Slow in terms
+of minutes, compared to the expected sub-second response time.
+Maybe the developers are okay with that, but there is
+no big reason not to use something orders of magnitude
+faster in venndir... like `text()` and `geom_text()`.
+It means item labels cannot contain markdown,
+unless we allow ggtext and gridtext as an option,
+like for `venn_meme()` when there is usually
+only one item per overlap.
+Using `text()` and `geom_text()` may impact the font
+and Unicode compatibility of displaying arrows (again).
+
+
+## new label preset
+
+* set label and count inside, signed labels outside
+
+
+## usability of custom label placement
+
+* Use case: move one overlap label inside, another label
+outside the polygon.
+* Use case: move the signed labels for one overlap
+outside, but keep set and main count label inside.
+
+
 ## bugs
 
-* If input contains `factor` values, they are coerced to `integer`
+* When set label is supposed to be inside, but there is no
+portion of the circle unique to that set label, the label
+seems to go near a border. However, it often overlaps the
+count label, and maybe should be grouped with the largest
+internal polygon overlap for that set.
+* Item labels ignores the argument `max_items` and should
+instead hide item labels and display numeric counts when the number
+of items is too high.
+* Sometimes with 4-way proportional Venn diagrams the main set
+label seems to point to the whole circle, instead of pointing
+to the subset of the circle that is specific to the label. Something
+seems to be going wrong when choosing the best available
+polygon to direct the label. It appears to work for intersect
+polygons, but not for main set labels, which suggests the order
+of choosing a polygon when more than one has a matching label
+is the problem -- and this should only happen with main labels
+because they are associated with the full circle, and with any
+overlap polygon that only involves that same label.
+* Item label `buffer_w` and `buffer_h` appear to use absolute
+plot units instead of relative units. Since proportional
+coordinates tends to be different range than the fixed Venn
+circles, the units are not interchangable, making it confusing.
+Also, these buffers should be apparent in `venndir()` and
+`render_venndir()` rather than being hidden inside `...`.
+
+* COMPLETE: If input contains `factor` values, they are coerced to `integer`
 which is incorrect. It needs to convert to `character` then
 follow the proper steps.
+
 
 ## vignette on fonts
 

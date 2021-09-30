@@ -45,7 +45,9 @@ counts2setlist <- function
    ## names represent Venn overlap combinations
    ## All missing combinations are assumed to be zero.
    combo_value_list <- lapply(names(x), function(i){
-      paste0(rep(i, x[[i]]), "_", seq_len(x[[i]]))
+      paste0(rep(i, x[[i]]),
+         rep("_", x[[i]]),
+         seq_len(x[[i]]))
    });
    combo_sets <- strsplit(names(x),
       fixed=TRUE,

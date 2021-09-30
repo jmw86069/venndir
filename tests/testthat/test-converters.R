@@ -191,3 +191,22 @@ test_that("im_value2list_Matrix", {
          output_valuelist)
    }
 })
+
+test_that("counts2setlist", {
+   countlist_test <- list(Am=0,
+      Bm=0,
+      `Am&Bm`=16);
+   peaklist_test <- counts2setlist(countlist_test)
+
+   testthat::expect_mapequal(
+      lengths(peaklist_test),
+      c(Am=16, Bm=16))
+   
+   so_test <- signed_overlaps(peaklist_test)
+   so_count <- so_test$count;
+   names(so_count) <- so_test$sets;
+   so_count;
+   testthat::expect_mapequal(
+      so_count,
+      c(Am=0, Bm=0, `Am&Bm`=16))
+})

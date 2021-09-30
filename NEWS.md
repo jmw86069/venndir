@@ -1,4 +1,49 @@
 
+# venndir 0.0.16.900
+
+## bug fix
+
+* `counts2setlist()` corrected an error when supplied with
+empty overlaps, which previously included at least one
+delimiter even for empty sets. Entries were added to the
+tests to confirm this behavior.
+* `polygon_label_fill()` small bug in how label placement used
+rotation, the polygon center was not properly re-used when
+un-rotating labels to the original orientation. The default was
+-20 degrees, so the effect was subtle.
+
+
+## changes to existing functions
+
+* `venndir_label_style()` was updated to change the logic used
+to place labels inside or outside each Venn overlap polygon,
+specifically to allow item labels to be inside, or hidden,
+and adjust the count label visibility accordingly.
+* `venndir_label_style()`, and `venndir()` now properly hide item
+labels using `max_items`, instead displaying the overlap count.
+* `venndir_label_style()` arguments `count` and `signed` have new options:
+
+   * `"ifneeded"` will display the overlap count when item labels are not
+   being displayed, otherwise when item labels are displayed the count
+   will be hidden.
+   * `"detect"` will display the overlap count inside when item labels are not
+   being displayed, otherwise the overlap count is outside when item labels
+   are displayed.
+
+* `polygon_label_fill()` new argument `ref_sp` used to know the relative
+size of the polygon being labeled, to account for the adjustment
+when `apply_n_scale=TRUE`:
+the buffer polygon is generally smaller for fewer labels, but the new
+adjustment prevents polygons from being shrunk when the polygon is
+already very small.
+* `signed_overlaps()` new default `overlap_type="default"` which
+attempts to choose a reasonable option. When all values are `c(0, 1)`
+it will choose `overlap_type="overlap"` which does not use directionality.
+When the input contains `numeric` or `integer` values it will enforce
+`sign()` so the comparison is done with the sign and not decimal values
+by default.
+
+
 # venndir 0.0.15.900
 
 ## bug fixes

@@ -9,13 +9,14 @@ polygon_label_fill(
   labels,
   color = "black",
   border = NA,
+  ref_sp = NULL,
   fontsize = 10,
   cex = 1,
   degrees = 0,
   dither_cex = 0.04,
   dither_color = 0.07,
   dither_degrees = 0,
-  scale_width = -0.1,
+  scale_width = -0.2,
   apply_n_scale = TRUE,
   buffer_w = 0,
   buffer_h = 0,
@@ -44,6 +45,11 @@ color of each label.}
 
 \item{border}{\code{vector} or \code{NA} with colors to define the border around
 each label.}
+
+\item{ref_sp}{object \code{sp::SpatialPolygons} used as a reference to
+compare the size of \code{sp} when \code{apply_n_scale=TRUE}. In general,
+fewer labels are placed more toward the center; also in general,
+this effect is applied less for smaller polygons.}
 
 \item{fontsize}{\code{numeric} value indicating the font size in points.}
 

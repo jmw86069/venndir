@@ -30,6 +30,7 @@ venndir(
   venn_sp = NULL,
   inside_percent_threshold = NULL,
   plot_style = c("base", "gg"),
+  item_style = c("text", "gridtext"),
   do_plot = TRUE,
   verbose = FALSE,
   ...
@@ -131,6 +132,20 @@ represent at least 5 percent of the total area.}
 \item{plot_style}{\code{character} indicating the style of graphics plot:
 \code{"gg"} uses ggplot2; \code{"base"}
 uses base R graphics. This argument is passed to \code{render_venndir()}.}
+
+\item{item_style}{\code{character} string indicating the style used to display
+item labels when they are enabled. The \code{"gridtext"} option is
+substantially slower for a large number of labels, but enables
+use of markdown. The \code{"text"} option is substantially faster, but
+does not allow markdown.
+\itemize{
+\item \code{"text"} uses \code{text()} for base R, or \code{geom_text()} for ggplot2.
+This option does not allow markdown, but is very fast.
+\item \code{"gridtext"} uses \code{gridtext::richtext_grob()} for base R, or
+\code{ggtext::geom_richtext()} for ggplot2. This option does allow
+markdown, but for many item labels (more than 300) this option
+is notably slower, on the order of several seconds to render.
+}}
 
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
 }

@@ -27,6 +27,7 @@ render_venndir(
   fontfamily = "Arial",
   inside_percent_threshold = 5,
   plot_style = c("base", "gg"),
+  item_style = c("text", "gridtext"),
   group_labels = TRUE,
   ggtheme = ggplot2::theme_void,
   draw_buffer = FALSE,

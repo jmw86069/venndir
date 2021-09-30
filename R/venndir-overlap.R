@@ -21,6 +21,16 @@
 #' The directional counts can be summarized in slightly different
 #' ways, defined by the argument `overlap_type`:
 #' 
+#' * `overlap_type="detect"` - default behavior: each vector in `setlist`
+#'    is handled independently:
+#'     * a vector with no names will use the vector
+#'     values as items after converting them to `character`;
+#'     * a named vector with `character` or `factor` values
+#'     will will use the vector names as items,
+#'     and character values as item values;
+#'     * a named vector with `numeric` or `integer` values
+#'     will use vector names as items, and will convert
+#'     numeric values to `sign()`.
 #' * `overlap_type="each"` - this option returns all possible
 #' directions individually counted.
 #' * `overlap_type="concordance"` - this option returns the counts
@@ -37,6 +47,12 @@
 #' * `overlap_type="agreement"` - this option groups all directions
 #' that agree and returns them as `"concordant"`, all others are
 #' returned as `"mixed"`.
+#' 
+#' Note that `overlap_type="agreement"` and `overlap_type="concordance"`
+#' will not convert `numeric` values to `sign()`, so if the input
+#' contains `numeric` values such as `1.2435` they should probably be
+#' converted to `sign()` before calling `signed_overlaps()`, for example:
+#' `signed_overlaps(lapply(setlist, sign))`
 #' 
 #' @family venndir core
 #' 
@@ -95,7 +111,8 @@
 #' @export
 signed_overlaps <- function
 (setlist,
- overlap_type=c("each",
+ overlap_type=c("detect",
+    "each",
     "overlap",
     "concordance",
     "agreement"),
@@ -126,11 +143,26 @@ signed_overlaps <- function
             i <- jamba::nameVector(rep(1, length(i)),
                as.character(i),
                makeNamesFunc=c);
+         } else {
+            if ("detect" %in% overlap_type) {
+               # for "detect", convert numeric or integer input to sign(i)
+               if ( (is.numeric(i) || is.integer(i)) && !all(i %in% c(-1, 0, 1, NA)) ) {
+                  i[] <- sign(i);
+               } else if (is.character(i) || is.factor(i)) {
+                  if (!any(duplicated(i)) && length(i) > 3) {
+                     warning("signed_overlaps(): named character vector, non-duplicate items, length > 3, the vector values are used as items.");
+                     i <- jamba::nameVector(rep(1, length(i)),
+                        as.character(i),
+                        makeNamesFunc=c);
+                  }
+               }
+            }
          }
          i
       });
       svims <- list2im_value(setlist);
-      if (all(unique(as.vector(svims)) %in% c(0, 1, NA))) {
+      if (overlap_type %in% c("detect") &&
+            all(unique(as.vector(svims)) %in% c(0, 1, NA))) {
          overlap_type <- "overlap";
       }
    }
@@ -328,4 +360,3 @@ make_venn_combn_df <- function
    }
    return(setdfs);
 }
-

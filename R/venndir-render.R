@@ -221,6 +221,7 @@ render_venndir <- function
  fontfamily="Arial",
  inside_percent_threshold=5,
  plot_style=c("base", "gg"),
+ item_style=c("text", "gridtext"),
  group_labels=TRUE,
  ggtheme=ggplot2::theme_void,
  draw_buffer=FALSE,
@@ -241,6 +242,7 @@ render_venndir <- function
    }
    show_items <- head(show_items, 1);
    plot_style <- match.arg(plot_style);
+   item_style <- match.arg(item_style);
 
    # Apply label_style
    if (!"custom" %in% label_style) {
@@ -827,31 +829,54 @@ render_venndir <- function
          # display items
          #item_color <- make_color_contrast(itemlabels_df$color,
          #   bg=
-         g_labels_items <- gridtext::richtext_grob(
-            x=itemlabels_df$x,
-            y=itemlabels_df$y,
-            text=itemlabels_df$text,
-            rot=-itemlabels_df$rot,
-            default.units="native",
-            padding=grid::unit(0, "pt"),
-            r=grid::unit(0, "pt"),
-            vjust=0.5,
-            hjust=0.5,
-            halign=0.5,
-            gp=grid::gpar(
-               fontfamily=fontfamily,
+         if ("gridtext" %in% item_style) {
+            g_labels_items <- gridtext::richtext_grob(
+               x=itemlabels_df$x,
+               y=itemlabels_df$y,
+               text=itemlabels_df$text,
+               rot=-itemlabels_df$rot,
+               default.units="native",
+               padding=grid::unit(0, "pt"),
+               r=grid::unit(0, "pt"),
+               vjust=0.5,
+               hjust=0.5,
+               halign=0.5,
+               gp=grid::gpar(
+                  fontfamily=fontfamily,
+                  col=itemlabels_df$color,
+                  fontsize=itemlabels_df$fontsize
+               ),
+               box_gp=grid::gpar(
+                  col=itemlabels_df$border
+               )
+            );
+            if (length(dev.list()) > 0) {
+               vps <- gridBase::baseViewports();
+               grid::pushViewport(vps$inner, vps$figure, vps$plot);
+               grid::grid.draw(g_labels_items);
+               grid::popViewport(3);
+            }
+         } else {
+            # draw using text()
+            text(
+               x=itemlabels_df$x,
+               y=itemlabels_df$y,
+               labels=itemlabels_df$text,
+               # srt is a hack because text() only handles one srt per call
+               srt=-head(itemlabels_df$rot, 1),
+               #default.units="native",
+               #padding=grid::unit(0, "pt"),
+               #r=grid::unit(0, "pt"),
+               adj=c(0.5, 0.5),
+               # cex for now is a hack estimate of cex for a given fontsize
+               cex=itemlabels_df$fontsize / 12,
                col=itemlabels_df$color,
-               fontsize=itemlabels_df$fontsize
-            ),
-            box_gp=grid::gpar(
-               col=itemlabels_df$border
-            )
-         );
-         if (length(dev.list()) > 0) {
-            vps <- gridBase::baseViewports();
-            grid::pushViewport(vps$inner, vps$figure, vps$plot);
-            grid::grid.draw(g_labels_items);
-            grid::popViewport(3);
+               # font could be used for fontfamily but mapping is unclear
+               # fontfamily
+               #
+               # itemlabels_df$border is currently not handled
+               ...
+            );
          }
       }
    } else if ("gg" %in% plot_style) {
@@ -955,21 +980,39 @@ render_venndir <- function
                   fill="#FFFFFF77",
                   color="#FF999977"));
          }
-         ggitems <- ggtext::geom_richtext(
-            data=itemlabels_df,
-            ggplot2::aes(x=x,
-               y=y,
-               label=text,
-               family=fontfamily,
-               #group=group,
-               angle=-rot,
-               hjust=0.5,
-               vjust=0.5,
-               #halign=0.5,
-               text.colour=color,
-               fill=NA,
-               label.colour=NA),
-            size=itemlabels_df$fontsize * 5/14);
+         if ("gridtext" %in% item_style) {
+            ggitems <- ggtext::geom_richtext(
+               data=itemlabels_df,
+               ggplot2::aes(x=x,
+                  y=y,
+                  label=text,
+                  family=fontfamily,
+                  #group=group,
+                  angle=-rot,
+                  hjust=0.5,
+                  vjust=0.5,
+                  #halign=0.5,
+                  text.colour=color,
+                  fill=NA,
+                  label.colour=NA),
+               size=itemlabels_df$fontsize * 5/14);
+         } else {
+            ggitems <- ggplot2::geom_text(
+               data=itemlabels_df,
+               ggplot2::aes(x=x,
+                  y=y,
+                  label=text,
+                  family=fontfamily,
+                  #group=group,
+                  angle=-rot,
+                  hjust=0.5,
+                  vjust=0.5,
+                  #halign=0.5,
+                  #text.colour=color,
+                  colour=color,
+                  fill=NA),
+               size=itemlabels_df$fontsize * 5/14);
+         }
          ggv <- ggv + ggitems;
       }
       
@@ -1117,12 +1160,17 @@ venndir_label_style <- function
     "outside"),
  count=c("inside",
     "outside",
+    "ifneeded",
+    "detect",
     "none"),
  signed=c("inside",
     "outside",
+    "ifneeded",
+    "detect",
     "none"),
  items=c("none",
     "inside"),
+ max_items=3000,
  inside_percent_threshold=5,
  label_types=c("main", "signed"),
  show_zero=TRUE,
@@ -1176,7 +1224,7 @@ venndir_label_style <- function
    } else if ("main items" %in% label_preset) {
       set <- "outside";
       overlap <- "none";
-      count <- "none";
+      count <- "ifneeded";
       signed <- "none";
       items <- "inside";
    } else if ("main count items" %in% label_preset) {
@@ -1195,12 +1243,20 @@ venndir_label_style <- function
 
    # match rows in label_df with venn_spdf
    n <- length(venndir_output$venn_spdf$label) + 1;
-   sp_index <- (n - 
-         match(venndir_output$label_df$overlap_set,
-            rev(venndir_output$venn_spdf$label)));
+   #sp_index <- (n - 
+   #      match(venndir_output$label_df$overlap_set,
+   #         rev(venndir_output$venn_spdf$label)));
    sp_index2 <- (
       match(venndir_output$label_df$overlap_set,
          (venndir_output$venn_spdf$label)));
+   
+   # associate label_df entries with the appropriate polygons
+   venn_spdf_df <- data.frame(venndir_output$venn_spdf);
+   venn_spdf_df$rownum <- seq_along(venndir_output$venn_spdf);
+   venn_spdf_df_sub <- subset(venn_spdf_df, !is.na(venn_counts));
+   sp_index <- venn_spdf_df_sub$rownum[match(
+      venndir_output$label_df$overlap_set,
+      venn_spdf_df_sub$label)];
    
    # handle label preset
    # check if any set label is hidden
@@ -1209,6 +1265,21 @@ venndir_label_style <- function
    # make sure each set has a shape to use, otherwise skip it
    label_has_shape <- (venndir_output$label_df$overlap_set %in% venndir_output$venn_spdf$label);
 
+   # check if there is room for label inside via inside_percent_threshold
+   sp_pct_area <- sp_percent_area(venndir_output$venn_spdf);
+   poly_pct_area <- jamba::rmNA(sp_pct_area[sp_index],
+      naValue=-1);
+   if (length(inside_percent_threshold) == 0) {
+      inside_percent_threshold <- c(0)
+   }
+   label_area_ok <- (poly_pct_area >= inside_percent_threshold);
+
+   # we need the total counts per overlap_set in order to apply max_items
+   main_label_df <- subset(venndir_output$label_df, type %in% "main");
+   main_match <- match(venndir_output$label_df$overlap_set,
+      main_label_df$overlap_set);
+   venndir_output$label_df$main_venn_counts <- main_label_df$venn_counts[main_match];
+   
    # update label positions only when label_preset is not "custom"
    if (!"custom" %in% label_preset) {
    
@@ -1241,42 +1312,127 @@ venndir_label_style <- function
             venndir_output$label_df$overlap[set_is_not_hidden] <- set;
          }
       }
-      
-      # count labels
-      venndir_output$label_df$count <- ifelse(
-         venndir_output$label_df$type %in% "main",
-         ifelse(
-            venndir_output$label_df$venn_counts > 0 | show_zero,
-            count,
-            "none"),
-         ifelse(
-            venndir_output$label_df$venn_counts > 0 | show_zero,
-            signed,
-            "none"));
-      if (any(c("none", "inside") %in% items)) {
-         # make sure there are venn_counts to be displayed
-         # there is a valid x coordinate which means a suitable polygon exists
+
+      ######################################################
+      # item labels
+      # - determine which overlaps display items inside
+      #   which determines where to display venn_counts
+      if ("inside" %in% items) {
          venndir_output$label_df$show_items <- ifelse(
-            venndir_output$label_df$venn_counts > 0 &
-               !is.na(venndir_output$label_df$x),
-            items,
-            "none");
+            venndir_output$label_df$main_venn_counts > 0 &
+               venndir_output$label_df$main_venn_counts <= max_items,
+            "inside",
+            "none"
+         );
+      } else {
+         venndir_output$label_df$show_items <- "none";
+      }
+      
+      ######################################################
+      # count labels
+      #jamba::printDebug("count labels, count:", count,
+      #   ", signed:", signed, ", items:", items, ", max_items:", max_items);
+      #print(venndir_output$label_df);
+      # new logic
+      venndir_output$label_df$count <- ifelse(
+         venndir_output$label_df$show_items %in% "none",
+         # inside can display count, no items are inside
+         ifelse(
+            venndir_output$label_df$type %in% "main",
+            ifelse(
+               venndir_output$label_df$venn_counts > 0 | show_zero,
+               ifelse(
+                  any(c("inside", "ifneeded", "detect") %in% count),
+                  "inside",
+                  "none"
+               ),
+               "none"
+            ),
+            ifelse(
+               venndir_output$label_df$venn_counts > 0 | show_zero,
+               ifelse(
+                  any(c("inside", "ifneeded", "detect") %in% signed),
+                  "inside",
+                  "none"
+               ),
+               "none"
+            )
+         ),
+         # inside cannot display count, items are inside
+         ifelse(
+            venndir_output$label_df$type %in% "main",
+            ifelse(
+               venndir_output$label_df$venn_counts > 0 | show_zero,
+               ifelse(
+                  any(c("detect") %in% count),
+                  "outside",
+                  "none"
+               ),
+               "none"
+            ),
+            ifelse(
+               venndir_output$label_df$venn_counts > 0 | show_zero,
+               ifelse(
+                  any(c("inside", "ifneeded", "detect") %in% signed),
+                  "inside",
+                  "none"
+               ),
+               "none"
+            )
+         )
+      )
+      #print(venndir_output$label_df);
+
+      if (FALSE) {            
+         venndir_output$label_df$count <- ifelse(
+            venndir_output$label_df$type %in% "main",
+            ifelse(
+               venndir_output$label_df$venn_counts > 0 | show_zero,
+               ifelse(
+                  venndir_output$label_df$main_venn_counts > max_items &
+                     any(c("detect", "none") %in% count) &
+                     "inside" %in% items,
+                  "inside",
+                  count),
+               "none"),
+            ifelse(
+               venndir_output$label_df$venn_counts > 0 | show_zero,
+               ifelse(
+                  venndir_output$label_df$venn_counts > max_items &
+                     "none" %in% signed &
+                     "inside" %in% items,
+                  "inside",
+                  signed),
+               "none"));
+      }
+      
+      if (FALSE) {
+         # item labels
+         if (any(c("none", "inside") %in% items)) {
+            # make sure there are venn_counts to be displayed
+            # there is a valid x coordinate which means a suitable polygon exists
+            venndir_output$label_df$show_items <- ifelse(
+               venndir_output$label_df$venn_counts > 0 &
+                  venndir_output$label_df$venn_counts <= max_items &
+                  !is.na(venndir_output$label_df$x),
+               items,
+               "none");
+         }
       }
       
       # check for inside area threshold
-      sp_pct_area <- sp_percent_area(venndir_output$venn_spdf);
-      poly_pct_area <- jamba::rmNA(sp_pct_area[sp_index],
-         naValue=0);
-      if (length(inside_percent_threshold) > 0 && any(poly_pct_area <= inside_percent_threshold)) {
+      # label_area_ok TRUE/FALSE
+      if (any(!label_area_ok)) {
          for (itype in c("count", "overlap")) {
             venndir_output$label_df[[itype]] <- ifelse(
-               (poly_pct_area <= inside_percent_threshold &
-                  venndir_output$label_df[[itype]] %in% "inside"),
+               venndir_output$label_df[[itype]] %in% "inside" &
+                  !label_area_ok,
                "outside",
                venndir_output$label_df[[itype]]);
          }
       }
-   
+      
+
       # update offset coordinates
       has_outside <- (venndir_output$label_df$overlap %in% "outside" |
             venndir_output$label_df$count %in% "outside");

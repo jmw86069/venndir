@@ -187,6 +187,17 @@
 #' @param plot_style `character` indicating the style of graphics plot:
 #'    `"gg"` uses ggplot2; `"base"`
 #'    uses base R graphics. This argument is passed to `render_venndir()`.
+#' @param item_style `character` string indicating the style used to display
+#'    item labels when they are enabled. The `"gridtext"` option is
+#'    substantially slower for a large number of labels, but enables
+#'    use of markdown. The `"text"` option is substantially faster, but
+#'    does not allow markdown.
+#'    * `"text"` uses `text()` for base R, or `geom_text()` for ggplot2.
+#'    This option does not allow markdown, but is very fast.
+#'    * `"gridtext"` uses `gridtext::richtext_grob()` for base R, or
+#'    `ggtext::geom_richtext()` for ggplot2. This option does allow
+#'    markdown, but for many item labels (more than 300) this option
+#'    is notably slower, on the order of several seconds to render.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
 #' @family venndir core
@@ -282,6 +293,7 @@ venndir <- function
  venn_sp=NULL,
  inside_percent_threshold=NULL,
  plot_style=c("base", "gg"),
+ item_style=c("text", "gridtext"),
  do_plot=TRUE,
  verbose=FALSE,
  ...)
@@ -295,6 +307,7 @@ venndir <- function
    
    overlap_type <- match.arg(overlap_type);
    plot_style <- match.arg(plot_style);
+   item_style <- match.arg(item_style);
    show_set <- match.arg(show_set);
    
    label_style <- head(label_style, 1);
@@ -758,10 +771,18 @@ venndir <- function
       label_df=label_df),
       label_style=label_style,
       show_zero=show_zero,
+      max_items=max_items,
       inside_percent_threshold=inside_percent_threshold,
       ...);
    label_df <- vo$label_df;
    venn_spdf <- vo$venn_spdf;
+   
+   ## update show_items based upon max_items
+   label_df$show_items <- ifelse(
+      label_df$show_items %in% "inside" &
+         label_df$venn_counts > max_items,
+      "none",
+      label_df$show_items);
 
    ## Call render_venndir()
    gg <- NULL;
@@ -780,6 +801,7 @@ venndir <- function
          display_counts=display_counts,
          label_style="custom",
          plot_style=plot_style,
+         item_style=item_style,
          max_items=max_items,
          inside_percent_threshold=inside_percent_threshold,
          ...);
