@@ -1,6 +1,56 @@
 
 # todo on venndir
 
+## 02nov2021
+
+* proportional Venn label positioning bugs:
+
+   * when a circle is fully inside another, it tries to label
+   the interior circle using the polygon with fewest overlaps;
+   however it errantly tries to place the count label for the
+   unique set also inside the polygon which is obviously incorrect.
+   * it would be good to re-draw Venn circles using the actual
+   set color after everything is rendered - to help reinforce
+   the set colors
+
+* "Try harder to make Euler proportional Venn diagram layout that
+represents all overlaps." A related issue was filed until R "eulerr"
+Github here: https://github.com/jolars/eulerr/issues/84
+
+   * basic idea is to manipulate the algorithm `eulerr/src/optim_final.cpp`
+   lines 125 to 131. Example code is shown that adjusts the scoring.
+   * The current approach ranks solutions by lowest
+   residual of `fitted_area - orig_area` - in other words absolute
+   area represented. My thought was to add an "area penalty" when
+   an entire overlap is not represented - this penalty could be
+   a percentage of the total counts that are not represented multiplied
+   by a weighting factor, for example 5x.
+
+
+## 29oct2021
+
+* Lot of examples of Venn diagram includes the percentage either along
+with the overlap count, or instead of the overlap count.
+* Several examples of Venn diagrams hide/display a subset of labels
+of interest.
+* Lot of venndir examples where the set label is super long, which
+makes the center of the label offset in a weird way.
+
+   * ideal world: have some configurable orientations of labels to
+   include in each cell.
+   * one example: set title is centered across the label, the overlap
+   and signed overlaps all appear below this title.
+
+
+
+## 01oct2021
+
+* Make `curate_venn_labels()` options more clearly defined
+
+   * the default data should be documented somewhere, perhaps as data
+   to make it easier to customize
+
+
 ## 28sep2021
 
 * I cannot ever remember how to add item labels! If I cannot remember,

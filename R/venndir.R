@@ -494,22 +494,41 @@ venndir <- function
       venn_spdf);
    
    # generate default set label positions outside the polygons
-   whichset <- which(venn_spdfs$type %in% "set");
-   whichset <- match(unique(venn_spdfs$label), venn_spdfs$label);
-   #whichset <- (length(venn_spdfs$label) + 1) - match(unique(venn_spdfs$label), rev(venn_spdfs$label));
+   # choose last entry in spdf for each unique label
+   # 02nov2021 - changed to use this logic
+   whichset <- (length(venn_spdfs$label) + 1) - match(unique(venn_spdfs$label), rev(venn_spdfs$label));
+   # choose first entry in spdf for each unique label
+   #whichset <- match(unique(venn_spdfs$label), venn_spdfs$label);
+   
+   # obtain outside label coordinates
+   # consider adding sp_buffer=-0.1 here and relative=TRUE
+   # which places segment inside polygon by 10% the polygon size
    ploxy <- polygon_label_outside(sp=venn_spdfs,
       which_sp=whichset,
       ...);
    venn_spdfs$x_offset <- 0;
    venn_spdfs$y_offset <- 0;
-   venn_spdfs$x_label[whichset] <- sapply(ploxy, function(ixy){ixy["border",1]})
-   venn_spdfs$y_label[whichset] <- sapply(ploxy, function(ixy){ixy["border",2]})
-   
+   ploxy_match <- match(venn_spdfs$label,
+      venn_spdfs$label[whichset]);
+   ploxy_label_x <- sapply(ploxy, function(ixy){ixy["border",1]});
+   ploxy_label_y <- sapply(ploxy, function(ixy){ixy["border",2]});
+   ploxy_outside_x <- sapply(ploxy, function(ixy){ixy["label",1]});
+   ploxy_outside_y <- sapply(ploxy, function(ixy){ixy["label",2]});
 
-   venn_spdfs$x_outside[whichset] <- sapply(ploxy, function(ixy){ixy["label",1]});
-   venn_spdfs$y_outside[whichset] <- sapply(ploxy, function(ixy){ixy["label",2]});
-   venn_spdfs$x_offset[whichset] <- sapply(ploxy, function(ixy){ixy["label",1]}) - venn_spdfs$x_label[whichset];
-   venn_spdfs$y_offset[whichset] <- sapply(ploxy, function(ixy){ixy["label",2]}) - venn_spdfs$y_label[whichset];
+   #
+   venn_spdfs$x_label[whichset] <- ploxy_label_x;
+   venn_spdfs$y_label[whichset] <- ploxy_label_y;
+   venn_spdfs$x_outside[whichset] <- ploxy_outside_x;
+   venn_spdfs$y_outside[whichset] <- ploxy_outside_y;
+   venn_spdfs$x_offset[whichset] <- ploxy_outside_x - venn_spdfs$x_label[whichset];
+   venn_spdfs$y_offset[whichset] <- ploxy_outside_y - venn_spdfs$y_label[whichset];
+   #
+   venn_spdfs$x_label <- ploxy_label_x[ploxy_match];
+   venn_spdfs$y_label <- ploxy_label_y[ploxy_match];
+   venn_spdfs$x_outside <- ploxy_outside_x[ploxy_match];
+   venn_spdfs$y_outside <- ploxy_outside_y[ploxy_match];
+   venn_spdfs$x_offset <- ploxy_outside_x[ploxy_match] - venn_spdfs$x_label;
+   venn_spdfs$y_offset <- ploxy_outside_y[ploxy_match] - venn_spdfs$y_label;
    
    venn_spdfs$vjust <- 0.5;
    venn_spdfs$hjust <- 0.5;
@@ -543,8 +562,14 @@ venndir <- function
       venn_counts=nCounts,
       stringsAsFactors=FALSE,
       check.names=FALSE);
-   nlabel_df <- jamba::mergeAllXY(data.frame(venn_spdf), nlabel_df);
-   nlabel_df <- nlabel_df[match(names(nCounts), nlabel_df$label),,drop=FALSE];
+   nlabel_df <- jamba::mergeAllXY(
+      #as.data.frame(venn_spdf),
+      subset(as.data.frame(venn_spdf), type %in% "overlap"),
+      nlabel_df);
+   # remove duplicate label rows
+   nmatch <- jamba::rmNA(match(names(nCounts),
+      nlabel_df$label));
+   nlabel_df <- nlabel_df[nmatch, , drop=FALSE];
    nlabel_df$color <- jamba::rmNA(nlabel_df$color,
       naValue="#FFFFFFFF");
    nlabel_df$venn_color <- jamba::rmNA(nlabel_df$venn_color,
@@ -555,32 +580,14 @@ venndir <- function
    
    # Now add the main count labels
    nlabel_df$show_set <- ifelse(
-      grepl(sep, fixed=TRUE, x=nlabel_df$label),
+      grepl(sep, fixed=TRUE, x=nlabel_df$label) |
+         is.na(nlabel_df$type),
       FALSE,
       TRUE);
    venn_text <- jamba::formatInt(
       jamba::rmNA(naValue=0,
          nlabel_df$venn_counts));
-   if (1 == 2) {
-      venn_text_old <- ifelse(
-         nlabel_df$show_set,
-         paste0("**",
-            nlabel_df$label,
-            "**",
-            ifelse(nlabel_df$venn_counts == 0,
-               "",
-               paste0("<br>\n",
-                  jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))
-               )
-            )
-            #jamba::formatInt(jamba::rmNA(naValue=0, nlabel_df$venn_counts))
-         ),
-         jamba::formatInt(
-            jamba::rmNA(naValue=0,
-               nlabel_df$venn_counts))
-      );
-   }
-   
+
    x_main <- nlabel_df$x_label;
    y_main <- nlabel_df$y_label;
    vjust_main <- rep(0.5, length(x_main));
@@ -637,19 +644,8 @@ venndir <- function
    hjust_signed <- rep(0, length(x_signed));
    halign_signed <- rep(0, length(x_signed));
    
-   ## label_style
-   #label_fill_main <- rep(NA, length(x_main));
-   #label_border_main <- rep(NA, length(x_main));
-   #label_color_main <- jamba::setTextContrastColor(
-   #   jamba::alpha2col(nlabel_df$color,
-   #   alpha=poly_alpha));
-   #label_fill_signed <- rep(NA, length(x_signed));
-   #label_border_signed <- rep(NA, length(x_signed));
-   #label_color_signed <- jamba::setTextContrastColor(
-   #   jamba::alpha2col(rep(nlabel_df$color, gCounts_len),
-   #      alpha=poly_alpha));
    
-   # venndir_label_style() now assigns these values
+   # venndir_label_style() assigns these values
    label_fill_main <- rep(NA, nrow(nlabel_df));
    label_border_main <- rep(NA, nrow(nlabel_df));
    label_color_main <- rep(NA, nrow(nlabel_df));
@@ -707,7 +703,6 @@ venndir <- function
    }
    
    ## Prepare label data.frame
-   #print(nlabel_df);
    label_n <- length(c(x_main, x_signed));
    label_df <- data.frame(
       x=c(x_main, x_signed),
@@ -748,7 +743,7 @@ venndir <- function
       label_df$overlap_sign <- c(rep("", length(x_main)),
          names(gbase_signs));
    }
-   
+
    ## Check for missing signed labels, then we nudge main label to center
    for (i in unique(label_df$overlap_set)) {
       irows <- (label_df$overlap_set %in% i & 

@@ -151,9 +151,19 @@ find_vennpoly_overlaps <- function
       names(venn_colors) <- names(sp);
    }
    
+   # check input class
+   if (!any(c("SpatialPolygons", "SpatialPolygonsDataFrame") %in% class(sp))) {
+      stop("Input must be SpatialPolygons or SpatialPolygonsDataFrame");
+   }
+   
    ## define incidence matrix of overlaps
-   el1 <- make_venn_combn_df(names(sp),
-      sep=sep);
+   if ("SpatialPolygonsDataFrame" %in% class(sp)) {
+      el1 <- make_venn_combn_df(rownames(as.data.frame(sp)),
+         sep=sep);
+   } else{
+      el1 <- make_venn_combn_df(names(sp),
+         sep=sep);
+   }
    if (verbose) {
       jamba::printDebug("find_vennpoly_overlaps(): ",
          "names(sp):", names(sp));

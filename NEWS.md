@@ -1,4 +1,25 @@
 
+# venndir 0.0.17.900
+
+## updates to existing functions
+
+* `venndir()` was updated to change the priority of label placement
+for proportional Venn diagrams. It used to choose the full set circle
+for the main set label, now it chooses the unique overlap polygon
+for that set if it exists, then uses the full set circle only
+as a fallback.
+* `venndir_label_style()` was updated to fix longstanding weird glitch
+with proportional Venn diagrams sometimes displaying counts when one
+set is fully inside all other sets, but that set has non-zero items
+unique to that set - so there is nowhere appropriate to display them.
+Because the main set label was displayed, the count label was errantly
+placed at the center of the Venn circle. Now the bug is fixed, the value
+is not displayed - it is part of the optional warning message that
+lists any overlap counts that could not be displayed.
+* `render_venndir()` fixed type "bow_lwd" is now correctly "box_lwd",
+only impacted box line width when the line width was changed from default.
+
+
 # venndir 0.0.16.900
 
 ## bug fix
