@@ -1,6 +1,20 @@
 
 # todo on venndir
 
+## 15nov2021
+
+* indicate total items per set somewhere in the figure
+* different label layout strategies, for example:
+
+   * The main set label is placed top-left, main counts bottom-left,
+   signed counts placed top-right through bottom-right. The label
+   width is calculated and centered inside the Venn polygon, however
+   the counts are sometimes pushed to the far right if the main
+   set label is too long.
+   * Alternative is to place set label top-center,
+   then main count labels bottom-left, signed counts bottom-right.
+
+
 ## 02nov2021
 
 * proportional Venn label positioning bugs:

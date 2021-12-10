@@ -1,4 +1,22 @@
 
+# venndir 0.0.18.900
+
+## bug fixes
+
+To resolve issue #2, the `colorjam` package was updated to
+add prefix to call `jamba::tcount()` to function `colorjam::approx_degrees()`.
+When the `colorjam` package is loaded, using `library(colorjam)` or
+`require(colorjam)` it automatically also loads jamba so its functions
+are available. However, when `colorjam::approx_degrees()` is called
+directly, without formally loading the `colorjam` package, the
+`jamba` functions are **not** loaded. This issue caused the error,
+which unfortunately causes the `venndir()` function to fail unless
+`jamba` or `colorjam` packages have been loaded previously.
+
+All that said, the "fix" is to require the updated `colorjam(>= 0.0.22.950)`
+package version that includes this fix.
+
+
 # venndir 0.0.17.900
 
 ## updates to existing functions
