@@ -9,7 +9,8 @@ venn_meme(
   proportional = FALSE,
   item_cex = 1.4,
   item_degrees = 0,
-  plot_style = "gg",
+  plot_style = c("gg", "base"),
+  item_style = c("gridtext", "text"),
   plot_warning = FALSE,
   ...
 )

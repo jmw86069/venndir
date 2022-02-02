@@ -11,6 +11,7 @@ rescale_sp(
   shift = c(0, 0),
   center = NULL,
   share_center = FALSE,
+  share_polygon_center = TRUE,
   update_bbox = TRUE,
   ...
 )
@@ -93,6 +94,25 @@ axis(1, las=2); axis(2, las=2);
 plot(sp123b[1], col=col3[1],
    add=TRUE);
 par("mfrow"=c(1, 1));
+
+{par("mfrow"=c(2, 2));
+plot(sp123, col=col3,
+   xlim=c(-4, 8), ylim=c(-4, 8))
+title(main="Original polygons", line=0);
+plot(rescale_sp(sp123, rotate_degrees=c(`11`=45, `12`=-10)), col=col3,
+   xlim=c(-4, 8), ylim=c(-4, 8))
+title(sub="yellow +45 degrees\nblue -10 degrees", line=0,
+   main="share_polygon_center=TRUE (default)")
+plot(rescale_sp(sp123, rotate_degrees=c(`11`=45, `12`=-10), share_polygon_center=FALSE), col=col3,
+   xlim=c(-4, 8), ylim=c(-4, 8))
+title(sub="yellow +45 degrees\nblue -10 degrees", line=0,
+   main="share_polygon_center=FALSE\n(each polygon uses its center)")
+plot(rescale_sp(sp123, rotate_degrees=c(`11`=45, `12`=-10), share_center=TRUE), col=col3,
+   xlim=c(-4, 8), ylim=c(-4, 8))
+title(sub="yellow +45 degrees\nblue -10 degrees", line=0,
+   main="share_center=TRUE\n(all polygons share one global center)")
+par("mfrow"=c(1, 1));}
+
 
 }
 \seealso{

@@ -162,7 +162,8 @@ venn_meme <- function
  proportional=FALSE,
  item_cex=1.4,
  item_degrees=0,
- plot_style="gg",
+ plot_style=c("gg", "base"),
+ item_style=c("gridtext", "text"),
  plot_warning=FALSE,
  ...)
 {
@@ -184,9 +185,20 @@ venn_meme <- function
          stop("Input x must have names, or be length <= 31 for 5-way Venn");
       }
    }
-
+   plot_style <- match.arg(plot_style);
+   item_style <- match.arg(item_style);
+   if ("text" %in% item_style) {
+      x <- lapply(x, function(i){
+         gsub("<br>", "\n", i);
+      })
+   } else if ("gridtext" %in% item_style) {
+      x <- lapply(x, function(i){
+         gsub("\n", "<br>", i);
+      })
+   }
+   
    # convert to setlist
-   setlist <- overlaplist2setlist(x)
+   setlist <- overlaplist2setlist(x);
 
    vo <- venndir(setlist,
       proportional=proportional,
@@ -194,6 +206,7 @@ venn_meme <- function
       label_preset="meme",
       item_degrees=item_degrees,
       item_cex=item_cex,
+      item_style=item_style,
       plot_style=plot_style,
       plot_warning=plot_warning,
       ...)

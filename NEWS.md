@@ -1,3 +1,44 @@
+# venndir 0.0.19.900
+
+## bug fixes
+
+* `polygon_label_fill()`: At last fixed an elusive bug causing certain
+item label scenarios to throw an error, turned out to be caused by lack
+of rownames on a matrix sorted by `jamba::mixedSortDF()`. The error
+occurred in an internal function `get_poly_points()` that iterates
+different labeling conditions until at least `n` label coordinates
+are returned. Apparently the function `sp::spsample()` does not
+guarantee returning the same number of coordinate points as requested.
+This error must have bitten someone else somewhere in the R world,
+requesting 15 sampled points, then receiving only 12.
+
+
+## changes to existing functions
+
+* `rescale_sp()` argument `rotate_degrees` will now recognized a named
+vector.
+
+   * names are expected to match polygon names stored in the
+   `sp` object in the ID slotName of each individual `Polygons` object,
+   for example the first polygon in a `SpatialPolygon` object would have
+   name stored as: `sp@polygons[[1]]@ID`. When `rotate_degrees` contains names,
+   only names that match the polygons will be applied, which allows
+   rotating individual polygons within a `SpatialPolygons` object.
+   * `share_polygon_center=TRUE` new argument intended for multi-polygon
+   `Polygons` objects, which happens when there are two disconnected
+   parts inside one `Polygons` element. When this occurs, by default
+   the two parts are rotated as if they were one unit, around their own
+   local center, by default. When `share_polygon_center=FALSE` each
+   polygon is rotated about its own personal center.
+
+* `venn_meme()`
+
+   * new argument `item_style="gridtext"` is a different default than
+   `venndir()` because memes are expected to have fewer labels, and are
+   most likely to use fancy markdown text formatting. This argument is
+   passed to `venndir()`. When `item_style="text"` it will autocorrect
+   `"<br>"` into newline; when `item_style="gridtext"` it will autocorrect
+   newline into `"<br>"`.
 
 # venndir 0.0.18.900
 

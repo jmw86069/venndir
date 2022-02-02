@@ -1,6 +1,50 @@
 
 # todo on venndir
 
+## 02feb2022
+
+* Option to supply specific SpatialPolygons objects for each set.
+* Option to apply `rotate_degrees` to the polygon representing specific sets.
+The function `rescale_sp()` takes `rotate_degrees` as an argument then
+applies to all polygons. It could potentially be applied to named
+polygons, if `rotate_degrees` also had names that matched the sp object.
+
+
+## 30jan2022
+
+### Bugs observed
+
+* Sometimes `label_style="shaded box"` throw error and do not display.
+* Sometimes `label_preset="main outside"` causes main labels not to
+be plotted. The inside labels appear correctly.
+* Proportional Venn labels draw a segment to an ambiguous polygon,
+sometimes two segments end inside the same polygon.
+
+### Feature enhancements
+
+* `venndir()` option to "recognize" when the input is format:
+
+   * incidence matrix: `im2list()`
+   * signed incidence matrix: `im_value2list()`
+   * overlap counts: `counts2setlist()`; force `return_items=FALSE`
+   * signed overlap counts: `signed_counts2setlist()`; force `return_items=FALSE`
+
+* Option to supply a list where some elements are signed, while
+others are not. For example, supplying "dysregulated genes" with
+direction, and supplying "genes assayed" which is not directional.
+This feature implies certain downstream effects:
+
+   * Concordance cannot be confirmed or denied with non-directional
+   list elements. For example, "gene hit down", "protein hit down",
+   "protein assayed" should be reported as "concordant", and the label
+   should be something like "downArrow hyphen downArrow".
+
+* Need more/better styles for arranging labels.
+
+   * Option to center set name above the counts and signed counts.
+   * Option for multi-column signed counts, especially for 3+ signed sets.
+
+
 ## 15nov2021
 
 * indicate total items per set somewhere in the figure
