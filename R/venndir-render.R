@@ -398,7 +398,11 @@ render_venndir <- function
          if (any(show_label & has_offset)) {
             use_offset <- (show_label & has_offset);
             offset_sets <- label_df$overlap_set[use_offset];
-            sp_index <- match(offset_sets, venn_spdf$label);
+            # 0.0.20.900 - fix order of preferred polygon labels
+            #sp_index <- match(offset_sets, venn_spdf$label);
+            sp_index <- (length(venn_spdf$label) + 1 - 
+                  match(offset_sets, 
+                     rev(venn_spdf$label)));
             segment_buffer <- ifelse(label_df$items %in% "inside",
                label_df$segment_buffer / 2,
                label_df$segment_buffer);
@@ -421,10 +425,10 @@ render_venndir <- function
             new_xy <- polygon_label_segment(
                x0=test_xy$x0,
                y0=test_xy$y0,
-               x1=test_xy$x0,
-               y1=test_xy$y0,
-               #x1=test_xy$x1,
-               #y1=test_xy$y1,
+               #x1=test_xy$x0,
+               #y1=test_xy$y0,
+               x1=test_xy$x1,
+               y1=test_xy$y1,
                sp=sp_list,
                sp_buffer=test_xy$segment_buffer,
                verbose=FALSE,

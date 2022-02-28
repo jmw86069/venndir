@@ -1,3 +1,43 @@
+# venndir 0.0.20.900
+
+## bug fixes
+
+Proportional Venn diagrams have been a bit of a challenge for labeling.
+Some edge cases were resolved finally, mostly relevant when certain
+Venn overlap wedges were razor thin, or when an overlap was represented
+by more than one polygon in the resulting geometry.
+
+Also, label placement outside the Venn circle was inconsistent, some
+of the options in `polygon_label_outside()` appear to work poorly together.
+Its default values were adjusted to be more consistently "pleasing".
+
+* `render_venndir()` had a bug that caused proportional Venn labels for
+single-set overlaps to be assigned to the wrong set polygon when the label
+was being positioned outside. The line segment would sometimes be visibly
+ambiguous. It would point the setA line segment to the full setA instead of
+the smaller non-overlap polygon representing unique setA items.
+In most cases the workaround was to use `segment_buffer=0` so the label
+arrow is drawn to the edge of the circle. When the overall Venn
+diagram had reasonable proportions the visual effect was not that
+obvious. With extreme Venn diagrams (small sliver of unique items
+for some sets) the output was not as intended.
+* `get_largest_polygon()` was updated to work with `SpatialPolygonsDataFrame`,
+previously it did not subset the polygons, returning the full set of polygons.
+It contributed to set labels being weirdly placed, specifically in rare cases
+where an overlap set (for example `setA&setB`) was represented by two polygons
+where setA and setB uniquely overlap, and where one of those polygons was
+extremely small. In the weird test case, the smaller polygon had area 0.2,
+while the larger polygon had area 150. The label is intended to point to
+the largest available polygon for each overlap, however with objects
+`SpatialPolygonsDataFrame` it was returning all polygons for each overlap,
+and the first polygon was labeled. The issue showed up only when the first
+of multiple polygons happened to be the smaller one, and substantially
+smaller.
+
+Lightweight change: `polygon_label_outside()` was moved into a separate .R
+file. The `venndir-sp.R` file has too many functions, it will be split into
+pieces eventually.
+
 # venndir 0.0.19.900
 
 ## bug fixes

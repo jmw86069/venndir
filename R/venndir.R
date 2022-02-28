@@ -503,8 +503,12 @@ venndir <- function
    # obtain outside label coordinates
    # consider adding sp_buffer=-0.1 here and relative=TRUE
    # which places segment inside polygon by 10% the polygon size
-   ploxy <- polygon_label_outside(sp=venn_spdfs,
-      which_sp=whichset,
+   # jamba::printDebug("whichset: ", whichset)
+   # print(as.data.frame(venn_spdfs))
+   # plot(venn_spdfs)
+   ploxy <- polygon_label_outside(sp=venn_spdfs[whichset,],
+      which_sp=seq_along(whichset),
+      sp_buffer=-0.9,
       ...);
    venn_spdfs$x_offset <- 0;
    venn_spdfs$y_offset <- 0;
@@ -516,19 +520,19 @@ venndir <- function
    ploxy_outside_y <- sapply(ploxy, function(ixy){ixy["label",2]});
 
    #
-   venn_spdfs$x_label[whichset] <- ploxy_label_x;
-   venn_spdfs$y_label[whichset] <- ploxy_label_y;
-   venn_spdfs$x_outside[whichset] <- ploxy_outside_x;
-   venn_spdfs$y_outside[whichset] <- ploxy_outside_y;
-   venn_spdfs$x_offset[whichset] <- ploxy_outside_x - venn_spdfs$x_label[whichset];
-   venn_spdfs$y_offset[whichset] <- ploxy_outside_y - venn_spdfs$y_label[whichset];
+   # venn_spdfs$x_label[whichset] <- ploxy_label_x;
+   # venn_spdfs$y_label[whichset] <- ploxy_label_y;
+   # venn_spdfs$x_outside[whichset] <- ploxy_outside_x;
+   # venn_spdfs$y_outside[whichset] <- ploxy_outside_y;
+   # venn_spdfs$x_offset[whichset] <- ploxy_outside_x - venn_spdfs$x_label[whichset];
+   # venn_spdfs$y_offset[whichset] <- ploxy_outside_y - venn_spdfs$y_label[whichset];
    #
    venn_spdfs$x_label <- ploxy_label_x[ploxy_match];
    venn_spdfs$y_label <- ploxy_label_y[ploxy_match];
    venn_spdfs$x_outside <- ploxy_outside_x[ploxy_match];
    venn_spdfs$y_outside <- ploxy_outside_y[ploxy_match];
-   venn_spdfs$x_offset <- ploxy_outside_x[ploxy_match] - venn_spdfs$x_label;
-   venn_spdfs$y_offset <- ploxy_outside_y[ploxy_match] - venn_spdfs$y_label;
+   venn_spdfs$x_offset <- venn_spdfs$x_outside - venn_spdfs$x_label;
+   venn_spdfs$y_offset <- venn_spdfs$y_outside - venn_spdfs$y_label;
    
    venn_spdfs$vjust <- 0.5;
    venn_spdfs$hjust <- 0.5;
