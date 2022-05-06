@@ -15,6 +15,7 @@ render_venndir(
   xpd = NA,
   font_cex = 1,
   item_cex = NULL,
+  item_cex_factor = 4,
   plot_warning = TRUE,
   show_label = NA,
   show_items = c(NA, "none", "sign item", "item", "sign"),
@@ -124,6 +125,12 @@ represented in \code{venndir_output$venv_spdf}, which is also
 the order returned by \code{signed_overlaps()}, for those overlaps
 represented by a polygon.
 }}
+
+\item{item_cex_factor}{\code{numeric} value that controls the extent
+of font size auto-scaling based upon the number of items in
+each overlap set. This value is multiplied by \code{1 / sqrt(count)},
+where larger values for \code{item_cex_factor} will therefore result
+in higher \code{item_cex} values with increasing number of labels.}
 
 \item{plot_warning}{\code{logical} indicating whether to draw a text
 label on the bottom of the plot whenever a non-zero overlap

@@ -84,6 +84,11 @@
 #'    represented in `venndir_output$venv_spdf`, which is also
 #'    the order returned by `signed_overlaps()`, for those overlaps
 #'    represented by a polygon.
+#' @param item_cex_factor `numeric` value that controls the extent
+#'    of font size auto-scaling based upon the number of items in
+#'    each overlap set. This value is multiplied by `1 / sqrt(count)`,
+#'    where larger values for `item_cex_factor` will therefore result
+#'    in higher `item_cex` values with increasing number of labels.
 #' @param plot_warning `logical` indicating whether to draw a text
 #'    label on the bottom of the plot whenever a non-zero overlap
 #'    count cannot be displayed given the `label_df` data. This
@@ -212,6 +217,7 @@ render_venndir <- function
  xpd=NA,
  font_cex=1,
  item_cex=NULL,
+ item_cex_factor=4,
  plot_warning=TRUE,
  show_label=NA,
  show_items=c(NA,
@@ -312,9 +318,9 @@ render_venndir <- function
             poly_rows <- which(!is.na(as.data.frame(venn_spdf)$venn_counts));
             so_counts <- as.data.frame(venn_spdf)$venn_counts[poly_rows];
             # crude scaling by total number of items
-            so_cex <- jamba::noiseFloor(1/sqrt(so_counts) * 2.5,
+            so_cex <- jamba::noiseFloor(1/sqrt(so_counts) * item_cex_factor,#2.5,
                ceiling=0.9,
-               minimum=0.1)
+               minimum=0.2)
             # update here in case area fails, it will use this crude item_cex
             item_cex <- item_cex * so_cex;
             # area of each polygon
@@ -326,11 +332,21 @@ render_venndir <- function
             # so_total_areas <- rgeos::gArea(
             #    rgeos::gSimplify(venn_spdf,
             #       tol=1));
+            
             # take median of the larger area polygons
             so_big <- median(so_areas[so_areas / max(so_areas) >= 0.5])
             so_areas_cex <- sqrt(so_areas) / sqrt(so_big);
+            
+            # weight the effect by number of item labels
+            # so that 2 labels would not be scaled as much as 10
+            so_areas_wt <- (1 + 0.5) / (so_counts + 0.5)
+            so_areas_cex_wt <- so_areas_wt + (1 - so_areas_wt) * so_areas_cex
             # adjust the crude scaling by the relative polygon area
-            item_cex <- item_cex * so_areas_cex;
+            item_cex <- item_cex * so_areas_cex_wt;
+            
+            # for debugging, the data.frame can be printed
+            #print(data.frame(so_counts, so_cex, so_areas_cex, so_areas_wt, so_areas_cex_wt, item_cex));
+            item_cex;
          }, error=function(e){
             item_cex;
          });

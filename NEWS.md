@@ -2,26 +2,37 @@
 
 ## updates to existing functions
 
-* `venndir()` and `render_venndir()` new argument `item_buffer` to make
-this option easier to modify. It is passed to `polygon_label_fill()`
-as argument `scale_width` which was otherwise very hard to find.
+* `venndir()` and `render_venndir()` new argument `item_buffer`
+
+   * goal is to make this option easier to modify
+   * It is passed to `polygon_label_fill()`
+   as argument `scale_width` which was otherwise very hard to find.
+
 * `render_venndir()` will now auto-calculate an appropriate `item_cex`
-when `item_cex=NULL` or `item_cex` has only one `numeric` value.
-The scaling is based upon the total number of items inside
-each polygon, and the relative area of each polygon.
-When `item_cex` is supplied as a `numeric` value, it is multipled
-by the auto-scaled adjustment, so the `item_cex` acts as a
-relative adjustment to the auto-scale font sizing.
-* `render_venndir()` default change `segment_buffer=-0.05`, which is
-smaller than previous `segment_buffer=-0.2`. This change will cause
-most segments to end very near the outer border of the polygon.
-For proportional euler diagrams, this change is also a
-stop-gap correction for having the segment line end too far inside
-the polygon, sometimes causing it to conflict with other polygons.
-That issue is caused by having the segment point inside the parent
-polygon (circle or ellipse) instead of an overlap polygon, and specifically
-the segment should point to the overlap polygon with the fewest overlaps,
-by default the polygon whose only overlap is to the set label itself.
+
+   * when `item_cex=NULL` or `item_cex` has only one `numeric` value.
+   The scaling is based upon the total number of items inside
+   each polygon, and the relative area of each polygon.
+   * When `item_cex` is supplied as a single `numeric` value, it is multipled
+   by the auto-scaled adjustment, so the `item_cex` acts as a
+   relative adjustment to the auto-scale font sizing.
+   * `item_cex_factor` helps control the magnitude of scaling for large
+    numbers of items (which shouldn't matter much since they are already
+    not very legible.).
+   
+* `render_venndir()` default change `segment_buffer=-0.05`
+
+   * smaller than previous `segment_buffer=-0.2`
+   * This change will cause
+   most segments to end very near the outer border of the polygon.
+   * For proportional euler diagrams, this change is also a
+   stop-gap correction for having the segment line end too far inside
+   the polygon, sometimes causing it to conflict with other polygons.
+   That issue is caused by having the segment point inside the parent
+   polygon (circle or ellipse) instead of an overlap polygon, and specifically
+   the segment should point to the overlap polygon with the fewest overlaps,
+   by default the polygon whose only overlap is to the set label itself.
+
 * `venn_meme()` was updated to pass `item_cex` as a two-item `numeric`
 vector in order to prevent the auto-scaling described above.
 
