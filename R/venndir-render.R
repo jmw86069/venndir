@@ -73,10 +73,17 @@
 #'    Venn overlap labels overall. A value `font_cex=1.2` will make
 #'    text labels 20% larger than normal.
 #' @param item_cex `numeric` value used to resize item labels,
-#'    used when `show_items` is used. This value can be supplied as
-#'    a vector, in which case it will be applied to each polygon
-#'    in the order they are drawn, typically the order presented
-#'    in `label_df`.
+#'    used when `show_items` is used.
+#'    * When `item_cex=NULL` or is a single value, auto-scaling is
+#'    performed based upon the number of items in each overlap
+#'    polygon, and the relative polygon areas. Any `numeric`
+#'    value for `item_cex` is multiplied by the auto-scaled value.
+#'    * When two or more values are supplied as a vector, the
+#'    values are recycled and applied to the number of Venn
+#'    overlap polygons, in the order of polygons with `type="overlap"`
+#'    represented in `venndir_output$venv_spdf`, which is also
+#'    the order returned by `signed_overlaps()`, for those overlaps
+#'    represented by a polygon.
 #' @param plot_warning `logical` indicating whether to draw a text
 #'    label on the bottom of the plot whenever a non-zero overlap
 #'    count cannot be displayed given the `label_df` data. This
@@ -153,10 +160,16 @@
 #' @param ggtheme `function` that outputs class `"theme", "gg"`,
 #'    compatible with output from `ggplot2::theme_void()`. This argument
 #'    is used to define the ggplot2 theme, when `plot_style="gg"`.
-#' @param draw_buffer `logical` indicating whether to draw the item
-#'    buffer used to determine item label positions inside each
-#'    polygon, only relevant when `label_preset` includes items,
-#'    and `show_items` is active.
+#' @param item_buffer `numeric` value representing a fractional buffer
+#'    width inside each polygon applied before placing labels inside
+#'    each polygon. This argument is passed to `polygon_label_fill()`
+#'    as argument `scale_width`. The value should be negative, because
+#'    the value represents the size relative to the full polygon size,
+#'    and negative values make the polygon smaller.
+#' @param draw_buffer `logical` indicating whether to draw the `item_buffer`
+#'    used to determine item label positions inside each polygon,
+#'    only relevant when `label_preset` includes items, and
+#'    `show_items` is active.
 #' @param ... additional arguments are passed to `plot()`
 #'    when plotting `venn_spdf` which is expected to be a
 #'    `sp::SpatialPolygonsDataFrame`.
@@ -198,7 +211,7 @@ render_venndir <- function
  expand_fraction=0,
  xpd=NA,
  font_cex=1,
- item_cex=0.9,
+ item_cex=NULL,
  plot_warning=TRUE,
  show_label=NA,
  show_items=c(NA,
@@ -210,7 +223,7 @@ render_venndir <- function
  max_items=100,
  show_zero=TRUE,
  show_segments=TRUE,
- segment_buffer=-0.2,
+ segment_buffer=-0.05,
  label_style=c("custom",
     "basic",
     "fill",
@@ -222,6 +235,7 @@ render_venndir <- function
  inside_percent_threshold=5,
  plot_style=c("base", "gg"),
  item_style=c("text", "gridtext"),
+ item_buffer=-0.15,
  group_labels=TRUE,
  ggtheme=ggplot2::theme_void,
  draw_buffer=FALSE,
@@ -282,6 +296,48 @@ render_venndir <- function
       if (!all(label_df_required %in% colnames(label_df))) {
          warning(paste0("label_df must contain colnames: ",
             jamba::cPaste(label_df_required)));
+      }
+      
+      # auto-scale item_cex based upon number of items and polygon area
+      if (length(item_cex) <= 1) {
+         if (length(item_cex) == 1) {
+            if (is.na(item_cex)) {
+               item_cex <- 1;
+            }
+         } else {
+            item_cex <- 1;
+         }
+         # recipe to calculate item_cex
+         item_cex <- tryCatch({
+            poly_rows <- which(!is.na(as.data.frame(venn_spdf)$venn_counts));
+            so_counts <- as.data.frame(venn_spdf)$venn_counts[poly_rows];
+            # crude scaling by total number of items
+            so_cex <- jamba::noiseFloor(1/sqrt(so_counts) * 2.5,
+               ceiling=0.9,
+               minimum=0.1)
+            # update here in case area fails, it will use this crude item_cex
+            item_cex <- item_cex * so_cex;
+            # area of each polygon
+            so_areas <- sapply(poly_rows, function(i){
+               rgeos::gArea(venn_spdf[i,])
+            })
+            # total area of all polygons
+            # (not used currently but might be preferred for proportional)
+            # so_total_areas <- rgeos::gArea(
+            #    rgeos::gSimplify(venn_spdf,
+            #       tol=1));
+            # take median of the larger area polygons
+            so_big <- median(so_areas[so_areas / max(so_areas) >= 0.5])
+            so_areas_cex <- sqrt(so_areas) / sqrt(so_big);
+            print(so_areas_cex);
+            # adjust the crude scaling by the relative polygon area
+            item_cex <- item_cex * so_areas_cex * so_cex;
+         }, error=function(e){
+            item_cex;
+         });
+      }
+      if (length(item_cex) == 0 || all(is.na(item_cex))) {
+         item_cex <- 1;
       }
       
       ## Fill any missing optional colnames with defaults
@@ -518,6 +574,7 @@ render_venndir <- function
             plot_style="none",
             draw_labels=FALSE,
             degrees=items_df1$item_degrees[1],
+            scale_width=item_buffer,
             ...);
       });
       # combine item label into one data.frame
@@ -901,7 +958,7 @@ render_venndir <- function
          ggv <- ggv + ggtheme();
       }
       # optional segment to count labels
-      if (length(segment_df) > 0) {
+      if (length(segment_df) > 0 && show_segments) {
          segment_df <- unique(segment_df);
          ggv <- ggv + ggplot2::geom_line(
             data=segment_df,

@@ -30,7 +30,9 @@ venndir(
   venn_sp = NULL,
   inside_percent_threshold = NULL,
   plot_style = c("base", "gg"),
+  item_cex = NULL,
   item_style = c("text", "gridtext"),
+  item_buffer = -0.15,
   do_plot = TRUE,
   verbose = FALSE,
   ...
@@ -133,11 +135,28 @@ represent at least 5 percent of the total area.}
 \code{"gg"} uses ggplot2; \code{"base"}
 uses base R graphics. This argument is passed to \code{render_venndir()}.}
 
+\item{item_cex}{\code{numeric} value used to resize item labels,
+used when \code{show_items} is used, passed to \code{render_venndir()}.
+\itemize{
+\item When \code{item_cex=NULL} or is a single value, auto-scaling is
+performed based upon the number of items in each overlap
+polygon, and the relative polygon areas. Any \code{numeric}
+value for \code{item_cex} is multiplied by the auto-scaled value.
+\item When two or more values are supplied as a vector, the
+values are recycled and applied to the number of Venn
+overlap polygons, in the order of polygons with \code{type="overlap"}
+represented in \code{venndir_output$venv_spdf}, which is also
+the order returned by \code{signed_overlaps()}, for those overlaps
+represented by a polygon.
+}}
+
 \item{item_style}{\code{character} string indicating the style used to display
 item labels when they are enabled. The \code{"gridtext"} option is
 substantially slower for a large number of labels, but enables
 use of markdown. The \code{"text"} option is substantially faster, but
-does not allow markdown.
+does not allow markdown. Therefore the default is \code{"text"}, and
+\code{"gridtext"} is mostly useful for \code{venn_meme()} which usually
+only has one or a small number of labels in each polygon.
 \itemize{
 \item \code{"text"} uses \code{text()} for base R, or \code{geom_text()} for ggplot2.
 This option does not allow markdown, but is very fast.
@@ -146,6 +165,13 @@ This option does not allow markdown, but is very fast.
 markdown, but for many item labels (more than 300) this option
 is notably slower, on the order of several seconds to render.
 }}
+
+\item{item_buffer}{\code{numeric} value representing a fractional buffer
+width inside each polygon applied before placing labels inside
+each polygon. This argument is passed to \code{polygon_label_fill()}
+as argument \code{scale_width}. The value should be negative, because
+the value represents the size relative to the full polygon size,
+and negative values make the polygon smaller.}
 
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
 }

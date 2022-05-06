@@ -187,17 +187,37 @@
 #' @param plot_style `character` indicating the style of graphics plot:
 #'    `"gg"` uses ggplot2; `"base"`
 #'    uses base R graphics. This argument is passed to `render_venndir()`.
+#' @param item_cex `numeric` value used to resize item labels,
+#'    used when `show_items` is used, passed to `render_venndir()`.
+#'    * When `item_cex=NULL` or is a single value, auto-scaling is
+#'    performed based upon the number of items in each overlap
+#'    polygon, and the relative polygon areas. Any `numeric`
+#'    value for `item_cex` is multiplied by the auto-scaled value.
+#'    * When two or more values are supplied as a vector, the
+#'    values are recycled and applied to the number of Venn
+#'    overlap polygons, in the order of polygons with `type="overlap"`
+#'    represented in `venndir_output$venv_spdf`, which is also
+#'    the order returned by `signed_overlaps()`, for those overlaps
+#'    represented by a polygon.
 #' @param item_style `character` string indicating the style used to display
 #'    item labels when they are enabled. The `"gridtext"` option is
 #'    substantially slower for a large number of labels, but enables
 #'    use of markdown. The `"text"` option is substantially faster, but
-#'    does not allow markdown.
+#'    does not allow markdown. Therefore the default is `"text"`, and
+#'    `"gridtext"` is mostly useful for `venn_meme()` which usually
+#'    only has one or a small number of labels in each polygon.
 #'    * `"text"` uses `text()` for base R, or `geom_text()` for ggplot2.
 #'    This option does not allow markdown, but is very fast.
 #'    * `"gridtext"` uses `gridtext::richtext_grob()` for base R, or
 #'    `ggtext::geom_richtext()` for ggplot2. This option does allow
 #'    markdown, but for many item labels (more than 300) this option
 #'    is notably slower, on the order of several seconds to render.
+#' @param item_buffer `numeric` value representing a fractional buffer
+#'    width inside each polygon applied before placing labels inside
+#'    each polygon. This argument is passed to `polygon_label_fill()`
+#'    as argument `scale_width`. The value should be negative, because
+#'    the value represents the size relative to the full polygon size,
+#'    and negative values make the polygon smaller.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
 #' @family venndir core
@@ -293,7 +313,9 @@ venndir <- function
  venn_sp=NULL,
  inside_percent_threshold=NULL,
  plot_style=c("base", "gg"),
+ item_cex=NULL,
  item_style=c("text", "gridtext"),
+ item_buffer=-0.15,
  do_plot=TRUE,
  verbose=FALSE,
  ...)
@@ -800,7 +822,9 @@ venndir <- function
          display_counts=display_counts,
          label_style="custom",
          plot_style=plot_style,
+         item_cex=item_cex,
          item_style=item_style,
+         item_buffer=item_buffer,
          max_items=max_items,
          inside_percent_threshold=inside_percent_threshold,
          ...);

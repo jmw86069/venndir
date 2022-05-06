@@ -50,8 +50,16 @@
 #'    should be a list of item vectors. Note that if a `setlist`
 #'    is passed to `overlaplist2setlist()` it will return
 #'    the `setlist` unchanged.
-#' @param proportional,item_cex,item_degrees,plot_style,plot_warning
+#' @param proportional,item_degrees,plot_style,plot_warning
 #'    default arguments passed to `venndir()`.
+#' @param item_cex `numeric` passed to `venndir()`, however when
+#'    `item_cex` is length=1, it is extended to length=2 in order
+#'    to prevent the auto-scaling adjustment typically used,
+#'    which adjusts the font size based upon the relative area
+#'    of each overlap polygon. In most cases this scaling is
+#'    not helpful for Venn memes. To enable auto-scaling, use
+#'    `item_cex=NULL`. See help text in `venndir()` for more
+#'    details.
 #' @param ... additional arguments are passed to `venndir()`.
 #' 
 #' @family venndir core
@@ -200,6 +208,9 @@ venn_meme <- function
    # convert to setlist
    setlist <- overlaplist2setlist(x);
 
+   if (length(item_cex) == 1) {
+      item_cex <- rep(item_cex, 2);
+   }
    vo <- venndir(setlist,
       proportional=proportional,
       show_items="item",

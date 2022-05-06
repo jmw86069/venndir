@@ -1,6 +1,91 @@
 
 # todo on venndir
 
+## 06may2022
+
+* adjust item label size `item_cex` automatically based upon
+
+   1. number of item labels
+   2. relative area of the polygon
+
+* `venndir()` and `render_venndir()` should have specific argument
+for the item label buffer width
+
+   * it currently uses `label_polygon_fill()` argument `scale_width` which is
+   impossible to remember!
+
+* Prepare some easy way to enable Venn diagrams from `sestats`
+results from `jamses::se_contrast_stats()`.
+
+   * Consider something similar for `limma::decideTests()` which returns
+   an incidence matrix.
+   * Consider allowing incidence matrix as valid input to `venndir()`.
+   * While we're at it, try to recognize other common inputs, such as
+   signed count vector, count vector, incidence matrix,
+   signed incidence matrix.
+
+### Convert from SpatialPolygonsDataFrame to sf equivalent
+
+Background:
+
+* The `sp` package is deprecated, to be retired by end of 2023.
+* All `sp` methods must be converted to use `sf` format.
+* Fortunately, `sf` uses something like a `data.frame`  as its
+storage model for polygons. Most if not all functions from `rgeos`
+are already available as `sf`-specific functions, the steps just
+all need to be ported.
+* Unsure if `spsample` is available for `sf`. It would not be too difficult
+to wrapper a very simple replacement function:
+
+   * start with square coordinate "grid"
+   * rotate grid 30, 45, or 60 degrees
+   * overlay grid onto polygon P
+   * resize grid progressively smaller until at least N points are inside P
+   * optionally perform basic rotations at each sizing to maximize fit
+
+
+## 28apr2022
+
+* `render_venndir()` does not honor `show_segments=FALSE` with
+`plot_style="gg"`.
+* In the rare case that two sets completely overlap, proportional Euler
+returns two identical circles. We should probably offset them at least
+1% so the circle colors are visible.
+
+   * `venndir()` obtains the proportional coordinates,
+   `get_venn_shapes()` creates the coordinates - the step that creates
+   coordinates should probably test and do the adjustment, so any
+   function that calls `get_venn_shapes()` will receive valid coordinates.
+
+* Problem: proportional Venn labels outside are not placed in ideal locations:
+
+   * often placed left and right side, which extend beyond the panel width
+   * sometimes still overlap other labels placed outside, partly due to
+   irregular label "box", wide text labels, multi-line text labels,
+   multi-component labels (set name, counts, signed counts)
+
+* Need a method to display overlap count and item labels in a set.
+* When item labels exceed `max_items` it should display the overlap counts,
+currently it displays nothing.
+* Need a method to display set sizes somewhere in the plot panel:
+
+   * Total items in each set.
+   * Total items overall.
+
+* Need method to display overlap percent as alternative to overlap count
+
+   * How do other Venn diagram tools calculate percent overlap?
+
+
+## 09mar2022
+
+* `textvenn()` is useful but sometimes labels are super long and fill
+the screen width (and beyond). It needs some logic to word-wrap.
+E.g. wrap by the separator `"&"` as first-pass; potentially word-wrap
+each label within that if longer than a defined length. Word-wrap
+probably needs to be sensitive to underscores "_", hyphens "-", period ".",
+and whitespace " ", including things like "\t\r\n", etc.
+
 ## 02feb2022
 
 * Option to supply specific SpatialPolygons objects for each set.

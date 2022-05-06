@@ -104,6 +104,10 @@ get_venn_shapes <- function
       }
    } else if (suppressPackageStartupMessages(require(eulerr))) {
       eu <- eulerr::euler(counts, ...);
+      # test for any identical circles/ellipses, potential methods:
+      # * test identical polygons, after rounding coordinates
+      # * test identical coordinate ranges, bbox(sp), after rounding
+      #test_repeat_polygons()
       venn_sp <- eulerr2polys(eu);
    } else {
       stop("Proportional diagrams require the eulerr package.");

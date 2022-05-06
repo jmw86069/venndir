@@ -14,7 +14,7 @@ render_venndir(
   expand_fraction = 0,
   xpd = NA,
   font_cex = 1,
-  item_cex = 0.9,
+  item_cex = NULL,
   plot_warning = TRUE,
   show_label = NA,
   show_items = c(NA, "none", "sign item", "item", "sign"),
@@ -22,13 +22,14 @@ render_venndir(
   max_items = 100,
   show_zero = TRUE,
   show_segments = TRUE,
-  segment_buffer = -0.2,
+  segment_buffer = -0.05,
   label_style = c("custom", "basic", "fill", "shaded", "shaded_box", "lite",
     "lite_box"),
   fontfamily = "Arial",
   inside_percent_threshold = 5,
   plot_style = c("base", "gg"),
   item_style = c("text", "gridtext"),
+  item_buffer = -0.15,
   group_labels = TRUE,
   ggtheme = ggplot2::theme_void,
   draw_buffer = FALSE,
@@ -110,10 +111,19 @@ Venn overlap labels overall. A value \code{font_cex=1.2} will make
 text labels 20\% larger than normal.}
 
 \item{item_cex}{\code{numeric} value used to resize item labels,
-used when \code{show_items} is used. This value can be supplied as
-a vector, in which case it will be applied to each polygon
-in the order they are drawn, typically the order presented
-in \code{label_df}.}
+used when \code{show_items} is used.
+\itemize{
+\item When \code{item_cex=NULL} or is a single value, auto-scaling is
+performed based upon the number of items in each overlap
+polygon, and the relative polygon areas. Any \code{numeric}
+value for \code{item_cex} is multiplied by the auto-scaled value.
+\item When two or more values are supplied as a vector, the
+values are recycled and applied to the number of Venn
+overlap polygons, in the order of polygons with \code{type="overlap"}
+represented in \code{venndir_output$venv_spdf}, which is also
+the order returned by \code{signed_overlaps()}, for those overlaps
+represented by a polygon.
+}}
 
 \item{plot_warning}{\code{logical} indicating whether to draw a text
 label on the bottom of the plot whenever a non-zero overlap
@@ -193,6 +203,13 @@ represent at least 5 percent of the total area.}
 of plot: \code{"base"} uses base R graphics; \code{"gg"} uses
 ggplot2 graphics (not yet implemented).}
 
+\item{item_buffer}{\code{numeric} value representing a fractional buffer
+width inside each polygon applied before placing labels inside
+each polygon. This argument is passed to \code{polygon_label_fill()}
+as argument \code{scale_width}. The value should be negative, because
+the value represents the size relative to the full polygon size,
+and negative values make the polygon smaller.}
+
 \item{group_labels}{\code{logical} to enable a relatively new feature that
 groups multiple \code{gridtext::richtext_grob()} elements together
 by overlap set and position, so there is one border and fill
@@ -204,10 +221,10 @@ implemented for base R plots, and not yet available for
 compatible with output from \code{ggplot2::theme_void()}. This argument
 is used to define the ggplot2 theme, when \code{plot_style="gg"}.}
 
-\item{draw_buffer}{\code{logical} indicating whether to draw the item
-buffer used to determine item label positions inside each
-polygon, only relevant when \code{label_preset} includes items,
-and \code{show_items} is active.}
+\item{draw_buffer}{\code{logical} indicating whether to draw the \code{item_buffer}
+used to determine item label positions inside each polygon,
+only relevant when \code{label_preset} includes items, and
+\code{show_items} is active.}
 
 \item{...}{additional arguments are passed to \code{plot()}
 when plotting \code{venn_spdf} which is expected to be a

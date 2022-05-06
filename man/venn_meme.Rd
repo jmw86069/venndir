@@ -26,7 +26,16 @@ should be a list of item vectors. Note that if a \code{setlist}
 is passed to \code{overlaplist2setlist()} it will return
 the \code{setlist} unchanged.}
 
-\item{proportional, item_cex, item_degrees, plot_style, plot_warning}{default arguments passed to \code{venndir()}.}
+\item{proportional, item_degrees, plot_style, plot_warning}{default arguments passed to \code{venndir()}.}
+
+\item{item_cex}{\code{numeric} passed to \code{venndir()}, however when
+\code{item_cex} is length=1, it is extended to length=2 in order
+to prevent the auto-scaling adjustment typically used,
+which adjusts the font size based upon the relative area
+of each overlap polygon. In most cases this scaling is
+not helpful for Venn memes. To enable auto-scaling, use
+\code{item_cex=NULL}. See help text in \code{venndir()} for more
+details.}
 
 \item{...}{additional arguments are passed to \code{venndir()}.}
 }
