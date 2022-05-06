@@ -329,9 +329,8 @@ render_venndir <- function
             # take median of the larger area polygons
             so_big <- median(so_areas[so_areas / max(so_areas) >= 0.5])
             so_areas_cex <- sqrt(so_areas) / sqrt(so_big);
-            print(so_areas_cex);
             # adjust the crude scaling by the relative polygon area
-            item_cex <- item_cex * so_areas_cex * so_cex;
+            item_cex <- item_cex * so_areas_cex;
          }, error=function(e){
             item_cex;
          });
