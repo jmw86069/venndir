@@ -1,3 +1,11 @@
+# venndir 0.0.22.900
+
+## bug fixes
+
+* `textvenn()` was throwing an error with jamba version `0.0.83.900`
+caused by updates to `jamba::printDebug()` used for printing colorized
+output. Dependency was bumped to `0.0.84.900` where the bug was fixed.
+
 # venndir 0.0.21.900
 
 ## updates to existing functions

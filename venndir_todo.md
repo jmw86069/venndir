@@ -1,6 +1,50 @@
 
 # todo on venndir
 
+## 31may2022
+
+* Bug with `textvenn()` caused by `jamba::printDebug()`.
+
+## 23may2022
+
+* Bug: `proportional=TRUE` and `show_items="sign item"` appears
+to cause it to position labels inside a polygon that does not
+exist. See venndir.R line 817 inside `render_venndir()`.
+Error: "Error in label_xy[, 1] : subscript out of bounds" seems
+like a symptom of a polygon that does not exist in proportional
+polygons.
+* Why is there such a large gap between overlap and signed counts
+in the label? See if there is a padding that can be reduced in
+the respective ggtext labels.
+* Consider new default: `overlap_type="each"`.
+* Consider new default: `label_preset="main outside"`.
+* Consider new default: `inside_label_percent=0` or `1`.
+* Consider by default positioning labels above/below rather than
+radially around the plot, otherwise consider `expand_fraction=0.2`.
+* `inside_label_percent` should use the bounding box area as the basis
+for the calculation, since the 4-way Venn takes up a larger percentage
+of the bounding box than the 3-way Venn. The theory should be the
+percentage of screen space available to position a label.
+
+   * Actually, "ideal world" the theory should be whether the label
+   fits inside the Venn overlap polygon. The label bounding box will
+   generally be larger than the actual label text, so this approach
+   is more likely to determine labels are "too big" when they could
+   actually fit inside the polygon.
+   * Single numerical counts are most intuitive inside the polygon.
+   * Signed counts are "busy" - but when they fit beside the main
+   overlap count without overstepping the polygon, it works well.
+
+## 15may2022
+
+* scale proportional coordinates to rough the same magnitude as
+non-proportional coordinate circles.
+
+   * proportional coordinates tend to have much larger (7x) magnitude
+   * other downstream components are based upon absolute coordinates:
+   * item_buffer, segment_buffer
+   * offset
+
 ## 06may2022
 
 * adjust item label size `item_cex` automatically based upon
