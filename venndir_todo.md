@@ -1,6 +1,29 @@
 
 # todo on venndir
 
+## 25jun2022
+
+Main goal is to transition away from using `sp` SpatialPolygons,
+to using `sf` SimpleFeatures.
+
+* Built-in functions like `st_buffer()` instead of depending on `rgeos` package.
+* Fewer or simpler R package dependencies.
+* Package `sp` is deprecated, to be retired in 2023.
+* Potential for simpler workflow.
+
+
+## 01jun2022
+
+* Intriguing example of textual Venn in the wild:
+https://github.com/JSuryatenggara/ChIP-AP
+
+   * biggest benefit is ability to use more than 3 sets, may be
+   a simple alternative to the spatially-organized `textvenn()`.
+   * theory is to represent essentially the summarized incidence matrix
+   * each column is a set
+   * "X" or " " to indicate presence, absence
+   * summary counts beside each row for each observed set of overlaps
+
 ## 31may2022
 
 * Bug with `textvenn()` caused by `jamba::printDebug()`.

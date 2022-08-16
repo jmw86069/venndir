@@ -581,6 +581,12 @@ get_largest_polygon <- function
 #' axis(1, las=2); axis(2, las=2);
 #' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
 #' 
+#' # same but with sf objects
+#' sp <- sp_circles(c(3, 2), c(2, 3), return_type="sf")
+#' plot(sp, col=c("#FF000077", "#FFDD0077"));
+#' axis(1, las=2); axis(2, las=2);
+#' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
+#' 
 #' @export
 sp_circles <- function
 (xcenter,
@@ -588,13 +594,14 @@ sp_circles <- function
  setnames=NULL,
  radius=1,
  n=60,
+ return_type=c("sp", "sf"),
  ...)
 {
-   angle_seq <- head(
-      seq(from=0,
-         to=pi*2,
-         length.out=n+1),
-      n);
+   #
+   return_type <- match.arg(return_type);
+   angle_seq <- head(seq(from=0,
+      to=pi*2,
+      length.out=n + 1), n);
    if (length(setnames) == 0) {
       setnames <- seq_along(xcenter);
    }
@@ -605,13 +612,26 @@ sp_circles <- function
    }
    radius <- rep(radius,
       length.out=length(xcenter));
-   
-   ell_sp <- sp::SpatialPolygons(lapply(seq_along(xcenter), function(i){
-      sp::Polygons(list(
-         sp::Polygon(cbind(xvals * radius[i] + xcenter[i],
-            yvals * radius[i] + ycenter[i]))),
-         setnames[i])
-   }), pO=seq_along(xcenter));
+
+   if ("sp" %in% return_type) {
+      ell_sp <- sp::SpatialPolygons(lapply(seq_along(xcenter), function(i){
+         sp::Polygons(list(
+            sp::Polygon(cbind(
+               head(xvals, n) * radius[i] + xcenter[i],
+               head(yvals, n) * radius[i] + ycenter[i]))),
+            setnames[i])
+      }), pO=seq_along(xcenter));
+   } else if ("sf" %in% return_type) {
+      ell_sf_list <- lapply(seq_along(xcenter), function(i){
+         ell_xy <- cbind(
+            x=c(xvals, head(xvals, 1)) * radius[i] + xcenter[i],
+            y=c(yvals, head(yvals, 1)) * radius[i] + ycenter[i]);
+         ell_sf <- sf::st_polygon(list(ell_xy));
+      })
+      ell_sf <- sf::st_sf(sf::st_sfc(ell_sf_list),
+         row.names=setnames);
+      return(invisible(ell_sf));
+   }
    invisible(ell_sp);
 }
 
@@ -659,8 +679,11 @@ sp_ellipses <- function
  yradius=2,
  rotation_degrees=c(0),
  n=60,
+ return_type=c("sp", "sf"),
  ...)
 {
+   #
+   return_type <- match.arg(return_type);
    angle_seq <- head(
       seq(from=0,
          to=pi*2,
@@ -696,16 +719,32 @@ sp_ellipses <- function
       length.out=length(xcenter));
    rotation_rad <- jamba::deg2rad(rotation_degrees);
    
-   ell_sp <- sp::SpatialPolygons(lapply(seq_along(xcenter), function(i){
-      i_xvals <- (xvals * xradius[i]);
-      i_yvals <- (yvals * yradius[i]);
-      e_xvals <- (i_xvals * cos(rotation_rad[i]) + i_yvals * sin(rotation_rad[i]));
-      e_yvals <- (i_yvals * cos(rotation_rad[i]) - i_xvals * sin(rotation_rad[i]));
-      sp::Polygons(list(
-         sp::Polygon(cbind(e_xvals + xcenter[i],
-            e_yvals + ycenter[i]))),
-         setnames[i])
-   }), pO=seq_along(xcenter));
+   if ("sp" %in% return_type) {
+      ell_sp <- sp::SpatialPolygons(lapply(seq_along(xcenter), function(i){
+         i_xvals <- (xvals * xradius[i]);
+         i_yvals <- (yvals * yradius[i]);
+         e_xvals <- (i_xvals * cos(rotation_rad[i]) + i_yvals * sin(rotation_rad[i]));
+         e_yvals <- (i_yvals * cos(rotation_rad[i]) - i_xvals * sin(rotation_rad[i]));
+         sp::Polygons(list(
+            sp::Polygon(cbind(e_xvals + xcenter[i],
+               e_yvals + ycenter[i]))),
+            setnames[i])
+      }), pO=seq_along(xcenter));
+   } else if ("sf" %in% return_type) {
+      ell_sf_list <- lapply(seq_along(xcenter), function(i){
+         i_xvals <- c(xvals, head(xvals, 1)) * xradius[i];
+         i_yvals <- c(yvals, head(yvals, 1)) * yradius[i];
+         e_xvals <- (i_xvals * cos(rotation_rad[i]) + i_yvals * sin(rotation_rad[i]));
+         e_yvals <- (i_yvals * cos(rotation_rad[i]) - i_xvals * sin(rotation_rad[i]));
+         ell_xy <- cbind(
+            x=e_xvals + xcenter[i],
+            y=e_yvals + ycenter[i]);
+         ell_sf <- sf::st_polygon(list(ell_xy));
+      })
+      ell_sf <- sf::st_sf(sf::st_sfc(ell_sf_list),
+         row.names=setnames);
+      return(invisible(ell_sf));
+   }
    invisible(ell_sp);
 }
 
@@ -760,13 +799,16 @@ nudge_sp <- function
  ...)
 {
    ## Optionally nudge the polygon coordinates
-   if (length(sp) == 0) {
+   if (length(sp) == 0 || ("sf" %in% class(sp) && nrow(sp) == 0)) {
       return(sp);
    }
-   if (!inherits(sp, "SpatialPolygons")) {
-      stop("sp must inherit from 'SpatialPolygons'");
+   is_sf <- inherits(sp, "sf");
+   is_sp <- inherits(sp, "SpatialPolygons");
+   if (!(is_sf || is_sf)) {
+      stop("sp must inherit from 'SpatialPolygons' or 'sf' SimpleFeatures.");
    }
-   if (inherits(sp, "SpatialPolygonsDataFrame")) {
+   is_spdf <- inherits(sp, "SpatialPolygonsDataFrame");
+   if (is_spdf || "sf" %in% class(sp)) {
       sp_names <- rownames(data.frame(sp));
    } else {
       sp_names <- names(sp);
@@ -776,27 +818,41 @@ nudge_sp <- function
    if (length(sp_nudge) > 0 &&
          is.list(sp_nudge) &&
          any(names(sp_nudge) %in% sp_names)) {
+      # iterate each name and adjust when the name is a m
       for (i in names(sp_nudge)[names(sp_nudge) %in% sp_names]) {
          j <- match(i, sp_names);
          i_nudge <- sp_nudge[[i]];
-         sp@polygons[[j]] <- rescale_ps(sp@polygons[[j]],
-            shift=i_nudge);
+         if (is_sp) {
+            sp@polygons[[j]] <- rescale_ps(sp@polygons[[j]],
+               shift=i_nudge);
+         } else if ("sf" %in% class(sp)) {
+            st_geometry(sp[j,]) <- st_geometry(sp[j,]) + i_nudge;
+         }
       }
    }
    
    ## update bbox - should probably be its own function
-   bbox_m <- jamba::rbindList(lapply(seq_along(sp::geometry(sp)), function(i){
-      as.vector(sp::bbox(sp::geometry(sp)[i]))
-   }));
-   colnames(bbox_m) <- c("xmin", "ymin", "xmax", "ymax");
-   bbox_v <- matrix(ncol=2,
-      c(min(bbox_m[,1]),
-      min(bbox_m[,2]),
-      max(bbox_m[,3]),
-      max(bbox_m[,4])))
-   colnames(bbox_v) <- c("min", "max");
-   rownames(bbox_v) <- c("x", "y");
-   sp@bbox <- bbox_v;
+   if (is_sp) {
+      bbox_m <- jamba::rbindList(lapply(seq_along(sp::geometry(sp)), function(i){
+         as.vector(sp::bbox(sp::geometry(sp)[i]))
+      }));
+      colnames(bbox_m) <- c("xmin", "ymin", "xmax", "ymax");
+      bbox_v <- matrix(ncol=2,
+         c(min(bbox_m[,1]),
+         min(bbox_m[,2]),
+         max(bbox_m[,3]),
+         max(bbox_m[,4])))
+      colnames(bbox_v) <- c("min", "max");
+      rownames(bbox_v) <- c("x", "y");
+      sp@bbox <- bbox_v;
+   }
+   if (is_sf) {
+      # st_bbox() is updated on Github (version "1.0.8" but dev version)
+      # when it is updated on CRAN this step will not be required
+      # probably version 1.0.9
+      sp_seq <- seq_len(nrow(sp));
+      attr(sp[[attr(sp, "sf_column")]], "bbox") <- sf::st_bbox(sp[sp_seq,]);
+   }
       
    return(invisible(sp));
 }
@@ -818,7 +874,7 @@ nudge_sp <- function
 #' 
 #' @inheritParams rescale_coordinates
 #' 
-#' @param p object `sp::SpatialPolygons`
+#' @param sp object `sp::SpatialPolygons`
 #' @param share_center `logical` indicating whether all polygons
 #'    should share the same center, where `share_center=TRUE` will
 #'    adjust everything collectively, and `share_center=FALSE` will
