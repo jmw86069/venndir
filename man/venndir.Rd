@@ -20,6 +20,7 @@ venndir(
   font_cex = c(1, 1, 0.8),
   poly_alpha = 0.8,
   alpha_by_counts = FALSE,
+  label_preset = c("none"),
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   circle_nudge = NULL,
   rotate_degrees = 0,
@@ -33,6 +34,7 @@ venndir(
   item_cex = NULL,
   item_style = c("text", "gridtext"),
   item_buffer = -0.15,
+  sign_count_delim = ": ",
   do_plot = TRUE,
   verbose = FALSE,
   ...
@@ -172,6 +174,9 @@ each polygon. This argument is passed to \code{polygon_label_fill()}
 as argument \code{scale_width}. The value should be negative, because
 the value represents the size relative to the full polygon size,
 and negative values make the polygon smaller.}
+
+\item{sign_count_delim}{\code{character} string used as a delimiter between
+the sign and counts, when \code{overlap_type} is not \code{"overlap"}.}
 
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
 }

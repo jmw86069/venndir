@@ -218,6 +218,8 @@
 #'    as argument `scale_width`. The value should be negative, because
 #'    the value represents the size relative to the full polygon size,
 #'    and negative values make the polygon smaller.
+#' @param sign_count_delim `character` string used as a delimiter between
+#'    the sign and counts, when `overlap_type` is not `"overlap"`.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
 #' @family venndir core
@@ -298,6 +300,7 @@ venndir <- function
  font_cex=c(1, 1, 0.8),
  poly_alpha=0.8,
  alpha_by_counts=FALSE,
+ label_preset=c("none"),
  label_style=c("basic",
     "fill",
     "shaded",
@@ -316,6 +319,7 @@ venndir <- function
  item_cex=NULL,
  item_style=c("text", "gridtext"),
  item_buffer=-0.15,
+ sign_count_delim=": ",
  do_plot=TRUE,
  verbose=FALSE,
  ...)
@@ -640,7 +644,7 @@ venndir <- function
    gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
       ilabel <- paste0(
          gbase_labels[i],
-         ": ",
+         sign_count_delim,
          format(trim=TRUE,
             big.mark=big.mark,
             unlist(gCounts)[i]));
@@ -790,6 +794,7 @@ venndir <- function
    vo <- venndir_label_style(list(
       venn_spdf=venn_spdfs,
       label_df=label_df),
+      label_preset=label_preset,
       label_style=label_style,
       show_zero=show_zero,
       max_items=max_items,
@@ -807,7 +812,10 @@ venndir <- function
 
    ## Call render_venndir()
    gg <- NULL;
-   if (display_counts %in% c(FALSE)) {
+   
+   ## TODO: allow custom display of counts for each Venn overlap
+   # For now, all or none, TRUE or FALSE.
+   if (FALSE %in% display_counts) {
       #label_df$show_label <- FALSE;
       label_df$display_counts <- FALSE;
    }
@@ -820,6 +828,7 @@ venndir <- function
          show_items=show_items,
          show_zero=show_zero,
          display_counts=display_counts,
+         label_preset=label_preset,
          label_style="custom",
          plot_style=plot_style,
          item_cex=item_cex,

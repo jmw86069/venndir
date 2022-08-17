@@ -1,3 +1,53 @@
+# venndir 0.0.23.900
+
+## change in defaults
+
+* The default `venndir_label_style()` position for set names is
+now `"outside"`, changed from previous `"inside"`. There were
+too many cases where the set name was long, then pushed
+the numeric count labels too far away from the desired position at the
+center of the Venn polygon. The new challenge is getting adequate
+spacing around the Venn diagram to place labels that fit inside
+the plot window.
+* `make_color_contrast()` was adjusted to reduce the saturation/chroma
+of light text colors, the end result reduces the "cyan" appearance of
+"dodgerblue" when converted to a lighter contrasting color.
+
+## changes to existing functions
+
+* `venndir()` new argument `sign_count_delim` allows customization of
+the delimiter between sign and numeric counts, for example `"^^: 12"`
+uses the default delimiter `": "`. In some cases it may be preferred
+to use `sign_count_delim=" "` to omit the colon `":"` character.
+
+## bug fixes
+
+* `venndir()` and related functions were failing in RStudio when
+used under `devtools::load_all()`, apparently because the `rgeos`
+package needs to be loaded with `@imports` before directly calling
+functions from the `rgeos` package. This issue appears to occur only
+when using `devtools`.
+
+* Corrected some warnings caused by argument overloading:
+
+   * `label_preset` is now recognized by `venndir()` and `render_venndir()`,
+   and is now passed formally from `venndir()` to `render_venndir()` to
+   prevent it being passed to other internal functions, such as the `plot()`
+   function. The warning was: `"label_preset" is not a graphical parameter`
+   * `display_counts` a developmental argument passed from `venndir()`
+   to `render_venndir()`. The warning was:
+   `"display_counts" is not a graphical parameter`
+
+## new branch (future dev)
+
+* A new Github branch was created
+`"sp-to-sf"` to migrate away from the sp (Spatial Polygons) package,
+and toward the sf (Simple Features) package. This migration will
+remove dependencies on `sp` and `rgeos` which are being retired
+in 2023 anyway. It should also make the overall dependency footprint
+of `venndir` much smaller, since `sf` has few dependencies while
+also covering the functions required from other packages.
+
 # venndir 0.0.22.900
 
 ## bug fixes

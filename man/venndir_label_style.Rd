@@ -12,7 +12,7 @@ venndir_label_style(
     "lite_box"),
   lite = "#FFEEAABB",
   bg = "white",
-  set = c("inside", "outside", "none"),
+  set = c("outside", "inside", "none"),
   overlap = c("none", "inside", "outside"),
   count = c("inside", "outside", "ifneeded", "detect", "none"),
   signed = c("inside", "outside", "ifneeded", "detect", "none"),

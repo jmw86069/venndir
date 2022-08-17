@@ -16,6 +16,7 @@
 #' @param x output from `eulerr::euler()`
 #' 
 #' @import sp
+#' @import rgeos
 #' 
 #' @export
 eulerr2polys <- function

@@ -156,8 +156,8 @@ print_color_df <- function
 #' @family venndir utility
 #'
 #' @examples
-#' x <- c("red", "blue", "gold", "ivory", "pink", "white");
-#' y <- rep("red4", 4);
+#' x <- c("firebrick", "dodgerblue", "gold", "pink", "white");
+#' y <- rep("red3", 4);
 #' make_color_contrast(x, y, do_plot=TRUE);
 #' 
 #' y <- rep("pink1", 4);
@@ -175,8 +175,8 @@ make_color_contrast <- function
  y=NULL,
  bg="white",
  L_threshold=65,
- C_floor=130,
- L_hi=100,
+ C_floor=90,
+ L_hi=95,
  L_lo=40,
  do_plot=FALSE,
  cex=2,
