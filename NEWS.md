@@ -1,3 +1,88 @@
+# venndir 0.0.25.900
+
+## new functions
+
+* `venndir_legend()`
+
+   * option for grid or base style, works with base or ggplot2 venndir.
+   * The recommended `style="grid"` as it offers a nicely organized style,
+   with better positioning which works the same for `base` and `ggplot2`
+   `venndir()` output.
+
+## changes to dependencies
+
+* added `data.table` to dependencies, since it is used by `shrink_df()`.
+* added `gridExtra` to enable optional legend `gridExtra::tableGrob()`.
+
+## changes to existing functions
+
+* `venndir()`
+
+   * argument default `overlap_type="concordance"` was changed to
+   `overlap_type="detect"` to fix regression where all input data
+   is assumed to be signed, thus showing up arrows even for non-directional
+   input data. The function `signed_overlaps()` will detect an appropriate
+   type unless given a specific `overlap_type` value.
+
+* `list2im_opt()` and `list2im_value()`
+
+   * argument default `do_sparse=TRUE` was changed to `do_sparse=FALSE`
+   because in almost all cases the most appropriate class is `matrix`.
+   Only for very rare cases with extremely large matrices should
+   sparse matrix objects be used, which makes it most appropriate as an
+   option and not a default.
+
+## bug fixes
+
+* `counts2setlist()` warnings regarding GEOS future retirement are silenced
+in the examples.
+* `list2im_opt()` uses the updated non-deprecated coersion of `matrix`
+to `"ngCMatrix"`, although the end result is still an object with class
+`"ngCMatrix"`. It now uses three `as()` coersions, as instructed by the
+Matrix package. The Matrix `as()` is properly imported by using
+`importFrom(methods, as)` and placing `Matrix` into the `Suggests` list.
+
+
+# venndir 0.0.24.900
+
+* `jamba` now requires version 0.0.90.900 for `coordPresets()` to
+provide figure positioning rather than plot positioning. Used
+for `plot_warning` with proportional Venn diagrams that cannot
+display all possible overlaps.
+* Signed labels should now have padding appropriate to their font size,
+instead of inheriting padding used by other labels. The visual effect
+is small, but should improve the packing of signed labels, making
+the overall group of labels smaller and more cohesive.
+
+## changes to existing functions
+
+* `venndir()`
+
+   * new argument `padding` to customize the padding around Venn labels.
+   * new behavior, `padding` is scaled relative to `font_cex`, for smaller
+   padding when the font size is scaled down.
+   * `plot_warning` label is placed relative to the bottom of the
+   plot figure, not the plot border, giving a bit more space below
+   the typical proportional Venn diagram.
+
+* `render_venndir()` calls `gridtext_richtext_grob()` instead of
+`gridtext::richtext_grob()` to enable vectorized `padding`.
+
+## new functions
+
+Two temporary functions to customize gridtext. Both functions also
+call internel `gridtext` functions, so they cannot be maintained when
+`venndir` is prepared for CRAN. More likely these functions will become
+the basis for `gridtext` issue and/or pull request (PR).
+
+* `gridtext_richtext_grob()` - apply `padding` in vectorized form, to
+enable distinct `padding` to be applied to each label. This function
+is modified to extend `padding` and call custom `gridtext_make_outer_box()`.
+* `gridtext_make_outer_box()` - apply `padding` in vectorized form, to
+enable distinct `padding` to be applied to each label.
+
+
+
 # venndir 0.0.23.900
 
 ## change in defaults

@@ -1,7 +1,7 @@
 
-#' Draw boundary around grouops of gridtext labels
+#' Draw boundary around groups of gridtext labels
 #' 
-#' Draw boundary around grouops of gridtext labels
+#' Draw boundary around groups of gridtext labels
 #' 
 #' This function is a helper function used to take individual
 #' labels defined by `gridtext::richtext_grob()`, and creating
@@ -21,6 +21,11 @@
 #'    The row in `gdf` with the highest `"r"` value is the
 #'    reference row, for the `"r"` radius, and the `"border_col"`
 #'    and `"box_fill"` values.
+#' @param segment_df `data.frame` with segment coordinates, optional.
+#' @param do_draw `logical` indicating whether to draw the finished
+#'    result in the context of the current open graphics device.
+#' @param verbose `logical` indicating whether to print verbose output.
+#' @param ... additional arguments are ignored.
 #' 
 #' @export
 draw_gridtext_groups <- function
@@ -40,8 +45,14 @@ draw_gridtext_groups <- function
       return(gdf);
    }
    
+   # internal helper function
    grob_group_roundrect <- function
-   (g_labels, gdf, k=seq_along(g_labels$children), adjx=NA, adjy=NA, verbose=FALSE)
+   (g_labels,
+    gdf,
+    k=seq_along(g_labels$children),
+    adjx=NA,
+    adjy=NA,
+    verbose=FALSE)
    {
       # adapted from gridtext::richtext_grob() internals
       if (verbose) {

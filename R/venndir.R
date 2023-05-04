@@ -286,7 +286,11 @@
 #' @export
 venndir <- function
 (setlist,
- overlap_type=c("concordance", "each", "overlap", "agreement"),
+ overlap_type=c("detect",
+    "concordance",
+    "each",
+    "overlap",
+    "agreement"),
  sets=NULL,
  set_colors=NULL,
  proportional=FALSE,
@@ -307,6 +311,8 @@ venndir <- function
     "shaded_box",
     "lite",
     "lite_box"),
+ padding=3,
+ r=2,
  circle_nudge=NULL,
  rotate_degrees=0,
  unicode=TRUE,
@@ -335,6 +341,10 @@ venndir <- function
    plot_style <- match.arg(plot_style);
    item_style <- match.arg(item_style);
    show_set <- match.arg(show_set);
+   if (length(padding) == 0) {
+      padding <- 3;
+   }
+   padding <- head(padding, 1);
    
    label_style <- head(label_style, 1);
    show_items <- head(show_items, 1);
@@ -757,10 +767,12 @@ venndir <- function
       lty=rep(1, label_n),
       lwd=rep(1, label_n),
       fill=c(label_fill_main, label_fill_signed),
-      padding=rep(c(4, 0),
+      padding=rep(
+         c(padding * font_cex[2], padding * font_cex[3] * 1),
          c(length(x_main), length(x_signed))),
       padding_unit=rep("pt", label_n),
-      r=rep(c(4, 2),
+      r=rep(
+         c(padding * font_cex[2], padding * font_cex[3]),
          c(length(x_main), length(x_signed))),
       r_unit=rep("pt", label_n),
       stringsAsFactors=FALSE,

@@ -47,6 +47,8 @@ Other venndir utility:
 \code{\link{expand_range}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
+\code{\link{gridtext_make_outer_box}()},
+\code{\link{gridtext_richtext_grob}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
@@ -56,6 +58,7 @@ Other venndir utility:
 \code{\link{rescale_p}()},
 \code{\link{shrink_df}()},
 \code{\link{sp_percent_area}()},
-\code{\link{venndir_label_style}()}
+\code{\link{venndir_label_style}()},
+\code{\link{venndir_legender}()}
 }
 \concept{venndir utility}

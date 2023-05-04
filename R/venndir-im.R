@@ -18,16 +18,16 @@
 #' 
 #' @family venndir conversion
 #' 
-#' @return `Matrix` object with class `"ngCMatrix"` that contains
-#'    contains `logical` values. When `do_sparse=FALSE` the returned
-#'    object is `matrix` with values `c(0, 1)`.
+#' @return `matrix` object with value `c(0, 1)` when `do_sparse=FALSE`
+#'    (default), or when `do_sparse=TRUE`, returns a `Matrix` object class
+#'    `"CsparseMatrix"` with `logical` values.
 #' 
 #' @param setlist `list` of vectors
 #' @param empty default single value used for empty/missing entries,
 #'    the default `empty=0` uses zero for entries not present.
 #'    Another alternative is `NA`.
 #' @param do_sparse `logical` indicating whether to coerce the output
-#'    to sparse matrix class `"ngCMatrix"` from the Matrix package.
+#'    to sparse matrix class `"CsparseMatrix"` from the Matrix package.
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
@@ -35,7 +35,9 @@
 #'    b=c("two", "one", "four", "five"));
 #' list2im_opt(setlist);
 #' 
-#' list2im_opt(setlist, do_sparse=FALSE);
+#' list2im_opt(setlist, do_sparse=TRUE);
+#' 
+#' @importFrom methods as
 #' 
 #' @export
 list2im_opt <- function
@@ -58,8 +60,14 @@ list2im_opt <- function
       j;
    }))
    rownames(setlistim) <- setnamesunion;
-   if (do_sparse && suppressPackageStartupMessages(require(Matrix))) {
-      setlistim <- as(setlistim, "ngCMatrix");
+   if (TRUE %in% do_sparse &&
+         requireNamespace("Matrix", quietly=TRUE)) {
+      setlistim <- as(
+         as(
+            as(setlistim,
+               "nMatrix"),
+            "generalMatrix"),
+         "CsparseMatrix");
    }
    return(setlistim);
 }
@@ -127,7 +135,7 @@ list2im_opt <- function
 #'       size=length(i));
 #'    i
 #' })
-#' imv2 <- list2im_value(setlist2, empty=NA, do_sparse=FALSE);
+#' imv2 <- list2im_value(setlist2, empty=NA);
 #' imv2;
 #' 
 #' # to convert back to list, define empty=NA so 0 is not considered as empty
@@ -149,7 +157,7 @@ list2im_opt <- function
 list2im_value <- function
 (setlist,
  empty=NULL,
- do_sparse=TRUE,
+ do_sparse=FALSE,
  force_sign=FALSE,
  ...)
 {
@@ -164,7 +172,7 @@ list2im_value <- function
    
    # define empty when not defined
    if (length(empty) == 0) {
-      if (setlist_hascharacter) {
+      if (TRUE %in% setlist_hascharacter) {
          empty <- ""
       } else {
          empty <- 0
@@ -176,14 +184,15 @@ list2im_value <- function
    setlistim <- do.call(cbind, lapply(setlist, function(i){
       i_match <- match(names(i), setnamesunion);
       j <- rep(NA, length(setnamesunion));
-      if (force_sign) {
+      if (TRUE %in% force_sign) {
          if (!is.numeric(i)) {
             stop("force_sign=TRUE but data is not numeric.")
          }
          j[i_match] <- sign(i);
       } else {
          if (is.factor(i)) {
-            warning("list2im_value() coerced some input values from factor to character.")
+            warning(paste0("list2im_value()",
+               " coerced some input values from factor to character."))
             j[i_match] <- as.character(i);
          } else {
             j[i_match] <- i;
@@ -196,8 +205,8 @@ list2im_value <- function
    }))
    rownames(setlistim) <- setnamesunion;
    if (!is.character(setlistim[1,1]) &&
-         do_sparse &&
-         suppressPackageStartupMessages(require(Matrix))) {
+         TRUE %in% do_sparse &&
+         requireNamespace("Matrix", quietly=TRUE)) {
       setlistim <- as(setlistim, "dgCMatrix");
    }
    return(setlistim);

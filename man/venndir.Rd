@@ -6,7 +6,7 @@
 \usage{
 venndir(
   setlist,
-  overlap_type = c("concordance", "each", "overlap", "agreement"),
+  overlap_type = c("detect", "concordance", "each", "overlap", "agreement"),
   sets = NULL,
   set_colors = NULL,
   proportional = FALSE,
@@ -22,6 +22,8 @@ venndir(
   alpha_by_counts = FALSE,
   label_preset = c("none"),
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
+  padding = 3,
+  r = 2,
   circle_nudge = NULL,
   rotate_degrees = 0,
   unicode = TRUE,
@@ -46,13 +48,18 @@ set items, and whose values represent direction using
 values \code{c(-1, 0, 1)}.}
 
 \item{overlap_type}{\code{character} value indicating the type of
-overlap logic: \code{"each"} records each combination of
-signs; \code{"overlap"} disregards the sign and returns any match
-item overlap; \code{"concordance"} represents counts for full
+overlap logic:
+\itemize{
+\item \code{"each"} records each combination of signs;
+\item \code{"overlap"} disregards the sign and returns any match
+item overlap;
+\item \code{"concordance"} represents counts for full
 agreement, or \code{"mixed"} for any inconsistent overlapping
-direction; \code{"agreement"} represents full agreement in direction
+direction;
+\item \code{"agreement"} represents full agreement in direction
 as \code{"agreement"}, and \code{"mixed"} for any inconsistent
-direction.}
+direction.
+}}
 
 \item{sets}{\code{integer} index of sets in \code{setlist} to display in
 the Venn diagram. This subset is useful when creating a Venn

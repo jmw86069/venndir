@@ -1,6 +1,179 @@
 
 # todo on venndir
 
+## 01may2023
+
+**Note the official TODO was moved to `TODO.md`.**
+
+## 03apr2023
+
+* check build issues on R-4.2.3, dependency on data.table
+
+## 06feb2023
+
+* add `venndir_legend()` to summarize number of elements per Venn set.
+* `venndir()`
+
+   * consider alternative label layouts:
+   
+      * position "overlap title" at top-center
+      * one column underneath when `overlap_type="overlap"` with counts
+      * two columns underneath, total counts on left, signed counts on right
+      * or one column with counts, then signed counts in the same column
+   
+   * output really needs to be its own object type
+
+      * convert from `list` to something like `class="venndir_output"`
+      which inherits from `list`, or is an S4 object with proper methods.
+      * input to functions like `nudge_venndir_label()` should take
+      a proper object instead of `list`.
+   
+   * make it clear how to display overlap titles, e.g. `set="all"` is not
+   working. The `x$label_df[,"overlap"]` column accepts
+   `"outside"`, `"inside"`, or `"none"`, and is not being filled correctly.
+   * `plot_warning=TRUE` when the label contains more than 3 overlap sets,
+   it should just indicate the number of overlap sets rather than list
+   each overlap set.
+
+* DONE. scale default `padding` value based upon `font_cex`
+
+   * DONE. currently `padding="4 pt"` is too much when the font is shrunk down small
+   * DONE. `padding` should be an argument to `venndir()`
+
+* add option for custom label placement?
+
+   * this option might not be needed if label orientation can be customized,
+   e.g. with title centered above all count labels underneath it, instead
+   of being offset.
+   * center by label box
+   * center by coordinate zero (the point between left/right columns in labels)
+
+* `nudge_venndir_label()`
+
+   * add proper function parameter documentation
+   * `x_offset`, `y_offset` should be additive to existing values
+   * should be possible to set a label `"inside"`, `"outside"`
+   * should be possible to set the overlap title `"inside"`, `"outside"`.
+
+* error with `label_style="shaded"` from `colorjam::blend_colors()`
+likely caused by blending NA or NULL colors. See `colorjam-blendcolors.R`
+line 161.
+* store more data inside `venndir()` output object
+
+   * Main goal is for `render_vendir()` to be totally self-sufficient
+   when operating on `venndir()` output.
+   * Essentially all new parameters used in `render_venndir()` should
+   be stored in the object, for example: `plot_warning`
+
+* label segments
+
+   * the segment buffer should use a scale relative to the plot scale
+   (e.g. 1% of the overall plot layout range), however when the polygon
+   cannot accommodate that buffer, it should use progressively smaller
+   scale relative to that polygon.
+
+* outside label positions
+
+   * ideally during rendering, labels should be "dodged" in some way
+   to minimize overlaps.
+
+
+## 20oct2022
+
+* `venndir()` possible bug
+
+   * when displaying `proportional=TRUE, overlap_type="overlap"` it does
+   not indicate when a non-overlap cannot be displayed, for example
+   items unique to one set. Found with 4-way Euler diagram.
+   * Appears to happen sometimes when eulerr returns circular instead of
+   ellipse shape, which seems to happen due to internal randomness.
+
+* `min_count` should be stored in `mem` output
+
+   * `mem_enrichment_heatmap()` uses `min_count` with `p_cutoff`
+   to define significant pathways
+   * `mem_plot_folio` has no argument `min_count` and cannot get it from `mem`
+   * `multiEnrichMap()` should store `min_count` in the output `mem`
+
+* new S4 classes
+
+   * `mem`: required for Bioconductor submission (if pursued), and
+   useful otherwise
+   * `mpf`: or `mem_plots` or `mem_folio` with output from `mem_plot_folio()`
+
+* `mem_enrichment_heatmap()`
+
+   * apparent bug when trying to order rows to match the order in
+   `mem_gene_path_heatmap()` - but a "bug" because it is unsupported,
+   but it does cause incorrect heatmaps when using
+   `ComplexHeatmap::draw(hm[row_index,])`.
+   * When supplied with `row_order` this function should properly order
+   by `names(row_order)` to match the actual `rownames(enrichIM)`
+   used for the heatmap.
+   * argument `min_count` is not explicitly passed by `mem_plot_folio()`
+   and not stored in the `mem` object.
+
+* Keep track of this URL for installation issues in Mac OSX regarding sf:
+https://github.com/r-spatial/sf/issues/1536#issuecomment-727342736
+
+## 20sep2022
+
+* `overlap_type="agreement"` should hide agreement for single-set overlap.
+* when overlap and signed overlap are displayed together, the label should
+center the main overlap number, with signed labels off to the side.
+
+   * Currently, main overlap and signed overlap are combined into one box,
+   the box is centered on the label coordinate. However, inside a polygon
+   sometimes the main overlap number is offset outside the polygon,
+   and the signed overlap numbers are also offset, so really no numeric
+   labels are positioned well. By default the main overlap number should
+   be inside the polygon.
+
+* Design idea: nudge label by overlap name.
+
+   * The idea is to make it easy to adjust a label.
+   * Something like this:
+   ```R
+   nudge_label=list(
+      `A&B`=c(x=1, y=0),
+      `A&B&C`=c(x=0.5, y=0),
+      `B`=c(x=0, y=1))
+   ```
+
+## 01sep2022
+
+* Small bug fix:
+
+   * `overlap_type="overlap"`,
+   * `label_preset="main items"`,
+   * `show_items="sign item"`
+   * It displays the counts instead of the sign, since there is no sign
+   when `overlap_type="overlap"`.
+   * when `overlap_type="overlap"`, the `show_items` argument should
+   ignore `"sign"` as a possible display value.
+
+* `signed_overlaps()` should default to non-signed overlaps
+when all entries in `setlist` have incidence value `1`, `"up"`.
+
+   * when `setlist` is an overlap list, convert with `overlaplist2setlist()`
+   to `setlist`.
+
+* Conversion functions, and inputs should be more user-friendly:
+
+   * `signed_overlaps()` argument `setlist` should accept output
+   from `label_df$items`.
+   * `counts2setlist()` and `signed_counts2setlist()` should
+   accept the names from `lengths(label_df$items)`,
+   which includes a suffix with the overlap hit values.
+
+      * For example, names include:
+      `"GroupA|1 0", "GroupB|0 1", "GroupA&GroupB|1 1"`.
+      Simple enough, they should be equivalent to:
+      `"GroupA", "GroupB", "GroupA&GroupB"`.
+      * Also, for signed overlaps, the suffix indicates the direction,
+      and should be honored.
+
+
 ## 31may2022
 
 * Bug with `textvenn()` caused by `jamba::printDebug()`.

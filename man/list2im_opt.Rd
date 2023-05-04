@@ -14,14 +14,14 @@ the default \code{empty=0} uses zero for entries not present.
 Another alternative is \code{NA}.}
 
 \item{do_sparse}{\code{logical} indicating whether to coerce the output
-to sparse matrix class \code{"ngCMatrix"} from the Matrix package.}
+to sparse matrix class \code{"CsparseMatrix"} from the Matrix package.}
 
 \item{...}{additional arguments are ignored.}
 }
 \value{
-\code{Matrix} object with class \code{"ngCMatrix"} that contains
-contains \code{logical} values. When \code{do_sparse=FALSE} the returned
-object is \code{matrix} with values \code{c(0, 1)}.
+\code{matrix} object with value \code{c(0, 1)} when \code{do_sparse=FALSE}
+(default), or when \code{do_sparse=TRUE}, returns a \code{Matrix} object class
+\code{"CsparseMatrix"} with \code{logical} values.
 }
 \description{
 Optimized conversion of list to incidence matrix
@@ -45,7 +45,7 @@ setlist <- list(A=c("one", "two", "three"),
    b=c("two", "one", "four", "five"));
 list2im_opt(setlist);
 
-list2im_opt(setlist, do_sparse=FALSE);
+list2im_opt(setlist, do_sparse=TRUE);
 
 }
 \seealso{

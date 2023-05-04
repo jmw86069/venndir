@@ -21,13 +21,18 @@ set items, and whose values represent direction using
 values \code{c(-1, 0, 1)}.}
 
 \item{overlap_type}{\code{character} value indicating the type of
-overlap logic: \code{"each"} records each combination of
-signs; \code{"overlap"} disregards the sign and returns any match
-item overlap; \code{"concordance"} represents counts for full
+overlap logic:
+\itemize{
+\item \code{"each"} records each combination of signs;
+\item \code{"overlap"} disregards the sign and returns any match
+item overlap;
+\item \code{"concordance"} represents counts for full
 agreement, or \code{"mixed"} for any inconsistent overlapping
-direction; \code{"agreement"} represents full agreement in direction
+direction;
+\item \code{"agreement"} represents full agreement in direction
 as \code{"agreement"}, and \code{"mixed"} for any inconsistent
-direction.}
+direction.
+}}
 
 \item{return_items}{\code{logical} indicating whether to return
 the items within each overlap set.}
@@ -111,7 +116,15 @@ converted to \code{sign()} before calling \code{signed_overlaps()}, for example:
 \code{signed_overlaps(lapply(setlist, sign))}
 }
 \examples{
+setlist <- make_venn_test(100, 2, do_signed=FALSE);
+
+# detect overlap_type
+attr(signed_overlaps(setlist, "detect"), "overlap_type")
+
 setlist <- make_venn_test(100, 2, do_signed=TRUE);
+
+# detect overlap_type
+attr(signed_overlaps(setlist, "detect"), "overlap_type")
 
 # straight overlap counts
 signed_overlaps(setlist, "overlap");

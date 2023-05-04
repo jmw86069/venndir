@@ -4,7 +4,6 @@
 # venndir
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The `venndir` package provides Venn directional diagrams, that can
@@ -32,6 +31,9 @@ To illustrate the point, `make_venn_test()` is used to create test
 `setlist` data.
 
 ``` r
+# silence the GEOS warnings
+options("warn"=-1)
+
 library(venndir)
 setlist <- make_venn_test(100, 3)
 setlist
@@ -71,7 +73,9 @@ More examples of proportional Venn diagrams are described below, but for
 now the simplest approach is to add argument `proportional=TRUE`:
 
 ``` r
-venndir(setlist, proportional=TRUE)
+venndir(setlist,
+   overlap_type="overlap",
+   proportional=TRUE)
 ```
 
 <img src="man/figures/README-venn_1e-1.png" width="100%" />
@@ -80,10 +84,26 @@ The default output use base R graphics, but you can use `ggplot2` with
 the argument `plot_style="gg"`:
 
 ``` r
-venndir(setlist, proportional=TRUE, plot_style="gg")
+venndir(setlist,
+   overlap_type="overlap",
+   proportional=TRUE,
+   plot_style="gg")
 ```
 
 <img src="man/figures/README-venn_1g-1.png" width="100%" />
+
+Finally, you can add a legend with `venndir_legender()`:
+
+``` r
+vo <- venndir(setlist,
+   proportional=TRUE,
+   overlap_type="overlap",
+   show_segments=FALSE,
+   plot_style="gg")
+venndir_legender(setlist=setlist, venndir_out=vo, font_cex=0.8)
+```
+
+<img src="man/figures/README-venn_1l-1.png" width="100%" />
 
 The function invisibly returns the `ggplot` object which can be
 manipulated alongside other `grid` graphical objects.
@@ -94,8 +114,8 @@ For a more interesting case, `make_venn_test(..., do_signed=TRUE)`
 creates a `setlist` with directionality (sign), which means each item is
 associated with a numerical direction:
 
-  - `+1` for up
-  - `-1` for down
+- `+1` for up
+- `-1` for down
 
 In this case, each vector in the `setlist` is a named vector, whose
 **names** are the items, and whose **values** are the signed direction
@@ -141,21 +161,20 @@ treatment.
 There are a few ways to summarize directional overlaps, which vary by
 the amount of detail.
 
-  - `overlap_type="overlap"` - This method ignores direction.
-  - `overlap_type="agreement"` - This method displays agreement and
-    disagreement, with no details about up/down direction.
-  - `overlap_type="concordance"` - **(default)** This method displays
-    concordant directions, up-up, down-down; all discordant combinations
-    are grouped together as “discordant”.
-  - `overlap_type="each"` - This method displays each directional
-    overlap.
+- `overlap_type="overlap"` - This method ignores direction.
+- `overlap_type="agreement"` - This method displays agreement and
+  disagreement, with no details about up/down direction.
+- `overlap_type="concordance"` - **(default)** This method displays
+  concordant directions, up-up, down-down; all discordant combinations
+  are grouped together as “discordant”.
+- `overlap_type="each"` - This method displays each directional overlap.
 
-### overlap\_type=“concordance”
+### overlap_type=“concordance”
 
 Let’s start with `overlap_type="concordance"` which displays the number
 `up-up`, and the number `down-down`, and everything else is considered
-“discordant”. This approach is effective at conveying direction,
-without too many unhelpful details.
+“discordant”. This approach is effective at conveying direction, without
+too many unhelpful details.
 
 ``` r
 venndir(setlist_dir)
@@ -168,7 +187,7 @@ down, and when the overlaps that disagree in direction are less
 interesting. For example, sometimes the overlaps are mostly `up-up` and
 rarely `down-down`, which can be very helpful to know.
 
-### overlap\_type=“each”
+### overlap_type=“each”
 
 The option `overlap_type="each"` shows the count for each directional
 combination. It works best when you want to see all the details,
@@ -180,7 +199,7 @@ venndir(setlist_dir, overlap_type="each")
 
 <img src="man/figures/README-venndir_each-1.png" width="100%" />
 
-### overlap\_type=“agreement”
+### overlap_type=“agreement”
 
 The option `overlap_type="agreement"` shows the count for each overlap
 that agrees in direction, regardless of the direction; and the count for
@@ -195,7 +214,7 @@ venndir(setlist_dir, overlap_type="agreement")
 
 <img src="man/figures/README-venndir_agreement-1.png" width="100%" />
 
-### overlap\_type=“overlap”
+### overlap_type=“overlap”
 
 The option `overlap_type="overlap"` simply ignores directionality.
 
@@ -211,10 +230,10 @@ As shown above, you can switch output to a proportional Venn diagram,
 which uses the really nice `eulerr` R package.
 
 ``` r
-venndir(setlist_dir,
+vo <- venndir(setlist_dir,
    proportional=TRUE,
-   #distance=5, label_style="lite",
-   font_cex=c(1.3, 0.9))
+   font_cex=c(1.3, 0.9, 0.7))
+venndir_legender(setlist_dir, venndir_out=vo, x="bottomright", font_cex=0.6)
 ```
 
 <img src="man/figures/README-venndir_each_p-1.png" width="100%" />
@@ -255,11 +274,11 @@ venndir(setlist,
 
 The output of `venndir()` is a `list` with:
 
-  - `"venn_spdf"` - which contains polygon coordinates stored as a
-    `sp::SpatialPolygonsDataFrame`. Essentially it stores each Venn
-    polygon, with annotations in a `data.frame`.
-  - `"label_df"` - a `data.frame` with individual text labels, colors,
-    and coordinates.
+- `"venn_spdf"` - which contains polygon coordinates stored as a
+  `sp::SpatialPolygonsDataFrame`. Essentially it stores each Venn
+  polygon, with annotations in a `data.frame`.
+- `"label_df"` - a `data.frame` with individual text labels, colors, and
+  coordinates.
 
 You can edit the `label_df` data manually, as needed, then render the
 Venn diagram using `render_venndir()`. (I really like having a function
@@ -271,37 +290,51 @@ vo <- venndir(setlist, proportional=TRUE, do_plot=FALSE);
 
 print(head(vo$label_df));
 #>                  x     y text venn_counts overlap_set type x_offset y_offset
-#> set_A       -8.729 -1.52   31          31       set_A main     0.00     0.00
-#> set_B        8.855 -4.38  390         390       set_B main     0.00     0.00
-#> set_C       -4.662  9.95   71          71       set_C main     0.00     0.00
-#> set_A&set_B -4.140 -2.24   27          27 set_A&set_B main     0.00     0.00
-#> set_A&set_C -6.591  2.59    6           6 set_A&set_C main    -3.29     1.42
-#> set_B&set_C  0.117  4.73   76          76 set_B&set_C main     0.00     0.00
+#> set_A       -8.730 -1.53   31          31       set_A main   -3.516   -0.998
+#> set_B        8.855 -4.38  390         390       set_B main    9.603   -3.716
+#> set_C       -4.662  9.95   71          71       set_C main   -0.888    4.745
+#> set_A&set_B -4.140 -2.24   27          27 set_A&set_B main    0.000    0.000
+#> set_A&set_C -6.591  2.59    6           6 set_A&set_C main   -3.353    1.592
+#> set_B&set_C  0.117  4.73   76          76 set_B&set_C main    0.000    0.000
 #>             show_label vjust hjust halign rot     color fontsize border lty lwd
-#> set_A               NA   0.5   0.5    0.5   0 #D9D9D9FF       14     NA   1   1
+#> set_A               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_B               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_C               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_A&set_B         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_A&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #> set_B&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
 #>             fill padding padding_unit r r_unit      overlap_sign        items
-#> set_A         NA       4           pt 4     pt       set_A|1 0 0 item_052....
-#> set_B         NA       4           pt 4     pt       set_B|0 1 0 item_011....
-#> set_C         NA       4           pt 4     pt       set_C|0 0 1 item_059....
-#> set_A&set_B   NA       4           pt 4     pt set_A&set_B|1 1 0 item_019....
-#> set_A&set_C   NA       4           pt 4     pt set_A&set_C|1 0 1 item_093....
-#> set_B&set_C   NA       4           pt 4     pt set_B&set_C|0 1 1 item_060....
-#>             overlap   count show_items hjust_outside hjust_inside vjust_outside
-#> set_A        inside  inside       none           0.5          0.5           0.5
-#> set_B        inside  inside       none           0.5          0.5           0.5
-#> set_C        inside  inside       none           0.5          0.5           0.5
-#> set_A&set_B    none  inside       none           0.5          0.5           0.5
-#> set_A&set_C    none outside       none           1.0          0.5           0.0
-#> set_B&set_C    none  inside       none           0.5          0.5           0.5
+#> set_A         NA       3           pt 3     pt       set_A|1 0 0 item_052....
+#> set_B         NA       3           pt 3     pt       set_B|0 1 0 item_011....
+#> set_C         NA       3           pt 3     pt       set_C|0 0 1 item_059....
+#> set_A&set_B   NA       3           pt 3     pt set_A&set_B|1 1 0 item_019....
+#> set_A&set_C   NA       3           pt 3     pt set_A&set_C|1 0 1 item_093....
+#> set_B&set_C   NA       3           pt 3     pt set_B&set_C|0 1 1 item_060....
+#>             nsets main_venn_counts overlap set_is_hidden show_items   count
+#> set_A           1               31 outside         FALSE       none  inside
+#> set_B           1              390 outside         FALSE       none  inside
+#> set_C           1               71 outside         FALSE       none  inside
+#> set_A&set_B     2               27    none         FALSE       none  inside
+#> set_A&set_C     2                6    none         FALSE       none outside
+#> set_B&set_C     2               76    none         FALSE       none  inside
+#>             label_left_outside label_left_inside label_right_outside
+#> set_A                     TRUE              TRUE               FALSE
+#> set_B                     TRUE              TRUE               FALSE
+#> set_C                     TRUE              TRUE               FALSE
+#> set_A&set_B              FALSE              TRUE               FALSE
+#> set_A&set_C               TRUE             FALSE               FALSE
+#> set_B&set_C              FALSE              TRUE               FALSE
+#>             label_right_inside hjust_outside hjust_inside vjust_outside
+#> set_A                    FALSE           0.5          0.5           0.5
+#> set_B                    FALSE           0.5          0.5           0.5
+#> set_C                    FALSE           0.5          0.5           0.5
+#> set_A&set_B              FALSE           0.5          0.5           0.5
+#> set_A&set_C              FALSE           1.0          0.5           0.0
+#> set_B&set_C              FALSE           0.5          0.5           0.5
 #>             vjust_inside
-#> set_A                1.0
-#> set_B                1.0
-#> set_C                1.0
+#> set_A                0.5
+#> set_B                0.5
+#> set_C                0.5
 #> set_A&set_B          0.5
 #> set_A&set_C          0.5
 #> set_B&set_C          0.5
@@ -319,19 +352,16 @@ provides two features:
 1.  It can adjust a label positions and visibility using `label_preset`.
 2.  It can adjust label visual style using `label_style`.
 
-### venndir\_label\_style() and label\_preset
+### venndir_label_style() and label_preset
 
 The `label_preset` has a few pre-configured options:
 
-  - `"main inside"` - displays main set labels, and counts inside each
-    polygon.
-  - `"main outside"` - displays each set label outside, and counts
-    inside.
-  - `"outside"` - displays set labels and counts outside.
-  - `"main items"` - displays set names outside, and item labels inside
-    each polygon. See below for examples.
-
-<!-- end list -->
+- `"main inside"` - displays main set labels, and counts inside each
+  polygon.
+- `"main outside"` - displays each set label outside, and counts inside.
+- `"outside"` - displays set labels and counts outside.
+- `"main items"` - displays set names outside, and item labels inside
+  each polygon. See below for examples.
 
 ``` r
 vo4 <- venndir_label_style(vo,
@@ -354,36 +384,35 @@ render_venndir(vo4l,
 
 <img src="man/figures/README-label_preset_1l-1.png" width="100%" />
 
-### venndir\_label\_style() and label\_style
+### venndir_label_style() and label_style
 
 The `label_style` is used for visual effects, to improve visibility of
 the text labels. It applies two basic operations, fill and border.
 
 Fill options:
 
-  - `"basic"` - removes background fill
-  - `"shaded"` - partial transparent fill using the overlap color
-  - `"fill"` - fill using the overlap color
-  - `"lite"` - lite shaded fill
-  - `"custom"` - will not update the fill, in case you manually adjusted
-    these values
+- `"basic"` - removes background fill
+- `"shaded"` - partial transparent fill using the overlap color
+- `"fill"` - fill using the overlap color
+- `"lite"` - lite shaded fill
+- `"custom"` - will not update the fill, in case you manually adjusted
+  these values
 
 Border options:
 
-  - `"box"` - will draw a border around each label *\`* `""` - absence
-    of `"box"` in `label_style` will remove any border
+- `"box"` - will draw a border around each label
+  \*`*`““`- absence of`”box”`in`label_style\` will remove any border
 
 The `label_style` string can be any string that contains those values,
 for example:
 
-  - `label_style="lite box"`
-  - `label_style="shaded"`
-  - `label_style="basic box"`
-
-<!-- end list -->
+- `label_style="lite box"`
+- `label_style="shaded"`
+- `label_style="basic box"`
 
 ``` r
 vo3 <- venndir_label_style(vo,
+   inside_percent_threshold=0,
    label_style="lite box")
 render_venndir(vo3);
 ```
@@ -401,19 +430,19 @@ The first example is the basic Venn overlap, without direction.
 ``` r
 setlist <- make_venn_test(1000, 3, do_signed=TRUE)
 textvenn(setlist, overlap_type="overlap")
-#>                                set_A&set_B                                     
-#>                                    27                                          
-#>   set_A                                                              set_B     
-#>    31                                                                 390      
-#>                                                                                
-#>                             set_A&set_B&set_C                                  
-#>                                     7                                          
-#>             set_A&set_C                              set_B&set_C               
-#>                  6                                       76                    
-#>                                                                                
-#>                                                                                
-#>                                   set_C                                        
-#>                                    71
+#>                                 set_A&set_B                                     
+#>                                     27                                          
+#>    set_A                                                              set_B     
+#>     31                                                                 390      
+#>                                                                                 
+#>                              set_A&set_B&set_C                                  
+#>                                      7                                          
+#>              set_A&set_C                              set_B&set_C               
+#>                   6                                       76                    
+#>                                                                                 
+#>                                                                                 
+#>                                    set_C                                        
+#>                                     71
 ```
 
 But of course direction is helpful, so here it is with the default
@@ -421,19 +450,19 @@ But of course direction is helpful, so here it is with the default
 
 ``` r
 textvenn(setlist, overlap_type="concordance")
-#>                                        set_A&set_B     ↑↑: 9                                          
-#>                                            27          ↓↓: 12                                         
-#>   set_A  ↑: 19                                          X: 6                           set_B  ↑: 185  
-#>    31    ↓: 12                                                                          390   ↓: 205  
-#>                                                                                                       
-#>                                     set_A&set_B&set_C  ↑↑↑: 2                                         
-#>                                             7           X: 5                                          
-#>                 set_A&set_C  ↑↑: 2                                set_B&set_C  ↑↑: 39                 
-#>                      6       ↓↓: 3                                    76       ↓↓: 21                 
-#>                              X: 1                                              X: 16                  
-#>                                                                                                       
-#>                                           set_C        ↑: 30                                          
-#>                                            71          ↓: 41
+#>                                         set_A&set_B     ↑↑: 9                                          
+#>                                             27          ↓↓: 12                                         
+#>    set_A  ↑: 19                                          X: 6                           set_B  ↑: 185  
+#>     31    ↓: 12                                                                          390   ↓: 205  
+#>                                                                                                        
+#>                                      set_A&set_B&set_C  ↑↑↑: 2                                         
+#>                                              7           X: 5                                          
+#>                  set_A&set_C  ↑↑: 2                                set_B&set_C  ↑↑: 39                 
+#>                       6       ↓↓: 3                                    76       ↓↓: 21                 
+#>                               X: 1                                              X: 16                  
+#>                                                                                                        
+#>                                            set_C        ↑: 30                                          
+#>                                             71          ↓: 41
 ```
 
 Not all consoles can display Unicode arrows, so you can use ASCII output
@@ -441,22 +470,22 @@ only with `unicode=FALSE`:
 
 ``` r
 textvenn(setlist, overlap_type="concordance", unicode=FALSE)
-#>                                        set_A&set_B     ^^: 9                                          
-#>                                            27          vv: 12                                         
-#>   set_A  ^: 19                                          X: 6                           set_B  ^: 185  
-#>    31    v: 12                                                                          390   v: 205  
-#>                                                                                                       
-#>                                     set_A&set_B&set_C  ^^^: 2                                         
-#>                                             7           X: 5                                          
-#>                 set_A&set_C  ^^: 2                                set_B&set_C  ^^: 39                 
-#>                      6       vv: 3                                    76       vv: 21                 
-#>                              X: 1                                              X: 16                  
-#>                                                                                                       
-#>                                           set_C        ^: 30                                          
-#>                                            71          v: 41
+#>                                         set_A&set_B     ^^: 9                                          
+#>                                             27          vv: 12                                         
+#>    set_A  ^: 19                                          X: 6                           set_B  ^: 185  
+#>     31    v: 12                                                                          390   v: 205  
+#>                                                                                                        
+#>                                      set_A&set_B&set_C  ^^^: 2                                         
+#>                                              7           X: 5                                          
+#>                  set_A&set_C  ^^: 2                                set_B&set_C  ^^: 39                 
+#>                       6       vv: 3                                    76       vv: 21                 
+#>                               X: 1                                              X: 16                  
+#>                                                                                                        
+#>                                            set_C        ^: 30                                          
+#>                                             71          v: 41
 ```
 
-Sorry, no proportional text Venn diagrams (yet)\!
+Sorry, no proportional text Venn diagrams (yet)!
 
 ## Nudge Venn circles
 
@@ -552,6 +581,7 @@ setlist <- make_venn_test(1000, 3, do_signed=TRUE);
 venndir(setlist,
    label_preset="main items",
    show_items="sign",
+   item_cex=3,
    show_segments=FALSE,
    max_items=10000);
 ```
@@ -565,6 +595,7 @@ venndir(setlist,
    label_preset="main items",
    overlap_type="each",
    show_items="sign",
+   item_cex=4,
    max_items=10000,
    show_segments=FALSE,
    proportional=TRUE);

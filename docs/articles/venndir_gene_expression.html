@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.25.900</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -64,8 +60,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="http://github.com/jmw86069/venndir/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="http://github.com/jmw86069/venndir/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -79,113 +75,122 @@
 
       
 
-      </header><script src="venndir_gene_expression_files/header-attrs-2.1/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Venndir with Gene Expression Data</h1>
             
       
-      <small class="dont-index">Source: <a href="http://github.com/jmw86069/venndir/blob/master/vignettes/venndir_gene_expression.Rmd"><code>vignettes/venndir_gene_expression.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/vignettes/venndir_gene_expression.Rmd" class="external-link"><code>vignettes/venndir_gene_expression.Rmd</code></a></small>
       <div class="hidden name"><code>venndir_gene_expression.Rmd</code></div>
 
     </div>
 
     
     
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jmw86069/venndir">venndir</a></span><span class="op">)</span></pre></div>
-<p>Venndir was inspired by gene expression data, which contains up/down directionality. Here are some examples showing how gene expression data can be used in <code>venndir</code>.</p>
-<div id="generic-example" class="section level3">
-<h3 class="hasAnchor">
-<a href="#generic-example" class="anchor"></a>Generic example</h3>
-<p>The <code><a href="../reference/make_venn_test.html">venndir::make_venn_test()</a></code> function is useful to generate test data.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">2500</span>, <span class="fl">3</span>,
-  sizes<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">500</span>, <span class="fl">200</span><span class="op">)</span>,
-  do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jmw86069/venndir" class="external-link">venndir</a></span><span class="op">)</span></span></code></pre></div>
+<p>Venndir was inspired by gene expression data, which contains up/down
+directionality. Here are some examples showing how gene expression data
+can be used in <code>venndir</code>.</p>
+<div class="section level3">
+<h3 id="generic-example">Generic example<a class="anchor" aria-label="anchor" href="#generic-example"></a>
+</h3>
+<p>The <code><a href="../reference/make_venn_test.html">venndir::make_venn_test()</a></code> function is useful to
+generate test data.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">2500</span>, <span class="fl">3</span>,</span>
+<span>  sizes<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">500</span>, <span class="fl">200</span><span class="op">)</span>,</span>
+<span>  do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="venndir_gene_expression_files/figure-html/generic_1-1.png" width="960"></p>
 </div>
-<div id="venndir-with-limma-results" class="section level3">
-<h3 class="hasAnchor">
-<a href="#venndir-with-limma-results" class="anchor"></a>Venndir with limma results</h3>
-<p>The <code>limma</code> package provides an extensive set of gene expression data analysis tools. The steps below reproduce the <code>Limma Users Guide</code> example <code>"Illumina Use Case"</code> in Section 17.3. This example requires data available at <a href="http://bioinf.wehi.edu.au/marray/IlluminaCaseStudy" class="uri">http://bioinf.wehi.edu.au/marray/IlluminaCaseStudy</a> copied to the current working directory.</p>
-<p>For the sake of this example, the steps assume the data is located in a folder <code>[HOME]/IlluminaCaseStudy</code>, where <code>[HOME]</code> is the user home directory.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">illuminadir</span> <span class="op">&lt;-</span> <span class="st">"~/IlluminaCaseStudy"</span>;
-<span class="va">do_limma</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>;
-<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="http://bioinf.wehi.edu.au/limma">limma</a></span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.exists</a></span><span class="op">(</span><span class="va">illuminadir</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">do_limma</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>;
-<span class="op">}</span>
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">targets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/readTargets.html">readTargets</a></span><span class="op">(</span>path<span class="op">=</span><span class="va">illuminadir</span><span class="op">)</span>
-  <span class="co"># import Illumina data</span>
-  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/read.ilmn.html">read.ilmn</a></span><span class="op">(</span>files<span class="op">=</span><span class="st">"probe profile.txt.gz"</span>,
-     ctrlfiles<span class="op">=</span><span class="st">"control probe profile.txt.gz"</span>,
-     other.columns<span class="op">=</span><span class="st">"Detection"</span>,
-    path<span class="op">=</span><span class="va">illuminadir</span><span class="op">)</span>
-  <span class="co"># define expressed probes</span>
-  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/nec.html">neqc</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-  <span class="va">expressed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">y</span><span class="op">$</span><span class="va">other</span><span class="op">$</span><span class="va">Detection</span> <span class="op">&lt;</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span>;
-  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[</span><span class="va">expressed</span>,<span class="op">]</span>
-  <span class="co"># calculate within-patient correlations</span>
-  <span class="va">ct</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">targets</span><span class="op">$</span><span class="va">CellType</span><span class="op">)</span>
-  <span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="fl">0</span><span class="op">+</span><span class="va">ct</span><span class="op">)</span>;
-  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">design</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">ct</span><span class="op">)</span>;
-  <span class="va">dupcor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/dupcor.html">duplicateCorrelation</a></span><span class="op">(</span><span class="va">y</span>,
-     <span class="va">design</span>,
-     block<span class="op">=</span><span class="va">targets</span><span class="op">$</span><span class="va">Donor</span><span class="op">)</span>;
-  <span class="va">dupcor</span><span class="op">$</span><span class="va">consensus.correlation</span>;
-
-  <span class="co"># fit linear model, paired by patient, with correlations</span>
-  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/lmFit.html">lmFit</a></span><span class="op">(</span><span class="va">y</span>,
-     <span class="va">design</span>,
-     block<span class="op">=</span><span class="va">targets</span><span class="op">$</span><span class="va">Donor</span>,
-     correlation<span class="op">=</span><span class="va">dupcor</span><span class="op">$</span><span class="va">consensus.correlation</span><span class="op">)</span>;
-  <span class="co"># define contrasts</span>
-  <span class="va">contrasts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/makeContrasts.html">makeContrasts</a></span><span class="op">(</span><span class="va">ML</span><span class="op">-</span><span class="va">MS</span>, 
-     <span class="va">LP</span><span class="op">-</span><span class="va">MS</span>, 
-     <span class="va">ML</span><span class="op">-</span><span class="va">LP</span>, 
-     levels<span class="op">=</span><span class="va">design</span><span class="op">)</span>
-  
-  <span class="co"># fit contrasts</span>
-  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/contrasts.fit.html">contrasts.fit</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">contrasts</span><span class="op">)</span>;
-  
-  <span class="co"># eBayes</span>
-  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/ebayes.html">eBayes</a></span><span class="op">(</span><span class="va">fit2</span>, trend<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="co">#&gt; Reading file ~/IlluminaCaseStudy/probe profile.txt.gz ... ...</span>
-<span class="co">#&gt; Reading file ~/IlluminaCaseStudy/control probe profile.txt.gz ... ...</span></pre></div>
-<p>The steps are straightforward except that this example uses a paired linear model. Nonetheless the results is the same, the resulting object is class <code>MArrayLM</code>.</p>
-<p>The function <code><a href="https://rdrr.io/pkg/limma/man/decideTests.html">limma::decideTests()</a></code> applied adjusted P-value and log2 fold change filtering, and produces class <code>TestResults</code> which is actually a signed incidence matrix. Take a look at the output:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="co"># decideTests() creates a signed incidence matrix</span>
-  <span class="va">fit2decide</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/decideTests.html">decideTests</a></span><span class="op">(</span><span class="va">fit2</span>, method<span class="op">=</span><span class="st">"global"</span><span class="op">)</span>;
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="co">#&gt; TestResults matrix</span>
-<span class="co">#&gt;               Contrasts</span>
-<span class="co">#&gt;                ML - MS LP - MS ML - LP</span>
-<span class="co">#&gt;   ILMN_2055271       0       0       0</span>
-<span class="co">#&gt;   ILMN_1653355       0       0       0</span>
-<span class="co">#&gt;   ILMN_1787689       0       0       0</span>
-<span class="co">#&gt;   ILMN_1745607      -1      -1       0</span>
-<span class="co">#&gt;   ILMN_1735045       0       0       0</span>
-<span class="co">#&gt;   ILMN_1659452       0       0       0</span></pre></div>
-<p>A signed incidence matrix can be converted to <code>setlist</code> with <code><a href="../reference/im_value2list.html">im_value2list()</a></code>. Then call <code><a href="../reference/venndir.html">venndir()</a></code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_3-1.png" width="960"></p>
+<div class="section level3">
+<h3 id="venndir-with-limma-results">Venndir with limma results<a class="anchor" aria-label="anchor" href="#venndir-with-limma-results"></a>
+</h3>
+<p>The <code>limma</code> package provides an extensive set of gene
+expression data analysis tools. The steps below reproduce the
+<code>Limma Users Guide</code> example <code>"Illumina Use Case"</code>
+in Section 17.3. This example requires data available at <a href="http://bioinf.wehi.edu.au/marray/IlluminaCaseStudy" class="external-link uri">http://bioinf.wehi.edu.au/marray/IlluminaCaseStudy</a>
+copied to the current working directory.</p>
+<p>For the sake of this example, the steps assume the data is located in
+a folder <code>[HOME]/IlluminaCaseStudy</code>, where
+<code>[HOME]</code> is the user home directory.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">illuminadir</span> <span class="op">&lt;-</span> <span class="st">"~/IlluminaCaseStudy"</span>;</span>
+<span><span class="va">do_limma</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>;</span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="http://bioinf.wehi.edu.au/limma" class="external-link">limma</a></span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">illuminadir</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">do_limma</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>;</span>
+<span><span class="op">}</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">targets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/readTargets.html" class="external-link">readTargets</a></span><span class="op">(</span>path<span class="op">=</span><span class="va">illuminadir</span><span class="op">)</span></span>
+<span>  <span class="co"># import Illumina data</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/read.ilmn.html" class="external-link">read.ilmn</a></span><span class="op">(</span>files<span class="op">=</span><span class="st">"probe profile.txt.gz"</span>,</span>
+<span>     ctrlfiles<span class="op">=</span><span class="st">"control probe profile.txt.gz"</span>,</span>
+<span>     other.columns<span class="op">=</span><span class="st">"Detection"</span>,</span>
+<span>    path<span class="op">=</span><span class="va">illuminadir</span><span class="op">)</span></span>
+<span>  <span class="co"># define expressed probes</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/nec.html" class="external-link">neqc</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">expressed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">y</span><span class="op">$</span><span class="va">other</span><span class="op">$</span><span class="va">Detection</span> <span class="op">&lt;</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span>;</span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[</span><span class="va">expressed</span>,<span class="op">]</span></span>
+<span>  <span class="co"># calculate within-patient correlations</span></span>
+<span>  <span class="va">ct</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">targets</span><span class="op">$</span><span class="va">CellType</span><span class="op">)</span></span>
+<span>  <span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="fl">0</span><span class="op">+</span><span class="va">ct</span><span class="op">)</span>;</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">design</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">ct</span><span class="op">)</span>;</span>
+<span>  <span class="va">dupcor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/dupcor.html" class="external-link">duplicateCorrelation</a></span><span class="op">(</span><span class="va">y</span>,</span>
+<span>     <span class="va">design</span>,</span>
+<span>     block<span class="op">=</span><span class="va">targets</span><span class="op">$</span><span class="va">Donor</span><span class="op">)</span>;</span>
+<span>  <span class="va">dupcor</span><span class="op">$</span><span class="va">consensus.correlation</span>;</span>
+<span></span>
+<span>  <span class="co"># fit linear model, paired by patient, with correlations</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/lmFit.html" class="external-link">lmFit</a></span><span class="op">(</span><span class="va">y</span>,</span>
+<span>     <span class="va">design</span>,</span>
+<span>     block<span class="op">=</span><span class="va">targets</span><span class="op">$</span><span class="va">Donor</span>,</span>
+<span>     correlation<span class="op">=</span><span class="va">dupcor</span><span class="op">$</span><span class="va">consensus.correlation</span><span class="op">)</span>;</span>
+<span>  <span class="co"># define contrasts</span></span>
+<span>  <span class="va">contrasts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/makeContrasts.html" class="external-link">makeContrasts</a></span><span class="op">(</span><span class="va">ML</span><span class="op">-</span><span class="va">MS</span>, </span>
+<span>     <span class="va">LP</span><span class="op">-</span><span class="va">MS</span>, </span>
+<span>     <span class="va">ML</span><span class="op">-</span><span class="va">LP</span>, </span>
+<span>     levels<span class="op">=</span><span class="va">design</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># fit contrasts</span></span>
+<span>  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/contrasts.fit.html" class="external-link">contrasts.fit</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">contrasts</span><span class="op">)</span>;</span>
+<span>  </span>
+<span>  <span class="co"># eBayes</span></span>
+<span>  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/ebayes.html" class="external-link">eBayes</a></span><span class="op">(</span><span class="va">fit2</span>, trend<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The steps are straightforward except that this example uses a paired
+linear model. Nonetheless the results is the same, the resulting object
+is class <code>MArrayLM</code>.</p>
+<p>The function <code><a href="https://rdrr.io/pkg/limma/man/decideTests.html" class="external-link">limma::decideTests()</a></code> applied adjusted
+P-value and log2 fold change filtering, and produces class
+<code>TestResults</code> which is actually a signed incidence matrix.
+Take a look at the output:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># decideTests() creates a signed incidence matrix</span></span>
+<span>  <span class="va">fit2decide</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/decideTests.html" class="external-link">decideTests</a></span><span class="op">(</span><span class="va">fit2</span>, method<span class="op">=</span><span class="st">"global"</span><span class="op">)</span>;</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>A signed incidence matrix can be converted to <code>setlist</code>
+with <code><a href="../reference/im_value2list.html">im_value2list()</a></code>. Then call <code><a href="../reference/venndir.html">venndir()</a></code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;</span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>A few features are immediately noticeable:</p>
 <ol style="list-style-type: decimal">
-<li><p>The <code>limma</code> contrasts <code>"ML - MS"</code> and <code>"LP - MS"</code> are shown in each Venn circle. The numbers in each circle represent statistically significant changes given the <code>limma</code> thresholds.</p></li>
-<li><p>There is fairly high overlap between these gene lists, <code>3,681</code> probes are shared, which is more than not shared <code>2,922</code> and <code>2,303</code>, respectively.</p></li>
+<li><p>The <code>limma</code> contrasts <code>"ML - MS"</code> and
+<code>"LP - MS"</code> are shown in each Venn circle. The numbers in
+each circle represent statistically significant changes given the
+<code>limma</code> thresholds.</p></li>
+<li><p>There is fairly high overlap between these gene lists,
+<code>3,681</code> probes are shared, which is more than not shared
+<code>2,922</code> and <code>2,303</code>, respectively.</p></li>
 <li>
-<p>Almost all the overlapping probes are changing in the same direction in these two contrasts</p>
+<p>Almost all the overlapping probes are changing in the same
+direction in these two contrasts</p>
 <ul>
 <li>
 <code>1,800</code> probes are up in both contrasts</li>
@@ -195,144 +200,172 @@
 <code>25</code> probes disagree in up-down or down-up direction</li>
 </ul>
 </li>
-<li><p>Implied in #3, the shared probes are roughly evenly distributed between up and down.</p></li>
+<li><p>Implied in #3, the shared probes are roughly evenly distributed
+between up and down.</p></li>
 </ol>
-<div id="proportional-venn-diagram-euler" class="section level4">
-<h4 class="hasAnchor">
-<a href="#proportional-venn-diagram-euler" class="anchor"></a>Proportional Venn diagram (Euler)</h4>
-<p>The data can be drawn with proportional circles, otherwise known as a Euler diagram, or proportional Venn diagram.</p>
-<p>For this diagram, we will plot <code>sets=c(1, 3)</code> mostly because these are more visually interesting.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_3p-1.png" width="960"></p>
+<div class="section level4">
+<h4 id="proportional-venn-diagram-euler">Proportional Venn diagram (Euler)<a class="anchor" aria-label="anchor" href="#proportional-venn-diagram-euler"></a>
+</h4>
+<p>The data can be drawn with proportional circles, otherwise known as a
+Euler diagram, or proportional Venn diagram.</p>
+<p>For this diagram, we will plot <code>sets=c(1, 3)</code> mostly
+because these are more visually interesting.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
-<div id="overlap_type-agreement" class="section level4">
-<h4 class="hasAnchor">
-<a href="#overlap_type-agreement" class="anchor"></a>overlap_type “agreement”</h4>
-<p>An alternative approach to represent concordance is by “agreement”, which combines up-up and down-down into one summary number.</p>
+<div class="section level4">
+<h4 id="overlap_type-agreement">overlap_type “agreement”<a class="anchor" aria-label="anchor" href="#overlap_type-agreement"></a>
+</h4>
+<p>An alternative approach to represent concordance is by “agreement”,
+which combines up-up and down-down into one summary number.</p>
 <p>Use the argument <code>overlap_type="agreement"</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_4-1.png" width="960"></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;</span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
-<div id="overlap_type-each" class="section level4">
-<h4 class="hasAnchor">
-<a href="#overlap_type-each" class="anchor"></a>overlap_type “each”</h4>
-<p>Finally, you can represent all the directional changes using <code>overlap_type="each"</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, overlap_type<span class="op">=</span><span class="st">"each"</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_5-1.png" width="960"></p>
+<div class="section level4">
+<h4 id="overlap_type-each">overlap_type “each”<a class="anchor" aria-label="anchor" href="#overlap_type-each"></a>
+</h4>
+<p>Finally, you can represent all the directional changes using
+<code>overlap_type="each"</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;</span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, overlap_type<span class="op">=</span><span class="st">"each"</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
-<div id="display-item-labels" class="section level4">
-<h4 class="hasAnchor">
-<a href="#display-item-labels" class="anchor"></a>Display item labels</h4>
-<p>It is sometimes interesting to show item labels inside the Venn diagram – but 3,600 text labels are too many to be displayed!</p>
-<p>For the purpose of this example, we will filter statistical hits using a higher fold change, and more significant P-value threshold – just to reduce the labels.</p>
-<p>In practice, examples with &gt;3000 hits should probably never be labeled unless printing full size on a poster (and even then, with small font!)</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="co"># increase stringency of statistical filtering</span>
-  <span class="va">fit2decide2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/decideTests.html">decideTests</a></span><span class="op">(</span><span class="va">fit2</span>,
-    p.value<span class="op">=</span><span class="fl">1e-4</span>,
-    lfc<span class="op">=</span><span class="fl">4</span><span class="op">)</span>;
-  <span class="co"># convert to signed list</span>
-  <span class="va">limmalist2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide2</span><span class="op">)</span>;
-  <span class="co"># display item labels</span>
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist2</span>,
-    sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
-    poly_alpha<span class="op">=</span><span class="fl">0.3</span>,
-    label_preset<span class="op">=</span><span class="st">"main items"</span>,
-    show_items<span class="op">=</span><span class="st">"sign item"</span>,
-    item_cex<span class="op">=</span><span class="fl">0.5</span>,
-    buffer_w<span class="op">=</span><span class="fl">0.3</span>,
-    max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_6-1.png" width="960"></p>
+<div class="section level4">
+<h4 id="display-item-labels">Display item labels<a class="anchor" aria-label="anchor" href="#display-item-labels"></a>
+</h4>
+<p>It is sometimes interesting to show item labels inside the Venn
+diagram – but 3,600 text labels are too many to be displayed!</p>
+<p>For the purpose of this example, we will filter statistical hits
+using a higher fold change, and more significant P-value threshold –
+just to reduce the labels.</p>
+<p>In practice, examples with &gt;3000 hits should probably never be
+labeled unless printing full size on a poster (and even then, with small
+font!)</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># increase stringency of statistical filtering</span></span>
+<span>  <span class="va">fit2decide2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/decideTests.html" class="external-link">decideTests</a></span><span class="op">(</span><span class="va">fit2</span>,</span>
+<span>    p.value<span class="op">=</span><span class="fl">1e-4</span>,</span>
+<span>    lfc<span class="op">=</span><span class="fl">4</span><span class="op">)</span>;</span>
+<span>  <span class="co"># convert to signed list</span></span>
+<span>  <span class="va">limmalist2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide2</span><span class="op">)</span>;</span>
+<span>  <span class="co"># display item labels</span></span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist2</span>,</span>
+<span>    sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span>    label_preset<span class="op">=</span><span class="st">"main items"</span>,</span>
+<span>    show_items<span class="op">=</span><span class="st">"sign item"</span>,</span>
+<span>    item_cex<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span>    buffer_w<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span>    max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
-<div id="display-item-directions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#display-item-directions" class="anchor"></a>DIsplay item directions</h3>
-<p>The display of item labels brings up some potential benefits: it does indicate the relative density of labels, and relative quantity of up/down/mixed direction.</p>
-<p>You can customize the item label so that it only displays the directional sign, and not the item. This technique may be good for higher number of items.</p>
+<div class="section level3">
+<h3 id="display-item-directions">DIsplay item directions<a class="anchor" aria-label="anchor" href="#display-item-directions"></a>
+</h3>
+<p>The display of item labels brings up some potential benefits: it does
+indicate the relative density of labels, and relative quantity of
+up/down/mixed direction.</p>
+<p>You can customize the item label so that it only displays the
+directional sign, and not the item. This technique may be good for
+higher number of items.</p>
 <p>Use argument <code>show_items="sign"</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist2</span>,
-    sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
-    poly_alpha<span class="op">=</span><span class="fl">0.3</span>,
-    label_preset<span class="op">=</span><span class="st">"main items"</span>,
-    show_items<span class="op">=</span><span class="st">"sign"</span>,
-    item_cex<span class="op">=</span><span class="fl">0.7</span>,
-    buffer_w<span class="op">=</span><span class="fl">0.3</span>,
-    max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_6s-1.png" width="960"></p>
-<div id="convert-probes-to-genes" class="section level4">
-<h4 class="hasAnchor">
-<a href="#convert-probes-to-genes" class="anchor"></a>Convert probes to genes</h4>
-<p>The first item label figure highlights an important issue: <code>limma</code> and similar analysis tools test the probes, not the genes.Therefore the results represent Illumina probes, which are not very helpful by themselves.</p>
-<p>Fortunately in this case, the gene data is available in <code>y$genes</code>, so we can convert each row to a gene symbol. However there are multiple probes per gene symbol. For the sake of this example, we will choose the first of each gene symbol from the statistical hits.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="co"># convert probe hits to gene hits</span>
-  <span class="va">limmalist2g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">limmalist2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span>
-    <span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">as.vector</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>;
-    <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>;
-    <span class="co"># use gene symbol</span>
-    <span class="va">igenes</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">$</span><span class="va">genes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>,<span class="st">"SYMBOL"</span><span class="op">]</span>;
-    <span class="co"># remove entries with no gene symbol</span>
-    <span class="va">igenes</span> <span class="op">&lt;-</span> <span class="va">igenes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span><span class="op">]</span>;
-    <span class="co"># choose the first entry per unique gene symbol</span>
-    <span class="va">j</span> <span class="op">&lt;-</span> <span class="va">i</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html">match</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span>, <span class="va">igenes</span><span class="op">)</span><span class="op">]</span>;
-    <span class="co"># assign name by gene symbol</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span>;
-    <span class="va">j</span>;
-  <span class="op">}</span><span class="op">)</span>
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist2g</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
-    show_items<span class="op">=</span><span class="st">"sign item"</span>,
-    poly_alpha<span class="op">=</span><span class="fl">0.3</span>,
-    label_preset<span class="op">=</span><span class="st">"main items"</span>,
-    item_cex<span class="op">=</span><span class="fl">0.5</span>,
-    buffer_w<span class="op">=</span><span class="fl">0.3</span>,
-    max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_7-1.png" width="960"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist2</span>,</span>
+<span>    sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span>    label_preset<span class="op">=</span><span class="st">"main items"</span>,</span>
+<span>    show_items<span class="op">=</span><span class="st">"sign"</span>,</span>
+<span>    item_cex<span class="op">=</span><span class="fl">0.7</span>,</span>
+<span>    buffer_w<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span>    max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="convert-probes-to-genes">Convert probes to genes<a class="anchor" aria-label="anchor" href="#convert-probes-to-genes"></a>
+</h4>
+<p>The first item label figure highlights an important issue:
+<code>limma</code> and similar analysis tools test the probes, not the
+genes.Therefore the results represent Illumina probes, which are not
+very helpful by themselves.</p>
+<p>Fortunately in this case, the gene data is available in
+<code>y$genes</code>, so we can convert each row to a gene symbol.
+However there are multiple probes per gene symbol. For the sake of this
+example, we will choose the first of each gene symbol from the
+statistical hits.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># convert probe hits to gene hits</span></span>
+<span>  <span class="va">limmalist2g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">limmalist2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>;</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>;</span>
+<span>    <span class="co"># use gene symbol</span></span>
+<span>    <span class="va">igenes</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">$</span><span class="va">genes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>,<span class="st">"SYMBOL"</span><span class="op">]</span>;</span>
+<span>    <span class="co"># remove entries with no gene symbol</span></span>
+<span>    <span class="va">igenes</span> <span class="op">&lt;-</span> <span class="va">igenes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span><span class="op">]</span>;</span>
+<span>    <span class="co"># choose the first entry per unique gene symbol</span></span>
+<span>    <span class="va">j</span> <span class="op">&lt;-</span> <span class="va">i</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span>, <span class="va">igenes</span><span class="op">)</span><span class="op">]</span>;</span>
+<span>    <span class="co"># assign name by gene symbol</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">igenes</span><span class="op">)</span>;</span>
+<span>    <span class="va">j</span>;</span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist2g</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    show_items<span class="op">=</span><span class="st">"sign item"</span>,</span>
+<span>    poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span>    label_preset<span class="op">=</span><span class="st">"main items"</span>,</span>
+<span>    item_cex<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span>    buffer_w<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span>    max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
-<div id="three-way-directional-venn" class="section level3">
-<h3 class="hasAnchor">
-<a href="#three-way-directional-venn" class="anchor"></a>Three-way directional Venn</h3>
-<p>The examples above purposefully used only two contrasts, partly because those two contrasts show very high concordance. This experiment design is quite common, to have three groups, and adding directionality for the third contrast can be confusing at first. (See section below on interpreting three-group Venn diagrams.)</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>,
-    sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,
-    overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span>;
-<span class="op">}</span></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_8-1.png" width="960"></p>
-<div id="comments-on-converting-probe-to-gene" class="section level4">
-<h4 class="hasAnchor">
-<a href="#comments-on-converting-probe-to-gene" class="anchor"></a>Comments on converting probe to gene</h4>
-<p>When converting probes to genes, I usually run a quick test to see if any genes have statistically significant probes that are “up” and “down” – I call these “bi-directional genes”. If there are no bi-directional genes, then choosing one entry per gene is reasonable. I leave this evaluation to the scientist, but please post an issue if you have specific questions.</p>
-<p>For RNA-seq data, the input data matrix may already contain gene expression values – as when using <code><a href="https://rdrr.io/pkg/tximport/man/tximport.html">tximport::tximport()</a></code> with the argument <code>tx2gene</code>; or when importing <code>featureCounts</code> data where each row represents one gene identifier. In those cases, no conversion is required.</p>
+<div class="section level3">
+<h3 id="three-way-directional-venn">Three-way directional Venn<a class="anchor" aria-label="anchor" href="#three-way-directional-venn"></a>
+</h3>
+<p>The examples above purposefully used only two contrasts, partly
+because those two contrasts show very high concordance. This experiment
+design is quite common, to have three groups, and adding directionality
+for the third contrast can be confusing at first. (See section below on
+interpreting three-group Venn diagrams.)</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>,</span>
+<span>    sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>    overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span>;</span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="comments-on-converting-probe-to-gene">Comments on converting probe to gene<a class="anchor" aria-label="anchor" href="#comments-on-converting-probe-to-gene"></a>
+</h4>
+<p>When converting probes to genes, I usually run a quick test to see if
+any genes have statistically significant probes that are “up” and “down”
+– I call these “bi-directional genes”. If there are no bi-directional
+genes, then choosing one entry per gene is reasonable. I leave this
+evaluation to the scientist, but please post an issue if you have
+specific questions.</p>
+<p>For RNA-seq data, the input data matrix may already contain gene
+expression values – as when using <code>tximport::tximport()</code> with
+the argument <code>tx2gene</code>; or when importing
+<code>featureCounts</code> data where each row represents one gene
+identifier. In those cases, no conversion is required.</p>
 </div>
 </div>
-<div id="interesting-examples-and-how-to-interpret-them" class="section level3">
-<h3 class="hasAnchor">
-<a href="#interesting-examples-and-how-to-interpret-them" class="anchor"></a>Interesting examples and how to interpret them</h3>
-<div id="three-group-analysis" class="section level4">
-<h4 class="hasAnchor">
-<a href="#three-group-analysis" class="anchor"></a>Three-group analysis</h4>
-<p>One common type of analysis involves three experimental groups. For example:</p>
+<div class="section level3">
+<h3 id="interesting-examples-and-how-to-interpret-them">Interesting examples and how to interpret them<a class="anchor" aria-label="anchor" href="#interesting-examples-and-how-to-interpret-them"></a>
+</h3>
+<div class="section level4">
+<h4 id="three-group-analysis">Three-group analysis<a class="anchor" aria-label="anchor" href="#three-group-analysis"></a>
+</h4>
+<p>One common type of analysis involves three experimental groups. For
+example:</p>
 <ol style="list-style-type: decimal">
 <li>Control group</li>
 <li>Treatment A</li>
@@ -344,13 +377,19 @@
 <li>Treatment B - Control</li>
 <li>Treatment B - Treatment A</li>
 </ol>
-<p>Nothing particularly unusual about the experiment design, nor the contrasts, these are fairly standard and straightforward.</p>
-<p>When creating a three-way Venn diagram, the results are also fairly straightforward. When the directionality is included, it can be more confusing, but also potentially much more informative.</p>
+<p>Nothing particularly unusual about the experiment design, nor the
+contrasts, these are fairly standard and straightforward.</p>
+<p>When creating a three-way Venn diagram, the results are also fairly
+straightforward. When the directionality is included, it can be more
+confusing, but also potentially much more informative.</p>
 <p>There are a few potential scenarios:</p>
 <ol style="list-style-type: decimal">
-<li>Treatment A does not affect similar genes as does Treatment B. This result is seen with low overlaps.</li>
-<li>Treatment A affects similar genes as Treatment B, but not with any particular concordance.</li>
-<li>Treatment A affects similar genes as Treatment B, with extremely high concordance.</li>
+<li>Treatment A does not affect similar genes as does Treatment B. This
+result is seen with low overlaps.</li>
+<li>Treatment A affects similar genes as Treatment B, but not with any
+particular concordance.</li>
+<li>Treatment A affects similar genes as Treatment B, with extremely
+high concordance.</li>
 </ol>
 </div>
 </div>
@@ -365,11 +404,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by James M. Ward.</p>
+  <p></p>
+<p>Developed by James M. Ward.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -377,6 +418,8 @@
 
   
 
+
+  
 
   </body>
 </html>

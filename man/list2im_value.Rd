@@ -4,7 +4,13 @@
 \alias{list2im_value}
 \title{Convert list to a value incidence matrix}
 \usage{
-list2im_value(setlist, empty = NULL, do_sparse = TRUE, force_sign = FALSE, ...)
+list2im_value(
+  setlist,
+  empty = NULL,
+  do_sparse = FALSE,
+  force_sign = FALSE,
+  ...
+)
 }
 \arguments{
 \item{setlist}{\code{list} of vectors}
@@ -72,7 +78,7 @@ setlist2 <- lapply(setlist2, function(i){
       size=length(i));
    i
 })
-imv2 <- list2im_value(setlist2, empty=NA, do_sparse=FALSE);
+imv2 <- list2im_value(setlist2, empty=NA);
 imv2;
 
 # to convert back to list, define empty=NA so 0 is not considered as empty

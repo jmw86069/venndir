@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.23.900
+Version: 0.0.25.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -11,7 +11,7 @@ Maintainer: James M. Ward <jmw86069@gmail.com>
 Description: Directional Venn diagrams and set overlaps.
 Depends: R (>= 3.0.0)
 biocViews:
-Imports: jamba(>= 0.0.84.900),
+Imports: jamba(>= 0.0.90.900),
     colorjam(>= 0.0.22.950),
     sp,
     sf,
@@ -20,7 +20,10 @@ Imports: jamba(>= 0.0.84.900),
     matrixStats,
     gridtext,
     ggtext,
-    gridBase
+    gridBase,
+    data.table,
+    gridExtra,
+    methods
 Suggests:
     eulerr,
     Matrix,
@@ -35,5 +38,5 @@ Remotes: github::jmw86069/jamba,
 URL: http://github.com/jmw86069/venndir
 BugReports: http://github.com/jmw86069/venndir/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr

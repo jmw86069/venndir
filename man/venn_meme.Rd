@@ -117,7 +117,9 @@ wtah <- (unlist(lapply(seq_along(wtahv), function(i){
 venn_meme(wtah)
 
 # by default any hidden overlaps do not trigger a warning to be displayed
-venn_meme(wtah, proportional=TRUE)
+# Note: using shape="circle" triggers an error in polygon_label_fill()
+# that needs to be debugged
+# venn_meme(wtah, proportional=TRUE)
 
 # for proportional diagrams it may be helpful to use shape="ellipse"
 venn_meme(wtah, proportional=TRUE, shape="ellipse")

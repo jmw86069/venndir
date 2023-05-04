@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-labels.R
 \name{draw_gridtext_groups}
 \alias{draw_gridtext_groups}
-\title{Draw boundary around grouops of gridtext labels}
+\title{Draw boundary around groups of gridtext labels}
 \usage{
 draw_gridtext_groups(
   g_labels,
@@ -26,9 +26,18 @@ the radius and radius unit for the rounded corner.
 The row in \code{gdf} with the highest \code{"r"} value is the
 reference row, for the \code{"r"} radius, and the \code{"border_col"}
 and \code{"box_fill"} values.}
+
+\item{segment_df}{\code{data.frame} with segment coordinates, optional.}
+
+\item{do_draw}{\code{logical} indicating whether to draw the finished
+result in the context of the current open graphics device.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{...}{additional arguments are ignored.}
 }
 \description{
-Draw boundary around grouops of gridtext labels
+Draw boundary around groups of gridtext labels
 }
 \details{
 This function is a helper function used to take individual

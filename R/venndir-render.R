@@ -375,11 +375,11 @@ render_venndir <- function
          lty=1,
          lwd=1,
          fill=NA,
-         padding=2,
+         padding=3,
          x_offset=0,
          y_offset=0,
          padding_unit="pt",
-         r=2,
+         r=3,
          segment_buffer=segment_buffer,
          r_unit="pt");
       label_df_add <- setdiff(names(label_df_defaults),
@@ -671,7 +671,7 @@ render_venndir <- function
             label_df$padding[show_overlap_outside],
             label_df$padding[show_overlap_inside],
             label_df$padding[show_count_outside],
-            label_df$padding[show_count_inside]),
+            label_df$padding[show_count_inside]) * 1,#font_cex,
          r=c(
             label_df$r[show_overlap_outside],
             label_df$r[show_overlap_inside],
@@ -806,7 +806,8 @@ render_venndir <- function
       g_label <- NULL;
       vps <- NULL;
       if (length(warning_label) > 0) {
-         cp <- jamba::coordPresets("bottom");
+         cp <- jamba::coordPresets(preset="bottom",
+            preset_type="figure");
          # new method using gridtext::
          g_warning <- gridtext::textbox_grob(
             text=gsub(": ", ":<br>", warning_label),
@@ -841,7 +842,9 @@ render_venndir <- function
       g_labels <- NULL;
       if (any(show_label)) {
          #
-         g_labels <- gridtext::richtext_grob(
+         # g_labels <- gridtext::richtext_grob(
+         # print("gdf$padding:");print(gdf$padding);
+         g_labels <- gridtext_richtext_grob(
             default.units="native",
             text=gdf$text,
             x=grid::unit(gdf$x, "native"),
@@ -860,12 +863,8 @@ render_venndir <- function
                fontsize=gdf$fontsize
             ),
             box_gp=grid::gpar(
-               #col=NA,
                col=if(group_labels){NA}else{gdf$border_col},
-               #col=gdf$border_col, # used when draw_gridtext_groups() is not used
-               #fill=NA,
                fill=if(group_labels){NA}else{gdf$box_fill},
-               #fill=gdf$box_fill, # used when draw_gridtext_groups() is not used
                lty=gdf$box_lty,
                lwd=gdf$box_lwd)
          );

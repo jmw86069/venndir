@@ -60,11 +60,14 @@
 #'    set items, and whose values represent direction using 
 #'    values `c(-1, 0, 1)`.
 #' @param overlap_type `character` value indicating the type of
-#'    overlap logic: `"each"` records each combination of
-#'    signs; `"overlap"` disregards the sign and returns any match
-#'    item overlap; `"concordance"` represents counts for full
+#'    overlap logic:
+#'    * `"each"` records each combination of signs;
+#'    * `"overlap"` disregards the sign and returns any match
+#'    item overlap;
+#'    * `"concordance"` represents counts for full
 #'    agreement, or `"mixed"` for any inconsistent overlapping
-#'    direction; `"agreement"` represents full agreement in direction
+#'    direction;
+#'    * `"agreement"` represents full agreement in direction
 #'    as `"agreement"`, and `"mixed"` for any inconsistent
 #'    direction.
 #' @param return_items `logical` indicating whether to return
@@ -86,7 +89,15 @@
 #' @param ... additional arguments are passed to `list2imsigned()`.
 #' 
 #' @examples
+#' setlist <- make_venn_test(100, 2, do_signed=FALSE);
+#' 
+#' # detect overlap_type
+#' attr(signed_overlaps(setlist, "detect"), "overlap_type")
+#' 
 #' setlist <- make_venn_test(100, 2, do_signed=TRUE);
+#' 
+#' # detect overlap_type
+#' attr(signed_overlaps(setlist, "detect"), "overlap_type")
 #' 
 #' # straight overlap counts
 #' signed_overlaps(setlist, "overlap");
@@ -124,7 +135,8 @@ signed_overlaps <- function
  ...)
 {
    ##
-   overlap_type <- match.arg(overlap_type);
+   overlap_type <- match.arg(overlap_type,
+      several.ok=TRUE);
    
    ## 1sec
    # convert setlist to signed incidence matrix
@@ -132,6 +144,7 @@ signed_overlaps <- function
    if (inherits(setlist, "Matrix") || inherits(setlist, "matrix")) {
       svims <- setlist;
    } else {
+      # handle list input
       setlist <- lapply(setlist, function(i){
          if (length(names(i)) == 0) {
             if (is.numeric(i)) {
@@ -161,9 +174,17 @@ signed_overlaps <- function
          i
       });
       svims <- list2im_value(setlist);
-      if (overlap_type %in% c("detect") &&
-            all(unique(as.vector(svims)) %in% c(0, 1, NA))) {
+   }
+   
+   # handle overlap_type="detect"
+   if ("detect" %in% overlap_type) {
+      if (all(unique(as.vector(svims)) %in% c(0, 1, NA))) {
          overlap_type <- "overlap";
+      } else {
+         overlap_type <- head(setdiff(overlap_type, "detect"), 1);
+         if (length(overlap_type) == 0) {
+            overlap_type <- "concordance";
+         }
       }
    }
    

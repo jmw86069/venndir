@@ -103,6 +103,8 @@ Other venndir utility:
 \code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
 \code{\link{get_venn_shapes}()},
+\code{\link{gridtext_make_outer_box}()},
+\code{\link{gridtext_richtext_grob}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
@@ -113,6 +115,7 @@ Other venndir utility:
 \code{\link{rescale_p}()},
 \code{\link{shrink_df}()},
 \code{\link{sp_percent_area}()},
-\code{\link{venndir_label_style}()}
+\code{\link{venndir_label_style}()},
+\code{\link{venndir_legender}()}
 }
 \concept{venndir utility}
