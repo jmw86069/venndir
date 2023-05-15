@@ -46,8 +46,11 @@ a \code{data.frame}. See argument descriptions below for the
 requirements of each object.}
 
 \item{venn_spdf}{\code{sp::SpatialPolygonsDataFrame} that contains
-one polygon for each displayed overlap set. This object is
-expected to contain colnames:
+one polygon for each displayed overlap set.
+Note: In future this object will be \code{sf::sf} in form of an enhanced
+\code{data.frame} with \code{"geometry"} column holding a series of polygon
+coordinates. There will be backward compatibility for \code{sp}.
+This object is expected to contain colnames:
 \itemize{
 \item \code{"color"} with fill color;
 \item \code{"alpha"} with transparency optionally applied to \code{"color"};
@@ -235,8 +238,8 @@ only relevant when \code{label_preset} includes items, and
 \code{show_items} is active.}
 
 \item{...}{additional arguments are passed to \code{plot()}
-when plotting \code{venn_spdf} which is expected to be a
-\code{sp::SpatialPolygonsDataFrame}.}
+when plotting \code{venn_spdf} which is expected to be an object
+class \code{sf::sf} or \code{sp::SpatialPolygonsDataFrame}.}
 }
 \description{
 Render Venn or Euler diagram

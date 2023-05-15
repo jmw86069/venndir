@@ -15,8 +15,11 @@
 #'    a `data.frame`. See argument descriptions below for the
 #'    requirements of each object.
 #' @param venn_spdf `sp::SpatialPolygonsDataFrame` that contains
-#'    one polygon for each displayed overlap set. This object is
-#'    expected to contain colnames:
+#'    one polygon for each displayed overlap set.
+#'    Note: In future this object will be `sf::sf` in form of an enhanced
+#'    `data.frame` with `"geometry"` column holding a series of polygon
+#'    coordinates. There will be backward compatibility for `sp`.
+#'    This object is expected to contain colnames:
 #'    
 #'    * `"color"` with fill color;
 #'    * `"alpha"` with transparency optionally applied to `"color"`;
@@ -176,8 +179,8 @@
 #'    only relevant when `label_preset` includes items, and
 #'    `show_items` is active.
 #' @param ... additional arguments are passed to `plot()`
-#'    when plotting `venn_spdf` which is expected to be a
-#'    `sp::SpatialPolygonsDataFrame`.
+#'    when plotting `venn_spdf` which is expected to be an object
+#'    class `sf::sf` or `sp::SpatialPolygonsDataFrame`.
 #'    
 #' @examples
 #' setlist <- make_venn_test(100, 3, do_signed=TRUE);
@@ -761,20 +764,49 @@ render_venndir <- function
    }
    
    # Render the different aspects of the venndir plot
+   if (!"sf" %in% class(venn_spdf)) {
+      vosf <- sf::st_as_sf(venn_spdf);
+   } else {
+      vosf <- venn_spdf;
+   }
    if ("base" %in% plot_style) {
       # Plot the Venn polygons
       if (length(venn_spdf) > 0) {
-         sp::plot(venn_spdf,
-            asp=asp,
-            col=jamba::alpha2col(venn_spdf$color,
-               alpha=venn_spdf$alpha),
-            lwd=venn_spdf$lwd,
-            lty=venn_spdf$lty,
-            border=venn_spdf$border,
-            xlim=xlim,
-            ylim=ylim,
-            xpd=xpd,
-            ...);
+         ## corrections to allow absence of border
+         # if (any(vosf$lwd == 0)) {
+         #    vosf$border <- ifelse(vosf$lwd == 0,
+         #       "#00000000", vosf$border)
+         #    vosf$lwd <- ifelse(vosf$lwd == 0,
+         #       1, vosf$lwd)
+         # }
+         if (TRUE) {
+            plot(x=vosf[,0],
+               asp=asp,
+               xlim=xlim,
+               ylim=ylim,
+               col=jamba::alpha2col(vosf$color,
+                  alpha=vosf$alpha),
+               border=ifelse(vosf$lwd == 0,
+                  "#00000000", vosf$border),
+               lwd=ifelse(vosf$lwd == 0,
+                  1, vosf$lwd),
+               lty=vosf$lty,
+               xpd=xpd,
+               ...)
+         } else {
+            # previous plotting style to be removed
+            sp::plot(venn_spdf,
+               asp=asp,
+               col=jamba::alpha2col(venn_spdf$color,
+                  alpha=venn_spdf$alpha),
+               lwd=venn_spdf$lwd,
+               lty=venn_spdf$lty,
+               border=venn_spdf$border,
+               xlim=xlim,
+               ylim=ylim,
+               xpd=xpd,
+               ...);
+         }
       }
       # draw label line segments if needed
       if (show_segments && length(segment_df) > 0) {
@@ -790,7 +822,7 @@ render_venndir <- function
             y0=segment_df1$y,
             y1=segment_df2$y,
             color=segment_df1$color,
-            lwd=segment_df1$lwd));
+            lwd=ifelse(segment_df1$lwd == 0, 1, segment_df1$lwd)));
          xpd1 <- par(xpd=NA);
          segments(
             x0=segment_wide$x0,
@@ -963,12 +995,15 @@ render_venndir <- function
    } else if ("gg" %in% plot_style) {
       # create ggplot2 output
       # convert spdf to sf
-      vosf <- sf::st_as_sf(venn_spdf);
+      # vosf <- sf::st_as_sf(venn_spdf);
       # Venn overlap polygons
       ggv <- ggplot2::ggplot(data=vosf) + 
          ggplot2::geom_sf(
-            ggplot2::aes(fill=jamba::alpha2col(color, alpha=alpha),
+            ggplot2::aes(
+               fill=jamba::alpha2col(color, alpha=alpha),
+               linewidth=vosf$lwd,
                color=border)) + 
+         ggplot2::scale_linewidth_identity() +
          ggplot2::scale_fill_identity() +
          ggplot2::scale_color_identity();
       if (length(ggtheme) > 0) {
@@ -1111,7 +1146,8 @@ render_venndir <- function
       label_df=label_df,
       gdf=gdf,
       segment_df=segment_df,
-      g_labels=g_labels)));
+      g_labels=g_labels,
+      vosf=vosf)));
 }
 
 

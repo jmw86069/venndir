@@ -77,6 +77,18 @@
 #'    seems to be preferred, however it may be useful to return the
 #'    `grob` object for manipulation before rendering inside the active
 #'    plot. In that case, use arguments: `style="grid", draw_legend=FALSE`.
+#' @param alias `character` vector with optional set aliases, experimental
+#'    feature to allow referring to entries in `setlist` by shorter aliases.
+#'    Note that `names(alias)` must also match `names(setlist)`.
+#'    Note: The argument `labels` is more likely to be useful, since
+#'    the original call to `venndir()` should use `setlist` with aliased
+#'    names, and expanded labels would be provided separately.
+#' @param labels `character` vector with optional set labels, experimental
+#'    feature to supply a longer label associated with each entry in `setlist`.
+#'    Note that `names(labels)` must also match `names(setlist)`.
+#'    Note: The most useful workflow would be to assign short aliases to
+#'    `names(setlist)` when calling `venndir()`, then use the original long
+#'    label names as argument `labels` here.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to subsequent functions.
 #' 
@@ -146,13 +158,28 @@
 #'       base_family="sans",
 #'       padding=grid::unit(c(2, 2), "mm")))
 #' 
+#' # optional expanded labels, and subset setlist
+#' setlist <- make_venn_test(100, 5, do_signed=TRUE);
+#' vo <- venndir(setlist,
+#'    sets=c(4, 1, 2),
+#'    show_segments=FALSE,
+#'    plot_style="gg")
+#' venndir_legender(venndir_out=vo,
+#'    font_cex=0.8,
+#'    setlist=setlist,
+#'    labels=jamba::nameVector(
+#'       paste0("This is set ", LETTERS[1:5]),
+#'       names(setlist)))
+#' 
 #' @export
 venndir_legender <- function
 (setlist,
  x="bottomleft", 
  venndir_out=NULL, 
  box.lwd=0, 
- style=c("grid", "base", "data.frame"),
+ style=c("grid",
+    "base",
+    "data.frame"),
  item_type="",
  header_color="#000000",
  header_bg="#FFFFFF",
@@ -163,6 +190,8 @@ venndir_legender <- function
  font_cex=1,
  table_theme=NULL,
  draw_legend=TRUE,
+ alias=NULL,
+ labels=NULL,
  verbose=FALSE,
  ...)
 {
@@ -186,6 +215,10 @@ venndir_legender <- function
       table_theme <- gridExtra::ttheme_default(base_size=12 * font_cex)
    }
    
+   # fix names by converting newline from HTML <br> to \n
+   setlist <- fix_setlist_names(setlist)
+   
+   # pick out venn colors if available
    vodf_color <- NULL;
    if (length(venndir_out) > 0) {
       vodf <- data.frame(venndir_out$venn_spdf);
@@ -194,10 +227,22 @@ venndir_legender <- function
          vodf$venn_color,
          vodf$label);
       vodf_color <- fix_setlist_names(vodf_color)
+   } else {
+      vodf_color <- jamba::nameVector(
+         rep("#FFFFFF", length(setlist)),
+         names(setlist))
    }
-   # fix names by converting newline from HTML <br> to \n
-   setlist <- fix_setlist_names(setlist)
+   
+   # optionally subset setlist by vodf_color
+   if (length(vodf_color) > 0 &&
+         !all(names(setlist) %in% names(vodf_color))) {
+      keep_sets <- intersect(names(vodf_color),
+         names(setlist));
+      setlist <- setlist[keep_sets]
+      vodf_color <- vodf_color[keep_sets]
+   }
 
+   
    # legend data.frame
    legend_df <- data.frame(check.names=FALSE,
       stringsAsFactors=FALSE,
@@ -211,6 +256,42 @@ venndir_legender <- function
       set=names(setlist),
       size=lengths(setlist))
 
+   # optional labels
+   if (length(labels) > 0) {
+      if (!all(names(setlist) %in% names(labels))) {
+         stop("names(labels) must contain all names(setlist)")
+      }
+      legend_df$legend <- paste0(
+         names(setlist), " - ",
+         labels[names(setlist)], ": ",
+         jamba::formatInt(lengths(setlist)),
+         " ",
+         item_type)
+      gridlegend_df <- data.frame(check.names=FALSE,
+         stringsAsFactors=FALSE,
+         set=names(setlist),
+         label=labels[names(setlist)],
+         size=lengths(setlist))
+   }
+   
+   # optional alias
+   if (length(alias) > 0) {
+      if (!all(names(setlist) %in% names(alias))) {
+         stop("names(alias) must contain all names(setlist)")
+      }
+      legend_df$legend <- paste0(
+         alias[names(setlist)], " - ",
+         names(setlist), ": ",
+         jamba::formatInt(lengths(setlist)),
+         " ",
+         item_type)
+      gridlegend_df <- data.frame(check.names=FALSE,
+         stringsAsFactors=FALSE,
+         set=alias[names(setlist)],
+         label=names(setlist),
+         size=lengths(setlist))
+   }
+   
    # render legend
    if ("base" %in% style && TRUE %in% draw_legend) {
       opar <- par("xpd"=TRUE);
@@ -267,7 +348,7 @@ venndir_legender <- function
             return(gp)
          }
          # adjust the top row
-         for (icol in seq_len(ncol(legend_df))) {
+         for (icol in seq_len(ncol(gridlegend_df_use))) {
             ind <- find_cell(legend_grob, 1, icol, "colhead-bg")
             if (length(ind) > 0) {
                legend_grob$grobs[ind][[1]][["gp"]] <- update_gpar_values(
@@ -293,7 +374,7 @@ venndir_legender <- function
          }
          # iterate each row
          for (irow in seq_len(nrow(legend_df))) {
-            for (icol in seq_len(ncol(legend_df))) {
+            for (icol in seq_len(ncol(gridlegend_df_use))) {
                ind <- find_cell(legend_grob, irow + 1, icol, "core-fg")
                for (ind0 in unique(ind)) {
                   legend_grob$grobs[ind0][[1]][["gp"]] <- update_gpar_values(

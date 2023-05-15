@@ -707,7 +707,7 @@ venndir <- function
    venn_spdfs$alpha <- ifelse(vset,
       poly_alpha,
       0);
-   venn_spdfs$lwd <- 2;
+   venn_spdfs$lwd <- 0.5;
    venn_spdfs$lty <- 1;
    venn_spdfs$border <- ifelse(vset,
       jamba::makeColorDarker(

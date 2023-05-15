@@ -1,3 +1,30 @@
+# venndir 0.0.26.900
+
+## changes to existing functions
+
+* `render_venndir()`
+
+   * `plot_style="base"` now plots the `sf` form of data, rather than
+   `SpatialPolygonsDataFrame`, the first step in transitioning from `sp`
+   to `sf` prior to the deprecation of the `sp` package altogether.
+   All plotting should be equivalent.
+   * `lwd` is now honored when plotting Venn circles and polygons, and
+   `lwd=0` is silently replaced with `lwd=1` and `col="#00000000"` so
+   the borders are hidden.
+   * `plot_style="gg"` honors `lwd` as `linewidth` using
+   `ggplot2::scale_linewidth_identity()`, which unfortunately is slightly
+   larger line width than corresponding values with base R plots. Ah well.
+   * Default line width changed from `lwd=2` to `lwd=0.5`. The value is
+   not configurable in function calls, but can be edited in the venndir
+   output `list` object, in `venn_spdf`.
+
+* `venndir_legender()`
+
+   * now properly matches subset `setlist` and order of the `venndir_out`,
+   in case using a subset of `setlist` in `venndir(..., sets=c(1, 3, 4))`
+   * fixed issue with grid output when no `venndir_out` was supplied,
+   now it defaults to white background with black text.
+
 # venndir 0.0.25.900
 
 ## new functions

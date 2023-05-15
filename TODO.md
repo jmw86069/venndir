@@ -1,5 +1,84 @@
 # TODO for venndir
 
+## 09may2023
+
+* `venndir()` and `render_venndir()`
+
+   * DONE: option to hide border around polygons/circles; or adjust line width
+
+* Debug rare issue with incorrect text spacing within labels in Venn diagrams?
+
+   * appears to be some rare `grid` state where signed labels have too much
+   visible spacing between arrows and numbers, for example `"^^: 12"`
+   appears like `"^^:          12"` for most labels, but not all.
+   * a fresh R session seems to resolve the problem. Using the same
+   R object in another new R session, the venndir output is rendered normally.
+   * `dev.new()` does not resolve the problem in the new plot window.
+   * the effect is exagerrated with `unicode=TRUE`, and diminished but still
+   present with `unicode=FALSE`. Whitespace is still much wider than normal.
+
+* Debug issue when `group_labels=FALSE`.
+
+   * The main set labels are no longer positioned to left or right of the
+   incoming segment, they are positioned over center of the segment endpoint.
+   This code might be errantly inside a conditional block.
+
+* consider "normalizing" proportional polygon coordinates so the `x,y` ranges
+are roughly consistent with those used by fixed 3-way and 4-way Venns.
+Potential benefit with other functions that may use absolute or relative
+sizes for things like `segment_buffer` and `item_buffer`.
+* consider `venndir_output` object class?
+
+   * could be useful for re-use and editing
+   * suggested slotNames
+   
+      * `venn_spdf`: soon to be using `sf` in form of `data.frame`
+      
+         * contains polygons for each main set (`spdf` will change to `sf`)
+         * polygons for each individual Venn overlap
+         * colors and alpha transparency assigned to main sets
+         * `x_label,y_label` coordinates of label inside each polygon center,
+         however not used? the `label_df[,c("x","y")]` are slightly different.
+      
+      * `label_df`: `data.frame`
+      
+         * contains label information to be rendered: `text`, `venn_counts`,
+         `overlap_set`, `type`
+         * `x,y` coordinates of polygon center
+         * `x_offset,y_offset` to position label outside relative to `x,y`
+         * `segment_buffer` used for segment depth into polygon
+         * label positioning inside/outside; vjust/hjust/halign; padding
+         * optionally contains items in each overlap
+         * optional: `show_items`, `items`, `item_cex`, `item_degrees`
+         
+      * `rv_label_df`: (optional?) adjusted `data.frame` from `render_venndir()`
+      * `setlist`: new `list` representing the input data, for convenience
+
+* consider text output from `venndir_legender()` for use by `textvenn()`
+* need convenient method to adjust set labels that are too wide
+
+   * current option is to edit `names(setlist)`
+   
+      * not convenient when using `venndir()` as a one-liner
+      * in theory only the display should be affected, not actual names
+      * the returned object names would also be affected
+   
+   * option to "alias" the sets
+   
+      * use something like A, B, C
+      * DONE: show both the alias and full name in `venndir_legender()` legend
+
+   * option to adjust labels on the fly
+   
+      * custom adjustment function, rather than editing upfront in `setlist`
+      * could provide a few common adjustment functions
+      
+         * word wrap: when label is too wide, it imposes word wrapping of
+         whitespace
+         * shortener: when label is too wide, it crops and makes labels unique
+         * aliaser: assigns single values from `LETTERS` or
+         `jamba::colNum2excelName()`
+
 ## 02may2023
 
 * Overall: replace use of `sp` (SpatialPolygons) with `sf` (Simple Features)

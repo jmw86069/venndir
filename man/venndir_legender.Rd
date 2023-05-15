@@ -20,6 +20,8 @@ venndir_legender(
   font_cex = 1,
   table_theme = NULL,
   draw_legend = TRUE,
+  alias = NULL,
+  labels = NULL,
   verbose = FALSE,
   ...
 )
@@ -96,6 +98,20 @@ legend. Because this function is in development, the \code{style="grid"}
 seems to be preferred, however it may be useful to return the
 \code{grob} object for manipulation before rendering inside the active
 plot. In that case, use arguments: \verb{style="grid", draw_legend=FALSE}.}
+
+\item{alias}{\code{character} vector with optional set aliases, experimental
+feature to allow referring to entries in \code{setlist} by shorter aliases.
+Note that \code{names(alias)} must also match \code{names(setlist)}.
+Note: The argument \code{labels} is more likely to be useful, since
+the original call to \code{venndir()} should use \code{setlist} with aliased
+names, and expanded labels would be provided separately.}
+
+\item{labels}{\code{character} vector with optional set labels, experimental
+feature to supply a longer label associated with each entry in \code{setlist}.
+Note that \code{names(labels)} must also match \code{names(setlist)}.
+Note: The most useful workflow would be to assign short aliases to
+\code{names(setlist)} when calling \code{venndir()}, then use the original long
+label names as argument \code{labels} here.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
@@ -189,6 +205,19 @@ legend_grob <- venndir_legender(setlist=setlist,
    table_theme=gridExtra::ttheme_default(base_size=11,
       base_family="sans",
       padding=grid::unit(c(2, 2), "mm")))
+
+# optional expanded labels, and subset setlist
+setlist <- make_venn_test(100, 5, do_signed=TRUE);
+vo <- venndir(setlist,
+   sets=c(4, 1, 2),
+   show_segments=FALSE,
+   plot_style="gg")
+venndir_legender(venndir_out=vo,
+   font_cex=0.8,
+   setlist=setlist,
+   labels=jamba::nameVector(
+      paste0("This is set ", LETTERS[1:5]),
+      names(setlist)))
 
 }
 \seealso{
