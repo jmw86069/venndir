@@ -8,6 +8,8 @@ venndir_legender(
   setlist,
   x = "bottomleft",
   venndir_out = NULL,
+  set_colors = NULL,
+  keep_newlines = FALSE,
   box.lwd = 0,
   style = c("grid", "base", "data.frame"),
   item_type = "",
@@ -36,6 +38,14 @@ as passed to \code{graphics::legend()} when \code{style="base"}.}
 \item{venndir_out}{\code{list} object returned by \code{venndir()}, which is used
 to generate the legend counts. When supplied, the \code{set_colors} are
 also defined by this object.}
+
+\item{set_colors}{\code{character} optional vector of R colors, whose names
+should match \code{names(setlist)}. When not supplied, colors are inferred
+from \code{venndir_out}, and when that is not supplied, colors are
+defined using \code{colorjam::rainbowJam()}.}
+
+\item{keep_newlines}{\code{logical} indicating whether to keep newlines
+(line breaks) in the set labels used in the Venn legend.}
 
 \item{box.lwd}{\code{numeric} used to define the box line width,
 as passed to \code{graphics::legend()} when \code{style="base"}.}
@@ -144,6 +154,13 @@ will have already been defined and stored into \code{legend_grob$vp}
 with x position \code{legend_grob$vp$x} and y position \code{legend_grob$vp$y}.
 Total legend width is: \code{sum(legend_grob$widths)}, and
 total legend height is: \code{sum(legend_grob$heights)}.
+
+Todo:
+\itemize{
+\item Consider bottom-justifying text in each cell, so there is consistent
+alignment of labels that end in ":" with the numerical value.
+This adjustment would only affect multi-line labels.
+}
 }
 \examples{
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
@@ -218,6 +235,12 @@ venndir_legender(venndir_out=vo,
    labels=jamba::nameVector(
       paste0("This is set ", LETTERS[1:5]),
       names(setlist)))
+
+# Venn with no border, and more transparent colors
+vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
+vo124$venn_spdf$lwd <- 0.1
+render_venndir(vo124)
+venndir_legender(setlist=setlist, venndir_out=vo124)
 
 }
 \seealso{

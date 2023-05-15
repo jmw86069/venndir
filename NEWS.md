@@ -24,6 +24,13 @@
    in case using a subset of `setlist` in `venndir(..., sets=c(1, 3, 4))`
    * fixed issue with grid output when no `venndir_out` was supplied,
    now it defaults to white background with black text.
+   * new argument `keep_newlines=FALSE` which by default removes newlines
+   (line breaks) in the set labels. Use `keep_newlines=TRUE` to keep
+   line breaks as-is.
+   * new argument `set_colors` to specify optional colors to use in the table.
+   * The `poly_alpha` value used to define transparency of Venn colors
+   is honored in the color legend, using `venn_spdf$alpha`.
+   * The border color `"border"` is now honored, as is `"lwd"`.
 
 # venndir 0.0.25.900
 

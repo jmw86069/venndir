@@ -21,6 +21,12 @@
 #' Total legend width is: `sum(legend_grob$widths)`, and
 #' total legend height is: `sum(legend_grob$heights)`.
 #' 
+#' Todo:
+#' 
+#' * Consider bottom-justifying text in each cell, so there is consistent
+#' alignment of labels that end in ":" with the numerical value.
+#' This adjustment would only affect multi-line labels.
+#' 
 #' @family venndir utility
 #' 
 #' @param setlist `list` used as input to `venndir()`, which is used
@@ -30,6 +36,12 @@
 #' @param venndir_out `list` object returned by `venndir()`, which is used
 #'    to generate the legend counts. When supplied, the `set_colors` are
 #'    also defined by this object.
+#' @param set_colors `character` optional vector of R colors, whose names
+#'    should match `names(setlist)`. When not supplied, colors are inferred
+#'    from `venndir_out`, and when that is not supplied, colors are
+#'    defined using `colorjam::rainbowJam()`.
+#' @param keep_newlines `logical` indicating whether to keep newlines
+#'    (line breaks) in the set labels used in the Venn legend.
 #' @param box.lwd `numeric` used to define the box line width,
 #'    as passed to `graphics::legend()` when `style="base"`.
 #' @param style `character` string indicating the style of legend:
@@ -171,11 +183,19 @@
 #'       paste0("This is set ", LETTERS[1:5]),
 #'       names(setlist)))
 #' 
+#' # Venn with no border, and more transparent colors
+#' vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
+#' vo124$venn_spdf$lwd <- 0.1
+#' render_venndir(vo124)
+#' venndir_legender(setlist=setlist, venndir_out=vo124)
+#' 
 #' @export
 venndir_legender <- function
 (setlist,
  x="bottomleft", 
  venndir_out=NULL, 
+ set_colors=NULL,
+ keep_newlines=FALSE,
  box.lwd=0, 
  style=c("grid",
     "base",
@@ -200,9 +220,13 @@ venndir_legender <- function
    # custom function to replace newline style with \n
    fix_setlist_names <- function
    (setlist,
-    use_newline="\n")
+    use_newline="\n",
+    keep_newlines=FALSE)
    {
-      names(setlist) <- gsub(paste0(use_newline, "+"),
+      if (FALSE %in% keep_newlines) {
+         use_newline <- " ";
+      }
+      names(setlist) <- gsub(paste0("[", use_newline, "]+"),
          use_newline,
          gsub("<br>|\n",
             use_newline,
@@ -214,23 +238,63 @@ venndir_legender <- function
    if (length(table_theme) == 0) {
       table_theme <- gridExtra::ttheme_default(base_size=12 * font_cex)
    }
-   
-   # fix names by converting newline from HTML <br> to \n
-   setlist <- fix_setlist_names(setlist)
-   
+
    # pick out venn colors if available
    vodf_color <- NULL;
-   if (length(venndir_out) > 0) {
+   vodf_border <- NULL;
+   vodf_lwd <- NULL;
+   if (length(set_colors) > 0) {
+      if (!all(names(setlist) %in% names(set_colors))) {
+         stop("Not all names(setlist) were defined in names(set_colors).")
+      }
+      vodf_color <- set_colors[names(setlist)];
+      vodf_border <- jamba::makeColorDarker(jamba::unalpha(vodf_color),
+         darkFactor=1.2)
+      vodf_lwd <- rep(0.5, length(vodf_color));
+      names(vodf_lwd) <- names(vodf_color);
+   } else if (length(venndir_out) > 0) {
       vodf <- data.frame(venndir_out$venn_spdf);
       vodf <- subset(vodf, type %in% "set");
       vodf_color <- jamba::nameVector(
          vodf$venn_color,
          vodf$label);
-      vodf_color <- fix_setlist_names(vodf_color)
+      if ("alpha" %in% colnames(data.frame(venndir_out$venn_spdf))) {
+         vodf_lwd <- jamba::nameVector(
+            vodf$lwd,
+            vodf$label);
+      } else {
+         vodf_lwd <- rep(1, length(vodf$label))
+         names(vodf_lwd) <- vodf$label;
+      }
+      if ("alpha" %in% colnames(data.frame(venndir_out$venn_spdf))) {
+         vodf_ol <- subset(data.frame(venndir_out$venn_spdf),
+            type %in% "overlap" &
+               label %in% names(vodf_color))
+         vo_match <- match(vodf$label, vodf_ol$label);
+         vo_alpha <- ifelse(is.na(vo_match),
+            1,
+            vodf_ol$alpha[vo_match])
+         vodf_color <- jamba::alpha2col(vodf_color,
+            alpha=vo_alpha)
+      }
+      if ("border" %in% colnames(data.frame(venndir_out$venn_spdf))) {
+         vodf_ol <- subset(data.frame(venndir_out$venn_spdf),
+            type %in% "overlap" &
+               label %in% names(vodf_color))
+         vo_match <- match(vodf$label, vodf_ol$label);
+         vodf_border <- ifelse(is.na(vo_match),
+            header_border,
+            vodf_ol$border[vo_match])
+         names(vodf_border) <- vodf$label;
+      }
    } else {
       vodf_color <- jamba::nameVector(
          rep("#FFFFFF", length(setlist)),
          names(setlist))
+      vodf_border <- jamba::makeColorDarker(jamba::unalpha(vodf_color),
+         darkFactor=1.2)
+      vodf_lwd <- rep(0.5, length(vodf_color));
+      names(vodf_lwd) <- names(vodf_color);
    }
    
    # optionally subset setlist by vodf_color
@@ -242,6 +306,20 @@ venndir_legender <- function
       vodf_color <- vodf_color[keep_sets]
    }
 
+   # fix names by converting newline from HTML <br> to \n
+   # Note: This step must occur after subsetting by names(setlist)
+   setlist <- fix_setlist_names(setlist,
+      use_newline="\n",
+      keep_newlines=keep_newlines)
+   vodf_color <- fix_setlist_names(vodf_color,
+      use_newline="\n",
+      keep_newlines=keep_newlines)
+   vodf_border <- fix_setlist_names(vodf_border,
+      use_newline="\n",
+      keep_newlines=keep_newlines)
+   vodf_lwd <- fix_setlist_names(vodf_lwd,
+      use_newline="\n",
+      keep_newlines=keep_newlines)
    
    # legend data.frame
    legend_df <- data.frame(check.names=FALSE,
@@ -250,7 +328,9 @@ venndir_legender <- function
          jamba::formatInt(lengths(setlist)),
          " ",
          item_type),
-      color=vodf_color[names(setlist)])
+      color=vodf_color[names(setlist)],
+      border=vodf_border[names(setlist)],
+      lwd=vodf_lwd[names(setlist)])
    gridlegend_df <- data.frame(check.names=FALSE,
       stringsAsFactors=FALSE,
       set=names(setlist),
@@ -396,8 +476,8 @@ venndir_legender <- function
                      gp=legend_grob$grobs[ind0][[1]][["gp"]],
                      gp_list=list(
                         fill=legend_df$color[irow],
-                        col=header_border,
-                        lwd=lwd))
+                        col=legend_df$border[irow],
+                        lwd=legend_df$lwd[irow]))
                   if (verbose) {
                      jamba::printDebug('legend_grob$grobs[ind0][[1]][["gp"]]',' (after):');
                      print(legend_grob$grobs[ind0][[1]][["gp"]])
