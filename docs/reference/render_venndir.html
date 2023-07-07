@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.25.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
       </span>
     </div>
 
@@ -110,8 +110,11 @@ requirements of each object.</p></dd>
 
 <dt>venn_spdf</dt>
 <dd><p><code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygonsDataFrame</a></code> that contains
-one polygon for each displayed overlap set. This object is
-expected to contain colnames:</p><ul><li><p><code>"color"</code> with fill color;</p></li>
+one polygon for each displayed overlap set.
+Note: In future this object will be <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf</a></code> in form of an enhanced
+<code>data.frame</code> with <code>"geometry"</code> column holding a series of polygon
+coordinates. There will be backward compatibility for <code>sp</code>.
+This object is expected to contain colnames:</p><ul><li><p><code>"color"</code> with fill color;</p></li>
 <li><p><code>"alpha"</code> with transparency optionally applied to <code>"color"</code>;</p></li>
 <li><p><code>"border"</code> with border color, where <code>NA</code> draws no border;</p></li>
 <li><p><code>"lwd"</code> with line width; and <code>"lty"</code> with line type. Only
@@ -337,8 +340,8 @@ only relevant when <code>label_preset</code> includes items, and
 
 <dt>...</dt>
 <dd><p>additional arguments are passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
-when plotting <code>venn_spdf</code> which is expected to be a
-<code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygonsDataFrame</a></code>.</p></dd>
+when plotting <code>venn_spdf</code> which is expected to be an object
+class <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf</a></code> or <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygonsDataFrame</a></code>.</p></dd>
 
 </dl></div>
     <div id="details">
@@ -362,6 +365,49 @@ of various aspects of the figure.</p>
 <span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, overlap_type<span class="op">=</span><span class="st">"each"</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu">render_venndir</span><span class="op">(</span><span class="va">vo</span><span class="op">)</span>;</span></span>
 <span class="r-plt img"><img src="render_venndir-1.png" alt="" width="768" height="768"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:07</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">5</span>,<span style="color: #FFAF5F;">10</span>,<span style="color: #FF8700;">11</span>,<span style="color: #FFAF5F;">12</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set  text x y vjust hjust halign rot padding   r r_unit label_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  set_A&amp;set_B     9 5 5   0.5     1    0.5   0     3.0 3.0     pt #262626FF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 set_A&amp;set_B ↑↑: 4 5 5  -0.5     0    0.0   0     2.4 2.4     pt   #A73232</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 set_A&amp;set_B ↑↓: 2 5 5   0.5     0    0.0   0     2.4 2.4     pt   #9526B7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 set_A&amp;set_B ↓↓: 3 5 5   1.5     0    0.0   0     2.4 2.4     pt   #0060BF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      14.0         NA       NA       1       1           pt   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     11.2         NA       NA       1       1           pt  10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11     11.2         NA       NA       1       1           pt  11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12     11.2         NA       NA       1       1           pt  12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:07</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       set_A **set_A** 1.704031 5.084777   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:07</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">3</span>,<span style="color: #FFAF5F;">6</span>,<span style="color: #FF8700;">7</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set  text        x        y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       set_A    23 3.001953 4.962891   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       set_A ↑: 12 3.001953 4.962891   0.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       set_A ↓: 11 3.001953 4.962891   1.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 #262626FF     14.0         NA       NA       1       1           pt   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   #FFCDCD     11.2         NA       NA       1       1           pt   6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   #BCF2FF     11.2         NA       NA       1       1           pt   7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:07</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">4</span>,<span style="color: #FFAF5F;">8</span>,<span style="color: #FF8700;">9</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set text        x        y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       set_B    7 6.998047 4.962891   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       set_B ↑: 4 6.998047 4.962891   0.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       set_B ↓: 3 6.998047 4.962891   1.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 #262626FF     14.0         NA       NA       1       1           pt   4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   #A73232     11.2         NA       NA       1       1           pt   8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   #0060BF     11.2         NA       NA       1       1           pt   9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:07</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">2</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x       y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       set_B **set_B** 8.295969 5.08478   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2</span>
 <span class="r-in"><span><span class="fu">render_venndir</span><span class="op">(</span><span class="va">vo</span>, plot_style<span class="op">=</span><span class="st">"gg"</span><span class="op">)</span>;</span></span>
 <span class="r-plt img"><img src="render_venndir-2.png" alt="" width="768" height="768"></span>
 <span class="r-plt img"><img src="render_venndir-3.png" alt="" width="768" height="768"></span>
@@ -373,6 +419,20 @@ of various aspects of the figure.</p>
 <span class="r-in"><span>   show_items<span class="op">=</span><span class="st">"sign"</span>,</span></span>
 <span class="r-in"><span>   draw_buffer<span class="op">=</span><span class="cn">TRUE</span>, buffer_w<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="render_venndir-4.png" alt="" width="768" height="768"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:08</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       set_A **set_A** 1.704031 5.084777   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:08</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">2</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x       y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       set_B **set_B** 8.295969 5.08478   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2</span>
 <span class="r-in"><span>   </span></span>
 <span class="r-in"><span><span class="co"># turn off line segments, increase item inside buffer width</span></span></span>
 <span class="r-in"><span><span class="fu">render_venndir</span><span class="op">(</span><span class="va">vo</span>,</span></span>
@@ -382,6 +442,20 @@ of various aspects of the figure.</p>
 <span class="r-in"><span>   show_items<span class="op">=</span><span class="st">"sign item"</span>,</span></span>
 <span class="r-in"><span>   buffer_w<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="render_venndir-5.png" alt="" width="768" height="768"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:08</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       set_A **set_A** 1.704031 5.084777   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col  box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     pt #262626FF       14  #9B0000CC #FFEEAABB       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:08</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">2</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x       y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       set_B **set_B** 8.295969 5.08478   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col  box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     pt #262626FF       14  #AA8700CC #FFEEAABB       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2</span>
 <span class="r-in"><span><span class="fu">render_venndir</span><span class="op">(</span><span class="va">vo</span>, plot_style<span class="op">=</span><span class="st">"gg"</span>, show_set<span class="op">=</span><span class="st">"all"</span>,</span></span>
 <span class="r-in"><span>   expand_fraction<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.2</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   label_preset<span class="op">=</span><span class="st">"main items"</span>,</span></span>

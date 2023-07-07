@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.25.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
       </span>
     </div>
 
@@ -58,6 +58,111 @@
 
 <div id="todo-for-venndir" class="section level1">
 
+<div class="section level2">
+<h2 id="id_07jul2023">07jul2023<a class="anchor" aria-label="anchor" href="#id_07jul2023"></a></h2>
+<ul><li>
+<p><code><a href="reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>
+<p>label positioning</p>
+<ul><li>Count label placement should center the main counts at the target location, with signed counts offset to the right side.</li>
+<li>When main label and count label are shown together, the x-center position should be the center of the combined set label, main count label.</li>
+<li>The main goal is to have the main count positioned as well inside and centered within the Venn polygon as possible. The signed counts should be considered embellishments to the main count label, so they can be slightly outside the polygon as long as they are anchored to the main counts.</li>
+<li>Currently, the whole label is centered in the polygon, which sometimes makes the main count label appear on the border between two polygons.</li>
+<li>When set label and counts are shown together, consider placing the main label centered at the top, count label on the left, signed labels on the right, such that the signed labels are positioned at the middle relative to the count label on the left.</li>
+</ul></li>
+<li><p>Consider option to display percentage beside counts for each section, as seen in several other Venn diagram tools. It’s probably too much to include percentages with the signed counts.</p></li>
+<li><p>Consider using <code>grid</code> coordinates for more rendering, specifically so labels might be positioned relative to other objects, seen when resizing a graphical window. Probably not a use case worth “solving” now that I write it out.</p></li>
+<li><p>Line segments should more reliably point to “just inside” the polygon shape, where the overlap is more or less a fixed amount, and slightly more than the current defaults. Currently the line mostly points to the border, it’s hard to see that the line ends just inside.</p></li>
+</ul></li>
+<li>
+<p>Consider new function <code>reposition_venn_gridtext_labels()</code></p>
+<ul><li>based upon <code><a href="reference/draw_gridtext_groups.html">draw_gridtext_groups()</a></code>
+</li>
+<li>Purpose would be to adjust label positions after grobs are defined, so the actual height/width is defined, but before rendering.</li>
+<li>Currently there is a bug, when <code>group_labels=TRUE</code> for labels outside, the whole group of labels is adjusted to right/left side of the connecting line segment. When <code>group_labels=FALSE</code> this step does not occur.</li>
+<li>This function should allow re-positioning labels within a label group, such as having the title at top-center, with count labels in one or two columns beneath it, properly aligned among themselves below the title.</li>
+<li>This function could also therefore enable themes, with different types of layouts. Some themes could represent the style of popular Venn diagram packages, to facilitate using alongside those packages.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_09may2023">09may2023<a class="anchor" aria-label="anchor" href="#id_09may2023"></a></h2>
+<ul><li>
+<p><code><a href="reference/venndir.html">venndir()</a></code> and <code><a href="reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>DONE: option to hide border around polygons/circles; or adjust line width</li>
+</ul></li>
+<li>
+<p>Debug rare issue with incorrect text spacing within labels in Venn diagrams?</p>
+<ul><li>appears to be some rare <code>grid</code> state where signed labels have too much visible spacing between arrows and numbers, for example <code>"^^: 12"</code> appears like <code>"^^:          12"</code> for most labels, but not all.</li>
+<li>a fresh R session seems to resolve the problem. Using the same R object in another new R session, the venndir output is rendered normally.</li>
+<li>
+<code><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.new()</a></code> does not resolve the problem in the new plot window.</li>
+<li>the effect is exagerrated with <code>unicode=TRUE</code>, and diminished but still present with <code>unicode=FALSE</code>. Whitespace is still much wider than normal.</li>
+</ul></li>
+<li>
+<p>Debug issue when <code>group_labels=FALSE</code>.</p>
+<ul><li>The main set labels are no longer positioned to left or right of the incoming segment, they are positioned over center of the segment endpoint. This code might be errantly inside a conditional block.</li>
+</ul></li>
+<li><p>consider “normalizing” proportional polygon coordinates so the <code>x,y</code> ranges are roughly consistent with those used by fixed 3-way and 4-way Venns. Potential benefit with other functions that may use absolute or relative sizes for things like <code>segment_buffer</code> and <code>item_buffer</code>.</p></li>
+<li>
+<p>consider <code>venndir_output</code> object class?</p>
+<ul><li><p>could be useful for re-use and editing</p></li>
+<li>
+<p>suggested slotNames</p>
+<ul><li>
+<p><code>venn_spdf</code>: soon to be using <code>sf</code> in form of <code>data.frame</code></p>
+<ul><li>contains polygons for each main set (<code>spdf</code> will change to <code>sf</code>)</li>
+<li>polygons for each individual Venn overlap</li>
+<li>colors and alpha transparency assigned to main sets</li>
+<li>
+<code>x_label,y_label</code> coordinates of label inside each polygon center, however not used? the <code>label_df[,c("x","y")]</code> are slightly different.</li>
+</ul></li>
+<li>
+<p><code>label_df</code>: <code>data.frame</code></p>
+<ul><li>contains label information to be rendered: <code>text</code>, <code>venn_counts</code>, <code>overlap_set</code>, <code>type</code>
+</li>
+<li>
+<code>x,y</code> coordinates of polygon center</li>
+<li>
+<code>x_offset,y_offset</code> to position label outside relative to <code>x,y</code>
+</li>
+<li>
+<code>segment_buffer</code> used for segment depth into polygon</li>
+<li>label positioning inside/outside; vjust/hjust/halign; padding</li>
+<li>optionally contains items in each overlap</li>
+<li>optional: <code>show_items</code>, <code>items</code>, <code>item_cex</code>, <code>item_degrees</code>
+</li>
+</ul></li>
+<li><p><code>rv_label_df</code>: (optional?) adjusted <code>data.frame</code> from <code><a href="reference/render_venndir.html">render_venndir()</a></code></p></li>
+<li><p><code>setlist</code>: new <code>list</code> representing the input data, for convenience</p></li>
+</ul></li>
+</ul></li>
+<li><p>consider text output from <code><a href="reference/venndir_legender.html">venndir_legender()</a></code> for use by <code><a href="reference/textvenn.html">textvenn()</a></code></p></li>
+<li>
+<p>need convenient method to adjust set labels that are too wide</p>
+<ul><li>
+<p>current option is to edit <code>names(setlist)</code></p>
+<ul><li>not convenient when using <code><a href="reference/venndir.html">venndir()</a></code> as a one-liner</li>
+<li>in theory only the display should be affected, not actual names</li>
+<li>the returned object names would also be affected</li>
+</ul></li>
+<li>
+<p>option to “alias” the sets</p>
+<ul><li>use something like A, B, C</li>
+<li>DONE: show both the alias and full name in <code><a href="reference/venndir_legender.html">venndir_legender()</a></code> legend</li>
+</ul></li>
+<li>
+<p>option to adjust labels on the fly</p>
+<ul><li><p>custom adjustment function, rather than editing upfront in <code>setlist</code></p></li>
+<li>
+<p>could provide a few common adjustment functions</p>
+<ul><li>word wrap: when label is too wide, it imposes word wrapping of whitespace</li>
+<li>shortener: when label is too wide, it crops and makes labels unique</li>
+<li>aliaser: assigns single values from <code>LETTERS</code> or <code><a href="https://rdrr.io/pkg/jamba/man/colNum2excelName.html" class="external-link">jamba::colNum2excelName()</a></code>
+</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></div>
 <div class="section level2">
 <h2 id="id_02may2023">02may2023<a class="anchor" aria-label="anchor" href="#id_02may2023"></a></h2>
 <ul><li>
@@ -145,7 +250,7 @@
 <ul><li>calculation appears to use the overall percentage items.</li>
 <li>The default layout would place percentage velow the main counts:</li>
 </ul></li>
-</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
+</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
 </tr></thead><tbody><tr class="odd"><td align="right">overlap_count</td>
 <td rowspan="2" align="left">
 <p>^: up_counts</p>

@@ -1,3 +1,21 @@
+# venndir 0.0.27.900
+
+## changes to existing functions
+
+* `curate_venn_labels()`
+
+   * The pattern matching was improved so that it can handle replacement
+   values that may contain patterns, without re-replacing resulting
+   `character` strings.
+   For example `from="1"` will no longer match the value `"-1"`
+   when it is the first entry of `curate_df[,"from"]`.
+   Similarly, an output string that contains `"1"` will no longer be
+   re-replaced again by matching pattern `from="1"`.
+   The use case was noticed when trying to specify a gridtext font size
+   using `from=c("-1", "1")` and
+   `sign=c("<span style='font-size=18pt'>Down</span>", "<span style='font-size=18pt'>Up</span>")`
+   which caused the `"1"` to be re-replaced.
+
 # venndir 0.0.26.900
 
 ## changes to existing functions

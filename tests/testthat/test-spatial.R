@@ -1,6 +1,6 @@
 
 context("venndir spatial")
-library(venndir)
+# library(venndir)
 
 test_that("degrees_to_adj", {
    df <- data.frame(adjx=c(0, 0.5, 1, 0.5, 0),

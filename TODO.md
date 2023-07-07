@@ -1,5 +1,56 @@
 # TODO for venndir
 
+## 07jul2023
+
+* `render_venndir()`
+
+   * label positioning
+   
+      * Count label placement should center the main counts at the target
+      location, with signed counts offset to the right side.
+      * When main label and count label are shown together, the x-center
+      position should be the center of the combined set label, main count label.
+      * The main goal is to have the main count positioned as well inside
+      and centered within the Venn polygon as possible. The signed counts
+      should be considered embellishments to the main count label, so
+      they can be slightly outside the polygon as long as they are anchored
+      to the main counts.
+      * Currently, the whole label is centered in the polygon, which sometimes
+      makes the main count label appear on the border between two polygons.
+      * When set label and counts are shown together, consider placing the
+      main label centered at the top, count label on the left, signed
+      labels on the right, such that the signed labels are positioned at
+      the middle relative to the count label on the left.
+   
+   * Consider option to display percentage beside counts for each section,
+   as seen in several other Venn diagram tools. It's probably too much
+   to include percentages with the signed counts.
+   
+   * Consider using `grid` coordinates for more rendering,
+   specifically so labels might be positioned relative to other objects,
+   seen when resizing a graphical window.
+   Probably not a use case worth "solving" now that I write it out.
+   * Line segments should more reliably point to "just inside" the
+   polygon shape, where the overlap is more or less a fixed amount,
+   and slightly more than the current defaults. Currently the line mostly
+   points to the border, it's hard to see that the line ends just inside.
+
+* Consider new function `reposition_venn_gridtext_labels()`
+
+   * based upon `draw_gridtext_groups()`
+   * Purpose would be to adjust label positions after grobs are defined,
+   so the actual height/width is defined, but before rendering.
+   * Currently there is a bug, when `group_labels=TRUE` for labels outside,
+   the whole group of labels is adjusted to right/left side of the connecting
+   line segment. When `group_labels=FALSE` this step does not occur.
+   * This function should allow re-positioning labels within a label group,
+   such as having the title at top-center, with count labels in one or
+   two columns beneath it, properly aligned among themselves below the title.
+   * This function could also therefore enable themes, with different types
+   of layouts. Some themes could represent the style of popular Venn diagram
+   packages, to facilitate using alongside those packages.
+
+
 ## 09may2023
 
 * `venndir()` and `render_venndir()`

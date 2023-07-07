@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.25.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
       </span>
     </div>
 
@@ -57,6 +57,42 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.27.900" id="venndir-0027900">venndir 0.0.27.900<a class="anchor" aria-label="anchor" href="#venndir-0027900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-27-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-27-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/curate_venn_labels.html">curate_venn_labels()</a></code></p>
+<ul><li>The pattern matching was improved so that it can handle replacement values that may contain patterns, without re-replacing resulting <code>character</code> strings. For example <code>from="1"</code> will no longer match the value <code>"-1"</code> when it is the first entry of <code>curate_df[,"from"]</code>. Similarly, an output string that contains <code>"1"</code> will no longer be re-replaced again by matching pattern <code>from="1"</code>. The use case was noticed when trying to specify a gridtext font size using <code>from=c("-1", "1")</code> and <code>sign=c("&lt;span style='font-size=18pt'&gt;Down&lt;/span&gt;", "&lt;span style='font-size=18pt'&gt;Up&lt;/span&gt;")</code> which caused the <code>"1"</code> to be re-replaced.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.26.900" id="venndir-0026900">venndir 0.0.26.900<a class="anchor" aria-label="anchor" href="#venndir-0026900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-26-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-26-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>
+<code>plot_style="base"</code> now plots the <code>sf</code> form of data, rather than <code>SpatialPolygonsDataFrame</code>, the first step in transitioning from <code>sp</code> to <code>sf</code> prior to the deprecation of the <code>sp</code> package altogether. All plotting should be equivalent.</li>
+<li>
+<code>lwd</code> is now honored when plotting Venn circles and polygons, and <code>lwd=0</code> is silently replaced with <code>lwd=1</code> and <code>col="#00000000"</code> so the borders are hidden.</li>
+<li>
+<code>plot_style="gg"</code> honors <code>lwd</code> as <code>linewidth</code> using <code><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">ggplot2::scale_linewidth_identity()</a></code>, which unfortunately is slightly larger line width than corresponding values with base R plots. Ah well.</li>
+<li>Default line width changed from <code>lwd=2</code> to <code>lwd=0.5</code>. The value is not configurable in function calls, but can be edited in the venndir output <code>list</code> object, in <code>venn_spdf</code>.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>now properly matches subset <code>setlist</code> and order of the <code>venndir_out</code>, in case using a subset of <code>setlist</code> in <code>venndir(..., sets=c(1, 3, 4))</code>
+</li>
+<li>fixed issue with grid output when no <code>venndir_out</code> was supplied, now it defaults to white background with black text.</li>
+<li>new argument <code>keep_newlines=FALSE</code> which by default removes newlines (line breaks) in the set labels. Use <code>keep_newlines=TRUE</code> to keep line breaks as-is.</li>
+<li>new argument <code>set_colors</code> to specify optional colors to use in the table.</li>
+<li>The <code>poly_alpha</code> value used to define transparency of Venn colors is honored in the color legend, using <code>venn_spdf$alpha</code>.</li>
+<li>The border color <code>"border"</code> is now honored, as is <code>"lwd"</code>.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.25.900" id="venndir-0025900">venndir 0.0.25.900<a class="anchor" aria-label="anchor" href="#venndir-0025900"></a></h2>
 <div class="section level3">

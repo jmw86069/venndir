@@ -1,8 +1,8 @@
 
 context("venndir converters")
-library(venndir)
+# library(venndir)
 
-has_Matrix <- suppressPackageStartupMessages(require(Matrix));
+# has_Matrix <- suppressPackageStartupMessages(require(Matrix));
 
 test_that("list2im_opt", {
    input_list <- list(A=letters[c(1,3,5,7,9)],
@@ -35,11 +35,14 @@ test_that("list2im_opt_Matrix", {
          b=2, f=1, j=1, d=1, h=1);
       im <- list2im_opt(input_list, do_sparse=TRUE)
       
+      testthat::expect_equal(
+         as.character(class(im)),
+         "ngCMatrix")
       testthat::expect_mapequal(
-         rowSums(im),
+         apply(im, 1, sum),
          ct)
       testthat::expect_mapequal(
-         colSums(im),
+         apply(im, 2, sum),
          c(A=5, B=5, C=5, D=0))
       testthat::expect_setequal(
          rownames(im),
@@ -99,16 +102,16 @@ test_that("list2im_value", {
       b=0, f=1, j=1, d=-1, h=1);
    
    testthat::expect_mapequal(
-      rowSums(abs(im_value)),
+      apply(abs(im_value), 1, sum),
       ct)
    testthat::expect_mapequal(
-      rowSums(im_value),
+      apply(im_value, 1, sum),
       ct_value)
    testthat::expect_mapequal(
-      colSums(abs(im_value)),
+      apply(abs(im_value), 2, sum),
       c(A=5, B=5, C=5, D=0))
    testthat::expect_mapequal(
-      colSums(im_value),
+      apply(im_value, 2, sum),
       c(A=1, B=1, C=1, D=0))
    testthat::expect_setequal(
       rownames(im_value),
@@ -134,16 +137,16 @@ test_that("list2im_value", {
          b=0, f=1, j=1, d=-1, h=1);
       
       testthat::expect_mapequal(
-         rowSums(abs(im_value)),
+         apply(abs(im_value), 1, sum),
          ct)
       testthat::expect_mapequal(
-         rowSums(im_value),
+         apply(im_value, 1, sum),
          ct_value)
       testthat::expect_mapequal(
-         colSums(abs(im_value)),
+         apply(abs(im_value), 2, sum),
          c(A=5, B=5, C=5, D=0))
       testthat::expect_mapequal(
-         colSums(im_value),
+         apply(im_value, 2, sum),
          c(A=1, B=1, C=1, D=0))
       testthat::expect_setequal(
          rownames(im_value),

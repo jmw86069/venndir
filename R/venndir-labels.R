@@ -55,17 +55,26 @@ draw_gridtext_groups <- function
     verbose=FALSE)
    {
       # adapted from gridtext::richtext_grob() internals
-      if (verbose) {
+      if (TRUE || verbose) {
          jamba::printDebug("draw_gridtext_groups(): ",
             "grob_group_roundrect(),  k:", k);
          print(head(gdf[k,,drop=FALSE]));
       }
-      xmin_pt <- vapply(g_labels$children[k], function(i){min(i$xext)}, numeric(1))
-      xmax_pt <- vapply(g_labels$children[k], function(i){max(i$xext)}, numeric(1))
-      ymin_pt <- vapply(g_labels$children[k], function(i){min(i$yext)}, numeric(1))
-      ymax_pt <- vapply(g_labels$children[k], function(i){max(i$yext)}, numeric(1))
+      xmin_pt <- vapply(g_labels$children[k], function(i){
+         min(i$xext)}, numeric(1))
+      xmax_pt <- vapply(g_labels$children[k], function(i){
+         max(i$xext)}, numeric(1))
+      ymin_pt <- vapply(g_labels$children[k], function(i){
+         min(i$yext)}, numeric(1))
+      ymax_pt <- vapply(g_labels$children[k], function(i){
+         max(i$yext)}, numeric(1))
+      
+      # 0.0.27.900 - TODO: this is a convenient place for labels to be
+      # repositioned, since the height/width of each grob is defined here.
+      # They could be laid out differently here, or based upon this code.
+      
       if (!is.na(adjx[[1]]) && adjx[[1]] == 1) {
-         # right-align
+         # right-align the group of labels, so the box edge is on the right
          xmax <- grid::unit(gdf$x[k][1], "native");
          xmin <- grid::unit(gdf$x[k][1], "native") + 
                grid::unit(min(xmin_pt) - max(xmax_pt), "pt")
@@ -79,7 +88,7 @@ draw_gridtext_groups <- function
                   grid::unit(max(xmax_pt), "pt"));
          }
       } else if (!is.na(adjx[[1]]) && adjx[[1]] == 0) {
-         # left-align
+         # left-align the group of labels, so the box edge is on the left
          xmin <- grid::unit(gdf$x[k][1], "native");
          xmax <- grid::unit(gdf$x[k][1], "native") + 
             grid::unit(max(xmax_pt) - min(xmin_pt), "pt")

@@ -10,6 +10,7 @@ curate_venn_labels(
   curate_df = NULL,
   unicode = TRUE,
   blend_preset = "ryb",
+  split = " ",
   ...
 )
 }
@@ -34,6 +35,12 @@ values, it is not applied when using a custom \code{curate_df}.}
 \code{colorjam::blend_colors()} to define the color wheel used
 during color blending operations.}
 
+\item{split}{\code{character} string used to split each "sign" in the input
+string \code{x}, assumed to be space character \code{" "}. This split is required
+to process replacement for each "sign" value without iteratively
+replacing values in \code{x} which can cause re-replacement of values
+which is not intended.}
+
 \item{...}{additional arguments are ignored.}
 }
 \value{
@@ -52,6 +59,26 @@ The input currently recognizes directional labels such as
 \code{"0 -1 1 0"} or the character labels \code{"agreement"}, \code{"concordant"},
 \code{"mixed"}. Note that zeros \code{"0"} are typically removed
 before calling this function.
+
+The input vector \code{x} is split using \code{strsplit()} using whitespace
+delimiter by default, then each full value is matched and replaced
+using \code{"from"} in \code{curate_df}.
+
+When \code{curate_df} is not supplied, default values are generated
+for \code{"from"} values: \code{"1"}, \code{"-1"}, \code{"0"}, \code{"concordant|agreement"},
+and \code{"mixed"}. Values are matched using regular expression \code{gsub()}
+however the full string must match, therefore \code{from="1"} will only
+match \code{"1"} and will not match \code{"-1"}.
+
+The \code{curate_df} must contain these three colnames:
+\itemize{
+\item \code{"from"} - regular expression patterns, which will be surrounded
+by \code{"^("} and \code{")$"} to ensure complete match.
+\item \code{"sign"} - \code{character} replacement for each value matched in \code{"from"}
+when \code{type="sign"}.
+\item \code{"color"} - \code{character} R color to assign to each value matched
+in \code{"from"}, when \code{type="color"}.
+}
 }
 \examples{
 options("warn"=-1); # make them stop

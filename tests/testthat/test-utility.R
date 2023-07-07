@@ -1,6 +1,6 @@
 
 context("venndir utility")
-library(venndir)
+# library(venndir)
 
 test_that("expand_range", {
    x <- c(0, 10);
@@ -96,10 +96,10 @@ test_that("make_venn_combn_df", {
 
 test_that("make_color_contrast", {
    mcc <- make_color_contrast(c("red", "blue"), c("red", "blue"),
-      L_hi=80, L_lo=40, L_threshold=65);
-   expect_equal(
+      L_hi=85, L_lo=40, L_threshold=65, C_floor=80);
+   testthat::expect_equal(
       mcc,
-      c("#FF9090", "#B5B5FF"))
+      c("#FFB5B5", "#CBCBFF"))
 })
 
 test_that("match_list", {

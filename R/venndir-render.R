@@ -901,7 +901,7 @@ render_venndir <- function
                lwd=gdf$box_lwd)
          );
          # draw grouped label background
-         if (group_labels) {
+         if (TRUE %in% group_labels) {
             g_labels <- tryCatch({
                dgg <- draw_gridtext_groups(
                   g_labels=g_labels,

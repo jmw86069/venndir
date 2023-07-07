@@ -19,7 +19,7 @@ again in an upcoming release."><!-- mathjax --><script src="https://cdnjs.cloudf
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.25.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
       </span>
     </div>
 
@@ -71,6 +71,8 @@ again in an upcoming release.</p>
 <span>  <span class="va">setlist</span>,</span>
 <span>  x <span class="op">=</span> <span class="st">"bottomleft"</span>,</span>
 <span>  venndir_out <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  set_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep_newlines <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  box.lwd <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid"</span>, <span class="st">"base"</span>, <span class="st">"data.frame"</span><span class="op">)</span>,</span>
 <span>  item_type <span class="op">=</span> <span class="st">""</span>,</span>
@@ -83,6 +85,8 @@ again in an upcoming release.</p>
 <span>  font_cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  table_theme <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  draw_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  alias <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -104,6 +108,18 @@ as passed to <code><a href="https://rdrr.io/r/graphics/legend.html" class="exter
 <dd><p><code>list</code> object returned by <code><a href="venndir.html">venndir()</a></code>, which is used
 to generate the legend counts. When supplied, the <code>set_colors</code> are
 also defined by this object.</p></dd>
+
+
+<dt>set_colors</dt>
+<dd><p><code>character</code> optional vector of R colors, whose names
+should match <code>names(setlist)</code>. When not supplied, colors are inferred
+from <code>venndir_out</code>, and when that is not supplied, colors are
+defined using <code><a href="https://rdrr.io/pkg/colorjam/man/rainbowJam.html" class="external-link">colorjam::rainbowJam()</a></code>.</p></dd>
+
+
+<dt>keep_newlines</dt>
+<dd><p><code>logical</code> indicating whether to keep newlines
+(line breaks) in the set labels used in the Venn legend.</p></dd>
 
 
 <dt>box.lwd</dt>
@@ -180,6 +196,24 @@ seems to be preferred, however it may be useful to return the
 plot. In that case, use arguments: <code>style="grid", draw_legend=FALSE</code>.</p></dd>
 
 
+<dt>alias</dt>
+<dd><p><code>character</code> vector with optional set aliases, experimental
+feature to allow referring to entries in <code>setlist</code> by shorter aliases.
+Note that <code>names(alias)</code> must also match <code>names(setlist)</code>.
+Note: The argument <code>labels</code> is more likely to be useful, since
+the original call to <code><a href="venndir.html">venndir()</a></code> should use <code>setlist</code> with aliased
+names, and expanded labels would be provided separately.</p></dd>
+
+
+<dt>labels</dt>
+<dd><p><code>character</code> vector with optional set labels, experimental
+feature to supply a longer label associated with each entry in <code>setlist</code>.
+Note that <code>names(labels)</code> must also match <code>names(setlist)</code>.
+Note: The most useful workflow would be to assign short aliases to
+<code>names(setlist)</code> when calling <code><a href="venndir.html">venndir()</a></code>, then use the original long
+label names as argument <code>labels</code> here.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
 
@@ -212,7 +246,10 @@ will have already been defined and stored into <code>legend_grob$vp</code>
 with x position <code>legend_grob$vp$x</code> and y position <code>legend_grob$vp$y</code>.
 Total legend width is: <code>sum(legend_grob$widths)</code>, and
 total legend height is: <code>sum(legend_grob$heights)</code>.</p>
-    </div>
+<p>Todo:</p><ul><li><p>Consider bottom-justifying text in each cell, so there is consistent
+alignment of labels that end in ":" with the numerical value.
+This adjustment would only affect multi-line labels.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir utility: 
@@ -240,6 +277,96 @@ total legend height is: <code>sum(legend_grob$heights)</code>.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">9</span>,<span style="color: #FFAF5F;">22</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          overlap_set   text        x        y vjust hjust halign rot padding</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  set_A&amp;set_B&amp;set_C      1 4.999814 5.248994   0.5     1    0.5   0     3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 set_A&amp;set_B&amp;set_C ↑↑↑: 1 4.999814 5.248994   0.5     0    0.0   0     2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      r r_unit label_col fontsize border_col box_fill box_lty box_lwd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  3.0     pt #262626FF     14.0         NA       NA       1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 2.4     pt   #A73232     11.2         NA       NA       1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9            pt   9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22           pt  22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">7</span>,<span style="color: #FFAF5F;">16</span>,<span style="color: #FF8700;">17</span>,<span style="color: #FFAF5F;">18</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set  text        x        y vjust hjust halign rot padding   r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  set_A&amp;set_B     8 4.999106 6.748495   0.5     1    0.5   0     3.0 3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 set_A&amp;set_B  X: 2 4.999106 6.748495  -0.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 set_A&amp;set_B ↑↑: 3 4.999106 6.748495   0.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 set_A&amp;set_B ↓↓: 3 4.999106 6.748495   1.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      pt #262626FF     14.0         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16     pt   #5E5E5E     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17     pt   #A73232     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18     pt   #0060BF     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16  16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17  17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18  18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">8</span>,<span style="color: #FFAF5F;">19</span>,<span style="color: #FF8700;">20</span>,<span style="color: #FFAF5F;">21</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set  text        x        y vjust hjust halign rot padding   r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  set_A&amp;set_C     7 3.773922 4.632696   0.5     1    0.5   0     3.0 3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 set_A&amp;set_C  X: 2 3.773922 4.632696  -0.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 set_A&amp;set_C ↑↑: 2 3.773922 4.632696   0.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 set_A&amp;set_C ↓↓: 3 3.773922 4.632696   1.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      pt #262626FF     14.0         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19     pt   #5E5E5E     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20     pt   #A73232     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21     pt   #0060BF     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19  19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20  20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21  21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text       x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       set_A **set_A** 1.90869 6.955722   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">4</span>,<span style="color: #FFAF5F;">10</span>,<span style="color: #FF8700;">11</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set text        x        y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        set_A   16 3.019531 6.238855   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10       set_A ↑: 9 3.019531 6.238855   0.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11       set_A ↓: 7 3.019531 6.238855   1.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  #262626FF     14.0         NA       NA       1       1           pt   4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   #FFCDCD     11.2         NA       NA       1       1           pt  10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   #BCF2FF     11.2         NA       NA       1       1           pt  11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">5</span>,<span style="color: #FFAF5F;">12</span>,<span style="color: #FF8700;">13</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set text        x        y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        set_B    7 6.980469 6.238855   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12       set_B ↑: 4 6.980469 6.238855   0.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13       set_B ↓: 3 6.980469 6.238855   1.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  #262626FF     14.0         NA       NA       1       1           pt   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   #A73232     11.2         NA       NA       1       1           pt  12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13   #0060BF     11.2         NA       NA       1       1           pt  13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">2</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       set_B **set_B** 8.091055 6.956222   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">6</span>,<span style="color: #FFAF5F;">14</span>,<span style="color: #FF8700;">15</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set text        x       y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        set_C    7 5.002174 3.08082   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14       set_C ↑: 5 5.002174 3.08082   0.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15       set_C ↓: 2 5.002174 3.08082   1.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  #262626FF     14.0         NA       NA       1       1           pt   6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14   #A73232     11.2         NA       NA       1       1           pt  14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   #0060BF     11.2         NA       NA       1       1           pt  15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:31</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">3</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       set_C **set_C** 5.003101 1.700411   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">venndir_legender</span><span class="op">(</span>setlist<span class="op">=</span><span class="va">setlist</span>,</span></span>
 <span class="r-in"><span>   venndir_out<span class="op">=</span><span class="va">vo</span>,</span></span>
@@ -302,6 +429,113 @@ total legend height is: <code>sum(legend_grob$heights)</code>.</p>
 <span class="r-in"><span>      base_family<span class="op">=</span><span class="st">"sans"</span>,</span></span>
 <span class="r-in"><span>      padding<span class="op">=</span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="st">"mm"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="venndir_legender-5.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># optional expanded labels, and subset setlist</span></span></span>
+<span class="r-in"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span></span>
+<span class="r-in"><span>   sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   show_segments<span class="op">=</span><span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>   plot_style<span class="op">=</span><span class="st">"gg"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">venndir_legender</span><span class="op">(</span>venndir_out<span class="op">=</span><span class="va">vo</span>,</span></span>
+<span class="r-in"><span>   font_cex<span class="op">=</span><span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>   setlist<span class="op">=</span><span class="va">setlist</span>,</span></span>
+<span class="r-in"><span>   labels<span class="op">=</span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/nameVector.html" class="external-link">nameVector</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"This is set "</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="venndir_legender-6.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Venn with no border, and more transparent colors</span></span></span>
+<span class="r-in"><span><span class="va">vo124</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, poly_alpha<span class="op">=</span><span class="fl">0.4</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vo124</span><span class="op">$</span><span class="va">venn_spdf</span><span class="op">$</span><span class="va">lwd</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="render_venndir.html">render_venndir</a></span><span class="op">(</span><span class="va">vo124</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">9</span>,<span style="color: #FFAF5F;">19</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          overlap_set text        x        y vjust hjust halign rot padding   r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  set_A&amp;set_B&amp;set_D    1 4.999814 5.248994   0.5     1    0.5   0     3.0 3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 set_A&amp;set_B&amp;set_D X: 1 4.999814 5.248994   0.5     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9      pt #262626FF     14.0         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19     pt   #5E5E5E     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19  19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">7</span>,<span style="color: #FFAF5F;">15</span>,<span style="color: #FF8700;">16</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set  text        x        y vjust hjust halign rot padding   r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  set_A&amp;set_B     6 4.999106 6.748495   0.5     1    0.5   0     3.0 3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 set_A&amp;set_B  X: 3 4.999106 6.748495   0.0     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 set_A&amp;set_B ↑↑: 3 4.999106 6.748495   1.0     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      pt #262626FF     14.0         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15     pt   #5E5E5E     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16     pt   #A73232     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15  15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16  16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text       x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       set_A **set_A** 1.90869 6.955722   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">4</span>,<span style="color: #FFAF5F;">10</span>,<span style="color: #FF8700;">11</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set  text        x        y vjust hjust halign rot padding   r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        set_A    25 3.019531 6.238855   0.5     1    0.5   0     3.0 3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10       set_A ↑: 12 3.019531 6.238855   0.0     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11       set_A ↓: 13 3.019531 6.238855   1.0     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      pt #262626FF     14.0         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     pt   #A73232     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11     pt   #0060BF     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">8</span>,<span style="color: #FFAF5F;">17</span>,<span style="color: #FF8700;">18</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set  text        x        y vjust hjust halign rot padding   r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  set_B&amp;set_D     2 6.231376 4.632696   0.5     1    0.5   0     3.0 3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 set_B&amp;set_D ↑↑: 1 6.231376 4.632696   0.0     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 set_B&amp;set_D ↓↓: 1 6.231376 4.632696   1.0     0    0.0   0     2.4 2.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      pt #262626FF     14.0         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17     pt   #A73232     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18     pt   #0060BF     11.2         NA       NA       1       1           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17  17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18  18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">5</span>,<span style="color: #FFAF5F;">12</span>,<span style="color: #FF8700;">13</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set text        x        y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        set_B    7 6.980469 6.238855   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12       set_B ↑: 4 6.980469 6.238855   0.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13       set_B ↓: 3 6.980469 6.238855   1.0     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  #262626FF     14.0         NA       NA       1       1           pt   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   #A73232     11.2         NA       NA       1       1           pt  12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13   #0060BF     11.2         NA       NA       1       1           pt  13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">2</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       set_B **set_B** 8.091055 6.956222   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">6</span>,<span style="color: #FFAF5F;">14</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    overlap_set text        x       y vjust hjust halign rot padding   r r_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        set_D    1 5.002174 3.08082   0.5     1    0.5   0     3.0 3.0     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14       set_D ↓: 1 5.002174 3.08082   0.5     0    0.0   0     2.4 2.4     pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    label_col fontsize border_col box_fill box_lty box_lwd padding_unit num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  #262626FF     14.0         NA       NA       1       1           pt   6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14   #0060BF     11.2         NA       NA       1       1           pt  14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:07:33</span>) 07Jul2023:   <span style="color: #FF8700;">draw_gridtext_groups(): </span><span style="color: #00AFFF;">grob_group_roundrect(),  k:</span><span style="color: #FF8700;">3</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   overlap_set      text        x        y vjust hjust halign rot padding r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       set_D **set_D** 5.003101 1.700411   0.5   0.5    0.5   0       3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r_unit label_col fontsize border_col box_fill box_lty box_lwd padding_unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     pt #262626FF       14         NA       NA       1       2           pt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3</span>
+<span class="r-in"><span><span class="fu">venndir_legender</span><span class="op">(</span>setlist<span class="op">=</span><span class="va">setlist</span>, venndir_out<span class="op">=</span><span class="va">vo124</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="venndir_legender-7.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
