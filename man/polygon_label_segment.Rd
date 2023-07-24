@@ -204,6 +204,7 @@ Other venndir label:
 \code{\link{draw_gridtext_groups}()},
 \code{\link{polygon_label_fill}()},
 \code{\link{polygon_label_outside}()},
+\code{\link{reposition_venn_gridtext_labels}()},
 \code{\link{sp_polylabelr}()}
 }
 \concept{venndir label}

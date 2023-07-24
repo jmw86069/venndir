@@ -55,7 +55,7 @@ draw_gridtext_groups <- function
     verbose=FALSE)
    {
       # adapted from gridtext::richtext_grob() internals
-      if (TRUE || verbose) {
+      if (verbose) {
          jamba::printDebug("draw_gridtext_groups(): ",
             "grob_group_roundrect(),  k:", k);
          print(head(gdf[k,,drop=FALSE]));

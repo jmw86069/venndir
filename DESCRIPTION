@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.27.900
+Version: 0.0.28.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",

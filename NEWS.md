@@ -1,3 +1,23 @@
+# venndir 0.0.28.900
+
+(Still in progress.)
+
+## bug fixes
+
+* `polygon_label_fill()` threw an error when supplied with an empty
+polygon, now returns `NULL` so the upstream function can deal
+with the lack of labels. The issue appears to arise from proportional
+diagrams that use item labels, where the item label has no suitable
+polygon to use. Presumably something from the updated `eulerr` package
+that creates overlap circles/ellipses to use in these diagrams.
+
+
+## new functions
+
+* Not released: `reposition_venn_gridtext_labels()` intended to help adjust and
+re-position gridtext labels relative to optional incoming line segments,
+and with goal of enabling different layouts for combinations of labels.
+
 # venndir 0.0.27.900
 
 ## changes to existing functions

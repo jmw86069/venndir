@@ -242,6 +242,9 @@ polygon_label_fill <- function
    if (n == 0) {
       return(NULL);
    }
+   if (length(sp) == 0) {
+      return(NULL)
+   }
    
    ## expand vectors to the number of labels
    color <- rep(color, length.out=n);
@@ -444,6 +447,8 @@ polygon_label_fill <- function
    }, error=function(e){
       print("Error in get_poly_points()");
       print(e);
+      # jamba::printDebug("sp:");print(sp);# debug
+      # jamba::printDebug("sp_buffer:");print(sp_buffer);# debug
       NULL;
    });
    if (length(label_xy) == 0) {

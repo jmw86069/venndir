@@ -22,10 +22,13 @@ curate_venn_labels(
 \code{x} into corresponding directional color.}
 
 \item{curate_df}{\code{data.frame} or \code{NULL} with optional curation
-rules. The colnames are expected to contain \code{c("from", "sign", "color")}.
-In this case, each row of \code{curate_df} is applied in order,
-and \code{gsub()} is called on each \code{"from"} and replaced using
-the value in column given by \code{type}.}
+rules. The input is coerced to \code{data.frame} if necessary.
+The colnames are expected to include:
+\itemize{
+\item \code{"from"} - regular expression patterns
+\item \code{"sign"} - replacement value when \code{type="sign"}
+\item \code{"color"} - replacement R color when \code{type="color"}
+}}
 
 \item{unicode}{\code{logical} indicating whether to use Unicode characters
 when \code{type="sign"}. Note this argument only affects the default
@@ -79,6 +82,13 @@ when \code{type="sign"}.
 \item \code{"color"} - \code{character} R color to assign to each value matched
 in \code{"from"}, when \code{type="color"}.
 }
+
+When two or more replacement values defined by \code{curate_df[,"sign"]} are
+present in one entry in \code{x}, the values are concatenated together
+with no whitespace. For example \code{"1 1"} becomes \code{"^^"} with no spacing.
+To impose whitespace between characters, define \code{sign=c("^ ", "v ")}
+to include whitespace. Any leading/trailing whitespace will be removed
+afterwards.
 }
 \examples{
 options("warn"=-1); # make them stop
