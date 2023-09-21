@@ -98,6 +98,20 @@ venndir_to_df <- function
          dftall <- subset(dftall, !blank_lines);
       }
    }
+   
+   # repair set names with "<br>"
+   if (any(grepl("<br.*>", ignore.case=TRUE, dftall$overlap_set))) {
+      dftall$overlap_set <- gsub("<br[ /]*>", " ",
+         ignore.case=TRUE,
+         dftall$overlap_set);
+      names(set_colors) <- gsub("<br[ /]*>", " ",
+         ignore.case=TRUE,
+         names(set_colors));
+   }
+   
+   if ("data.frame" %in% return_type) {
+      return(dftall[, 1:4])
+   }
 
    # split by set, then subset by set/direction
    kdftall <- jamba::kable_coloring(

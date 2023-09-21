@@ -11,6 +11,7 @@ are unrelated to venndir's use of polygon geometry functions.
 
    * intended to convert Venn diagrams to `data.frame` or a user-friendly
    `kable` formatted table suitable in RMarkdown.
+   * removes `"<br>"` from setlist names when relevant.
 
 ## changes to existing functions
 
