@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.28.900
+Version: 0.0.29.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -12,7 +12,7 @@ Description: Directional Venn diagrams and set overlaps.
 Depends: R (>= 3.0.0)
 biocViews:
 Imports: jamba(>= 0.0.90.900),
-    colorjam(>= 0.0.22.950),
+    colorjam(>= 0.0.26.900),
     sp,
     sf,
     rgeos,

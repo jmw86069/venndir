@@ -38,6 +38,9 @@
 #'    indicating whether the directional label can include special
 #'    Unicode characters.
 #' @param big.mark `character` passed to `format()` for numeric labels.
+#' @param blend_preset `character` string passed as `preset` to
+#'    `colorjam::blend_colors()` to define the color wheel used
+#'    during color blending operations.
 #' @param curate_df `data.frame` or `NULL` passed to `curate_venn_labels()`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' 
@@ -76,6 +79,7 @@ textvenn <- function
  unicode=TRUE,
  big.mark=",",
  sep="&",
+ blend_preset="ryb",
  curate_df=NULL,
  verbose=FALSE,
  ...)
@@ -125,7 +129,9 @@ textvenn <- function
    if (n == 2) {
       ## 2-way Venn, one central number
       vCol <- set_color;
-      vCol12 <- colorjam::blend_colors(vCol);
+      vCol12 <- colorjam::blend_colors(vCol,
+         preset=blend_preset,
+         ...);
       
       ## Create matrix for labels
       set_colnums <- c(1,5,3)*2 - 1;
@@ -237,10 +243,18 @@ textvenn <- function
    } else if (n == 3) {
       ## 3-way Venn
       vCol <- set_color;
-      vCol12 <- colorjam::blend_colors(vCol[1:2]);
-      vCol23 <- colorjam::blend_colors(vCol[2:3]);
-      vCol13 <- colorjam::blend_colors(vCol[c(1,3)]);
-      vCol123 <- colorjam::blend_colors(vCol[c(1:3)]);
+      vCol12 <- colorjam::blend_colors(vCol[1:2],
+         preset=blend_preset,
+         ...);
+      vCol23 <- colorjam::blend_colors(vCol[2:3],
+         preset=blend_preset,
+         ...);
+      vCol13 <- colorjam::blend_colors(vCol[c(1,3)],
+         preset=blend_preset,
+         ...);
+      vCol123 <- colorjam::blend_colors(vCol[c(1:3)],
+         preset=blend_preset,
+         ...);
 
       ## Create matrix for labels
       set_colnums <- c(1,5,3, 3,2,4, 3) * 2 - 1;

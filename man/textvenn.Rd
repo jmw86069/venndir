@@ -18,6 +18,7 @@ textvenn(
   unicode = TRUE,
   big.mark = ",",
   sep = "&",
+  blend_preset = "ryb",
   curate_df = NULL,
   verbose = FALSE,
   ...
@@ -57,6 +58,10 @@ indicating whether the directional label can include special
 Unicode characters.}
 
 \item{big.mark}{\code{character} passed to \code{format()} for numeric labels.}
+
+\item{blend_preset}{\code{character} string passed as \code{preset} to
+\code{colorjam::blend_colors()} to define the color wheel used
+during color blending operations.}
 
 \item{curate_df}{\code{data.frame} or \code{NULL} passed to \code{curate_venn_labels()}.}
 

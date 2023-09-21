@@ -1,5 +1,35 @@
 # TODO for venndir
 
+## 21sep2023
+
+* Migrate from `sp` to `polyclip`
+
+   * `sp` is being retired October 2023. Decided not to use `sf` due to
+   heavy dependencies focused on geographical map software libraries
+   which are not relevant here.
+   * `polyclip` provides the basic manipulations required:
+   intersect, union, subtract, rotate, buffer.
+   * Does `venndir` need to accept past object formats with `sp` objects?
+   
+      * Migration function to convert old `sp` to new `polyclip` object.
+   
+   * Replace `venn_spdf` with `data.frame` equivalent format.
+   * Functions to port:
+   
+      * `find_vennpoly_overlaps()` - input `SpatialPolygons`,
+      output `SpatialDataFrame`
+      * `eulerr2polys()` - output `SpatialPolygons`
+      * `intersect_polygons()` - input/output `SpatialPolygons`
+      * `union_polygons()` - input/output `SpatialPolygons`
+      * `get_largest_polygon()` - input/output `SpatialPolygons`
+      * `sp_circles()`,`sp_ellipses()` - output `SpatialPolygons`
+      * `nudge_sp()` - input/output `SpatialPolygons`
+      * `rescale_sp()`,`rescale_ps()`,`rescale_p()`,`rescale_coordinates()` - ?
+      * `polygon_label_segment()`
+      * `sp_polylabelr()`
+      * `sp_percent_area()`
+      * `get_sp_buffer()`
+
 ## 07jul2023
 
 * `render_venndir()`

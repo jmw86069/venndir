@@ -20,7 +20,7 @@ This function returns the largest polygon in a
 \code{sp::SpatialPolygons} object, notably when there
 are multiple polygons contained in one object.
 The function calculates the largest area using
-\code{rgeos:gArea()}.
+\code{rgeos::gArea()}.
 
 If two polygons have identical area, the first
 polygon is returned.

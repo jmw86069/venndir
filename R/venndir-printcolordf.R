@@ -155,6 +155,10 @@ print_color_df <- function
 #' 
 #' @family venndir utility
 #'
+#' @param blend_preset `character` string passed as `preset` to
+#'    `colorjam::blend_colors()` to define the color wheel used
+#'    during color blending operations.
+#' 
 #' @examples
 #' x <- c("firebrick", "dodgerblue", "gold", "pink", "white");
 #' y <- rep("red3", 4);
@@ -178,6 +182,7 @@ make_color_contrast <- function
  C_floor=90,
  L_hi=95,
  L_lo=40,
+ blend_preset="ryb",
  do_plot=FALSE,
  cex=2,
  ...)
@@ -203,7 +208,9 @@ make_color_contrast <- function
    y1 <- jamba::alpha2col(y, alpha=y_alpha_adj);
    new_bg <- jamba::alpha2col(bg, alpha=1 - y_alpha_adj);
    ybg_list <- as.list(as.data.frame(t(cbind(y1, new_bg))));
-   new_y <- colorjam::blend_colors(ybg_list);
+   new_y <- colorjam::blend_colors(ybg_list,
+      preset=blend_preset,
+      ...);
    x_hcl <- jamba::col2hcl(x);
    y_hcl <- jamba::col2hcl(new_y);
    

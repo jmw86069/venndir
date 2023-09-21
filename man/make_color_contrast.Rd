@@ -12,10 +12,16 @@ make_color_contrast(
   C_floor = 90,
   L_hi = 95,
   L_lo = 40,
+  blend_preset = "ryb",
   do_plot = FALSE,
   cex = 2,
   ...
 )
+}
+\arguments{
+\item{blend_preset}{\code{character} string passed as \code{preset} to
+\code{colorjam::blend_colors()} to define the color wheel used
+during color blending operations.}
 }
 \description{
 Make color contrast

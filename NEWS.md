@@ -1,6 +1,23 @@
-# venndir 0.0.28.900
+# venndir 0.0.29.900
 
-(Still in progress.)
+* bumped version dependency for colorjam (>= 0.0.26.900)
+* added steps for plan to migrate from `sp` to `polyclip`, avoiding
+heavy dependencies on GDAL, GEOS, LWGEOM software libraries which
+are unrelated to venndir's use of polygon geometry functions.
+
+## new functions
+
+* `venndir_to_df()`
+
+   * intended to convert Venn diagrams to `data.frame` or a user-friendly
+   `kable` formatted table suitable in RMarkdown.
+
+## changes to existing functions
+
+* several functions have new argument `blend_preset` to enforce
+`colorjam::blend_preset()` using the RYB color preset.
+
+# venndir 0.0.28.900
 
 ## bug fixes
 

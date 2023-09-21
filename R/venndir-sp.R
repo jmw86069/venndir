@@ -96,7 +96,7 @@ eulerr2polys <- function
 #' @param preset,blend_preset `character` string passed to
 #'    `colorjam::rainbowJam()` and `colorjam::blend_colors()`,
 #'    respectively, to define the color hue wheel used for categorical
-#'    colors, and for color blending. The default `preset="dichromat"`
+#'    colors, and for color blending. The default `preset="dichromat2"`
 #'    chooses color-blindness-friendly categorical colors, and
 #'    `blend_preset="ryb"` blends multiple colors using a red-yellow-blue
 #'    color wheel, consistent with paint-type color combinations.
@@ -134,7 +134,7 @@ find_vennpoly_overlaps <- function
  venn_items=NULL,
  venn_colors=NULL,
  sep="&",
- preset="dichromat",
+ preset="dichromat2",
  blend_preset="ryb",
  sp_nudge=NULL,
  rotate_degrees=0,
@@ -497,7 +497,7 @@ match_list <- function
 #' `sp::SpatialPolygons` object, notably when there
 #' are multiple polygons contained in one object.
 #' The function calculates the largest area using
-#' `rgeos:gArea()`.
+#' `rgeos::gArea()`.
 #' 
 #' If two polygons have identical area, the first
 #' polygon is returned.

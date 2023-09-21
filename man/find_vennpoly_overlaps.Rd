@@ -10,7 +10,7 @@ find_vennpoly_overlaps(
   venn_items = NULL,
   venn_colors = NULL,
   sep = "&",
-  preset = "dichromat",
+  preset = "dichromat2",
   blend_preset = "ryb",
   sp_nudge = NULL,
   rotate_degrees = 0,
@@ -37,7 +37,7 @@ overlap set.}
 \item{preset, blend_preset}{\code{character} string passed to
 \code{colorjam::rainbowJam()} and \code{colorjam::blend_colors()},
 respectively, to define the color hue wheel used for categorical
-colors, and for color blending. The default \code{preset="dichromat"}
+colors, and for color blending. The default \code{preset="dichromat2"}
 chooses color-blindness-friendly categorical colors, and
 \code{blend_preset="ryb"} blends multiple colors using a red-yellow-blue
 color wheel, consistent with paint-type color combinations.}
