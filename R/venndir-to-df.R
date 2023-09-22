@@ -100,13 +100,21 @@ venndir_to_df <- function
    }
    
    # repair set names with "<br>"
-   if (any(grepl("<br.*>", ignore.case=TRUE, dftall$overlap_set))) {
-      dftall$overlap_set <- gsub("<br[ /]*>", " ",
-         ignore.case=TRUE,
-         dftall$overlap_set);
-      names(set_colors) <- gsub("<br[ /]*>", " ",
-         ignore.case=TRUE,
-         names(set_colors));
+   if (any(grepl("<br.*>|\n", ignore.case=TRUE, dftall$overlap_set))) {
+      dftall$overlap_set <- gsub("[ ]+", " ",
+         gsub("<br[ /]*>|\n", " ",
+            ignore.case=TRUE,
+            dftall$overlap_set))
+      names(set_colors) <- gsub("[ ]+", " ",
+         gsub("<br[ /]*>|\n", " ",
+            ignore.case=TRUE,
+            names(set_colors)))
+   }
+   if (any(grepl("<br.*>|\n", ignore.case=TRUE, dftall$overlap_sign))) {
+      dftall$overlap_sign <- gsub("[ ]+", " ",
+         gsub("<br[ /]*>|\n", " ",
+            ignore.case=TRUE,
+            dftall$overlap_sign))
    }
    
    if ("data.frame" %in% return_type) {

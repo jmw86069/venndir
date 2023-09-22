@@ -2,6 +2,14 @@
 
 ## 21sep2023
 
+* `venndir_legender()`
+
+   * For signed data, include direction labels, colorized properly.
+   `"size"` `"direction"`
+   `"579"`  `"(↑: 123, ↓: 456)"`
+   * It should call `curate_venn_labels()` which means it needs the arguments
+   `curate_df`,`unicode` to allow customization.
+
 * Migrate from `sp` to `polyclip`
 
    * `sp` is being retired October 2023. Decided not to use `sf` due to
