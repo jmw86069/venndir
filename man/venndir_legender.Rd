@@ -5,13 +5,14 @@
 \title{Add optional legend to venndir figures (developmental)}
 \usage{
 venndir_legender(
-  setlist,
+  setlist = NULL,
   x = "bottomleft",
   venndir_out = NULL,
   set_colors = NULL,
   keep_newlines = FALSE,
+  include_total = TRUE,
   box.lwd = 0,
-  style = c("grid", "base", "data.frame"),
+  style = c("grid", "data.frame"),
   item_type = "",
   header_color = "#000000",
   header_bg = "#FFFFFF",
@@ -20,6 +21,7 @@ venndir_legender(
   x_inset = grid::unit(2, "lines"),
   y_inset = grid::unit(2, "lines"),
   font_cex = 1,
+  poly_alpha = 0.8,
   table_theme = NULL,
   draw_legend = TRUE,
   alias = NULL,
@@ -248,6 +250,7 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
+\code{\link{find_venn_overlaps_JamPolygon}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{gridtext_make_outer_box}()},

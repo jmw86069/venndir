@@ -294,8 +294,13 @@ polygon_label_outside <- function
    names(sp_buffer) <- which_sp;
    
    # get bbox for the whole polygon
-   spall <- rgeos::gUnaryUnion(sp);
-   spbox <- sp::bbox(sp);
+   if ("JamPolygon" %in% class(sp)) {
+      spall <- union_JamPolygon(sp)
+      spbox <- bbox_JamPolygon(sp);
+   } else {
+      spall <- rgeos::gUnaryUnion(sp);
+      spbox <- sp::bbox(sp);
+   }
    
    # expand the bounding box
    spbox_ex <- spbox;
@@ -335,11 +340,15 @@ polygon_label_outside <- function
          center <- matrix(ncol=2, rowMeans(spbox)) + (rnorm(2) / 1000);
       } else {
          # use mean of label positions
-         center <- matrix(ncol=2,
-            colMeans(jamba::rbindList(lapply(seq_len(length(sp)), function(iwhich){
-               unlist(
-                  sp_polylabelr(sp::geometry(sp)[iwhich]))
-            }))[,c("x", "y")]));
+         if ("JamPolygon" %in% class(sp)) {
+            center <- labelr_JamPolygon(sp);
+         } else {
+            center <- matrix(ncol=2,
+               colMeans(jamba::rbindList(lapply(seq_len(length(sp)), function(iwhich){
+                  unlist(
+                     sp_polylabelr(sp::geometry(sp)[iwhich]))
+               }))[,c("x", "y")]));
+         }
       }
    } else {
       center <- matrix(ncol=2, center);
@@ -361,12 +370,19 @@ polygon_label_outside <- function
       xy)
    {
       # get polygon points
-      spi <- get_largest_polygon(sp);
-      #plot(spi, col="green", border="green3", add=TRUE)
-      spxy <- spi@polygons[[1]]@Polygons[[1]]@coords;
+      if ("JamPolygon" %in% class(sp)) {
+         spx <- unlist(sp@polygons[, "x"])
+         spy <- unlist(sp@polygons[, "y"])
+         spxy <- cbind(x=spx, y=spy);
+      } else {
+         spi <- get_largest_polygon(sp);
+         #plot(spi, col="green", border="green3", add=TRUE)
+         spxy <- spi@polygons[[1]]@Polygons[[1]]@coords;
+      }
       xy <- matrix(ncol=ncol(spxy), rep(xy, length.out=ncol(spxy)));
-      xydist <- as.matrix(dist(rbind(xy, spxy)))[-1,1];
-      xymax <- spxy[which.max(xydist),,drop=FALSE];
+      xydist <- as.matrix(dist(rbind(xy, spxy)))[-1, 1];
+      xymax <- spxy[which.max(xydist), , drop=FALSE];
+      colnames(xymin) <- c("x", "y");
       return(xymax);
    }
    
@@ -376,25 +392,37 @@ polygon_label_outside <- function
       xy)
    {
       # get polygon points
-      spi <- get_largest_polygon(sp);
-      spxy <- spi@polygons[[1]]@Polygons[[1]]@coords;
+      if ("JamPolygon" %in% class(sp)) {
+         spx <- unlist(sp@polygons[, "x"])
+         spy <- unlist(sp@polygons[, "y"])
+         spxy <- cbind(x=spx, y=spy);
+      } else {
+         spi <- get_largest_polygon(sp);
+         spxy <- spi@polygons[[1]]@Polygons[[1]]@coords;
+      }
       xy <- matrix(ncol=ncol(spxy), rep(xy, length.out=ncol(spxy)));
-      xydist <- as.matrix(dist(rbind(xy, spxy)))[-1,1];
-      xymin <- spxy[which.min(xydist),,drop=FALSE];
-      colnames(xymin) <- c("x","y");
+      xydist <- as.matrix(dist(rbind(xy, spxy)))[-1, 1];
+      xymin <- spxy[which.min(xydist), , drop=FALSE];
+      colnames(xymin) <- c("x", "y");
       cbind(xymin, dist=xydist);
    }
    
    # reference coordinate for each polygon
    polyref_xy <- jamba::rbindList(lapply(which_sp, function(iwhich){
       # get sub-polygon
-      if ("SpatialPolygonsDataFrame" %in% class(sp)) {
-         isp <- sp[iwhich,];
+      if ("JamPolygons" %in% class(sp)) {
+         isp <- sp[iwhich, ];
+      } else if ("SpatialPolygonsDataFrame" %in% class(sp)) {
+         isp <- sp[iwhich, ];
       } else {
          isp <- sp[iwhich];
       }
       if (debug > 1) {
-         sp::plot(isp, col="#44000011", add=TRUE)
+         if ("JamPolygons" %in% class(sp)) {
+            plot(isp, do_newpage=FALSE, do_pop_viewport=FALSE)
+         } else {
+            sp::plot(isp, col="#44000011", add=TRUE)
+         }
       }
       
       # get point farthest from center
@@ -405,8 +433,12 @@ polygon_label_outside <- function
          # possible check to see if xymax equals center or
          # within a small fraction compared to total bbox size,
          # if so then consider using farthest point
-         xymax <- matrix(ncol=2,
-            unlist(sp_polylabelr(isp))[c("x", "y")]);
+         if ("JamPolygon" %in% class(sp)) {
+            xymax <- labelr_JamPolygon(isp);
+         } else {
+            xymax <- matrix(ncol=2,
+               unlist(sp_polylabelr(isp))[c("x", "y")]);
+         }
          if (all(xymax == center)) {
             if (verbose) {
                jamba::printDebug("polygon_label_outside(): ",
@@ -417,7 +449,11 @@ polygon_label_outside <- function
          }
       }
       if (debug > 1) {
-         points(xymax, col="purple3", pch=20, cex=3);
+         if ("JamPolygon" %in% class(sp)) {
+            # grid::grid.points(x=xymax[,1], y=xymax[,2])
+         } else {
+            points(xymax, col="purple3", pch=20, cex=3);
+         }
       }
       xymax;
    }));
@@ -425,10 +461,10 @@ polygon_label_outside <- function
    
    # iterate multiple polygons to find angles
    angles1 <- sapply(which_sp, function(iwhich){
-      xymax <- polyref_xy[as.character(iwhich),,drop=FALSE];
+      xymax <- polyref_xy[as.character(iwhich), , drop=FALSE];
       # get reference position
-      x1 <- c(center[1,1], xymax[1,1]);
-      y1 <- c(center[1,2], xymax[1,2]);
+      x1 <- c(center[1, 1], xymax[1, 1]);
+      y1 <- c(center[1, 2], xymax[1, 2]);
       
       # add a small random value to prevent identical angles
       angle <- jamba::rad2deg(
@@ -450,7 +486,9 @@ polygon_label_outside <- function
       jamba::printDebug("polygon_label_outside(): ",
          "degree angles after spread_degrees():",
          format(angles, digits=2, trim=TRUE));
-      if ("SpatialPolygonsDataFrame" %in% class(sp)) {
+      if ("JamPolygon" %in% class(sp)) {
+         inames <- names(sp);
+      } else if ("SpatialPolygonsDataFrame" %in% class(sp)) {
          inames <- rownames(data.frame(sp));
       } else {
          inames <- names(sp);
@@ -467,8 +505,10 @@ polygon_label_outside <- function
    
    if (debug > 1) {
       for (idistance in unique(distance)) {
-         sp::plot(rgeos::gBuffer(spall, width=idistance),
-            col=NA, border="grey60", lty=2, add=TRUE);
+         if (!"JamPolygon" %in% class(sp)) {
+            sp::plot(rgeos::gBuffer(spall, width=idistance),
+               col=NA, border="grey60", lty=2, add=TRUE);
+         }
       }
    }
    
@@ -516,6 +556,7 @@ polygon_label_outside <- function
          x1use <- plsxy1[1,1];
          y1use <- plsxy1[1,2];
       }
+      # Todo: adapt polygon_label_segment() for JamPolygon input.
       plsxy <- polygon_label_segment(
          sp=isp,
          sp_buffer=sp_buffer[[as.character(iwhich)]],
@@ -556,6 +597,7 @@ polygon_label_outside <- function
       }
       return(segmentxy);
    });
+   # Todo: Adapt below to handle class "JamPolygon"
    if ("SpatialPolygonsDataFrame" %in% class(sp)) {
       if (length(rownames(data.frame(sp))) == 0) {
          names(segmentxy_list) <- which_sp;

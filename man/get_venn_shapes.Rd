@@ -68,6 +68,7 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
+\code{\link{find_venn_overlaps_JamPolygon}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{gridtext_make_outer_box}()},
 \code{\link{gridtext_richtext_grob}()},

@@ -59,6 +59,7 @@ Other venndir label:
 \code{\link{polygon_label_fill}()},
 \code{\link{polygon_label_outside}()},
 \code{\link{polygon_label_segment}()},
+\code{\link{polygon_list_label_segment}()},
 \code{\link{sp_polylabelr}()}
 }
 \concept{venndir label}

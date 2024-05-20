@@ -222,7 +222,7 @@
 #'    the sign and counts, when `overlap_type` is not `"overlap"`.
 #' @param ... additional arguments are passed to `render_venndir()`.
 #' 
-#' @family venndir core
+#' @family venndir deprecated
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 3);
@@ -284,7 +284,7 @@
 #' 
 #' 
 #' @export
-venndir <- function
+venndir_OLD <- function
 (setlist,
  overlap_type=c("detect",
     "concordance",
@@ -328,6 +328,7 @@ venndir <- function
  sign_count_delim=": ",
  do_plot=TRUE,
  verbose=FALSE,
+ debug=0,
  ...)
 {
    # basic workflow:
@@ -517,10 +518,22 @@ venndir <- function
          color="#00000000",
          label=venn_sp_names))
    venn_spdf$type <- "overlap";
+   if (1 %in% debug) {
+      venn_spdf1m <- sp::merge(venn_spdf1,
+         venn_spdf,
+         all.x=TRUE);
+      return(list(venn_spdf=venn_spdf,
+         venn_spdf1=venn_spdf1,
+         venn_spdf1m=venn_spdf1m));
+   }
    venn_spdf1 <- sp::merge(venn_spdf1,
       venn_spdf,
       all.x=TRUE);
    venn_spdf1$type <- "set";
+   if (2 %in% debug) {
+      return(list(venn_spdf=venn_spdf,
+         venn_spdf1=venn_spdf1));
+   }
    venn_spdf1 <- sp::spChFIDs(venn_spdf1,
       paste0(venn_spdf1$label, "|set"));
    venn_spdf1$color <- set_color[venn_spdf1$label];
@@ -528,6 +541,11 @@ venndir <- function
    # merge set and overlap polygons
    venn_spdfs <- rbind(venn_spdf1[,colnames(data.frame(venn_spdf))],
       venn_spdf);
+   if (3 %in% debug) {
+      return(list(venn_spdf=venn_spdf,
+         venn_spdf1=venn_spdf1,
+         venn_spdfs=venn_spdfs));
+   }
    
    # generate default set label positions outside the polygons
    # choose last entry in spdf for each unique label
@@ -627,7 +645,14 @@ venndir <- function
    venn_text <- jamba::formatInt(
       jamba::rmNA(naValue=0,
          nlabel_df$venn_counts));
-
+   if (4 %in% debug) {
+      return(list(venn_spdf=venn_spdf,
+         venn_spdf1=venn_spdf1,
+         venn_spdfs=venn_spdfs,
+         nlabel_df=nlabel_df,
+         venn_text=venn_text));
+   }
+   
    x_main <- nlabel_df$x_label;
    y_main <- nlabel_df$y_label;
    vjust_main <- rep(0.5, length(x_main));
@@ -855,6 +880,14 @@ venndir <- function
          retlist$gg <- gg;
       }
    }
-
+   if (5 %in% debug) {
+      return(list(venn_spdf=venn_spdf,
+         venn_spdf1=venn_spdf1,
+         venn_spdfs=venn_spdfs,
+         nlabel_df=nlabel_df,
+         venn_text=venn_text,
+         gg=gg));
+   }
+   
    return(invisible(retlist));
 }

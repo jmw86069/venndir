@@ -56,6 +56,7 @@ Other venndir label:
 \code{\link{polygon_label_fill}()},
 \code{\link{polygon_label_outside}()},
 \code{\link{polygon_label_segment}()},
+\code{\link{polygon_list_label_segment}()},
 \code{\link{reposition_venn_gridtext_labels}()}
 }
 \concept{venndir label}

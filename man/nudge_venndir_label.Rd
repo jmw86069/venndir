@@ -31,7 +31,7 @@ vo <- nudge_venndir_label(vo,
    set=c("set_A&set_B&set_C"),
    x_offset=3,
    y_offset=-1)
-render_venndir(vo,
+render_venndir_OLD(vo,
    main="After nudging one count label")
 
 }
@@ -40,6 +40,7 @@ Other venndir utility:
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
+\code{\link{find_venn_overlaps_JamPolygon}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{gridtext_make_outer_box}()},

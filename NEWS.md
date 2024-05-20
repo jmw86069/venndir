@@ -1,3 +1,121 @@
+# venndir 0.0.30.900
+
+**The polyclip update.** Removing all remnants of `sp` and `rgeos`.
+
+Major change, all functions ported or rewritten not to rely upon `sp`,
+`rgeos`, and `sf`, since the migration to `sf` would also incur heavy
+burden of installing `sf` and all its map/geography-related system
+libraries.
+
+Backward compatibility is limited for pre-existing venndir output,
+since `rgeos` was removed from CRAN (ugh). In principle a pre-existing
+object could be re-run to produce the new object output.
+
+Attempts were made for `venndir()` to produce output equivalent to previous
+versions, but it is unclear how practical that may be.
+
+All graphical output uses `grid`, no support for `base` or `ggplot2`.
+The `grid` output was chosen since it can be conveniently combined
+into panels using `patchwork` or `cowplot`, while offering more robust
+features to position graphical components, also keeping 1:1 aspect ratio
+so Venn circles remain circular.
+
+New S4 objects:
+
+* `JamPolygon` - makeshift polygon `data.frame` to hold one polygon per row
+(where one "polygon" may be represented as a multi-part polygon with optional
+holes or nested holes.) This object makes calling `polyclip` and `grid`
+functions more reliable, since they recognize slightly different formats.
+* `Venndir` - replacement for `list` output, with equivalent content.
+Will transition to function accessors to obtain content, removing
+need for direct list access.
+
+
+## venndir package changes
+
+* added `pracma`, `polyclip`, `vwline` to Depends.
+* removed `sf`, `sp`, `rgeos` from Depends. (Ack)
+* removed `ggtext` from Depends, all output uses `gridtext` or `grid`.
+* replaced `venndir()` and `render_venndir()` with new versions,
+very temporarily moving previous functions to `venndir_OLD()` and
+`render_venndir_OLD()`.
+* new function for item label fill, previously called `sp::spsample()`.
+
+
+## new `JamPolygon` object and functions
+
+(It may eventually become its own R package.)
+
+* `JamPolygon` is intended to provide a very basic mechanism to store
+polygon coordinates with the following design:
+
+   * One "polygon" is stored on one row of a `data.frame`.
+   * One "polygon" can include multiple parts, for example including holes,
+   nested polygons (polygon inside the hole of the parent polygon), and
+   disjoint/separate polygon components. For example one "polygon"
+   could represent multiple separate shapes, each with or without holes
+   and enclosed polygons.
+   The driving reason is to handle proportional Venn diagrams,
+   which sometimes have a set fully enclosed inside another set
+   which creates a hole in the larger set; sometimes two elliptical polygons
+   overlap in the middle at an angle, so the unique portion of one ellipse
+   is split into two parts.
+   * Multi-part polygons are assumed to be simplified, with no overlapping
+   solid regions. (Polygons are combined with `union_JamPolygon()`.)
+   * Multi-part polygons always use `"evenodd"` logic, so any inner
+   polygon is assumed to be a hole, and any polygon inside a hole is
+   assumed to be solid. This logic is applied regardless the
+   clockwise/counterclockwise orientation of points for each polygon
+   (polyclip convention: solid is clockwise, holes are counter-clockwise).
+   Calls to `polyclip` functions will adjust the polygon orientation
+   as needed for the purpose of using `polyclip`, but these details
+   are not important for `JamPolygon` itself.
+   * Other properties can be associated with the polygon row, to help
+   maintain and view these associations in a convenient way:
+   name, label, fill, border, border.lwd, fontsize, family,
+   innerborder, innerborder.lwd.
+   * Optional properties can be added to describe multi-polygon rows:
+   orientation, polygon_holes, polygon_clockwise, polygon_parent.
+   They are mostly useful for internal functions.
+   * `innerborder` is a new feature, my selfish desire to enable borders
+   that are not overdrawn with adjacent polygons (which share the same border
+   but on different sides). It requires a brilliant package `vwline`
+   to draw variable-width lines (thanks Paul Murrell). It also requires
+   knowledge of the direction lines are drawn, in order to define
+   left/right border relative to the path taken when rendering the border.
+   * All plot rendering uses `grid` graphics. All coordinates are
+   encoded in the `JamPolygon` object, so they can be plotted separately,
+   however `plot()` and `plot.JamPolygon()` use `grid`.
+
+* Some supporting functions for `JamPolygon`:
+
+   * `plot.JamPolygon()` - `grid` draw function for `JamPolygon` objects
+   * `rbind2()` - generic function to combine multiple `JamPolygon` objects
+   * `bbox_JamPolygon()` - bounding box enclosing all polygons
+   * `area_JamPolygon()` - area for each row, accounting for holes and nested
+   polygons.
+   * `buffer_JamPolygon()` - expand or shrink polygon borders
+   * `point_in_JamPolygon()` - test for point inside solid portion of polygons
+   * `has_point_in_JamPolygon()` - logical presence/absence of point in any
+   solid polygon
+   * `add_orientation_JamPolygon()` - adds polygon/multipolygon orientation,
+   including holes, clockwise, and parent enclosing polygon.
+   * `labelr_JamPolygon()` - define best label position within each polygon
+   * `minus_JamPolygon()` - first polygon, removing subsequent polygons
+   * `union_JamPolygon()` - combine and simplify all polygons into one row
+   * `intersect_JamPolygon()` - first polygon, intersecting subsequent polygons
+   * `sample_JamPolygon()` - define sample points within solid polygon
+   * `split_JamPolygon()` - split multi-part polygons onto separate rows.
+   Note that holes become solid polygons during this step.
+   * `polyclip_to_JamPolygon()` - convert `polyclip::polyclip()` output
+   to `JamPolygon`.
+
+## New object `Venndir` for venndir output
+
+* Intended to replace previous `list` format, with data accessor functions
+instead of direct access to list components.
+
+
 # venndir 0.0.29.900
 
 * bumped version dependency for colorjam (>= 0.0.26.900)

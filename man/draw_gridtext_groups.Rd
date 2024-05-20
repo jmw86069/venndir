@@ -8,6 +8,7 @@ draw_gridtext_groups(
   g_labels,
   gdf,
   segment_df = NULL,
+  adjust_center = FALSE,
   do_draw = TRUE,
   verbose = FALSE,
   ...
@@ -29,6 +30,15 @@ and \code{"box_fill"} values.}
 
 \item{segment_df}{\code{data.frame} with segment coordinates, optional.}
 
+\item{adjust_center}{\code{logical} indicating whether to adjust the x-centering
+for a group of labels when \code{adjx=0.5}, using the total width of the
+group of labels. When FALSE (default) the label x-position is not
+adjusted, which assumes labels are already oriented properly with
+respect to the x-axis position.
+This option is \code{FALSE} specifically for two-column labels positioned
+around a fixed centerpoint, where one column could be wider than the
+other, and it would otherwise push the other column the other way.}
+
 \item{do_draw}{\code{logical} indicating whether to draw the finished
 result in the context of the current open graphics device.}
 
@@ -40,7 +50,7 @@ result in the context of the current open graphics device.}
 Draw boundary around groups of gridtext labels
 }
 \details{
-This function is a helper function used to take individual
+This function is an internal function used to take individual
 labels defined by \code{gridtext::richtext_grob()}, and creating
 \code{grid::roundrectGrob()} objects that cover each group of
 labels with one rounded rectangular boundary.
@@ -50,6 +60,7 @@ Other venndir label:
 \code{\link{polygon_label_fill}()},
 \code{\link{polygon_label_outside}()},
 \code{\link{polygon_label_segment}()},
+\code{\link{polygon_list_label_segment}()},
 \code{\link{reposition_venn_gridtext_labels}()},
 \code{\link{sp_polylabelr}()}
 }

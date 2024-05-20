@@ -296,6 +296,7 @@ Other venndir label:
 \code{\link{draw_gridtext_groups}()},
 \code{\link{polygon_label_fill}()},
 \code{\link{polygon_label_segment}()},
+\code{\link{polygon_list_label_segment}()},
 \code{\link{reposition_venn_gridtext_labels}()},
 \code{\link{sp_polylabelr}()}
 }

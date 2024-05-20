@@ -14,6 +14,10 @@ reference:
   desc: Functions to help import and convert data
   contents:
   - has_concept("venndir conversion")
+- title: JamPolygon object and functions
+  desc: Functions for JamPolygon objects
+  contents:
+  - has_concept("JamPolygon")
 - title: venndir Spatial Functions
   desc: Functions for spatial objects and polygon manipulation
   contents:
@@ -26,6 +30,10 @@ reference:
   desc: Internal venndir utility functions
   contents:
   - has_concept("venndir utility")
+- title: venndir deprecated functions
+  desc: Deprecated functions losing support
+  contents:
+  - has_concept("venndir deprecated")
 - title: venndir plotly functions (experimental)
   desc: Functions for plotly compatibility (experimental)
   contents:

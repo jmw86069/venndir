@@ -15,8 +15,6 @@
 #' 
 #' @param x output from `eulerr::euler()`
 #' 
-#' @import sp
-#' @import rgeos
 #' 
 #' @export
 eulerr2polys <- function
@@ -1462,7 +1460,9 @@ polygon_label_segment <- function
             jamba::printDebug("polygon_label_segment(): ",
                "j:", j, ", spi[j]:", spi[j]);
          }
-         if (is.list(sp)) {
+         if ("JamPolygon" %in% class(sp)) {
+            sp_use <- sp[spi[j], ];
+         } else if (is.list(sp)) {
             sp_use <- sp[[spi[j]]];
          } else {
             sp_use <- sp[spi[j]];
@@ -1486,11 +1486,13 @@ polygon_label_segment <- function
    }
    
    lxy <- cbind(c(x0, x1), c(y0, y1));
-   sl <- sp::SpatialLines(list(sp::Lines(list(sp::Line(lxy)), ID="a")))
-   spt <- sp::SpatialPoints(lxy);
+   if (!"JamPolygon" %in% class(sp)) {
+      sl <- sp::SpatialLines(list(sp::Lines(list(sp::Line(lxy)), ID="a")))
+      spt <- sp::SpatialPoints(lxy);
+   }
 
    # optional debug plot
-   if (TRUE %in% plot_debug) {
+   if (TRUE %in% plot_debug && !"JamPolygon" %in% class(sp)) {
       xlim <- range(c(sp::bbox(sp)[1,],
          lxy[,1]), 
          na.rm=TRUE);
@@ -1517,7 +1519,11 @@ polygon_label_segment <- function
    if (is.list(sp)) {
       sp <- sp[[1]];
    }
-   if (is.numeric(sp_buffer) && !sp_buffer %in% 0) {
+   if ("JamPolygon" %in% class(sp)) {
+      #
+      # Todo: grow polygon in size using sp_buffer
+      #
+   } else if (is.numeric(sp_buffer) && !sp_buffer %in% 0) {
       sp <- get_sp_buffer(sp,
          sp_buffer=sp_buffer,
          relative=relative,
@@ -1536,7 +1542,22 @@ polygon_label_segment <- function
             add=TRUE)
       }
    }
-   if (rgeos::gContains(sp, sl)) {
+   
+   # check line inside polygon
+   if ("JamPolygon" %in% class(sp)) {
+      P <- list(x=lxy[, 1], y=lxy[, 2]);
+      point_inside <- polyclip::pointinpolygon(P=P,
+         A=list(x=sp@polygons[, "x"],
+            y=sp@polygons[, "y"]));
+      # jamba::printDebug("point_inside:");print(point_inside);
+      #
+      # Todo: Draw the rest of the owl.
+      #
+      # If one point is inside, one outside - it intersects.
+      # If both inside, line must be extended.
+      # It neither inside, we have a problem.
+      #
+   } else if (rgeos::gContains(sp, sl)) {
       # return if sl is fully contained inside sp
       if (verbose) {
          jamba::printDebug("polygon_label_segment(): ",

@@ -1,5 +1,179 @@
 # TODO for venndir
 
+## 02may2024
+
+* `venndir_legender()`
+
+   * Use "Set" and "Size" capitalized.
+   * Left-align text in "Set" column; right-align numbers in "Size".
+   * Consider option not to colorize the table rows.
+   * Consider adding a column "Color" with filled cell. Bonus points
+   for having the color be a perfect square (not rectangular).
+   * Apply contrasting color, when rows are filled with `set_colors`,
+   currently text is always black.
+
+## 23apr2024
+
+* `plot.JamPolygon()`, `plot()` (JamPolygon)
+
+   * Allow and document how to create a multi-panel plot.
+   For example, how can it be used with `patchwork` to assemble a
+   Venn diagram beside a heatmap, or beside output from `plot_sedesign()`?
+
+## 22apr2024
+
+* `render_venndir()` throws font-related warnings when the output PNG or PDF
+font library is not found, and sometimes substitutes Unicode characters
+with `"."`. It seems to happen uniquely to PDF output, might be platform-
+and device-dependent. Some suggested workarounds include:
+
+   * Use `extrafonts` package to import the desired fonts. Not tested.
+   * Use specific `fontfamily` which is recognized for the requested output,
+   however in RMarkdown when creating PNG and PDF files for the same chunk,
+   it appears that the PNG and PDF recognized fonts are not consistent.
+
+
+## 22mar2024
+
+* Remove all `sp`,`sf`,`rgeos` functions
+* Remove all portions of remaining functions that call `sp`,`sf`,`rgeos`
+
+   * `polygon_label_segment()` - still uses a hybrid approach,
+   accepting sp and jp objects.
+
+* Verify the new `venndir()` returns equivalent data as `venndir_OLD()`
+even if it is returned in different manner.
+
+   * Clean up output data format
+
+* Verify `render_venndir_polyclip()` accepts equivalent input data.
+* Consider making `venndir()` output equivalent to previous versions,
+so that methods that expect specific output might still work?
+* Consider S4 `Venndir` object, with slot names:
+
+   * slots:
+
+      * `jp` - set polygons, name, label, color
+      * `jps` - set/overlap polygons, name, label, type, overlap
+      * `label_df` - overlap count, signed count, count label, items (optional)
+      * `setlist` - the input `setlist` for easy reference
+   
+   * methods:
+   
+      * `validate()` - check internal consistency, set names, overlaps, label xy
+      
+         * names(setlist) matches names(jp), are found in names(jps)
+         * jps overlap names -> set names -> found in names(setlist), names(jp)
+         * label_df overlap names all present in jps overlap names
+         * label_df specific overlap count sum equals jps overlap count
+
+      * `setlist()` - accessor for `setlist` slot
+      * `im()` - calls `list2im_opt()`
+      * `im_signed()` (or `im_value()`) - calls `list2im_value()`
+      * `plot()` - calls `render_venndir()`
+
+* label positioning shorthand: NOCPSI
+
+   * Set _N_ame, _O_verlap Name, _C_ount, _P_ercentage, _S_igned, _I_tems
+   * uppercase is "outside", lowercase is "inside" the relevant polygon
+   * Default: Ncps: set _N_ame outside; _c_ount/_s_igned inside, others hidden
+   * To show items: NCSi: _N_ame/_C_ount/_S_igned outside; items inside
+
+* consider table item display inside/outside
+
+   * `gridExtra::tableGrob()` with 1 to 3 columns, which could be positioned
+   beneath other name/count labels. Seen in published Venn diagram figure.
+   Probably only works well for a small number of items.
+
+## 13mar2024
+
+* Optionally display overall percentage below main count label.
+* Consider `JamPolygon` which is a `data.frame`:
+
+   * `data.frame` details:
+   
+      * Each row is strictly one polygon, multipart polygons are still one row.
+      * `x`: `list` column with one or more `numeric` vectors.
+      * `y`: `list` column with one or more `numeric` vectors.
+      * `name` - unique entry, essentially `rownames()`
+      * `label` -  by default uses `name` but can be anything including `NA`,
+      also it can contain the same label as another polygon.
+      
+         * Unclear whether it can store `gridtext::richtext_grob()`?
+      
+      * `labels` - optional, label each multipart polygon - not implemented yet
+      * `fill` - internal polygon fill color
+      * `border`, `border.lwd`, `border.lty` - outer border
+      
+         * Consider R package `vwline` for variable width lines, part of
+         which enables rendering the outer/inner portion of a line.
+      
+      * `innerborder`, `innerborder.lwd`, `innerborder.lty` - inner border
+      * `family`, `fontsize` - `grid::gpar()` for the label.
+      * `label_x`, `label_y` - to position the label inside the polygon
+      * `outerlabel_x`, `outerlabel_y` - to position the label outside the polygon?
+
+   * `plot.JamPolygon()`
+   
+      * Wrapper to render `JamPolygon` likely using `grid` methods.
+   
+   * `print.JamPolygon()`, `summary.JamPolygon()`
+   
+      * summary function to print contents, probably using `print.data.frame`
+
+
+## 12feb2024
+
+* Idea: Consider reporting "overlaps not shown" using `gridExtra::grid.table()`
+* Related: Could `gridExtra::grid.table()` be used for Venn labels?
+
+   * It would need to be rendered with `textGrob()` then replaced with
+   `gridtext::richtext_grob()`
+
+* Marry `gridtext` and `ggrepel` for non-overlapping labels.
+
+   * Follow: https://github.com/wilkelab/gridtext/issues/33
+   There is a working pull request in `gridtext`, pending changes in `ggrepel`.
+   Just awaiting each package author approval.
+
+* `venndir_legendir()`
+
+   * Consider option to display "Total" unique items as the bottom row.
+
+* Fix issue with Venn numeric label coloring when background color is dark.
+
+   * The `venndir_legendir()` label shows light text correctly, the signed
+   labels appear to be adjusted correctly, but the count label appears
+   not to be adjusted correctly. Some cells are correct, others are not,
+   suggesting this is a mismatched ordering issue.
+   Observed with 4-way Venn, it appears only the overlap regions adjust
+   text, not the unique-set regions.
+
+
+## 27nov2023
+
+* Urgent: Transition from `sp` and `rgeos` to `polyclip` since `rgeos`
+has been removed from CRAN. Ugh.
+
+   * Current status:
+   
+      * Most individual functions are ported with equivalent functions
+      provided by `polyclip::polyclip()`.
+      * There are still edge cases with polygons having holes, nested polygons
+      (multi-part polygons) which are not handled consistently.
+
+## 04oct2023
+
+* debug issue when LOCALE is "C" the labels are not shown, and
+error is generating saying `gridtext` does not recognize characters,
+referencing some simple unicode characters (up/down arrows, etc.)
+
+   * workaround is to change LOCALE to `"en_US.UTF-8"` with:
+   `Sys.setlocale("LC_ALL", "en_US.UTF-8")` but unclear why it's a problem?
+   This workaround does not seem portable for other actual locales.
+
+* Optionally display overall percentage below main count label
+
 ## 21sep2023
 
 * `venndir_legender()`

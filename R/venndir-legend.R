@@ -191,14 +191,14 @@
 #' 
 #' @export
 venndir_legender <- function
-(setlist,
+(setlist=NULL,
  x="bottomleft", 
  venndir_out=NULL, 
  set_colors=NULL,
  keep_newlines=FALSE,
+ include_total=TRUE,
  box.lwd=0, 
  style=c("grid",
-    "base",
     "data.frame"),
  item_type="",
  header_color="#000000",
@@ -208,6 +208,7 @@ venndir_legender <- function
  x_inset=grid::unit(2, "lines"),
  y_inset=grid::unit(2, "lines"),
  font_cex=1,
+ poly_alpha=0.8,
  table_theme=NULL,
  draw_legend=TRUE,
  alias=NULL,
@@ -238,6 +239,26 @@ venndir_legender <- function
    if (length(table_theme) == 0) {
       table_theme <- gridExtra::ttheme_default(base_size=12 * font_cex)
    }
+   
+   # construct setlist if not provided
+   total_items <- NULL;
+   if (length(setlist) == 0) {
+      if (length(venndir_out) == 0) {
+         stop("Either setlist or venndir_out must be provided.");
+      }
+      vodf <- venndir_out$venn_jps@polygons;
+      vodf1 <- subset(vodf, type %in% "overlap");
+      total_items <- sum(vodf1$venn_counts);
+      # vodf1[, c("venn_name", "venn_counts")]
+      vodf_names <- strsplit(vodf1$venn_name, "&");
+      vodf_levels <- unique(unlist(vodf_names));
+      vodf_counts <- rep(vodf1$venn_counts, lengths(vodf_names));
+      vodf_split <- factor(unlist(vodf_names), levels=vodf_levels);
+      setlist_sizes <- sapply(split(vodf_counts, vodf_split), sum);
+      setlist <- lapply(setlist_sizes, function(i){
+         rep(1, length.out=i)
+      })
+   }
 
    # pick out venn colors if available
    vodf_color <- NULL;
@@ -253,39 +274,49 @@ venndir_legender <- function
       vodf_lwd <- rep(0.5, length(vodf_color));
       names(vodf_lwd) <- names(vodf_color);
    } else if (length(venndir_out) > 0) {
-      vodf <- data.frame(venndir_out$venn_spdf);
-      vodf <- subset(vodf, type %in% "set");
+      vodf_all <- venndir_out$venn_jps@polygons;
+      # jamba::printDebug("vodf_all:");print(vodf_all);# debug
+      use_label <- head(intersect(c("label", "name"),
+         colnames(vodf_all)), 1);
+      
+      vodf <- subset(vodf_all, type %in% "set");
       vodf_color <- jamba::nameVector(
          vodf$venn_color,
-         vodf$label);
-      if ("alpha" %in% colnames(data.frame(venndir_out$venn_spdf))) {
+         vodf[[use_label]]);
+      if ("alpha" %in% colnames(vodf)) {
          vodf_lwd <- jamba::nameVector(
-            vodf$lwd,
-            vodf$label);
+            vodf$border.lwd,
+            vodf[[use_label]]);
       } else {
-         vodf_lwd <- rep(1, length(vodf$label))
-         names(vodf_lwd) <- vodf$label;
+         vodf_lwd <- rep(1, length(vodf[[use_label]]))
+         names(vodf_lwd) <- vodf[[use_label]];
       }
-      if ("alpha" %in% colnames(data.frame(venndir_out$venn_spdf))) {
-         vodf_ol <- subset(data.frame(venndir_out$venn_spdf),
+      if ("alpha" %in% colnames(vodf)) {
+         vodf_ol <- subset(vodf_all,
             type %in% "overlap" &
                label %in% names(vodf_color))
-         vo_match <- match(vodf$label, vodf_ol$label);
+         vo_match <- match(vodf[[use_label]], vodf_ol[[use_label]]);
          vo_alpha <- ifelse(is.na(vo_match),
             1,
             vodf_ol$alpha[vo_match])
          vodf_color <- jamba::alpha2col(vodf_color,
             alpha=vo_alpha)
+      } else {
+         # poly_alpha
+         vodf_color <- jamba::alpha2col(vodf_color,
+            alpha=poly_alpha)
       }
-      if ("border" %in% colnames(data.frame(venndir_out$venn_spdf))) {
-         vodf_ol <- subset(data.frame(venndir_out$venn_spdf),
+      if ("border" %in% colnames(vodf)) {
+         vodf_ol <- subset(vodf_all,
             type %in% "overlap" &
                label %in% names(vodf_color))
-         vo_match <- match(vodf$label, vodf_ol$label);
+         # vo_match <- match(vodf[[use_label]], vodf_ol[[use_label]]);
+         vo_match <- match(vodf[[use_label]], vodf[[use_label]]);
          vodf_border <- ifelse(is.na(vo_match),
             header_border,
-            vodf_ol$border[vo_match])
-         names(vodf_border) <- vodf$label;
+            vodf$border[vo_match])
+         # vodf_ol$border[vo_match])
+         names(vodf_border) <- vodf[[use_label]];
       }
    } else {
       vodf_color <- jamba::nameVector(
@@ -295,6 +326,21 @@ venndir_legender <- function
          darkFactor=1.2)
       vodf_lwd <- rep(0.5, length(vodf_color));
       names(vodf_lwd) <- names(vodf_color);
+   }
+   
+   # optionally include total unique items
+   if (TRUE %in% include_total) {
+      if (length(venndir_out) > 0) {
+         # venndir_legender(setlist=setlist, venndir_out=vo, x="bottomright")
+         total_items <- sum(vodf_all$venn_counts, na.rm=TRUE);
+      } else {
+         sv <- signed_overlaps(setlist[sets],
+            overlap_type="overlap",
+            return_items=FALSE,
+            ...);
+         total_items <- sum(sv$count, na.rm=TRUE);
+      }
+      # jamba::printDebug("total_items:", total_items);# debug
    }
    
    # optionally subset setlist by vodf_color
@@ -331,6 +377,8 @@ venndir_legender <- function
       color=vodf_color[names(setlist)],
       border=vodf_border[names(setlist)],
       lwd=vodf_lwd[names(setlist)])
+   
+   # optionally include total unique items
    gridlegend_df <- data.frame(check.names=FALSE,
       stringsAsFactors=FALSE,
       set=names(setlist),
@@ -372,21 +420,18 @@ venndir_legender <- function
          size=lengths(setlist))
    }
    
+   # optionally include total item count
+   if (TRUE %in% include_total) {
+      gridlegend_df2 <- data.frame(check.names=FALSE,
+         stringsAsFactors=FALSE,
+         set=paste0("Total", ifelse(nchar(item_type) > 0, " ", ""),
+            item_type),
+         size=total_items);
+      gridlegend_df <- rbind(gridlegend_df, gridlegend_df2);
+   }
+
    # render legend
-   if ("base" %in% style && TRUE %in% draw_legend) {
-      opar <- par("xpd"=TRUE);
-      on.exit(par(opar))
-      legend(x=x,
-         box.lwd=box.lwd,
-         inset=c(-0.05, 0),
-         col=NA,
-         pch=22,
-         pt.bg=legend_df$color,
-         pt.cex=2,
-         border=NULL,
-         legend=legend_df$legend,
-         ...);
-   } else if ("grid" %in% style) {
+   if ("grid" %in% style) {
       # prepare graphical object
       gridlegend_df_use <- gridlegend_df;
       gridlegend_df_use$set <- paste0(gridlegend_df$set, ":");

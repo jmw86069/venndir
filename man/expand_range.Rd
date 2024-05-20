@@ -84,6 +84,7 @@ expand_range(list(xlim=xlim, ylim=ylim))
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{eulerr2polys}()},
+\code{\link{find_venn_overlaps_JamPolygon}()},
 \code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{gridtext_make_outer_box}()},
