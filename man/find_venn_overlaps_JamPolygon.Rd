@@ -96,25 +96,32 @@ plot(xo, flip_sign=-1);
 
 }
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
-\code{\link{eulerr2polys}()},
-\code{\link{expand_range}()},
-\code{\link{find_vennpoly_overlaps}()},
-\code{\link{get_venn_shapes}()},
-\code{\link{gridtext_make_outer_box}()},
-\code{\link{gridtext_richtext_grob}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
-\code{\link{match_list}()},
-\code{\link{nudge_venndir_label}()},
-\code{\link{print_color_df}()},
-\code{\link{rescale_ps}()},
-\code{\link{rescale_p}()},
-\code{\link{shrink_df}()},
-\code{\link{sp_percent_area}()},
-\code{\link{venndir_label_style}()},
-\code{\link{venndir_legender}()}
+Other JamPolygon: 
+\code{\link{JamPolygon-class}},
+\code{\link{Venndir-class}},
+\code{\link{add_orientation_JamPolygon}()},
+\code{\link{area_JamPolygon}()},
+\code{\link{bbox_JamPolygon}()},
+\code{\link{buffer_JamPolygon}()},
+\code{\link{check_JamPolygon}()},
+\code{\link{check_Venndir}()},
+\code{\link{eulerr_to_JamPolygon}()},
+\code{\link{farthest_point_JamPolygon}()},
+\code{\link{has_point_in_JamPolygon}()},
+\code{\link{intersect_JamPolygon}()},
+\code{\link{label_fill_JamPolygon}()},
+\code{\link{label_outside_JamPolygon}()},
+\code{\link{label_segment_JamPolygon}()},
+\code{\link{labelr_JamPolygon}()},
+\code{\link{minus_JamPolygon}()},
+\code{\link{nearest_point_JamPolygon}()},
+\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{plot.JamPolygon}()},
+\code{\link{point_in_JamPolygon}()},
+\code{\link{polyclip_to_JamPolygon}()},
+\code{\link{sample_JamPolygon}()},
+\code{\link{split_JamPolygon}()},
+\code{\link{union_JamPolygon}()},
+\code{\link{update_JamPolygon}()}
 }
-\concept{venndir utility}
+\concept{JamPolygon}

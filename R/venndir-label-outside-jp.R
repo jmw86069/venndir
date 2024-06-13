@@ -21,7 +21,7 @@
 #'    * `"label"` uses the mean x,y coordinate
 #'    of all the polygon label positions;
 #'    * `"bbox"` uses the mean x,y
-#'    coordinate of the bounding box that encompasses `sp`.
+#'    coordinate of the bounding box that encompasses the polygons.
 #'    
 #'    The effect
 #'    is to extend outer labels radially around this center point.
@@ -53,7 +53,20 @@ label_outside_JamPolygon <- function
    # validate input
    center_method <- match.arg(center_method);
    if (length(which_jp) == 0) {
-      which_jp <- seq_len(length(jp));
+      ## use only those entries with polygon coordinates
+      which_jp <- which(sapply(seq_len(nrow(jp@polygons)), function(ijp){
+         length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
+      }))
+      # jamba::printDebug("which_jp: ", which_jp);# debug
+      # which_jp <- seq_len(length(jp));
+   } else {
+      # use only those entries with polygon coordinates
+      which_jp_sub <- sapply(which_jp, function(ijp){
+         length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
+      })
+      # jamba::printDebug("table(which_jp_sub): ");print(table(which_jp_sub));# debug
+      which_jp <- which_jp[which_jp_sub];
+      # jamba::printDebug("which_jp: ", which_jp);# debug
    }
    
    # buffer
@@ -65,8 +78,23 @@ label_outside_JamPolygon <- function
    names(buffer) <- names(jp)[which_jp];
 
    # get bbox for the whole polygon
-   jpall <- union_JamPolygon(jp)
    jpbox <- bbox_JamPolygon(jp);
+   
+   # added tiny buffer around polygons before union
+   # otherwise tiny slivers of holes remain, apparently
+   # due to rounding errors in the polygon coordinates,
+   # which cause adjacent polygons to be not-quite-adjacent.
+   # Anyway, the tiny holes caused label_segment_JamPolygon()
+   # to take 10-15 seconds per line, instead of being instant.
+   jpb <- max(apply(jpbox, 1, diff)) / 100;
+   jpall <- buffer_JamPolygon(
+      union_JamPolygon(
+         buffer_JamPolygon(jp,
+            buffer=jpb,
+            relative=FALSE)),
+      buffer=jpb,
+      relative=FALSE);
+   # plot(jpall);# debug
 
    # expand the bounding box
    jpbox_ex <- jpbox;
@@ -107,7 +135,7 @@ label_outside_JamPolygon <- function
    polyref_xy <- jamba::rbindList(lapply(which_jp, function(iwhich){
       # get sub-polygon
       ijp <- jp[iwhich, ];
-      if (length(unlist(ijp@polygons$x)) == 0) {
+      if (length(jamba::rmNA(unlist(ijp@polygons$x))) == 0) {
          # no polygon present
          return(cbind(x=NA_integer_, y=NA_integer_))
       }
@@ -148,8 +176,12 @@ label_outside_JamPolygon <- function
    angles[not_na] <- spread_degrees(angles1[not_na],
       min_degrees=min_degrees);
    names(angles) <- names(jp)[which_jp];
-   
-   # jamba::printDebug("angles:");print(data.frame(angles1, angles));# debug
+
+   if (verbose > 1) {   
+      jamba::printDebug("label_outside_JamPolygon(): ",
+         "angles:");
+      print(head(data.frame(angles1, angles), 20));
+   }
    
    # expand to twice the bbox size
    # max_radius <- max(rowDiffs(jpbox)) * 2;
@@ -158,6 +190,10 @@ label_outside_JamPolygon <- function
    ## for each angle find the line segment
    segmentxy_list <- lapply(which_jp, function(iwhich){
       # get sub-polygon
+      if (verbose > 1) {
+         jamba::printDebug("label_outside_JamPolygon(): ",
+            "iwhich: ", match(iwhich, which_jp), " of ", length(which_jp));
+      }
       ijp <- jp[iwhich, ];
       iname <- names(ijp);
       
@@ -172,14 +208,24 @@ label_outside_JamPolygon <- function
       # Find the point at the encompassing polygon outer edge.
       # This point is the outside label position.
       # polygon_label_segment()
+      if (verbose > 1) {
+         jamba::printDebug("label_outside_JamPolygon(): ",
+            "started first label_segment_JamPolygon.")
+      }
       plsxy1 <- label_segment_JamPolygon(
          jp=jpall,
-         buffer=idistance,
+         buffer=idistance * 1,
          relative=FALSE,
          x0=xedge,
          y0=yedge,
          x1=center[1, 1],
-         y1=center[1, 2]);
+         y1=center[1, 2],
+         verbose=verbose,
+         ...);
+      if (verbose > 1) {
+         jamba::printDebug("label_outside_JamPolygon(): ",
+            "completed first label_segment_JamPolygon");
+      }
       
       # find the point at the specific polygon outer edge
       if ("vector" %in% segment_method) {
@@ -195,7 +241,7 @@ label_outside_JamPolygon <- function
       }
 
       # polygon_label_segment()
-      if (verbose) {
+      if (verbose > 1) {
          jamba::printDebug("label_segment_JamPolygon call:");
          print(list(
             jp=ijp,
@@ -214,8 +260,14 @@ label_outside_JamPolygon <- function
          x0=unlist(plsxy1[1, 1]),
          y0=unlist(plsxy1[1, 2]),
          x1=x1use,
-         y1=y1use);
-
+         y1=y1use,
+         verbose=verbose,
+         ...);
+      if (verbose > 1) {
+         jamba::printDebug("label_outside_JamPolygon(): ",
+            "completed second label_segment_JamPolygon");
+      }
+      
       # line segment
       segmentxy <- cbind(
          x=unname(c(plsxy[1, 1], plsxy1[1, 1])),
@@ -232,6 +284,10 @@ label_outside_JamPolygon <- function
       
       return(segmentxy);
    });
+   if (verbose > 1) {   
+      jamba::printDebug("label_outside_JamPolygon(): ",
+         "completed segmentxy_list");
+   }
    
    names(segmentxy_list) <- names(jp)[which_jp];
    
@@ -306,6 +362,8 @@ nearest_point_JamPolygon <- function
 
 #' Define a label segment for JamPolygon
 #' 
+#' @family JamPolygon
+#' 
 #' @export
 label_segment_JamPolygon <- function
 (x0,
@@ -324,6 +382,10 @@ label_segment_JamPolygon <- function
    return_class <- match.arg(return_class);
    
    if (length(x0) > 1) {
+      if (verbose) {
+         jamba::printDebug("label_segment_JamPolygon(): ",
+            "iterating ", length(x0), " input entries.");
+      }
       i <- seq_along(x0);
       x1 <- rep(x1, length.out=length(x0));
       y0 <- rep(y0, length.out=length(x0));
@@ -360,15 +422,29 @@ label_segment_JamPolygon <- function
       y=c(y0, y1));
 
    # check for empty jp
-   if (length(unlist(jp@polygons$x)) == 0) {
-      return(lxy);
+   if ("list" %in% class(jp)) {
+      if (length(jp) == 1) {
+         jp <- jp[[1]];
+      } else {
+         jp <- do.call(rbind2, jp);
+      }
+      # jamba::printDebug("label_segment_JamPolygon(): ", "use_jp:");print(use_jp);# debug
+      if (length(jamba::rmNA(unlist(jp@polygons$x))) == 0) {
+         # jamba::printDebug("label_segment_JamPolygon(): ", "empty jp");# debug
+         return(lxy);
+      }
+   } else {
+      # jamba::printDebug("label_segment_JamPolygon(): ", "jp@polygons:");print(jp@polygons);# debug
+      if (length(jamba::rmNA(unlist(jp@polygons$x))) == 0) {
+         return(lxy);
+      }
    }
    
    # optional polygon buffer
    buffer <- head(buffer, 1);
 
    # grow polygon in size using buffer
-   if (!0 %in% buffer) {
+   if (!0 %in% buffer && !"list" %in% class(jp)) {
       jp <- buffer_JamPolygon(jp,
          buffer=buffer,
          relative=relative,

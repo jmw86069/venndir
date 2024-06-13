@@ -166,24 +166,16 @@ This adjustment would only affect multi-line labels.
 }
 \examples{
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
+# by default the legend is shown
 vo <- venndir(setlist)
 
-venndir_legender(setlist=setlist,
-   venndir_out=vo,
-   x="bottomleft")
+# move to different corner
+vo <- venndir(setlist, legend_x="bottomleft")
 
-# base legend bottom-right
+# turn off the default legend
+vo <- venndir(setlist, draw_legend=FALSE)
 venndir_legender(setlist=setlist,
    venndir_out=vo,
-   style="base",
-   x="bottomright")
-
-vo <- venndir(setlist,
-   show_segments=FALSE,
-   plot_style="gg")
-venndir_legender(setlist=setlist,
-   venndir_out=vo,
-   style="grid",
    x="bottomleft")
 
 # test multi-line labels
@@ -191,35 +183,31 @@ names(setlist) <- c("Group A-<br>Group B",
    "Group B-<br>\nGroup C",
    "Dex_KO-\nVeh_WT")
 vo <- venndir(setlist,
-   show_segments=FALSE,
-   plot_style="gg")
+   show_segments=FALSE)
 venndir_legender(setlist=setlist,
    venndir_out=vo,
-   style="grid",
    x="bottomleft")
 
 # Same as above, showing how to render the legend_grob.
 # This method also "hides" the column headers.
 vo <- venndir(setlist,
    show_segments=FALSE,
-   font_cex=c(1, 1, 0.5, 0.5),
-   plot_style="gg")
+   draw_legend=FALSE,
+   font_cex=c(1, 1, 0.5, 0.5))
 legend_grob <- venndir_legender(setlist=setlist,
    venndir_out=vo,
-   style="grid",
    draw_legend=FALSE,
    header_color="white",
-   x="bottomright")
+   x="bottomleft")
 grid::grid.draw(legend_grob)
 
 # custom grid table theme
 vo <- venndir(setlist,
    show_segments=FALSE,
-   plot_style="gg")
+   draw_legend=FALSE)
 legend_grob <- venndir_legender(setlist=setlist,
    venndir_out=vo,
    headers=FALSE,
-   style="grid",
    x="bottomright",
    table_theme=gridExtra::ttheme_default(base_size=11,
       base_family="sans",
@@ -230,7 +218,7 @@ setlist <- make_venn_test(100, 5, do_signed=TRUE);
 vo <- venndir(setlist,
    sets=c(4, 1, 2),
    show_segments=FALSE,
-   plot_style="gg")
+   draw_legend=FALSE)
 venndir_legender(venndir_out=vo,
    font_cex=0.8,
    setlist=setlist,
@@ -240,18 +228,16 @@ venndir_legender(venndir_out=vo,
 
 # Venn with no border, and more transparent colors
 vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
-vo124$venn_spdf$lwd <- 0.1
-render_venndir(vo124)
+vo124$vo@jps@polygons$border.lwd <- 0.1
+vo124$vo@jps@polygons$innerborder.lwd <- 0.1
+vor124 <- render_venndir(vo124$vo, draw_legend=FALSE)
 venndir_legender(setlist=setlist, venndir_out=vo124)
 
 }
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
-\code{\link{eulerr2polys}()},
 \code{\link{expand_range}()},
-\code{\link{find_venn_overlaps_JamPolygon}()},
-\code{\link{find_vennpoly_overlaps}()},
 \code{\link{get_venn_shapes}()},
 \code{\link{gridtext_make_outer_box}()},
 \code{\link{gridtext_richtext_grob}()},
@@ -261,10 +247,9 @@ Other venndir utility:
 \code{\link{match_list}()},
 \code{\link{nudge_venndir_label}()},
 \code{\link{print_color_df}()},
-\code{\link{rescale_ps}()},
-\code{\link{rescale_p}()},
 \code{\link{shrink_df}()},
-\code{\link{sp_percent_area}()},
-\code{\link{venndir_label_style}()}
+\code{\link{three_point_angle}()},
+\code{\link{venndir_label_style}()},
+\code{\link{venndir_to_df}()}
 }
 \concept{venndir utility}

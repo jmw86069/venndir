@@ -8,6 +8,8 @@
 #' 
 #' * Accept input from `signed_overlaps()` for purely table summary.
 #' 
+#' @family venndir utility
+#' 
 #' @returns object of class `"data.frame"` or `"knitr_kable"` based upon
 #'    argument `return_type`.
 #' 
@@ -29,6 +31,9 @@
 #' kdf <- venndir_to_df(venndir_out)
 #' kdf
 #' 
+#' kdf <- venndir_to_df(venndir_out, return_type="data.frame")
+#' kdf
+#' 
 #' @export
 venndir_to_df <- function
 (venndir_out,
@@ -43,7 +48,10 @@ venndir_to_df <- function
    # validate arguments
    return_type <- match.arg(return_type);
    # label_df
-   label_df <- venndir_out$label_df;
+   if (!"Venndir" %in% class(venndir_out) && "vo" %in% names(venndir_out)) {
+      venndir_out <- venndir_out$vo;
+   }
+   label_df <- venndir_out@label_df;
    # encode factor to help sort properly
    label_df$overlap_set <- factor(label_df$overlap_set,
       levels=unique(label_df$overlap_set))
@@ -52,11 +60,9 @@ venndir_to_df <- function
    
    # spdf
    if (length(set_colors) == 0) {
-      spdf <- as.data.frame(venndir_out$venn_spdf)
       set_colors <- jamba::nameVector(
-         spdf$venn_color,
-         spdf$label,
-         renameFirst=FALSE)
+         subset(venndir_out@jps@polygons,
+            type %in% "overlap")[, c("venn_color", "label")]);
    }
    
    # label text color
@@ -128,7 +134,7 @@ venndir_to_df <- function
       row.names=FALSE);
    kdftall <- kableExtra::column_spec(kdftall,
       column=1,
-      color=dftall$text_color)
+      color=jamba::unalpha(dftall$text_color))
    for (igroup in as.character(unique(dftall$overlap_set))) {
       from_to <- which(dftall$overlap_set %in% igroup);
       bg_color <- set_colors[igroup];

@@ -16,6 +16,8 @@ venndir(
   max_items = 3000,
   show_zero = FALSE,
   font_cex = c(1, 1, 0.8),
+  show_label = NA,
+  display_counts = TRUE,
   poly_alpha = 0.8,
   alpha_by_counts = FALSE,
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),

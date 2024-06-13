@@ -18,6 +18,10 @@ reference:
   desc: Functions for JamPolygon objects
   contents:
   - has_concept("JamPolygon")
+- title: venndir polygon Functions
+  desc: Functions for polygons
+  contents:
+  - has_concept("venndir polygons")
 - title: venndir Spatial Functions
   desc: Functions for spatial objects and polygon manipulation
   contents:

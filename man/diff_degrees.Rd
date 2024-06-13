@@ -38,17 +38,9 @@ diff_degrees(180, 361)
 Other venndir spatial: 
 \code{\link{degrees_to_adj}()},
 \code{\link{display_angles}()},
-\code{\link{get_largest_polygon}()},
-\code{\link{get_sp_buffer}()},
-\code{\link{intersect_polygons}()},
 \code{\link{mean_degree_arc}()},
 \code{\link{mean_degrees}()},
-\code{\link{nudge_sp}()},
 \code{\link{rescale_coordinates}()},
-\code{\link{rescale_sp}()},
-\code{\link{sp_circles}()},
-\code{\link{sp_ellipses}()},
-\code{\link{spread_degrees}()},
-\code{\link{union_polygons}()}
+\code{\link{spread_degrees}()}
 }
 \concept{venndir spatial}

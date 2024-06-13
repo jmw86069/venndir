@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -54,7 +54,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>venndir label style</h1>
-    <small class="dont-index">Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/R/venndir-render.R" class="external-link"><code>R/venndir-render.R</code></a></small>
+    <small class="dont-index">Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/R/venndir-label-style.R" class="external-link"><code>R/venndir-label-style.R</code></a></small>
     <div class="hidden name"><code>venndir_label_style.Rd</code></div>
     </div>
 
@@ -65,6 +65,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">venndir_label_style</span><span class="op">(</span></span>
 <span>  <span class="va">venndir_output</span>,</span>
+<span>  show_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Nsc"</span><span class="op">)</span>,</span>
 <span>  label_preset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"main inside"</span>, <span class="st">"main outside"</span>, <span class="st">"outside"</span>, <span class="st">"all outside"</span>,</span>
 <span>    <span class="st">"concept"</span>, <span class="st">"meme"</span>, <span class="st">"items"</span>, <span class="st">"main items"</span>, <span class="st">"main count items"</span>, <span class="st">"custom"</span><span class="op">)</span>,</span>
 <span>  label_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basic"</span>, <span class="st">"box"</span>, <span class="st">"fill"</span>, <span class="st">"fill_box"</span>, <span class="st">"shaded"</span>, <span class="st">"shaded_box"</span>, <span class="st">"lite"</span>,</span>
@@ -73,9 +74,11 @@
 <span>  bg <span class="op">=</span> <span class="st">"white"</span>,</span>
 <span>  set <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"outside"</span>, <span class="st">"inside"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"inside"</span>, <span class="st">"outside"</span><span class="op">)</span>,</span>
+<span>  percent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"inside"</span>, <span class="st">"outside"</span><span class="op">)</span>,</span>
 <span>  count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inside"</span>, <span class="st">"outside"</span>, <span class="st">"ifneeded"</span>, <span class="st">"detect"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  signed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inside"</span>, <span class="st">"outside"</span>, <span class="st">"ifneeded"</span>, <span class="st">"detect"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"inside"</span><span class="op">)</span>,</span>
+<span>  show_items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  max_items <span class="op">=</span> <span class="fl">3000</span>,</span>
 <span>  inside_percent_threshold <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  label_types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"main"</span>, <span class="st">"signed"</span><span class="op">)</span>,</span>
@@ -115,9 +118,7 @@ to be on a white background, using argument <code>bg</code>.</p>
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir utility: 
 <code><a href="curate_venn_labels.html">curate_venn_labels</a>()</code>,
-<code><a href="eulerr2polys.html">eulerr2polys</a>()</code>,
 <code><a href="expand_range.html">expand_range</a>()</code>,
-<code><a href="find_vennpoly_overlaps.html">find_vennpoly_overlaps</a>()</code>,
 <code><a href="get_venn_shapes.html">get_venn_shapes</a>()</code>,
 <code><a href="gridtext_make_outer_box.html">gridtext_make_outer_box</a>()</code>,
 <code><a href="gridtext_richtext_grob.html">gridtext_richtext_grob</a>()</code>,
@@ -127,11 +128,10 @@ to be on a white background, using argument <code>bg</code>.</p>
 <code><a href="match_list.html">match_list</a>()</code>,
 <code><a href="nudge_venndir_label.html">nudge_venndir_label</a>()</code>,
 <code><a href="print_color_df.html">print_color_df</a>()</code>,
-<code><a href="rescale_ps.html">rescale_ps</a>()</code>,
-<code><a href="rescale_p.html">rescale_p</a>()</code>,
 <code><a href="shrink_df.html">shrink_df</a>()</code>,
-<code><a href="sp_percent_area.html">sp_percent_area</a>()</code>,
-<code><a href="venndir_legender.html">venndir_legender</a>()</code></p></div>
+<code><a href="three_point_angle.html">three_point_angle</a>()</code>,
+<code><a href="venndir_legender.html">venndir_legender</a>()</code>,
+<code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
     </div>
 
   </div>

@@ -13,3 +13,22 @@ coordinates.}
 \description{
 Calculate angle between three consecutive points
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{expand_range}()},
+\code{\link{get_venn_shapes}()},
+\code{\link{gridtext_make_outer_box}()},
+\code{\link{gridtext_richtext_grob}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{make_venn_test}()},
+\code{\link{match_list}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{venndir_label_style}()},
+\code{\link{venndir_legender}()},
+\code{\link{venndir_to_df}()}
+}
+\concept{venndir utility}

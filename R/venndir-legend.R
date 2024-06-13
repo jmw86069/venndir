@@ -111,24 +111,16 @@
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 3, do_signed=TRUE);
+#' # by default the legend is shown
 #' vo <- venndir(setlist)
 #' 
-#' venndir_legender(setlist=setlist,
-#'    venndir_out=vo,
-#'    x="bottomleft")
+#' # move to different corner
+#' vo <- venndir(setlist, legend_x="bottomleft")
 #' 
-#' # base legend bottom-right
+#' # turn off the default legend
+#' vo <- venndir(setlist, draw_legend=FALSE)
 #' venndir_legender(setlist=setlist,
 #'    venndir_out=vo,
-#'    style="base",
-#'    x="bottomright")
-#' 
-#' vo <- venndir(setlist,
-#'    show_segments=FALSE,
-#'    plot_style="gg")
-#' venndir_legender(setlist=setlist,
-#'    venndir_out=vo,
-#'    style="grid",
 #'    x="bottomleft")
 #' 
 #' # test multi-line labels
@@ -136,35 +128,31 @@
 #'    "Group B-<br>\nGroup C",
 #'    "Dex_KO-\nVeh_WT")
 #' vo <- venndir(setlist,
-#'    show_segments=FALSE,
-#'    plot_style="gg")
+#'    show_segments=FALSE)
 #' venndir_legender(setlist=setlist,
 #'    venndir_out=vo,
-#'    style="grid",
 #'    x="bottomleft")
 #' 
 #' # Same as above, showing how to render the legend_grob.
 #' # This method also "hides" the column headers.
 #' vo <- venndir(setlist,
 #'    show_segments=FALSE,
-#'    font_cex=c(1, 1, 0.5, 0.5),
-#'    plot_style="gg")
+#'    draw_legend=FALSE,
+#'    font_cex=c(1, 1, 0.5, 0.5))
 #' legend_grob <- venndir_legender(setlist=setlist,
 #'    venndir_out=vo,
-#'    style="grid",
 #'    draw_legend=FALSE,
 #'    header_color="white",
-#'    x="bottomright")
+#'    x="bottomleft")
 #' grid::grid.draw(legend_grob)
 #' 
 #' # custom grid table theme
 #' vo <- venndir(setlist,
 #'    show_segments=FALSE,
-#'    plot_style="gg")
+#'    draw_legend=FALSE)
 #' legend_grob <- venndir_legender(setlist=setlist,
 #'    venndir_out=vo,
 #'    headers=FALSE,
-#'    style="grid",
 #'    x="bottomright",
 #'    table_theme=gridExtra::ttheme_default(base_size=11,
 #'       base_family="sans",
@@ -175,7 +163,7 @@
 #' vo <- venndir(setlist,
 #'    sets=c(4, 1, 2),
 #'    show_segments=FALSE,
-#'    plot_style="gg")
+#'    draw_legend=FALSE)
 #' venndir_legender(venndir_out=vo,
 #'    font_cex=0.8,
 #'    setlist=setlist,
@@ -185,8 +173,9 @@
 #' 
 #' # Venn with no border, and more transparent colors
 #' vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
-#' vo124$venn_spdf$lwd <- 0.1
-#' render_venndir(vo124)
+#' vo124$vo@jps@polygons$border.lwd <- 0.1
+#' vo124$vo@jps@polygons$innerborder.lwd <- 0.1
+#' vor124 <- render_venndir(vo124$vo, draw_legend=FALSE)
 #' venndir_legender(setlist=setlist, venndir_out=vo124)
 #' 
 #' @export
@@ -340,7 +329,6 @@ venndir_legender <- function
             ...);
          total_items <- sum(sv$count, na.rm=TRUE);
       }
-      # jamba::printDebug("total_items:", total_items);# debug
    }
    
    # optionally subset setlist by vodf_color
@@ -426,8 +414,18 @@ venndir_legender <- function
          stringsAsFactors=FALSE,
          set=paste0("Total", ifelse(nchar(item_type) > 0, " ", ""),
             item_type),
+         label="",
          size=total_items);
+      if (!"label" %in% colnames(gridlegend_df)) {
+         gridlegend_df2$label <- NULL;
+      }
       gridlegend_df <- rbind(gridlegend_df, gridlegend_df2);
+      #
+      legend_df2 <- data.frame(legend="Total",
+         color="grey95",
+         border="grey95",
+         lwd=2);
+      legend_df <- rbind(legend_df, legend_df2);
    }
 
    # render legend

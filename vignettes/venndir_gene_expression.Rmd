@@ -131,6 +131,11 @@ if (do_limma) {
 A signed incidence matrix can be converted to `setlist`
 with `im_value2list()`. Then call `venndir()`.
 
+The `"im_value"` refers to an incidence matrix with values (signs),
+and `"2list"` will convert to a `list`.
+The `list` returned will contain named vectors, where
+names are the item labels, and values are the signs.
+
 ```{r limma_3}
 if (do_limma) {
   limmalist <- im_value2list(fit2decide);
@@ -138,7 +143,7 @@ if (do_limma) {
 }
 ```
 
-A few features are immediately noticeable:
+A few features are noticeable:
 
 1. The `limma` contrasts `"ML - MS"` and `"LP - MS"` are
 shown in each Venn circle. The numbers in each circle
@@ -168,6 +173,7 @@ because these are more visually interesting.
 
 ```{r limma_3p}
 if (do_limma) {
+  limmalist <- im_value2list(fit2decide);
   venndir(limmalist, sets=c(1, 3), proportional=TRUE);
 }
 ```
@@ -226,10 +232,9 @@ if (do_limma) {
   venndir(limmalist2,
     sets=c(1, 2),
     poly_alpha=0.3,
-    label_preset="main items",
+    show_labels="Ni",
     show_items="sign item",
     item_cex=0.5,
-    buffer_w=0.3,
     max_items=1000);
 }
 ```
@@ -252,10 +257,9 @@ if (do_limma) {
   venndir(limmalist2,
     sets=c(1, 2),
     poly_alpha=0.3,
-    label_preset="main items",
+    show_labels="Ni",
     show_items="sign",
     item_cex=0.7,
-    buffer_w=0.3,
     max_items=1000);
 }
 ```
@@ -274,28 +278,33 @@ so we can convert each row to a gene symbol. However there are multiple
 probes per gene symbol. For the sake of this example, we will choose
 the first of each gene symbol from the statistical hits.
 
+> There is another Jam R package function that may be helpful:
+`genejam::freshenGenes()`. This function takes one of more columns
+of gene symbols, gene accessions, gene identifiers, and returns
+the "best matching result" using Bioconductor gene annotation data.
+
 ```{r limma_7}
 if (do_limma) {
   # convert probe hits to gene hits
+  limmalist2 <- im_value2list(fit2decide2);
+  # iterate the hit list to convert to gene
   limmalist2g <- lapply(limmalist2, function(i){
-    k <- as.vector(i);
-    names(k) <- names(i);
+    kdf <- data.frame(check.names=FALSE, i);
     # use gene symbol
-    igenes <- y$genes[names(k),"SYMBOL"];
-    # remove entries with no gene symbol
-    igenes <- igenes[nchar(igenes) > 0 && !is.na(igenes)];
-    # choose the first entry per unique gene symbol
-    j <- i[match(unique(igenes), igenes)];
-    # assign name by gene symbol
-    names(j) <- unique(igenes);
-    j;
+    kdf$genes <- y$genes[rownames(kdf), "SYMBOL"];
+    # subset for unique genes with non-empty value
+    kdf_sub <- subset(kdf, nchar(genes) > 0 & !duplicated(genes))
+    # make a vector of signed direction
+    kdf_genes <- kdf_sub[, 1];
+    # name the vector using gene symbol
+    names(kdf_genes) <- kdf_sub$genes;
+    kdf_genes
   })
   venndir(limmalist2g, sets=c(1, 2),
+    show_labels="Ni",
     show_items="sign item",
     poly_alpha=0.3,
-    label_preset="main items",
     item_cex=0.5,
-    buffer_w=0.3,
     max_items=1000);
 }
 ```
@@ -304,10 +313,10 @@ if (do_limma) {
 ### Three-way directional Venn
 
 The examples above purposefully used only two contrasts,
-partly because those two contrasts show very high concordance.
-This experiment design is quite common, to have three groups,
+because those two contrasts show very high concordance.
+An experiment design with three groups is quite common,
 and adding directionality for the third contrast can
-be confusing at first. (See section below on interpreting
+be confusing, and still useful. (See section below on interpreting
 three-group Venn diagrams.)
 
 ```{r limma_8}

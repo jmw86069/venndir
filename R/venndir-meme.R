@@ -164,7 +164,7 @@
 #' `r&sty&fh`="Mr<br>Monopoly",
 #' `sty&fh&str&t&f&fu&r`="Mr T"
 #' )
-#' venn_meme(mrvenn, proportional=TRUE)
+#' venn_meme(mrvenn, proportional=TRUE, item_style="text")
 #' 
 #' @export
 venn_meme <- function
@@ -172,9 +172,10 @@ venn_meme <- function
  proportional=FALSE,
  item_cex=1.4,
  item_degrees=0,
- plot_style=c("gg", "base"),
+ # plot_style=c("gg", "base"),
  item_style=c("gridtext", "text"),
  plot_warning=FALSE,
+ verbose=FALSE,
  ...)
 {
    #
@@ -195,7 +196,6 @@ venn_meme <- function
          stop("Input x must have names, or be length <= 31 for 5-way Venn");
       }
    }
-   plot_style <- match.arg(plot_style);
    item_style <- match.arg(item_style);
    if ("text" %in% item_style) {
       x <- lapply(x, function(i){
@@ -208,20 +208,29 @@ venn_meme <- function
    }
    
    # convert to setlist
+   if (verbose) {
+      jamba::printDebug("venn_meme(): ",
+         "Calling overlaplist2setlist()");
+   }
    setlist <- overlaplist2setlist(x);
 
    if (length(item_cex) == 1) {
       item_cex <- rep(item_cex, 2);
    }
+   if (verbose) {
+      jamba::printDebug("venn_meme(): ",
+         "Calling venndir()");
+   }
    vo <- venndir(setlist,
       proportional=proportional,
       show_items="item",
-      label_preset="meme",
+      show_labels="i",
+      # label_preset="meme",
       item_degrees=item_degrees,
       item_cex=item_cex,
       item_style=item_style,
-      plot_style=plot_style,
       plot_warning=plot_warning,
+      verbose=verbose,
       ...)
    return(invisible(vo))
 }

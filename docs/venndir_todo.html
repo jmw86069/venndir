@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -296,7 +296,7 @@
 <div class="section level2">
 <h2 id="id_02feb2022">02feb2022<a class="anchor" aria-label="anchor" href="#id_02feb2022"></a></h2>
 <ul><li>Option to supply specific SpatialPolygons objects for each set.</li>
-<li>Option to apply <code>rotate_degrees</code> to the polygon representing specific sets. The function <code><a href="reference/rescale_sp.html">rescale_sp()</a></code> takes <code>rotate_degrees</code> as an argument then applies to all polygons. It could potentially be applied to named polygons, if <code>rotate_degrees</code> also had names that matched the sp object.</li>
+<li>Option to apply <code>rotate_degrees</code> to the polygon representing specific sets. The function <code>rescale_sp()</code> takes <code>rotate_degrees</code> as an argument then applies to all polygons. It could potentially be applied to named polygons, if <code>rotate_degrees</code> also had names that matched the sp object.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="id_30jan2022">30jan2022<a class="anchor" aria-label="anchor" href="#id_30jan2022"></a></h2>
@@ -382,15 +382,15 @@
 <li>Revisit the workflow to nudge or move label positions.</li>
 </ul></li>
 <li>
-<p>COMPLETE: <code><a href="reference/polygon_label_fill.html">polygon_label_fill()</a></code> argument <code>apply_n_scale=TRUE</code> should also adjust polygons by relative size of the polygon compared to the size of the overall Venn diagram. Smaller polygons with fewer labels should not be adjusted as much as larger polygons.</p>
+<p>COMPLETE: <code>polygon_label_fill()</code> argument <code>apply_n_scale=TRUE</code> should also adjust polygons by relative size of the polygon compared to the size of the overall Venn diagram. Smaller polygons with fewer labels should not be adjusted as much as larger polygons.</p>
 <ul><li>In general, proportional diagrams should use the same buffer for each polygon, since the polygon is already proportional to the number of item labels.</li>
 </ul></li>
-<li><p><code><a href="reference/polygon_label_outside.html">polygon_label_outside()</a></code> should adjust relative buffer consistent with <code><a href="reference/polygon_label_fill.html">polygon_label_fill()</a></code>, based upon the plot size.</p></li>
+<li><p><code>polygon_label_outside()</code> should adjust relative buffer consistent with <code>polygon_label_fill()</code>, based upon the plot size.</p></li>
 <li>
 <p>More arguments should be added to <code><a href="reference/venndir.html">venndir()</a></code> so these options are not “hidden” features:</p>
 <ul><li>shape=“ellipse” is used for proportional Euler diagrams and allows elliptical ovals instead of circles.</li>
 <li>
-<code>scale_width</code> is passed to <code><a href="reference/polygon_label_fill.html">polygon_label_fill()</a></code> when items are being displayed.</li>
+<code>scale_width</code> is passed to <code>polygon_label_fill()</code> when items are being displayed.</li>
 <li>
 <code>draw_buffer</code> - shows item polygon buffer</li>
 <li>
@@ -398,7 +398,7 @@
 <li>
 <code>apply_n_scale</code> - adjusts item polygon buffer by number of labels.</li>
 <li>
-<code>center_method</code>, <code>vector_method</code>, <code>segment_method</code> passed to <code><a href="reference/polygon_label_outside.html">polygon_label_outside()</a></code> to position labels around the Venn polygons.</li>
+<code>center_method</code>, <code>vector_method</code>, <code>segment_method</code> passed to <code>polygon_label_outside()</code> to position labels around the Venn polygons.</li>
 </ul></li>
 <li><p>Longer term, I might need to adjust the “optimization settings” used by the <code>eulerr</code> package. It appears to perform a solver minimization function that maximizes the total overlap count represented. I think it could be penalized when a set overlap is not represented to “encourage” it not to skip a potential overlap.</p></li>
 </ul><div class="section level3">
@@ -471,13 +471,13 @@
 <ul><li>
 <code><a href="reference/render_venndir.html">render_venndir()</a></code> argument <code>max_items</code> is being ignored. For overlaps with too many items, desired behavior is to display the counts instead of item labels.</li>
 <li>
-<code><a href="reference/polygon_label_outside.html">polygon_label_outside()</a></code> is glitchy for weird proportional cases, for example 4 sets and <code>shape="ellipse"</code> might warrant different default settings. Alternative method would involve taking boundary point, expanding the boundary, find nearest point on that boundary, then proceeding with <code><a href="reference/spread_degrees.html">spread_degrees()</a></code>.</li>
+<code>polygon_label_outside()</code> is glitchy for weird proportional cases, for example 4 sets and <code>shape="ellipse"</code> might warrant different default settings. Alternative method would involve taking boundary point, expanding the boundary, find nearest point on that boundary, then proceeding with <code><a href="reference/spread_degrees.html">spread_degrees()</a></code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="performance">performance<a class="anchor" aria-label="anchor" href="#performance"></a></h3>
 <ul><li>Showing a few hundred item labels is still painfully slow. Consider <code><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text()</a></code> as an alternative. Or test options that remove the dither options for color/degrees/cex in case that somehow triggers non-vectorized rendering.</li>
 <li>
-<code><a href="reference/polygon_label_outside.html">polygon_label_outside()</a></code> for 5-way Venn overlaps sometimes moves labels to weird positions. Workaround with <code>min_degrees=8</code> but not sure why.</li>
+<code>polygon_label_outside()</code> for 5-way Venn overlaps sometimes moves labels to weird positions. Workaround with <code>min_degrees=8</code> but not sure why.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="miscellaneous">miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h3>
@@ -632,11 +632,11 @@
 <h3 id="improve-item-label-efficiency">improve item label efficiency<a class="anchor" aria-label="anchor" href="#improve-item-label-efficiency"></a></h3>
 <ul><li>large number of labels makes it very inefficient – find a way to make it faster.</li>
 <li>one idea: instead of calling <code>gridtext</code> for each polygon, aggregate them into a <code>data.frame</code> then display them in one call. Doubtful this change will be much faster.</li>
-<li>another idea: the <code><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">sp::spsample()</a></code> function success rate is fairly low, requiring iterating with higher <code>n + i</code> labels in order to get <code>n</code> coordinates inside the polygon area. This iteration might be rate-limiting with large <code>n</code>.</li>
+<li>another idea: the “sp” <code>spsample()</code> function success rate is fairly low, requiring iterating with higher <code>n + i</code> labels in order to get <code>n</code> coordinates inside the polygon area. This iteration might be rate-limiting with large <code>n</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="make-output-compatible-with-plotly-or-something-interactive">make output compatible with plotly (or something interactive)<a class="anchor" aria-label="anchor" href="#make-output-compatible-with-plotly-or-something-interactive"></a></h3>
-<ul><li>Currently <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html" class="external-link">ggtext::geom_richtext()</a></code> is not compatible with <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> but probably just lacks the <code>to_basic</code> wrapper function. (See <code><a href="https://rdrr.io/pkg/splicejam/man/to_basic.GeomShape.html" class="external-link">splicejam::to_basic.GeomShape()</a></code> for an example workaround.)</li>
+<ul><li>Currently <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html" class="external-link">ggtext::geom_richtext()</a></code> is not compatible with <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> but probably just lacks the <code>to_basic</code> wrapper function. (See “splicejam” <code>to_basic.GeomShape()</code> for an example workaround.)</li>
 <li>This feature may require text labels at 0 or 90 degrees.</li>
 </ul></div>
 <div class="section level3">
@@ -664,7 +664,7 @@
 </ul></li>
 <li>
 <p>DONE: When there is only one item, consider using the center label instead of choosing a location inside the polygon, which sometimes chooses something away from the center.</p>
-<ul><li>Note that sometimes the <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> point is outside the polygon, which happens sometimes when the polygon has a hole or otherwise “weird” shape. The method checks for that and uses the buffer polygon <code><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">sp::spsample()</a></code> approach if the <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> point is not contained in the source polygon.</li>
+<ul><li>Note that sometimes the <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> point is outside the polygon, which happens sometimes when the polygon has a hole or otherwise “weird” shape. The method checks for that and uses the buffer polygon <code>spsample()</code> approach if the <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> point is not contained in the source polygon.</li>
 </ul></li>
 </ul></div>
 <div class="section level3">
@@ -717,7 +717,7 @@
 <h3 id="done-option-to-move-count-labels-outside-the-polygon">DONE: option to move count labels outside the polygon<a class="anchor" aria-label="anchor" href="#done-option-to-move-count-labels-outside-the-polygon"></a></h3>
 <ul><li>
 <p>DONE: implement <code>x_offset,y_offset</code> for count labels</p>
-<ul><li>Draw a line to polygon border if needed (<code><a href="reference/polygon_label_segment.html">polygon_label_segment()</a></code>)</li>
+<ul><li>Draw a line to polygon border if needed (<code>polygon_label_segment()</code>)</li>
 </ul></li>
 </ul></div>
 <div class="section level3">

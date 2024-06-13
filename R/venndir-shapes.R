@@ -261,10 +261,13 @@ get_venn_polygon_shapes <- function
       stop("Proportional diagrams require the eulerr package.");
    }
    if (length(circle_nudge) > 0) {
+      # jamba::printDebug("get_venn_polygon_shapes(): ", "before circle_nudge:");print(venn_polygon_list);# debug
+      # jamba::printDebug("get_venn_polygon_shapes(): ", "circle_nudge:");print(circle_nudge);# debug
       venn_polygon_list <- nudge_polygon_list(
          polygon_list=venn_polygon_list,
          nudge=circle_nudge,
          rotate_degrees=rotate_degrees)
+      # jamba::printDebug("get_venn_polygon_shapes(): ", "after circle_nudge:");print(venn_polygon_list);# debug
    } else if (any(rotate_degrees != 0)) {
       venn_polygon_list <- nudge_polygon_list(
          polygon_list=venn_polygon_list,

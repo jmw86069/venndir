@@ -201,7 +201,6 @@ venndir <- function
  do_plot=TRUE,
  verbose=FALSE,
  debug=0,
-
  circle_nudge=NULL,
  rotate_degrees=0,
  ...)
@@ -434,59 +433,11 @@ venndir <- function
    # rownames(venn_jpol@polygons) <- names(venn_jpol);
    venn_jp@polygons$type <- "set";
    venn_jpol@polygons$type <- "overlap";
+   # jamba::printDebug("venndir(): ", "venn_jpol:");print(venn_jpol);# debug
    
    # combine into one object
    venn_jps <- rbind2(venn_jp, venn_jpol);
-  
-   ## return the owl to this point
-   # return(invisible(list(venn_jp=venn_jp, venn_jpol=venn_jpol, nCounts=nCounts)));
 
-   # combine venn_sp with venn_spdf
-   #venn_sp <- sp::spChFIDs(venn_sp,
-   #   paste0(names(venn_sp), "|set"));
-   #   paste0(names(venn_sp), "|set"));
-   if (FALSE) {
-      venn_pcl_names <- jamba::nameVector(names(venn_jp));
-      # venn_sp_names <- jamba::nameVector(names(venn_sp));
-      venn_spdf1 <- sp::SpatialPolygonsDataFrame(
-         sp::spChFIDs(venn_sp,
-            names(venn_sp_names)),
-         data=data.frame(
-            check.names=FALSE,
-            stringsAsFactors=FALSE,
-            color="#00000000",
-            label=venn_sp_names))
-      venn_spdf$type <- "overlap";
-      if (1 %in% debug) {
-         venn_spdf1m <- sp::merge(venn_spdf1,
-            venn_spdf,
-            all.x=TRUE);
-         return(list(venn_spdf=venn_spdf,
-            venn_spdf1=venn_spdf1,
-            venn_spdf1m=venn_spdf1m));
-      }
-      venn_spdf1 <- sp::merge(venn_spdf1,
-         venn_spdf,
-         all.x=TRUE);
-      venn_spdf1$type <- "set";
-      if (2 %in% debug) {
-         return(list(venn_spdf=venn_spdf,
-            venn_spdf1=venn_spdf1));
-      }
-      venn_spdf1 <- sp::spChFIDs(venn_spdf1,
-         paste0(venn_spdf1$label, "|set"));
-      venn_spdf1$color <- set_color[venn_spdf1$label];
-      venn_spdf1$venn_color <- venn_spdf1$color;
-      # merge set and overlap polygons
-      venn_spdfs <- rbind(venn_spdf1[,colnames(data.frame(venn_spdf))],
-         venn_spdf);
-      if (3 %in% debug) {
-         return(list(venn_spdf=venn_spdf,
-            venn_spdf1=venn_spdf1,
-            venn_spdfs=venn_spdfs));
-      }
-   }
-   
    ## Todo:
    # - determine which overlap polygon can represent each set label
    #    - if set is fully inside another set, it must choose the least
@@ -494,6 +445,7 @@ venndir <- function
    whichset <- (length(venn_jps@polygons$label) + 1) -
       match(unique(venn_jps@polygons$label),
          rev(venn_jps@polygons$label));
+   # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
    
    # obtain outer label coordinates
    # consider adding sp_buffer=-0.1 here and relative=TRUE
@@ -507,10 +459,20 @@ venndir <- function
    if (TRUE) {
       # jamba::printDebug("whichset:", whichset);
       # print(venn_jps[whichset, ]);
+      if (verbose) {
+         jamba::printDebug("venndir(): ",
+            "started label_outside_JamPolygon()");
+      }
       ploxy <- label_outside_JamPolygon(jp=venn_jps[whichset, ],
          which_jp=seq_along(whichset),
          distance=segment_distance,
-         buffer=-0.9)
+         verbose=verbose,
+         buffer=-0.9,
+         ...)
+      if (verbose) {
+         jamba::printDebug("venndir(): ",
+            "completed label_outside_JamPolygon()");
+      }
       venn_jps@polygons$x_offset <- 0;
       venn_jps@polygons$y_offset <- 0;
       ploxy_match <- match(venn_jps@polygons$label,
@@ -870,7 +832,9 @@ venndir <- function
       # jamba::printDebug("venn_jps@polygons (after venndir_label_style)");print(venn_jps@polygons);# debug
       # jamba::printDebug("label_df (after venndir_label_style)");print(label_df);# debug
    }
-
+   # jamba::printDebug("venndir(): ", "vo@label_df:");print(vo@label_df);# debug
+   # jamba::printDebug("venndir(): ", "venn_jps@polygons:");print(venn_jps@polygons);# debug
+   
    ## 0.0.30.900 - assume this check already happened in venndir_label_style()
    # update show_items based upon max_items
    if (FALSE) {

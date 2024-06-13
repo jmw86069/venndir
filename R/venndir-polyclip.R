@@ -4,12 +4,10 @@
 #' Convert euler output to polygons
 #' 
 #' This function takes the output from `eulerr::euler()` and
-#' converts it to polygons in `sp::SpatialPolygons` format.
-#' Essentially the output from `eulerr::euler()` is either a
-#' set of circles, or ellipses.
+#' converts it to polygons in `list` format.
 #' 
-#' @return `sp::SpatialPolygons` object with one `sp::Polygons`
-#'    element for each Euler circle or ellipse.
+#' @return `list` polygon object with one polygon
+#'    for each Euler circle or ellipse.
 #' 
 #' @family venndir polygons
 #' 
@@ -19,7 +17,6 @@
 #'    where each list contains `numeric` vectors named `"x"` and `"y"`.
 #' 
 #' @examples
-#' circles <- get_venn_shapes(c(A=1, B=2, "A&B"=3), proportional=TRUE)
 #' counts <- c(A=1, B=2, `A&B`=3)
 #' x <- eulerr::euler(counts)
 #' polygon_list <- eulerr_to_polygon_list(x)
@@ -31,55 +28,52 @@ eulerr_to_polygon_list <- function
 (x)
 {
    # x <- va
-   ellipses1 <- eulerr:::ellipse(h=x$ellipses$h,
+   ellipses1 <- simple_ellipse(h=x$ellipses$h,
       k=x$ellipses$k,
       a=x$ellipses$a,
       b=x$ellipses$b,
       phi=x$ellipses$phi);
    names(ellipses1) <- rownames(x$ellipses);
    return(ellipses1);
-   
-   ellipses <- lapply(ellipses1, function(i){
-      do.call(cbind, i)
-   });
-   
-   ## list of sp::Polygon objects
-   ellipses_P <- lapply(ellipses, function(i){
-      sp::Polygon(i)
-   })
-   #jamba::sdim(ellipses_P);
-   
-   ## sp::SpatialPolygon object (numbered)
-   ellipses_SP1 <- sp::SpatialPolygons(
-      lapply(seq_len(length(ellipses_P)), function(i2){
-         iName <- as.character(i2);
-         ell1 <- ellipses_P[[i2]];
-         sp::Polygons(list(ell1),
-            iName);
-      }),
-      pO=seq_len(length(ellipses_P)));
-   
-   ## sp::SpatialPolygon object (named)
-   ellipses_SP <- sp::SpatialPolygons(
-      lapply(names(ellipses_P), function(i2){
-         iName <- as.character(i2);
-         ell1 <- ellipses_P[[i2]];
-         sp::Polygons(list(ell1), iName);
-      }),
-      pO=seq_len(length(ellipses_P)));
-   return(ellipses_SP);
+}
+
+#' Simple ellipse function
+#' 
+#' @family venndir polygons
+#' 
+#' @export
+simple_ellipse <- function
+(h,
+ k,
+ a,
+ b=a,
+ phi=0,
+ n=200L)
+{
+   theta <- seq.int(0, 2 * pi, length.out = n)
+   m <- length(h)
+   out <- vector("list", m)
+   for (i in seq_along(h)) {
+      out[[i]]$x <- h[i] + a[i] * cos(theta) * cos(phi[i]) - 
+         b[i] * sin(theta) * sin(phi[i])
+      out[[i]]$y <- k[i] + b[i] * sin(theta) * cos(phi[i]) + 
+         a[i] * cos(theta) * sin(phi[i])
+   }
+   out
 }
 
 #' Convert eulerr output to JamPolygon
 #' 
 #' @returns `JamPolygon` object
 #' 
+#' @family JamPolygon
+#' 
 #' @export
 eulerr_to_JamPolygon <- function
 (x)
 {
    # x <- va
-   ellipses1 <- eulerr:::ellipse(h=x$ellipses$h,
+   ellipses1 <- simple_ellipse(h=x$ellipses$h,
       k=x$ellipses$k,
       a=x$ellipses$a,
       b=x$ellipses$b,
@@ -122,7 +116,7 @@ eulerr_to_JamPolygon <- function
 #'    * `"label_x"`
 #'    * `"label_y"`
 #' 
-#' @family venndir utility
+#' @family JamPolygon
 #' 
 #' @param jp `JamPolygon` that contains one polygon per set, named
 #'    using set names.
@@ -303,7 +297,7 @@ find_venn_overlaps_JamPolygon <- function
          if (length(whichNo) >= 1) {
             if (verbose) {
                jamba::printDebug("find_venn_overlaps_JamPolygon(): ",
-                  "minus_polygon_list(jp[whichNo, ]), whichNo: ", whichNo);
+                  "minus_JamPolygon(jp[whichNo, ]), whichNo: ", whichNo);
                # print(jp[whichNo, ]);# debug
             }
             ellUse <- minus_JamPolygon(rbind2(ellYes, jp[whichNo, ]));
@@ -352,7 +346,6 @@ find_venn_overlaps_JamPolygon <- function
    # venn_poly_counts <- venn_poly_coords@polygons$venn_count;
    venn_poly_items <- venn_poly_coords@polygons$venn_items;
 
-   ## sp::SpatialPolygon object (named)
    vennUse <- which(lengths(venn_poly_coords@polygons$x) > 0);
    vennMissing <- which(lengths(venn_poly_coords@polygons$x) == 0);
    if (verbose) {
@@ -391,37 +384,7 @@ find_venn_overlaps_JamPolygon <- function
    # Port this function: sp_polylabelr(i)
    # which calls polylabelr::poi(x, y) on each polygon
    return(invisible(venn_poly_coords));
-   # return(invisible(venn_pcdf));
 
-   if (do_plot) {
-      plot(venn_SP,
-         col=venn_poly_colors[vennUse],
-         border=jamba::makeColorDarker(venn_poly_colors[vennUse]))
-      plot(sp,
-         col="transparent",
-         border=alpha2col(alpha=0.5, venn_colors),
-         lwd=2,
-         add=TRUE)
-   }
-   
-   ## Get central label from each polygon
-   ## Optional: allow using sp::coordinates()
-   venn_labels_xys <- lapply(venn_poly_coords[vennUse], function(i){
-      sp_polylabelr(i)
-   });
-   venn_labels_xy <- jamba::rbindList(venn_labels_xys);
-   venn_spdf$x_label <- unname(unlist(venn_labels_xy[,1]));
-   venn_spdf$y_label <- unname(unlist(venn_labels_xy[,2]));
-   if (do_plot) {
-      points(venn_labels_xy, pch=20,
-         col=jamba::makeColorDarker(venn_poly_colors));
-   }
-   
-   ## TODO: handle labels not represented
-   venn_missing <- venn_poly_coords[vennMissing];
-   attr(venn_spdf, "venn_missing") <- venn_missing;
-   
-   return(invisible(venn_spdf));
 }
 
 
@@ -523,13 +486,13 @@ intersect_JamPolygon <- function
       return(jp);
    }
    if (any(lengths(jp) == 0)) {
-      return(blank_jp, new_name)
+      return(blank_jp(jp, new_name))
    }
    Ax <- jp@polygons$x[[1]];
    Ay <- jp@polygons$y[[1]];
-   if (length(unlist(Ax)) == 0) {
+   if (length(jamba::rmNA(unlist(Ax))) == 0) {
       # if polygon is empty, return empty
-      return(blank_jp, new_name)
+      return(blank_jp(jp, new_name))
    }
    if (!is.list(Ax)) {
       Ax <- list(Ax);
@@ -543,9 +506,9 @@ intersect_JamPolygon <- function
    for (i in pseq) {
       Bx <- jp@polygons$x[[i]];
       By <- jp@polygons$y[[i]];
-      if (length(unlist(Ax)) == 0) {
+      if (length(jamba::rmNA(unlist(Ax))) == 0) {
          # if polygon is empty, return empty
-         return(blank_jp, new_name)
+         return(blank_jp(jp, new_name))
       }
       if (!is.list(Bx)) {
          Bx <- list(Bx);
@@ -559,7 +522,7 @@ intersect_JamPolygon <- function
          op="intersection")
       if (length(A) == 0 || any(lengths(A) == 0)) {
          # if result is empty, return empty jp
-         return(blank_jp, new_name)
+         return(blank_jp(jp, new_name))
       }
    }
    jp <- jp[1, ];
@@ -623,6 +586,14 @@ intersect_JamPolygon <- function
 #' jp3b <- union_JamPolygon(jp3, new_name="polygons 1,2")
 #' plot(jp3b)
 #' 
+#' # test empty polygon
+#' jp3na <- jp3;
+#' jp3na@polygons[2, "x"] <- I(list(NA))
+#' jp3na@polygons[2, "y"] <- I(list(NA))
+#' jp3na
+#' union_JamPolygon(jp3na[1,])
+#' union_JamPolygon(jp3na)
+#' 
 #' @export
 union_JamPolygon <- function
 (jp,
@@ -639,13 +610,13 @@ union_JamPolygon <- function
    
    # start with first non-empty polygon
    for (i in seq_len(length(jp))) {
-      Ax <- jp@polygons$x[[1]];
-      Ay <- jp@polygons$y[[1]];
-      if (length(unlist(Ax)) > 0) {
+      Ax <- jp@polygons$x[[i]];
+      Ay <- jp@polygons$y[[i]];
+      if (length(jamba::rmNA(unlist(Ax))) > 0) {
          break;
       }
    }
-   if (length(unlist(jp@polygons$x)) == 0) {
+   if (length(jamba::rmNA(unlist(jp@polygons$x))) == 0) {
       # if all polygons are empty, return first entry
       if (verbose) {
          jamba::printDebug("union_JamPolygon(): ",
@@ -661,12 +632,11 @@ union_JamPolygon <- function
    A <- lapply(seq_along(Ax), function(i){
       list(x=Ax[[i]], y=Ay[[i]])
    })
-
-   pseq <- tail(seq_len(length(jp)), -i);   
+   pseq <- tail(seq_len(length(jp)), -i);
    for (i in pseq) {
       Bx <- jp@polygons$x[[i]];
       By <- jp@polygons$y[[i]];
-      if (length(unlist(Bx)) == 0) {
+      if (length(jamba::rmNA(unlist(Bx))) == 0) {
          # if B is empty, keep A
          next;
       }
@@ -747,7 +717,7 @@ minus_JamPolygon <- function
    for (i in pseq) {
       Bx <- jp@polygons$x[[i]];
       By <- jp@polygons$y[[i]];
-      if (length(unlist(Bx)) == 0) {
+      if (length(jamba::rmNA(unlist(Bx))) == 0) {
          # if polygon is empty, there is nothing to subtract
          next;
       }
@@ -914,6 +884,8 @@ minus_polygon_list <- function
 #' 
 #' Plot polygon_list using base R
 #' 
+#' @family venndir polygons
+#'
 #' @examples
 #' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
 #' x <- eulerr::euler(counts)
@@ -1038,7 +1010,12 @@ plot_polygon_list <- function
 #' 
 #' Bounding box for polygon list
 #' 
+#' @family venndir polygons
+#' 
 #' @examples
+#' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
+#' x <- eulerr::euler(counts)
+#' polygon_list <- eulerr_to_polygon_list(x)
 #' bbox_polygon_list(polygon_list)
 #' 
 #' @export
@@ -1082,6 +1059,8 @@ bbox_polygon_list <- function
 #'    using `text()`
 #' @param ... additional arguments are passed to `text()` when
 #'    `add_labels=TRUE`
+#' 
+#' @family venndir polygons
 #' 
 #' @examples
 #' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
@@ -1428,7 +1407,7 @@ nudge_polygon_list <- function
    if (length(polygon_list) == 0) {
       return(polygon_list);
    }
-   if (all(c("x", "y") %in% names(polygon_list))) {
+   if (all(c("x", "y") %in% names(polygon_list) && length(polygon_list) == 2)) {
       # input is xy_list format
       xy_list <- polygon_list;
       polygon_list <- xy_list_to_polygon_list(xy_list);
@@ -1466,6 +1445,8 @@ nudge_polygon_list <- function
 #' are nudged the exact same amount. If there are nested polygons, they
 #' are iteratively all nudged the same.
 #' 
+#' @family venndir polygons
+#' 
 #' @examples
 #' D <- list(
 #'    x=c(-3, 3, 3, 0, -3),
@@ -1485,6 +1466,12 @@ nudge_polygon_coords <- function
  ...)
 {
    #
+   if (length(nudge) == 1) {
+      nudge <- unname(rep(nudge, length.out=2))
+   }
+   if (length(names(nudge)) == 0) {
+      names(nudge) <- c("x", "y")
+   }
    if (is.list(polygon_list) &&
          all(c("x", "y") %in% names(polygon_list))) {
       # simple list with "x","y"

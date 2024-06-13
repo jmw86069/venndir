@@ -31,7 +31,7 @@ To illustrate the point, `make_venn_test()` is used to create test
 `setlist` data.
 
 ``` r
-# silence the GEOS warnings
+# silence the warnings
 options("warn"=-1)
 
 library(venndir)
@@ -69,57 +69,28 @@ venndir(setlist)
 <img src="man/figures/README-venn_1-1.png" width="100%" />
 
 You can make a proportional Venn diagram, also known as a Euler diagram.
-More examples of proportional Venn diagrams are described below, but for
-now the simplest approach is to add argument `proportional=TRUE`:
+Add argument `proportional=TRUE`.
 
 ``` r
-venndir(setlist,
-   overlap_type="overlap",
+vo <- venndir(setlist,
    proportional=TRUE)
 ```
 
 <img src="man/figures/README-venn_1e-1.png" width="100%" />
 
-The default output use base R graphics, but you can use `ggplot2` with
-the argument `plot_style="gg"`:
-
-``` r
-venndir(setlist,
-   overlap_type="overlap",
-   proportional=TRUE,
-   plot_style="gg")
-```
-
-<img src="man/figures/README-venn_1g-1.png" width="100%" />
-
-Finally, you can add a legend with `venndir_legender()`:
-
-``` r
-vo <- venndir(setlist,
-   proportional=TRUE,
-   overlap_type="overlap",
-   show_segments=FALSE,
-   plot_style="gg")
-venndir_legender(setlist=setlist, venndir_out=vo, font_cex=0.8)
-```
-
-<img src="man/figures/README-venn_1l-1.png" width="100%" />
-
-The function invisibly returns the `ggplot` object which can be
-manipulated alongside other `grid` graphical objects.
-
 ## Venn Direction
 
-For a more interesting case, `make_venn_test(..., do_signed=TRUE)`
-creates a `setlist` with directionality (sign), which means each item is
+The namesake of this package is Venn with directionality!
+
+Test with: `make_venn_test(..., do_signed=TRUE)`. Each item is
 associated with a numerical direction:
 
 - `+1` for up
 - `-1` for down
 
-In this case, each vector in the `setlist` is a named vector, whose
-**names** are the items, and whose **values** are the signed direction
-`+1` or `-1`. Take a look.
+Each vector in `setlist_dir` is a named vector, whose **names** are the
+items, and whose **values** are the direction, with `+1` or `-1`. Take a
+look.
 
 ``` r
 setlist_dir <- make_venn_test(100, 3, do_signed=TRUE)
@@ -171,10 +142,11 @@ the amount of detail.
 
 ### overlap_type=“concordance”
 
-Let’s start with `overlap_type="concordance"` which displays the number
-`up-up`, and the number `down-down`, and everything else is considered
-“discordant”. This approach is effective at conveying direction, without
-too many unhelpful details.
+This option displays the number `up-up`, and the number `down-down`, and
+everything else is considered “discordant”. This approach is effective
+at conveying direction, without too many details.
+
+Notice the `"X"` to indicate discordance.
 
 ``` r
 venndir(setlist_dir)
@@ -182,16 +154,10 @@ venndir(setlist_dir)
 
 <img src="man/figures/README-venndir_1-1.png" width="100%" />
 
-It is mostly helpful when you want to see how many overlaps agree up and
-down, and when the overlaps that disagree in direction are less
-interesting. For example, sometimes the overlaps are mostly `up-up` and
-rarely `down-down`, which can be very helpful to know.
-
 ### overlap_type=“each”
 
-The option `overlap_type="each"` shows the count for each directional
-combination. It works best when you want to see all the details,
-typically for only 2 or 3 sets.
+This option shows the count for each combination. It works best when you
+want to see all the details, however it can create a lot of labels!
 
 ``` r
 venndir(setlist_dir, overlap_type="each")
@@ -201,9 +167,9 @@ venndir(setlist_dir, overlap_type="each")
 
 ### overlap_type=“agreement”
 
-The option `overlap_type="agreement"` shows the count for each overlap
-that agrees in direction, regardless of the direction; and the count for
-overlaps that disagree in direction.
+This option shows the count that agrees in direction, and the count that
+disagrees in direction. It does not indicate whether the agreement is up
+or down.
 
 This option is especially good at summarizing the number that agree and
 disagree, without including potentially confusing details.
@@ -216,7 +182,7 @@ venndir(setlist_dir, overlap_type="agreement")
 
 ### overlap_type=“overlap”
 
-The option `overlap_type="overlap"` simply ignores directionality.
+This option only displays the overlap count, ignoring direction.
 
 ``` r
 venndir(setlist_dir, overlap_type="overlap")
@@ -226,198 +192,99 @@ venndir(setlist_dir, overlap_type="overlap")
 
 ## Proportional Venn Direction
 
-As shown above, you can switch output to a proportional Venn diagram,
-which uses the really nice `eulerr` R package.
+As mentioned previously, you can display proportional Venn diagram, (a
+Euler diagram), which uses the excellent `eulerr` R package. Add
+argument `proportional=TRUE`.
 
 ``` r
 vo <- venndir(setlist_dir,
    proportional=TRUE,
    font_cex=c(1.3, 0.9, 0.7))
-venndir_legender(setlist_dir, venndir_out=vo, x="bottomright", font_cex=0.6)
 ```
 
 <img src="man/figures/README-venndir_each_p-1.png" width="100%" />
 
-Labeling is often a challenge with proportional Venn diagrams. By
-default, for directional Venn counts, if a polygon is less than 5% of
-the total area, the label is placed outside. For standard Venn counts
-the default threshold is 1%.
-
-Below is the same diagram, showing only the overlap counts, and not the
-directional counts.
+Labeling is often a challenge with proportional Venn diagrams. For very
+small regions, you can push the label outside with
+`inside_percent_threshold=5`. This option will move labels outside when
+the region is less than 5% of the total area.
 
 ``` r
 venndir(setlist,
    proportional=TRUE,
    overlap_type="overlap",
-   label_style="lite",
+   label_style="lite box",
+   inside_percent_threshold=5,
    font_cex=c(1.3, 1))
 ```
 
 <img src="man/figures/README-venndir_overlap_p-1.png" width="100%" />
 
-You can change the threshold for placing labels outside with the
-argument `inside_percent_threshold`, which takes integer percent values
-from 0 to 100.
-
-``` r
-venndir(setlist,
-   proportional=TRUE,
-   inside_percent_threshold=0.1,
-   overlap_type="overlap",
-   font_cex=c(1.3, 1))
-```
-
-<img src="man/figures/README-venndir_overlap_p2-1.png" width="100%" />
-
 ## Customizing the Venn diagram
 
-The output of `venndir()` is a `list` with:
+### Label styles
 
-- `"venn_spdf"` - which contains polygon coordinates stored as a
-  `sp::SpatialPolygonsDataFrame`. Essentially it stores each Venn
-  polygon, with annotations in a `data.frame`.
-- `"label_df"` - a `data.frame` with individual text labels, colors, and
-  coordinates.
+The argument `label_style` can be used to customize the label:
 
-You can edit the `label_df` data manually, as needed, then render the
-Venn diagram using `render_venndir()`. (I really like having a function
-named `render_venndir()`…)
+- `label_style="lite"` - adds lite shading behind each label
+- `label_style="shaded"` - adds partially transparent shading
+- `label_style="fill"` - adds solid colored shading
+- `label_style="box"` - adds a small outline box around the label
 
-``` r
-setlist <- make_venn_test(1000, 3, do_signed=FALSE)
-vo <- venndir(setlist, proportional=TRUE, do_plot=FALSE);
+Multiple terms can be combined, for example to add shading and a box:
 
-print(head(vo$label_df));
-#>                  x     y text venn_counts overlap_set type x_offset y_offset
-#> set_A       -8.730 -1.53   31          31       set_A main   -3.516   -0.998
-#> set_B        8.855 -4.38  390         390       set_B main    9.603   -3.716
-#> set_C       -4.662  9.95   71          71       set_C main   -0.888    4.745
-#> set_A&set_B -4.140 -2.24   27          27 set_A&set_B main    0.000    0.000
-#> set_A&set_C -6.591  2.59    6           6 set_A&set_C main   -3.353    1.592
-#> set_B&set_C  0.117  4.73   76          76 set_B&set_C main    0.000    0.000
-#>             show_label vjust hjust halign rot     color fontsize border lty lwd
-#> set_A               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#> set_B               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#> set_C               NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#> set_A&set_B         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#> set_A&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#> set_B&set_C         NA   0.5   0.5    0.5   0 #262626FF       14     NA   1   1
-#>             fill padding padding_unit r r_unit      overlap_sign        items
-#> set_A         NA       3           pt 3     pt       set_A|1 0 0 item_052....
-#> set_B         NA       3           pt 3     pt       set_B|0 1 0 item_011....
-#> set_C         NA       3           pt 3     pt       set_C|0 0 1 item_059....
-#> set_A&set_B   NA       3           pt 3     pt set_A&set_B|1 1 0 item_019....
-#> set_A&set_C   NA       3           pt 3     pt set_A&set_C|1 0 1 item_093....
-#> set_B&set_C   NA       3           pt 3     pt set_B&set_C|0 1 1 item_060....
-#>             nsets main_venn_counts overlap set_is_hidden show_items   count
-#> set_A           1               31 outside         FALSE       none  inside
-#> set_B           1              390 outside         FALSE       none  inside
-#> set_C           1               71 outside         FALSE       none  inside
-#> set_A&set_B     2               27    none         FALSE       none  inside
-#> set_A&set_C     2                6    none         FALSE       none outside
-#> set_B&set_C     2               76    none         FALSE       none  inside
-#>             label_left_outside label_left_inside label_right_outside
-#> set_A                     TRUE              TRUE               FALSE
-#> set_B                     TRUE              TRUE               FALSE
-#> set_C                     TRUE              TRUE               FALSE
-#> set_A&set_B              FALSE              TRUE               FALSE
-#> set_A&set_C               TRUE             FALSE               FALSE
-#> set_B&set_C              FALSE              TRUE               FALSE
-#>             label_right_inside hjust_outside hjust_inside vjust_outside
-#> set_A                    FALSE           0.5          0.5           0.5
-#> set_B                    FALSE           0.5          0.5           0.5
-#> set_C                    FALSE           0.5          0.5           0.5
-#> set_A&set_B              FALSE           0.5          0.5           0.5
-#> set_A&set_C              FALSE           1.0          0.5           0.0
-#> set_B&set_C              FALSE           0.5          0.5           0.5
-#>             vjust_inside
-#> set_A                0.5
-#> set_B                0.5
-#> set_C                0.5
-#> set_A&set_B          0.5
-#> set_A&set_C          0.5
-#> set_B&set_C          0.5
+- `label_style="shaded box"` - adds colored shading and a box outline
 
-vo$label_df[1:3,"border"] <- c("red4", "darkorange", "blue4");
-vo$label_df[1:3,"fill"] <- c("red3", "darkorange2", "blue3");
-render_venndir(vo);
-```
+### Label position
 
-<img src="man/figures/README-venndir_each_p2-1.png" width="100%" />
+Argument `show_labels` is used to position labels. Each letter defines a
+type of label, and UPPERCASE or lowercase indicates where to place the
+label.
 
-A convenience function `venndir_label_style()` is provided which
-provides two features:
+- UPPERCASE = outside the Venn diagram
+- lowercase = inside the Venn diagram
 
-1.  It can adjust a label positions and visibility using `label_preset`.
-2.  It can adjust label visual style using `label_style`.
+The letters:
 
-### venndir_label_style() and label_preset
+- N = the set name
+- C = the overlap count
+- S = the signed overlap count(s)
+- i = the overlapping items
 
-The `label_preset` has a few pre-configured options:
+Guidance:
 
-- `"main inside"` - displays main set labels, and counts inside each
-  polygon.
-- `"main outside"` - displays each set label outside, and counts inside.
-- `"outside"` - displays set labels and counts outside.
-- `"main items"` - displays set names outside, and item labels inside
-  each polygon. See below for examples.
+- The default: `show_labels="Ncs"` will show \_N_ame outside, \_c_ounts
+  inside. When \_s_igned labels are shown, they also appear inside.
+  Signed labels are not shown when `overlap_type="overlap"`.
+- Display all labels inside: `show_labels="ncs"`
+- It works best to have the \_c_ounts and \_s_igned counts together,
+  usually inside.
+- To display items, `show_labels="Ni"` is recommended, to show \_N_ame
+  outside, and \_i_tems inside. You can still use
+  `show_items="sign item"` so that each item label will include the
+  direction.
+- When displaying items, the counts and signed counts are automatically
+  moved outside. (There isn’t a great way to place item labels around
+  the count labels. Maybe in future.)
 
 ``` r
-vo4 <- venndir_label_style(vo,
-   label_preset="main outside",
+vo4 <- venndir(setlist,
+   show_labels="ncs",
    inside_percent_threshold=0)
-render_venndir(vo4);
 ```
 
 <img src="man/figures/README-label_preset_1-1.png" width="100%" />
 
-You can hide line segments with `show_segments=FALSE`.
+Hide line segments with `show_segments=FALSE`
 
 ``` r
-vo4l <- venndir_label_style(vo,
-   label_preset="main outside",
+vo4l <- venndir(setlist,
+   show_labels="Ncs",
+   show_segments=FALSE,
    inside_percent_threshold=0)
-render_venndir(vo4l,
-   show_segments=FALSE);
 ```
 
 <img src="man/figures/README-label_preset_1l-1.png" width="100%" />
-
-### venndir_label_style() and label_style
-
-The `label_style` is used for visual effects, to improve visibility of
-the text labels. It applies two basic operations, fill and border.
-
-Fill options:
-
-- `"basic"` - removes background fill
-- `"shaded"` - partial transparent fill using the overlap color
-- `"fill"` - fill using the overlap color
-- `"lite"` - lite shaded fill
-- `"custom"` - will not update the fill, in case you manually adjusted
-  these values
-
-Border options:
-
-- `"box"` - will draw a border around each label
-  \*`*`““`- absence of`”box”`in`label_style\` will remove any border
-
-The `label_style` string can be any string that contains those values,
-for example:
-
-- `label_style="lite box"`
-- `label_style="shaded"`
-- `label_style="basic box"`
-
-``` r
-vo3 <- venndir_label_style(vo,
-   inside_percent_threshold=0,
-   label_style="lite box")
-render_venndir(vo3);
-```
-
-<img src="man/figures/README-label_style_1-1.png" width="100%" />
 
 ## Text Venn for the R Console
 
@@ -428,6 +295,9 @@ display colored text, just not in Rmarkdown.
 The first example is the basic Venn overlap, without direction.
 
 ``` r
+# Options are used for the RMarkdown
+# options("jam.htmlOut"=TRUE, "jam.comment"=FALSE)
+
 setlist <- make_venn_test(1000, 3, do_signed=TRUE)
 textvenn(setlist, overlap_type="overlap")
 #>                                 set_A&set_B                                     
@@ -485,6 +355,12 @@ textvenn(setlist, overlap_type="concordance", unicode=FALSE)
 #>                                             71          v: 41
 ```
 
+``` r
+
+# Revert options
+# options("jam.htmlOut"=FALSE, "jam.comment"=TRUE)
+```
+
 Sorry, no proportional text Venn diagrams (yet)!
 
 ## Nudge Venn circles
@@ -513,6 +389,8 @@ venndir(setlist_o,
 
 <img src="man/figures/README-nudge_1-1.png" width="100%" />
 
+    #> ##  (19:02:56) 11Jun2024:   warning_label exists
+
 The argument `circle_nudge` lets you nudge (move) a Venn circle given
 x,y coordinates. Provide a `list` named by the set you want to move,
 with a `numeric` vector for the `x,y` coordinates direction.
@@ -539,18 +417,26 @@ cases with too many labels to display, it is sometimes still useful to
 display the sign, as a visual cue for the proportion of shared or
 discordant signs.
 
-Two arguments are required: the `label_preset` to define the visibility
-of items and main set labels; and `show_items` to define the type of
-item label. For example `label_preset="main items"` will display main
-set labels outside, and item labels inside; and `show_items="item"` will
-display the item label, `show_items="sign item"` will display the sign
-and item label, `show_items="sign"` will display only the sign.
+Two changes are required:
+
+1.  Argument `show_labels` must include `"i"` to indicate items should
+    be included in the labels. Preferred options:
+
+    - `"Ni"` which shows \_N_ame outside, and \_i_tems inside.
+    - `"NCi"` which shows \_N_ame and \_C_ounts outside, and \_i_tems
+      inside.
+
+2.  Argument `show_items` should be one of
+
+    - `"item"` - to show only the item label
+    - `"sign item"` - to show the sign beside each item label
+    - `"sign"` - to show only the item label
 
 ``` r
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir(setlist,
    poly_alpha=0.3,
-   label_preset="main items",
+   show_labels="NCi",
    show_items="sign item");
 ```
 
@@ -560,28 +446,31 @@ Interestingly, the density of labels gives some indication of the
 relative overlaps.
 
 The same plot using proportional circles makes the label density
-effectively uniform:
+effectively uniform. Note the option `show_items="sign"` displays only
+the directional arrow, and `item_cex=2` makes the arrows twice as large
+as normal.
 
 ``` r
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir(setlist,
    poly_alpha=0.3,
-   label_preset="main items",
-   show_items="item",
+   show_labels="Ni",
+   item_cex=2,
+   show_items="sign",
    proportional=TRUE);
 ```
 
 <img src="man/figures/README-vennitems_1p-1.png" width="100%" />
 
-With too many features to label, it’s still interesting to indicate the
-sign.
+The sign is an interesting visual summary when there are too many labels
+to display otherwise.
 
 ``` r
 setlist <- make_venn_test(1000, 3, do_signed=TRUE);
 venndir(setlist,
-   label_preset="main items",
+   show_labels="Ni",
    show_items="sign",
-   item_cex=3,
+   item_cex=2,
    show_segments=FALSE,
    max_items=10000);
 ```
@@ -592,13 +481,13 @@ Again, proportional Venn circles effectively makes the density uniform.
 
 ``` r
 venndir(setlist,
-   label_preset="main items",
+   show_labels="Ni",
    overlap_type="each",
    show_items="sign",
    item_cex=4,
    max_items=10000,
    show_segments=FALSE,
-   proportional=TRUE);
+   proportional=TRUE)
 ```
 
 <img src="man/figures/README-vennitems_2p-1.png" width="100%" />

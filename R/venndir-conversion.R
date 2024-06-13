@@ -168,12 +168,9 @@ overlaplist2setlist <- function
 #' )
 #' setlist <- signed_counts2setlist(x)
 #' vo <- venndir(setlist, "each")
-#' polygon_label_outside(vo$venn_spdf, 1, debug=TRUE, distance=diff(par("usr")[1:2]) * 0.05)
 #' venndir(setlist, "each", show_items="sign", item_degrees=-10)
 #' 
 #' vo <- venndir(setlist, proportional=TRUE, label_style="shaded_box", show_set="none")
-#' plo <- polygon_label_outside(vo$venn_spdf, NULL, debug=TRUE, distance=diff(par("usr")[1:2]) * 0.05)
-#' plo
 #' 
 #' @export
 signed_counts2setlist <- function

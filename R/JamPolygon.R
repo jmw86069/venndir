@@ -36,6 +36,8 @@
 #' 
 #' @param object `JamPolygon` object
 #' 
+#' @family JamPolygon
+#' 
 #' @export
 check_JamPolygon <- function
 (object)
@@ -53,6 +55,8 @@ check_JamPolygon <- function
 #' 
 #' JamPolygon class
 #' 
+#' @family JamPolygon
+
 #' @examples
 #' df <- data.frame(name=c("polygon1", "polygon2"),
 #'    x=I(list(
@@ -127,6 +131,8 @@ if (!isGeneric("plot")) {
 #' * Consider disabling the thin black border by default.
 #' 
 #' @returns `JamPolygon` object, invisibly.
+#' 
+#' @family JamPolygon
 #' 
 #' @examples
 #' dfx <- data.frame(name=c("polygon1", "polygon2"),
@@ -421,6 +427,7 @@ plot.JamPolygon <- function
    # add polygon orientations
    x <- add_orientation_JamPolygon(x,
       flip_sign=flip_sign);
+   # jamba::printDebug("plot.JamPolygon(): ", "x:");print(x);# debug
    
    # fill in some default values where missing
    if (!"border.lwd" %in% colnames(x@polygons)) {
@@ -552,8 +559,16 @@ plot.JamPolygon <- function
                jamba::printDebug("Rendering polygon: ", irow);
             }
             use_coords_df <- subset(coords_df, pathId %in% irow);
+            # 0.0.31.900 - when polygon is empty, skip
+            if (all(is.na(use_coords_df$x))) {
+               next;
+            }
             if (nrow(use_coords_df) > 0) {
                # render one polygon without border
+               # jamba::printDebug("grid.path data:");print(data.frame(x=adjx(use_coords_df$x),
+               #    y=adjy(use_coords_df$y),
+               #    pathId=use_coords_df$pathId,
+               #    id=use_coords_df$id));# debug
                grid::grid.path(rule="evenodd",
                   x=adjx(use_coords_df$x),
                   y=adjy(use_coords_df$y),
@@ -849,6 +864,8 @@ setMethod("ncol",
 #' 
 #' Calculate angle between three consecutive points
 #' 
+#' @family venndir utility
+#' 
 #' @param x `matrix` with first two columns assumed to contain `x`, `y`
 #'    coordinates.
 #' @export
@@ -886,6 +903,8 @@ three_point_angle <- function
 #' 
 #' @returns `JamPolygon` with column `"orientation"` added to
 #'    slot "polygons".
+#' 
+#' @family JamPolygon
 #' 
 #' @param jp `JamPolygon`
 #' @param flip_sign `integer` to indicate whether the orientation should
@@ -961,8 +980,14 @@ add_orientation_JamPolygon <- function
    }
    # iterate each row
    orientations <- jamba::rbindList(lapply(seq_len(length(jp)), function(i){
-      if (length(unlist(jp@polygons$x[[i]])) == 0) {
-         return(NA)
+      # jamba::printDebug("orientations jp:");print(jp);# debug
+      unlistx <- unlist(jp@polygons$x[[i]]);
+      if (length(jamba::rmNA(unlistx)) == 0) {
+         # jamba::printDebug("orientations, empty polygon i:", i);# debug
+         return(data.frame(polygon_clockwise=NA,
+            orientation=NA,
+            holes=NA,
+            polygon_parent=NA))
       }
       use_x <- jp@polygons$x[[i]];
       use_y <- jp@polygons$y[[i]];
@@ -1135,11 +1160,14 @@ add_orientation_JamPolygon <- function
 #' Bounding box for JamPolygon
 #' 
 #' @param jp `JamPolygon` object
+#' @param ... additional arguments are ignored.
+#' 
+#' @family JamPolygon
 #' 
 #' @export
 bbox_JamPolygon <- function
 (jp,
-   ...)
+ ...)
 {
    #
    n <- length(jp);
@@ -1247,6 +1275,7 @@ area_JamPolygon <- function
    # (polygon or hole)
    
    # add orientation (sign) to each polygon part
+   # jamba::printDebug("area_JamPolygon(): ", "jp");print(jp);# debug
    jp <- add_orientation_JamPolygon(jp,
       flip_sign=flip_sign,
       ...)
@@ -1259,7 +1288,8 @@ area_JamPolygon <- function
    jp_areas <- lapply(seq_len(length(jp)), function(irow){
       use_x <- jp@polygons$x[[irow]];
       use_y <- jp@polygons$y[[irow]];
-      if (length(unlist(use_x)) == 0) {
+      # jamba::printDebug("area_JamPolygon(): ", "use_x");print(use_x);# debug
+      if (length(jamba::rmNA(unlist(use_x))) == 0) {
          return(0);
       }
       use_orientations <- jp@polygons$orientation[[irow]]
@@ -1275,7 +1305,7 @@ area_JamPolygon <- function
       iareas <- unlist(lapply(seq_along(use_x), function(ipart){
          ix <- use_x[[ipart]];
          iy <- use_y[[ipart]];
-         if (length(unlist(ix)) == 0) {
+         if (length(jamba::rmNA(unlist(ix))) == 0) {
             return(0)
          }
          iarea <- pracma::polyarea(x=ix, y=iy)
@@ -1351,7 +1381,7 @@ point_in_JamPolygon <- function
          abs(i)
       }));
    }
-   # jamba::printDebug("jp:");print(jp);
+   # jamba::printDebug("point_in_JamPolygon(): ", "jp:");print(jp);# debug
    
    # iterate each row in jp@polygons
    olm1 <- do.call(cbind, lapply(jamba::nameVector(seq_len(length(jp))), function(irow){
@@ -1417,6 +1447,7 @@ has_point_in_JamPolygon <- function
  ...)
 {
    #
+   # jamba::printDebug("has_point_in_JamPolygon(): ", "jp:");print(jp);# debug
    lengths(point_in_JamPolygon(x=x,
       jp=jp,
       apply_holes=apply_holes,
@@ -1562,6 +1593,8 @@ polyclip_to_JamPolygon <- function
 #' 1. Enable polygon buffer to guarantee minimum spacing from borders.
 #' 2. Allow different spatial patterns, currently square or rectangular.
 #' In future, consider hexagonal, diamond, or diagonal.
+#' 
+#' @family JamPolygon
 #' 
 #' @examples
 #' df3 <- data.frame(name=c("polygon1", "polygon2"),
@@ -1797,6 +1830,8 @@ sample_JamPolygon <- function
 #' 
 #' Apply buffer outside or inside JamPolygon
 #' 
+#' @family JamPolygon
+#' 
 #' @param jp `JamPolygon` with one or more polygons. When multiple polygons
 #'    are provided, they are combined with `union_JamPolygon()` so that
 #'    one overall buffer can be provided.
@@ -1817,7 +1852,7 @@ buffer_JamPolygon <- function
       # return buffer=0 jp unchanged
       return(jp)
    }
-   if (length(unlist(jp@polygons$x)) == 0) {
+   if (length(jamba::rmNA(unlist(jp@polygons$x))) == 0) {
       # return empty jp unchanged
       return(jp)
    }
@@ -1866,7 +1901,7 @@ buffer_JamPolygon <- function
          # union_polygon_list(polygon_list),
          buffer,
          jointype="round")
-      if (length(unlist(buffer_polygon_list)) == 0) {
+      if (length(jamba::rmNA(unlist(buffer_polygon_list))) == 0) {
          return(NULL);
       }
       return(polyclip_to_JamPolygon(buffer_polygon_list));

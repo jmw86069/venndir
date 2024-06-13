@@ -10,8 +10,8 @@ eulerr_to_polygon_list(x)
 \item{x}{output from \code{eulerr::euler()}}
 }
 \value{
-\code{sp::SpatialPolygons} object with one \code{sp::Polygons}
-element for each Euler circle or ellipse.
+\code{list} polygon object with one polygon
+for each Euler circle or ellipse.
 
 \code{list} with polygons for each unique set defined by \code{names(x)},
 where each list contains \code{numeric} vectors named \code{"x"} and \code{"y"}.
@@ -21,12 +21,9 @@ Convert euler output to polygons
 }
 \details{
 This function takes the output from \code{eulerr::euler()} and
-converts it to polygons in \code{sp::SpatialPolygons} format.
-Essentially the output from \code{eulerr::euler()} is either a
-set of circles, or ellipses.
+converts it to polygons in \code{list} format.
 }
 \examples{
-circles <- get_venn_shapes(c(A=1, B=2, "A&B"=3), proportional=TRUE)
 counts <- c(A=1, B=2, `A&B`=3)
 x <- eulerr::euler(counts)
 polygon_list <- eulerr_to_polygon_list(x)
@@ -36,19 +33,23 @@ polygon_areas(polygon_list)
 }
 \seealso{
 Other venndir polygons: 
+\code{\link{bbox_polygon_list}()},
 \code{\link{get_largest_polygon_list}()},
-\code{\link{get_polygon_buffer}()},
 \code{\link{get_venn_polygon_shapes}()},
 \code{\link{intersect_polygon_list}()},
+\code{\link{labelr_polygon_list}()},
 \code{\link{minus_polygon_list}()},
+\code{\link{nudge_polygon_coords}()},
 \code{\link{nudge_polygon_list}()},
+\code{\link{plot_polygon_list}()},
 \code{\link{polygon_areas}()},
 \code{\link{polygon_circles}()},
 \code{\link{polygon_ellipses}()},
 \code{\link{polygon_list_labelr}()},
 \code{\link{polygon_list_to_xy_list}()},
 \code{\link{rescale_polygon_list}()},
+\code{\link{simple_ellipse}()},
 \code{\link{union_polygon_list}()},
-\code{\link{xy_list_to_coord_list}()}
+\code{\link{xy_list_to_polygon_list}()}
 }
 \concept{venndir polygons}

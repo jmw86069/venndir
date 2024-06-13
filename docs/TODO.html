@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -59,6 +59,229 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_12jun2024">12jun2024<a class="anchor" aria-label="anchor" href="#id_12jun2024"></a></h2>
+<ul><li>
+<p><code><a href="reference/venn_meme.html">venn_meme()</a></code> - some visual adjustments are needed</p>
+<ul><li>Fix regression in <code>gridtext</code> for item labels, not recognizing <code>&lt;br&gt;</code>
+</li>
+<li>When one item label is present, use proper center position instead of patterned fill. Or change the default fill pattern being used. Current state: item label is placed near edges and not in the center.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_11jun2024">11jun2024<a class="anchor" aria-label="anchor" href="#id_11jun2024"></a></h2>
+<ul><li>
+<p>DONE. <code><a href="reference/venndir.html">venndir()</a></code> error</p>
+<ul><li>Error is caused when two sets do not overlap, and <code>proportional=TRUE</code>. See <code><a href="reference/find_venn_overlaps_JamPolygon.html">find_venn_overlaps_JamPolygon()</a></code> in venndir-base-polyclip.R#428 <code><a href="reference/intersect_JamPolygon.html">intersect_JamPolygon()</a></code> in venndir-polyclip.R#245.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_02may2024">02may2024<a class="anchor" aria-label="anchor" href="#id_02may2024"></a></h2>
+<ul><li>
+<p><code><a href="reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>Use “Set” and “Size” capitalized.</li>
+<li>Left-align text in “Set” column; right-align numbers in “Size”.</li>
+<li>Consider option not to colorize the table rows.</li>
+<li>Consider adding a column “Color” with filled cell. Bonus points for having the color be a perfect square (not rectangular).</li>
+<li>Apply contrasting color, when rows are filled with <code>set_colors</code>, currently text is always black.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_23apr2024">23apr2024<a class="anchor" aria-label="anchor" href="#id_23apr2024"></a></h2>
+<ul><li>
+<p><code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> (JamPolygon)</p>
+<ul><li>Allow and document how to create a multi-panel plot. For example, how can it be used with <code>patchwork</code> to assemble a Venn diagram beside a heatmap, or beside output from <code>plot_sedesign()</code>?</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_22apr2024">22apr2024<a class="anchor" aria-label="anchor" href="#id_22apr2024"></a></h2>
+<ul><li>
+<p><code><a href="reference/render_venndir.html">render_venndir()</a></code> throws font-related warnings when the output PNG or PDF font library is not found, and sometimes substitutes Unicode characters with <code>"."</code>. It seems to happen uniquely to PDF output, might be platform- and device-dependent. Some suggested workarounds include:</p>
+<ul><li>Use <code>extrafonts</code> package to import the desired fonts. Not tested.</li>
+<li>Use specific <code>fontfamily</code> which is recognized for the requested output, however in RMarkdown when creating PNG and PDF files for the same chunk, it appears that the PNG and PDF recognized fonts are not consistent.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_22mar2024">22mar2024<a class="anchor" aria-label="anchor" href="#id_22mar2024"></a></h2>
+<ul><li><p>Remove all “sp”,<code>sf</code>,“rgeos” functions</p></li>
+<li>
+<p>Remove all portions of remaining functions that call “sp”,<code>sf</code>,“rgeos”</p>
+<ul><li>
+<code>polygon_label_segment()</code> - still uses a hybrid approach, accepting sp and jp objects.</li>
+</ul></li>
+<li>
+<p>Verify the new <code><a href="reference/venndir.html">venndir()</a></code> returns equivalent data as <code>venndir_OLD()</code> even if it is returned in different manner.</p>
+<ul><li>Clean up output data format</li>
+</ul></li>
+<li><p>Verify <code>render_venndir_polyclip()</code> accepts equivalent input data.</p></li>
+<li><p>Consider making <code><a href="reference/venndir.html">venndir()</a></code> output equivalent to previous versions, so that methods that expect specific output might still work?</p></li>
+<li>
+<p>Consider S4 <code>Venndir</code> object, with slot names:</p>
+<ul><li>
+<p>slots:</p>
+<ul><li>
+<code>jp</code> - set polygons, name, label, color</li>
+<li>
+<code>jps</code> - set/overlap polygons, name, label, type, overlap</li>
+<li>
+<code>label_df</code> - overlap count, signed count, count label, items (optional)</li>
+<li>
+<code>setlist</code> - the input <code>setlist</code> for easy reference</li>
+</ul></li>
+<li>
+<p>methods:</p>
+<ul><li>
+<p><code>validate()</code> - check internal consistency, set names, overlaps, label xy</p>
+<ul><li>names(setlist) matches names(jp), are found in names(jps)</li>
+<li>jps overlap names -&gt; set names -&gt; found in names(setlist), names(jp)</li>
+<li>label_df overlap names all present in jps overlap names</li>
+<li>label_df specific overlap count sum equals jps overlap count</li>
+</ul></li>
+<li><p><code>setlist()</code> - accessor for <code>setlist</code> slot</p></li>
+<li><p><code>im()</code> - calls <code><a href="reference/list2im_opt.html">list2im_opt()</a></code></p></li>
+<li><p><code>im_signed()</code> (or <code>im_value()</code>) - calls <code><a href="reference/list2im_value.html">list2im_value()</a></code></p></li>
+<li><p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> - calls <code><a href="reference/render_venndir.html">render_venndir()</a></code></p></li>
+</ul></li>
+</ul></li>
+<li>
+<p>label positioning shorthand: NOCPSI</p>
+<ul><li>Set _N_ame, _O_verlap Name, _C_ount, _P_ercentage, _S_igned, _I_tems</li>
+<li>uppercase is “outside”, lowercase is “inside” the relevant polygon</li>
+<li>Default: Ncps: set _N_ame outside; _c_ount/_s_igned inside, others hidden</li>
+<li>To show items: NCSi: _N_ame/_C_ount/_S_igned outside; items inside</li>
+</ul></li>
+<li>
+<p>consider table item display inside/outside</p>
+<ul><li>
+<code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::tableGrob()</a></code> with 1 to 3 columns, which could be positioned beneath other name/count labels. Seen in published Venn diagram figure. Probably only works well for a small number of items.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_13mar2024">13mar2024<a class="anchor" aria-label="anchor" href="#id_13mar2024"></a></h2>
+<ul><li><p>Optionally display overall percentage below main count label.</p></li>
+<li>
+<p>Consider <code>JamPolygon</code> which is a <code>data.frame</code>:</p>
+<ul><li>
+<p><code>data.frame</code> details:</p>
+<ul><li><p>Each row is strictly one polygon, multipart polygons are still one row.</p></li>
+<li><p><code>x</code>: <code>list</code> column with one or more <code>numeric</code> vectors.</p></li>
+<li><p><code>y</code>: <code>list</code> column with one or more <code>numeric</code> vectors.</p></li>
+<li><p><code>name</code> - unique entry, essentially <code><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames()</a></code></p></li>
+<li>
+<p><code>label</code> - by default uses <code>name</code> but can be anything including <code>NA</code>, also it can contain the same label as another polygon.</p>
+<ul><li>Unclear whether it can store <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>?</li>
+</ul></li>
+<li><p><code>labels</code> - optional, label each multipart polygon - not implemented yet</p></li>
+<li><p><code>fill</code> - internal polygon fill color</p></li>
+<li>
+<p><code>border</code>, <code>border.lwd</code>, <code>border.lty</code> - outer border</p>
+<ul><li>Consider R package <code>vwline</code> for variable width lines, part of which enables rendering the outer/inner portion of a line.</li>
+</ul></li>
+<li><p><code>innerborder</code>, <code>innerborder.lwd</code>, <code>innerborder.lty</code> - inner border</p></li>
+<li><p><code>family</code>, <code>fontsize</code> - <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code> for the label.</p></li>
+<li><p><code>label_x</code>, <code>label_y</code> - to position the label inside the polygon</p></li>
+<li><p><code>outerlabel_x</code>, <code>outerlabel_y</code> - to position the label outside the polygon?</p></li>
+</ul></li>
+<li>
+<p><code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
+<ul><li>Wrapper to render <code>JamPolygon</code> likely using <code>grid</code> methods.</li>
+</ul></li>
+<li>
+<p><code>print.JamPolygon()</code>, <code>summary.JamPolygon()</code></p>
+<ul><li>summary function to print contents, probably using <code>print.data.frame</code>
+</li>
+</ul></li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_12feb2024">12feb2024<a class="anchor" aria-label="anchor" href="#id_12feb2024"></a></h2>
+<ul><li><p>Idea: Consider reporting “overlaps not shown” using <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::grid.table()</a></code></p></li>
+<li>
+<p>Related: Could <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::grid.table()</a></code> be used for Venn labels?</p>
+<ul><li>It would need to be rendered with <code>textGrob()</code> then replaced with <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>
+</li>
+</ul></li>
+<li>
+<p>Marry <code>gridtext</code> and <code>ggrepel</code> for non-overlapping labels.</p>
+<ul><li>Follow: <a href="https://github.com/wilkelab/gridtext/issues/33" class="external-link uri">https://github.com/wilkelab/gridtext/issues/33</a> There is a working pull request in <code>gridtext</code>, pending changes in <code>ggrepel</code>. Just awaiting each package author approval.</li>
+</ul></li>
+<li>
+<p><code>venndir_legendir()</code></p>
+<ul><li>Consider option to display “Total” unique items as the bottom row.</li>
+</ul></li>
+<li>
+<p>Fix issue with Venn numeric label coloring when background color is dark.</p>
+<ul><li>The <code>venndir_legendir()</code> label shows light text correctly, the signed labels appear to be adjusted correctly, but the count label appears not to be adjusted correctly. Some cells are correct, others are not, suggesting this is a mismatched ordering issue. Observed with 4-way Venn, it appears only the overlap regions adjust text, not the unique-set regions.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_27nov2023">27nov2023<a class="anchor" aria-label="anchor" href="#id_27nov2023"></a></h2>
+<ul><li>
+<p>DONE. Urgent: Transition from “sp” and “rgeos” to <code>polyclip</code> since “rgeos” has been removed from CRAN. Ugh.</p>
+<ul><li>
+<p>Current status:</p>
+<ul><li>Most individual functions are ported with equivalent functions provided by <code><a href="https://rdrr.io/pkg/polyclip/man/polyclip.html" class="external-link">polyclip::polyclip()</a></code>.</li>
+<li>There are still edge cases with polygons having holes, nested polygons (multi-part polygons) which are not handled consistently.</li>
+</ul></li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_04oct2023">04oct2023<a class="anchor" aria-label="anchor" href="#id_04oct2023"></a></h2>
+<ul><li>
+<p>debug issue when LOCALE is “C” the labels are not shown, and error is generating saying <code>gridtext</code> does not recognize characters, referencing some simple unicode characters (up/down arrows, etc.)</p>
+<ul><li>workaround is to change LOCALE to <code>"en_US.UTF-8"</code> with: <code>Sys.setlocale("LC_ALL", "en_US.UTF-8")</code> but unclear why it’s a problem? This workaround does not seem portable for other actual locales.</li>
+</ul></li>
+<li><p>Optionally display overall percentage below main count label</p></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_21sep2023">21sep2023<a class="anchor" aria-label="anchor" href="#id_21sep2023"></a></h2>
+<ul><li>
+<p><code><a href="reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>For signed data, include direction labels, colorized properly. <code>"size"</code> <code>"direction"</code> <code>"579"</code> <code>"(↑: 123, ↓: 456)"</code>
+</li>
+<li>It should call <code><a href="reference/curate_venn_labels.html">curate_venn_labels()</a></code> which means it needs the arguments <code>curate_df</code>,<code>unicode</code> to allow customization.</li>
+</ul></li>
+<li>
+<p>DONE. Migrate from “sp” to <code>polyclip</code></p>
+<ul><li><p>“sp” is being retired October 2023. Decided not to use <code>sf</code> due to heavy dependencies focused on geographical map software libraries which are not relevant here.</p></li>
+<li><p><code>polyclip</code> provides the basic manipulations required: intersect, union, subtract, rotate, buffer.</p></li>
+<li>
+<p>Does <code>venndir</code> need to accept past object formats with “sp” objects?</p>
+<ul><li>Migration function to convert old “sp” to new <code>polyclip</code> object.</li>
+</ul></li>
+<li><p>Replace <code>venn_spdf</code> with <code>data.frame</code> equivalent format.</p></li>
+<li>
+<p>Functions to port:</p>
+<ul><li>
+<code>find_vennpoly_overlaps()</code> - input <code>SpatialPolygons</code>, output <code>SpatialDataFrame</code>
+</li>
+<li>
+<code>eulerr2polys()</code> - output <code>SpatialPolygons</code>
+</li>
+<li>
+<code>intersect_polygons()</code> - input/output <code>SpatialPolygons</code>
+</li>
+<li>
+<code>union_polygons()</code> - input/output <code>SpatialPolygons</code>
+</li>
+<li>
+<code>get_largest_polygon()</code> - input/output <code>SpatialPolygons</code>
+</li>
+<li>
+<code>sp_circles()</code>,<code>sp_ellipses()</code> - output <code>SpatialPolygons</code>
+</li>
+<li>
+<code>nudge_sp()</code> - input/output <code>SpatialPolygons</code>
+</li>
+<li>
+<code>rescale_sp()</code>,<code>rescale_ps()</code>,<code>rescale_p()</code>,<code><a href="reference/rescale_coordinates.html">rescale_coordinates()</a></code> - ?</li>
+<li><code>polygon_label_segment()</code></li>
+<li><code>sp_polylabelr()</code></li>
+<li><code>sp_percent_area()</code></li>
+<li><code>get_sp_buffer()</code></li>
+</ul></li>
+</ul></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_07jul2023">07jul2023<a class="anchor" aria-label="anchor" href="#id_07jul2023"></a></h2>
 <ul><li>
 <p><code><a href="reference/render_venndir.html">render_venndir()</a></code></p>
@@ -75,7 +298,7 @@
 <li><p>Line segments should more reliably point to “just inside” the polygon shape, where the overlap is more or less a fixed amount, and slightly more than the current defaults. Currently the line mostly points to the border, it’s hard to see that the line ends just inside.</p></li>
 </ul></li>
 <li>
-<p>Consider new function <code>reposition_venn_gridtext_labels()</code></p>
+<p>Consider new function <code><a href="reference/reposition_venn_gridtext_labels.html">reposition_venn_gridtext_labels()</a></code></p>
 <ul><li>based upon <code><a href="reference/draw_gridtext_groups.html">draw_gridtext_groups()</a></code>
 </li>
 <li>Purpose would be to adjust label positions after grobs are defined, so the actual height/width is defined, but before rendering.</li>
@@ -166,35 +389,27 @@
 <div class="section level2">
 <h2 id="id_02may2023">02may2023<a class="anchor" aria-label="anchor" href="#id_02may2023"></a></h2>
 <ul><li>
-<p>Overall: replace use of <code>sp</code> (SpatialPolygons) with <code>sf</code> (Simple Features)</p>
+<p>Overall: replace use of “sp” (SpatialPolygons) with <code>sf</code> (Simple Features)</p>
 <ul><li><p>requires changing <code>venn_spdf</code> into the <code>sf</code> equivalent, which could be nearly drop-in replacement. The <code>sf</code> default object is based upon <code>data.frame</code> already.</p></li>
-<li><p>requires converting sp-specific functions: <code><a href="reference/nudge_sp.html">nudge_sp()</a></code>, <code><a href="reference/rescale_ps.html">rescale_ps()</a></code>, <code><a href="reference/rescale_sp.html">rescale_sp()</a></code>, <code><a href="reference/rescale_p.html">rescale_p()</a></code>, <code><a href="reference/rescale_coordinates.html">rescale_coordinates()</a></code>, <code><a href="reference/get_sp_buffer.html">get_sp_buffer()</a></code>. Some functions like <code><a href="reference/get_sp_buffer.html">get_sp_buffer()</a></code> may be built-in with <code>sf</code>.</p></li>
-<li><p>remove dependencies <code>sp</code> and <code>rgeos</code>.</p></li>
+<li><p>requires converting sp-specific functions: <code>nudge_sp()</code>, <code>rescale_ps()</code>, <code>rescale_sp()</code>, <code>rescale_p()</code>, <code><a href="reference/rescale_coordinates.html">rescale_coordinates()</a></code>, <code>get_sp_buffer()</code>. Some functions like <code>get_sp_buffer()</code> may be built-in with <code>sf</code>.</p></li>
+<li><p>remove dependencies “sp” and “rgeos”.</p></li>
 <li>
-<p>replace <code>rgeos</code> functions with with built-in <code>sf</code> equivalents:</p>
-<ul><li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/misc-gArea.html" class="external-link">rgeos::gArea()</a></code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">sf::st_area()</a></code>
+<p>replace “rgeos” functions with with built-in <code>sf</code> equivalents:</p>
+<ul><li>“rgeos” <code>gArea()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">sf::st_area()</a></code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/rgeos-deprecated.html" class="external-link">rgeos::gDifference()</a></code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">sf::st_difference()</a></code>
+<li>“rgeos” <code>gDifference()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">sf::st_difference()</a></code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/rgeos-deprecated.html" class="external-link">rgeos::gBuffer()</a></code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">sf::st_buffer()</a></code>
+<li>“rgeos” <code>gBuffer()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">sf::st_buffer()</a></code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/pred-binary-gIntersects.html" class="external-link">rgeos::gIntersects()</a></code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_intersects()</a></code>
+<li>“rgeos” <code>gIntersects()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_intersects()</a></code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/topo-unary-gSimplify.html" class="external-link">rgeos::gSimplify()</a></code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">sf::st_simplify()</a></code>
+<li>“rgeos” <code>gSimplify()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">sf::st_simplify()</a></code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/topo-bin-gUnion.html" class="external-link">rgeos::gUnaryUnion()</a></code> -&gt; <code>sf::st_union(x)</code>
+<li>“rgeos” <code>gUnaryUnion()</code> -&gt; <code>sf::st_union(x)</code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/pred-binary-gContains.html" class="external-link">rgeos::gContains()</a></code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_contains()</a></code>
+<li>“rgeos” <code>gContains()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_contains()</a></code>
 </li>
-<li>
-<code><a href="https://rdrr.io/pkg/rgeos/man/rgeos-deprecated.html" class="external-link">rgeos::gUnion()</a></code> -&gt; <code>sf::st_union(x, y)</code>
+<li>“rgeos” <code>gUnion()</code> -&gt; <code>sf::st_union(x, y)</code>
 </li>
 </ul></li>
 </ul></li>
@@ -208,7 +423,7 @@
 </ul></li>
 <li>
 <p><code><a href="reference/venn_meme.html">venn_meme()</a></code></p>
-<ul><li>Examples for <code>venn_meme(wtah, proportional=TRUE)</code> causes an error in <code><a href="reference/polygon_label_fill.html">polygon_label_fill()</a></code> potentiallly trying to fill labels into a polygon overlap that does not exist in the object. It previously skipped those sections, however an error is thrown.</li>
+<ul><li>Examples for <code>venn_meme(wtah, proportional=TRUE)</code> causes an error in <code>polygon_label_fill()</code> potentiallly trying to fill labels into a polygon overlap that does not exist in the object. It previously skipped those sections, however an error is thrown.</li>
 <li>Consider renaming as <code>venndir_meme()</code>
 </li>
 </ul></li>
@@ -216,7 +431,7 @@
 <p>For fun, consider renaming functions similar to <code><a href="reference/render_venndir.html">render_venndir()</a></code>. Some ideas:</p>
 <ul><li>DONE: <code>venndir_legend()</code> -&gt; <code><a href="reference/venndir_legender.html">venndir_legender()</a></code>?</li>
 <li>
-<code><a href="reference/find_vennpoly_overlaps.html">find_vennpoly_overlaps()</a></code> -&gt; <code>venndir_descender()</code>, it descends the polygon overlap combinations.</li>
+<code>find_vennpoly_overlaps()</code> -&gt; <code>venndir_descender()</code>, it descends the polygon overlap combinations.</li>
 <li>
 <code><a href="reference/get_venn_shapes.html">get_venn_shapes()</a></code> -&gt; <code>venndir_attender()</code>
 </li>

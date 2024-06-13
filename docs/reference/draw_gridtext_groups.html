@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -67,6 +67,7 @@
 <span>  <span class="va">g_labels</span>,</span>
 <span>  <span class="va">gdf</span>,</span>
 <span>  segment_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  adjust_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -96,6 +97,17 @@ and <code>"box_fill"</code> values.</p></dd>
 <dd><p><code>data.frame</code> with segment coordinates, optional.</p></dd>
 
 
+<dt>adjust_center</dt>
+<dd><p><code>logical</code> indicating whether to adjust the x-centering
+for a group of labels when <code>adjx=0.5</code>, using the total width of the
+group of labels. When FALSE (default) the label x-position is not
+adjusted, which assumes labels are already oriented properly with
+respect to the x-axis position.
+This option is <code>FALSE</code> specifically for two-column labels positioned
+around a fixed centerpoint, where one column could be wider than the
+other, and it would otherwise push the other column the other way.</p></dd>
+
+
 <dt>do_draw</dt>
 <dd><p><code>logical</code> indicating whether to draw the finished
 result in the context of the current open graphics device.</p></dd>
@@ -111,7 +123,7 @@ result in the context of the current open graphics device.</p></dd>
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>This function is a helper function used to take individual
+    <p>This function is an internal function used to take individual
 labels defined by <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>, and creating
 <code><a href="https://rdrr.io/r/grid/grid.roundrect.html" class="external-link">grid::roundrectGrob()</a></code> objects that cover each group of
 labels with one rounded rectangular boundary.</p>
@@ -119,10 +131,7 @@ labels with one rounded rectangular boundary.</p>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir label: 
-<code><a href="polygon_label_fill.html">polygon_label_fill</a>()</code>,
-<code><a href="polygon_label_outside.html">polygon_label_outside</a>()</code>,
-<code><a href="polygon_label_segment.html">polygon_label_segment</a>()</code>,
-<code><a href="sp_polylabelr.html">sp_polylabelr</a>()</code></p></div>
+<code><a href="reposition_venn_gridtext_labels.html">reposition_venn_gridtext_labels</a>()</code></p></div>
     </div>
 
   </div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -63,7 +63,7 @@
       </tr></tbody><tbody><tr><td>
           <p><code><a href="render_venndir.html">render_venndir()</a></code> </p>
         </td>
-        <td><p>Render Venn or Euler diagram</p></td>
+        <td><p>Render venndir output</p></td>
       </tr><tr><td>
           <p><code><a href="signed_overlaps.html">signed_overlaps()</a></code> </p>
         </td>
@@ -113,6 +113,198 @@
         </td>
         <td><p>venndir conversion from signed overlap counts to setlist</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="jampolygon-object-and-functions">JamPolygon object and functions <a href="#jampolygon-object-and-functions" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Functions for JamPolygon objects</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="JamPolygon-class.html">JamPolygon-class</a></code> </p>
+        </td>
+        <td><p>JamPolygon class</p></td>
+      </tr><tr><td>
+          <p><code><a href="Venndir-class.html">Venndir-class</a></code> </p>
+        </td>
+        <td><p>Venndir class</p></td>
+      </tr><tr><td>
+          <p><code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Define orientation for each polygon, clockwise or counterclockwise</p></td>
+      </tr><tr><td>
+          <p><code><a href="area_JamPolygon.html">area_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Area for each polygon in JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="bbox_JamPolygon.html">bbox_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Bounding box for JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="buffer_JamPolygon.html">buffer_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Apply buffer outside or inside JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_JamPolygon.html">check_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Check JamPolygon object</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_Venndir.html">check_Venndir()</a></code> </p>
+        </td>
+        <td><p>Check Venndir object</p></td>
+      </tr><tr><td>
+          <p><code><a href="eulerr_to_JamPolygon.html">eulerr_to_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Convert eulerr output to JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="farthest_point_JamPolygon.html">farthest_point_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Get the farthest polygon point from a reference point</p></td>
+      </tr><tr><td>
+          <p><code><a href="find_venn_overlaps_JamPolygon.html">find_venn_overlaps_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Find Venn polygon overlaps</p></td>
+      </tr><tr><td>
+          <p><code><a href="has_point_in_JamPolygon.html">has_point_in_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Determine if a point is inside any JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="intersect_JamPolygon.html">intersect_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Intersect one or more JamPolygon objects</p></td>
+      </tr><tr><td>
+          <p><code><a href="label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Arrange text labels inside a polygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="label_outside_JamPolygon.html">label_outside_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Position labels outside JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="label_segment_JamPolygon.html">label_segment_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Define a label segment for JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="labelr_JamPolygon.html">labelr_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Define label positions for JamPolygon using polylabelr::poi()</p></td>
+      </tr><tr><td>
+          <p><code><a href="minus_JamPolygon.html">minus_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Subtract one or more JamPolygon objects</p></td>
+      </tr><tr><td>
+          <p><code><a href="nearest_point_JamPolygon.html">nearest_point_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Get the nearest polygon point to a reference point</p></td>
+      </tr><tr><td>
+          <p><code><a href="plot-JamPolygon-missing-method.html">plot(<i>&lt;JamPolygon&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Plot JamPolygon object</p></td>
+      </tr><tr><td>
+          <p><code><a href="plot.JamPolygon.html">plot(<i>&lt;JamPolygon&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Plot JamPolygon object</p></td>
+      </tr><tr><td>
+          <p><code><a href="point_in_JamPolygon.html">point_in_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Determine if a point is inside a JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="polyclip_to_JamPolygon.html">polyclip_to_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Convert polyclip polygon to JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="sample_JamPolygon.html">sample_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Sample points within JamPolygon</p></td>
+      </tr><tr><td>
+          <p><code><a href="split_JamPolygon.html">split_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Split JamPolygon multipart polygons</p></td>
+      </tr><tr><td>
+          <p><code><a href="union_JamPolygon.html">union_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Union one or more JamPolygon objects</p></td>
+      </tr><tr><td>
+          <p><code><a href="update_JamPolygon.html">update_JamPolygon()</a></code> </p>
+        </td>
+        <td><p>Update attributes for a JamPolygon object</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="venndir-polygon-functions">venndir polygon Functions <a href="#venndir-polygon-functions" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Functions for polygons</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="bbox_polygon_list.html">bbox_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Bounding box for polygon list</p></td>
+      </tr><tr><td>
+          <p><code><a href="eulerr_to_polygon_list.html">eulerr_to_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Convert euler output to polygons</p></td>
+      </tr><tr><td>
+          <p><code><a href="get_largest_polygon_list.html">get_largest_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Largest polygon in a polygon list</p></td>
+      </tr><tr><td>
+          <p><code><a href="get_venn_polygon_shapes.html">get_venn_polygon_shapes()</a></code> </p>
+        </td>
+        <td><p>Get Venn shapes as polygon_list</p></td>
+      </tr><tr><td>
+          <p><code><a href="intersect_polygon_list.html">intersect_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Intersect one or more polygons</p></td>
+      </tr><tr><td>
+          <p><code><a href="labelr_polygon_list.html">labelr_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Calculate polygon label positions using Pole of Inaccessibility</p></td>
+      </tr><tr><td>
+          <p><code><a href="minus_polygon_list.html">minus_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Subtract one or more polygons</p></td>
+      </tr><tr><td>
+          <p><code><a href="nudge_polygon_coords.html">nudge_polygon_coords()</a></code> </p>
+        </td>
+        <td><p>Nudge polygon coordinates</p></td>
+      </tr><tr><td>
+          <p><code><a href="nudge_polygon_list.html">nudge_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Nudge polygon_list</p></td>
+      </tr><tr><td>
+          <p><code><a href="plot_polygon_list.html">plot_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Plot polygon_list using base R</p></td>
+      </tr><tr><td>
+          <p><code><a href="polygon_areas.html">polygon_areas()</a></code> </p>
+        </td>
+        <td><p>Polygon area for simple or list of polygons</p></td>
+      </tr><tr><td>
+          <p><code><a href="polygon_circles.html">polygon_circles()</a></code> </p>
+        </td>
+        <td><p>Make polygon_list circles</p></td>
+      </tr><tr><td>
+          <p><code><a href="polygon_ellipses.html">polygon_ellipses()</a></code> </p>
+        </td>
+        <td><p>Make polygon_list ellipses</p></td>
+      </tr><tr><td>
+          <p><code><a href="polygon_list_labelr.html">polygon_list_labelr()</a></code> </p>
+        </td>
+        <td><p>Simple wrapper to polylabelr::poi() for polygon_list</p></td>
+      </tr><tr><td>
+          <p><code><a href="polygon_list_to_xy_list.html">polygon_list_to_xy_list()</a></code> </p>
+        </td>
+        <td><p>Convert polygon list of x,y coordinate into a list by x and y</p></td>
+      </tr><tr><td>
+          <p><code><a href="rescale_polygon_list.html">rescale_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Rescale a polygon_list object</p></td>
+      </tr><tr><td>
+          <p><code><a href="simple_ellipse.html">simple_ellipse()</a></code> </p>
+        </td>
+        <td><p>Simple ellipse function</p></td>
+      </tr><tr><td>
+          <p><code><a href="union_polygon_list.html">union_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Union one or more polygons</p></td>
+      </tr><tr><td>
+          <p><code><a href="xy_list_to_polygon_list.html">xy_list_to_polygon_list()</a></code> </p>
+        </td>
+        <td><p>Convert coordinate list of x and y into polygon list of x,y coordinates</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="venndir-spatial-functions">venndir Spatial Functions <a href="#venndir-spatial-functions" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Functions for spatial objects and polygon manipulation</p>
         </th>
@@ -129,18 +321,6 @@
         </td>
         <td><p>Display degree angles around a unit circle</p></td>
       </tr><tr><td>
-          <p><code><a href="get_largest_polygon.html">get_largest_polygon()</a></code> </p>
-        </td>
-        <td><p>Largest polygon in a SpatialPolygons object</p></td>
-      </tr><tr><td>
-          <p><code><a href="get_sp_buffer.html">get_sp_buffer()</a></code> </p>
-        </td>
-        <td><p>Get SpatialPolygons after applying buffer width</p></td>
-      </tr><tr><td>
-          <p><code><a href="intersect_polygons.html">intersect_polygons()</a></code> </p>
-        </td>
-        <td><p>Intersect one or more polygons</p></td>
-      </tr><tr><td>
           <p><code><a href="mean_degree_arc.html">mean_degree_arc()</a></code> </p>
         </td>
         <td><p>Mean arc angle in degrees</p></td>
@@ -149,33 +329,13 @@
         </td>
         <td><p>Mean angle in degrees</p></td>
       </tr><tr><td>
-          <p><code><a href="nudge_sp.html">nudge_sp()</a></code> </p>
-        </td>
-        <td><p>Nudge SpatialPolygons</p></td>
-      </tr><tr><td>
           <p><code><a href="rescale_coordinates.html">rescale_coordinates()</a></code> </p>
         </td>
         <td><p>Scale, rotate, and shift numeric coordinates</p></td>
       </tr><tr><td>
-          <p><code><a href="rescale_sp.html">rescale_sp()</a></code> </p>
-        </td>
-        <td><p>Rescale a SpatialPolygons object</p></td>
-      </tr><tr><td>
-          <p><code><a href="sp_circles.html">sp_circles()</a></code> </p>
-        </td>
-        <td><p>Make SpatialPolygons circles</p></td>
-      </tr><tr><td>
-          <p><code><a href="sp_ellipses.html">sp_ellipses()</a></code> </p>
-        </td>
-        <td><p>Make SpatialPolygons ellipses</p></td>
-      </tr><tr><td>
           <p><code><a href="spread_degrees.html">spread_degrees()</a></code> </p>
         </td>
         <td><p>Spread angles to minimum degrees difference</p></td>
-      </tr><tr><td>
-          <p><code><a href="union_polygons.html">union_polygons()</a></code> </p>
-        </td>
-        <td><p>Union one or more polygons</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="venndir-label-functions">venndir Label Functions <a href="#venndir-label-functions" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Helpful label functions</p>
@@ -185,21 +345,9 @@
         </td>
         <td><p>Draw boundary around groups of gridtext labels</p></td>
       </tr><tr><td>
-          <p><code><a href="polygon_label_fill.html">polygon_label_fill()</a></code> </p>
+          <p><code><a href="reposition_venn_gridtext_labels.html">reposition_venn_gridtext_labels()</a></code> </p>
         </td>
-        <td><p>Arrange text labels inside a polygon</p></td>
-      </tr><tr><td>
-          <p><code><a href="polygon_label_outside.html">polygon_label_outside()</a></code> </p>
-        </td>
-        <td><p>Polygon label outside</p></td>
-      </tr><tr><td>
-          <p><code><a href="polygon_label_segment.html">polygon_label_segment()</a></code> </p>
-        </td>
-        <td><p>Define a polygon label line segment</p></td>
-      </tr><tr><td>
-          <p><code><a href="sp_polylabelr.html">sp_polylabelr()</a></code> </p>
-        </td>
-        <td><p>Get SpatialPolygons polylabelr coordinate</p></td>
+        <td><p>Reposition venn gridtext labels</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="venndir-utility-functions">venndir Utility Functions <a href="#venndir-utility-functions" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Internal venndir utility functions</p>
@@ -209,17 +357,9 @@
         </td>
         <td><p>Curate Venn labels</p></td>
       </tr><tr><td>
-          <p><code><a href="eulerr2polys.html">eulerr2polys()</a></code> </p>
-        </td>
-        <td><p>Convert euler output to polygons</p></td>
-      </tr><tr><td>
           <p><code><a href="expand_range.html">expand_range()</a></code> </p>
         </td>
         <td><p>Expand numeric range</p></td>
-      </tr><tr><td>
-          <p><code><a href="find_vennpoly_overlaps.html">find_vennpoly_overlaps()</a></code> </p>
-        </td>
-        <td><p>Find Venn polygon overlaps</p></td>
       </tr><tr><td>
           <p><code><a href="get_venn_shapes.html">get_venn_shapes()</a></code> </p>
         </td>
@@ -257,21 +397,13 @@
         </td>
         <td><p>Print colorized text table</p></td>
       </tr><tr><td>
-          <p><code><a href="rescale_p.html">rescale_p()</a></code> </p>
-        </td>
-        <td><p>Rescale a Polygon object</p></td>
-      </tr><tr><td>
-          <p><code><a href="rescale_ps.html">rescale_ps()</a></code> </p>
-        </td>
-        <td><p>Rescale a Polygons object</p></td>
-      </tr><tr><td>
           <p><code><a href="shrink_df.html">shrink_df()</a></code> </p>
         </td>
         <td><p>Shrink data.frame by group</p></td>
       </tr><tr><td>
-          <p><code><a href="sp_percent_area.html">sp_percent_area()</a></code> </p>
+          <p><code><a href="three_point_angle.html">three_point_angle()</a></code> </p>
         </td>
-        <td><p>Percent area for each polygon in SpatialPolygons</p></td>
+        <td><p>Calculate angle between three consecutive points</p></td>
       </tr><tr><td>
           <p><code><a href="venndir_label_style.html">venndir_label_style()</a></code> </p>
         </td>
@@ -280,7 +412,15 @@
           <p><code><a href="venndir_legender.html">venndir_legender()</a></code> </p>
         </td>
         <td><p>Add optional legend to venndir figures (developmental)</p></td>
+      </tr><tr><td>
+          <p><code><a href="venndir_to_df.html">venndir_to_df()</a></code> </p>
+        </td>
+        <td><p>Convert venndir output to data.frame</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="venndir-deprecated-functions">venndir deprecated functions <a href="#venndir-deprecated-functions" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Deprecated functions losing support</p>
+        </th>
+      </tr></tbody><tbody></tbody><tbody><tr><th colspan="2">
           <h2 id="venndir-plotly-functions-experimental-">venndir plotly functions (experimental) <a href="#venndir-plotly-functions-experimental-" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Functions for plotly compatibility (experimental)</p>
         </th>

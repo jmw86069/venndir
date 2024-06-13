@@ -1,5 +1,22 @@
 # TODO for venndir
 
+## 12jun2024
+
+* `venn_meme()` - some visual adjustments are needed
+
+   * Fix regression in `gridtext` for item labels, not recognizing `<br>`
+   * When one item label is present, use proper center position instead
+   of patterned fill. Or change the default fill pattern being used.
+   Current state: item label is placed near edges and not in the center.
+
+## 11jun2024
+
+* DONE. `venndir()` error
+
+   * Error is caused when two sets do not overlap, and `proportional=TRUE`. See
+   `find_venn_overlaps_JamPolygon()` in venndir-base-polyclip.R#428
+   `intersect_JamPolygon()` in venndir-polyclip.R#245.
+
 ## 02may2024
 
 * `venndir_legender()`
@@ -35,8 +52,8 @@ and device-dependent. Some suggested workarounds include:
 
 ## 22mar2024
 
-* Remove all `sp`,`sf`,`rgeos` functions
-* Remove all portions of remaining functions that call `sp`,`sf`,`rgeos`
+* Remove all "sp",`sf`,"rgeos" functions
+* Remove all portions of remaining functions that call "sp",`sf`,"rgeos"
 
    * `polygon_label_segment()` - still uses a hybrid approach,
    accepting sp and jp objects.
@@ -152,7 +169,7 @@ so that methods that expect specific output might still work?
 
 ## 27nov2023
 
-* Urgent: Transition from `sp` and `rgeos` to `polyclip` since `rgeos`
+* DONE. Urgent: Transition from "sp" and "rgeos" to `polyclip` since "rgeos"
 has been removed from CRAN. Ugh.
 
    * Current status:
@@ -184,16 +201,16 @@ referencing some simple unicode characters (up/down arrows, etc.)
    * It should call `curate_venn_labels()` which means it needs the arguments
    `curate_df`,`unicode` to allow customization.
 
-* Migrate from `sp` to `polyclip`
+* DONE. Migrate from "sp" to `polyclip`
 
-   * `sp` is being retired October 2023. Decided not to use `sf` due to
+   * "sp" is being retired October 2023. Decided not to use `sf` due to
    heavy dependencies focused on geographical map software libraries
    which are not relevant here.
    * `polyclip` provides the basic manipulations required:
    intersect, union, subtract, rotate, buffer.
-   * Does `venndir` need to accept past object formats with `sp` objects?
+   * Does `venndir` need to accept past object formats with "sp" objects?
    
-      * Migration function to convert old `sp` to new `polyclip` object.
+      * Migration function to convert old "sp" to new `polyclip` object.
    
    * Replace `venn_spdf` with `data.frame` equivalent format.
    * Functions to port:
@@ -344,7 +361,7 @@ sizes for things like `segment_buffer` and `item_buffer`.
 
 ## 02may2023
 
-* Overall: replace use of `sp` (SpatialPolygons) with `sf` (Simple Features)
+* Overall: replace use of "sp" (SpatialPolygons) with `sf` (Simple Features)
 
    * requires changing `venn_spdf` into the `sf` equivalent, which could
    be nearly drop-in replacement. The `sf` default object is based upon
@@ -352,17 +369,17 @@ sizes for things like `segment_buffer` and `item_buffer`.
    * requires converting sp-specific functions: `nudge_sp()`, `rescale_ps()`,
    `rescale_sp()`, `rescale_p()`, `rescale_coordinates()`, `get_sp_buffer()`.
    Some functions like `get_sp_buffer()` may be built-in with `sf`.
-   * remove dependencies `sp` and `rgeos`.
-   * replace `rgeos` functions with with built-in `sf` equivalents:
+   * remove dependencies "sp" and "rgeos".
+   * replace "rgeos" functions with with built-in `sf` equivalents:
    
-      * `rgeos::gArea()` -> `sf::st_area()`
-      * `rgeos::gDifference()` -> `sf::st_difference()`
-      * `rgeos::gBuffer()` -> `sf::st_buffer()`
-      * `rgeos::gIntersects()` -> `sf::st_intersects()`
-      * `rgeos::gSimplify()` -> `sf::st_simplify()`
-      * `rgeos::gUnaryUnion()` -> `sf::st_union(x)`
-      * `rgeos::gContains()` -> `sf::st_contains()`
-      * `rgeos::gUnion()` -> `sf::st_union(x, y)`
+      * "rgeos" `gArea()` -> `sf::st_area()`
+      * "rgeos" `gDifference()` -> `sf::st_difference()`
+      * "rgeos" `gBuffer()` -> `sf::st_buffer()`
+      * "rgeos" `gIntersects()` -> `sf::st_intersects()`
+      * "rgeos" `gSimplify()` -> `sf::st_simplify()`
+      * "rgeos" `gUnaryUnion()` -> `sf::st_union(x)`
+      * "rgeos" `gContains()` -> `sf::st_contains()`
+      * "rgeos" `gUnion()` -> `sf::st_union(x, y)`
       
 
 * `venndir()`

@@ -10,6 +10,31 @@ bbox_polygon_list(polygon_list, ...)
 Bounding box for polygon list
 }
 \examples{
+counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
+x <- eulerr::euler(counts)
+polygon_list <- eulerr_to_polygon_list(x)
 bbox_polygon_list(polygon_list)
 
 }
+\seealso{
+Other venndir polygons: 
+\code{\link{eulerr_to_polygon_list}()},
+\code{\link{get_largest_polygon_list}()},
+\code{\link{get_venn_polygon_shapes}()},
+\code{\link{intersect_polygon_list}()},
+\code{\link{labelr_polygon_list}()},
+\code{\link{minus_polygon_list}()},
+\code{\link{nudge_polygon_coords}()},
+\code{\link{nudge_polygon_list}()},
+\code{\link{plot_polygon_list}()},
+\code{\link{polygon_areas}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
+\code{\link{polygon_list_labelr}()},
+\code{\link{polygon_list_to_xy_list}()},
+\code{\link{rescale_polygon_list}()},
+\code{\link{simple_ellipse}()},
+\code{\link{union_polygon_list}()},
+\code{\link{xy_list_to_polygon_list}()}
+}
+\concept{venndir polygons}

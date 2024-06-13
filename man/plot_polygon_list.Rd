@@ -37,3 +37,25 @@ plot_polygon_list(polygon_list2,
    col=colorjam::rainbowJam(length(polygon_list2), alpha=0.5))
 
 }
+\seealso{
+Other venndir polygons: 
+\code{\link{bbox_polygon_list}()},
+\code{\link{eulerr_to_polygon_list}()},
+\code{\link{get_largest_polygon_list}()},
+\code{\link{get_venn_polygon_shapes}()},
+\code{\link{intersect_polygon_list}()},
+\code{\link{labelr_polygon_list}()},
+\code{\link{minus_polygon_list}()},
+\code{\link{nudge_polygon_coords}()},
+\code{\link{nudge_polygon_list}()},
+\code{\link{polygon_areas}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
+\code{\link{polygon_list_labelr}()},
+\code{\link{polygon_list_to_xy_list}()},
+\code{\link{rescale_polygon_list}()},
+\code{\link{simple_ellipse}()},
+\code{\link{union_polygon_list}()},
+\code{\link{xy_list_to_polygon_list}()}
+}
+\concept{venndir polygons}

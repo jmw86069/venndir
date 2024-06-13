@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -168,9 +168,7 @@ argument <code>sizes</code>, which takes priority over <code>min_size</code>, an
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir utility: 
 <code><a href="curate_venn_labels.html">curate_venn_labels</a>()</code>,
-<code><a href="eulerr2polys.html">eulerr2polys</a>()</code>,
 <code><a href="expand_range.html">expand_range</a>()</code>,
-<code><a href="find_vennpoly_overlaps.html">find_vennpoly_overlaps</a>()</code>,
 <code><a href="get_venn_shapes.html">get_venn_shapes</a>()</code>,
 <code><a href="gridtext_make_outer_box.html">gridtext_make_outer_box</a>()</code>,
 <code><a href="gridtext_richtext_grob.html">gridtext_richtext_grob</a>()</code>,
@@ -179,12 +177,11 @@ argument <code>sizes</code>, which takes priority over <code>min_size</code>, an
 <code><a href="match_list.html">match_list</a>()</code>,
 <code><a href="nudge_venndir_label.html">nudge_venndir_label</a>()</code>,
 <code><a href="print_color_df.html">print_color_df</a>()</code>,
-<code><a href="rescale_ps.html">rescale_ps</a>()</code>,
-<code><a href="rescale_p.html">rescale_p</a>()</code>,
 <code><a href="shrink_df.html">shrink_df</a>()</code>,
-<code><a href="sp_percent_area.html">sp_percent_area</a>()</code>,
+<code><a href="three_point_angle.html">three_point_angle</a>()</code>,
 <code><a href="venndir_label_style.html">venndir_label_style</a>()</code>,
-<code><a href="venndir_legender.html">venndir_legender</a>()</code></p></div>
+<code><a href="venndir_legender.html">venndir_legender</a>()</code>,
+<code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
     </div>
 
     <div id="ref-examples">
@@ -312,34 +309,34 @@ argument <code>sizes</code>, which takes priority over <code>min_size</code>, an
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## text venn diagram</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="textvenn.html">textvenn</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"overlap"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #080808; background-color: #FFAF5F;">    set_A&amp;set_B    </span><span style="color: #767676;">                                </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #080808; background-color: #D7AF87;">    set_A&amp;set_B    </span><span style="color: #767676;">                                </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #D75F5F;">         8         </span><span style="color: #767676;">                                </span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #E4E4E4; background-color: #FF0000;"> set_A </span><span style="color: #767676;">                                                            </span><span style="color: #080808; background-color: #FFD700;"> set_B </span><span style="color: #767676;">   </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #080808; background-color: #FFD75F;"> set_A </span><span style="color: #767676;">                                                            </span><span style="color: #E4E4E4; background-color: #D75F5F;"> set_B </span><span style="color: #767676;">   </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #D75F5F;">  16   </span><span style="color: #767676;">                                                            </span><span style="color: #D75F5F;">   7   </span><span style="color: #767676;">   </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                                                             </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #080808; background-color: #D7AFAF;"> set_A&amp;set_B&amp;set_C </span><span style="color: #767676;">                                </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #FF5F00;">         1         </span><span style="color: #767676;">                                </span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">          </span><span style="color: #E4E4E4; background-color: #D787FF;"> set_A&amp;set_C </span><span style="color: #767676;">                            </span><span style="color: #080808; background-color: #AFD7AF;"> set_B&amp;set_C </span><span style="color: #767676;">             </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">          </span><span style="color: #080808; background-color: #87D7AF;"> set_A&amp;set_C </span><span style="color: #767676;">                            </span><span style="color: #E4E4E4; background-color: #D787D7;"> set_B&amp;set_C </span><span style="color: #767676;">             </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">          </span><span style="color: #D75F5F;">      7      </span><span style="color: #767676;">                            </span><span style="color: #FF5F5F;">      0      </span><span style="color: #767676;">             </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                                                             </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                                                             </span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #080808; background-color: #87AFFF;">       set_C       </span><span style="color: #767676;">                                </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #080808; background-color: #AFAFFF;">       set_C       </span><span style="color: #767676;">                                </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #D75F5F;">         7         </span><span style="color: #767676;">                                </span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## text venn diagram with signed direction</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="textvenn.html">textvenn</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"each"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #080808; background-color: #FFAF5F;">    set_A&amp;set_B    </span><span style="color: #D75F5F;"> ↑↑: 3  </span><span style="color: #767676;">                                    </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #080808; background-color: #D7AF87;">    set_A&amp;set_B    </span><span style="color: #D75F5F;"> ↑↑: 3  </span><span style="color: #767676;">                                    </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #D75F5F;">         8         </span><span style="color: #AF5FAF;"> ↑↓: 2  </span><span style="color: #767676;">                                    </span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #E4E4E4; background-color: #FF0000;"> set_A </span><span style="color: #D75F5F;"> ↑: 9 </span><span style="color: #767676;">                                       </span><span style="color: #0087D7;"> ↓↓: 3  </span><span style="color: #767676;">                       </span><span style="color: #080808; background-color: #FFD700;"> set_B </span><span style="color: #D75F5F;"> ↑: 4 </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #080808; background-color: #FFD75F;"> set_A </span><span style="color: #D75F5F;"> ↑: 9 </span><span style="color: #767676;">                                       </span><span style="color: #0087D7;"> ↓↓: 3  </span><span style="color: #767676;">                       </span><span style="color: #E4E4E4; background-color: #D75F5F;"> set_B </span><span style="color: #D75F5F;"> ↑: 4 </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #D75F5F;">  16   </span><span style="color: #0087D7;"> ↓: 7 </span><span style="color: #767676;">                                                                      </span><span style="color: #D75F5F;">   7   </span><span style="color: #0087D7;"> ↓: 3 </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                                                                                </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #080808; background-color: #D7AFAF;"> set_A&amp;set_B&amp;set_C </span><span style="color: #D75F5F;"> ↑↑↑: 1 </span><span style="color: #767676;">                                    </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #FF5F00;">         1         </span><span style="color: #767676;">                                            </span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">             </span><span style="color: #E4E4E4; background-color: #D787FF;"> set_A&amp;set_C </span><span style="color: #D75F5F;"> ↑↑: 2 </span><span style="color: #767676;">                              </span><span style="color: #080808; background-color: #AFD7AF;"> set_B&amp;set_C </span><span style="color: #D75F5F;"> ↑↑: 0 </span><span style="color: #767676;">             </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">             </span><span style="color: #080808; background-color: #87D7AF;"> set_A&amp;set_C </span><span style="color: #D75F5F;"> ↑↑: 2 </span><span style="color: #767676;">                              </span><span style="color: #E4E4E4; background-color: #D787D7;"> set_B&amp;set_C </span><span style="color: #D75F5F;"> ↑↑: 0 </span><span style="color: #767676;">             </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">             </span><span style="color: #D75F5F;">      7      </span><span style="color: #AF5FAF;"> ↑↓: 1 </span><span style="color: #767676;">                              </span><span style="color: #FF5F5F;">      0      </span><span style="color: #767676;">                    </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #AF5FAF;"> ↓↑: 1 </span><span style="color: #767676;">                                                               </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                          </span><span style="color: #0087D7;"> ↓↓: 3 </span><span style="color: #767676;">                                                               </span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #080808; background-color: #87AFFF;">       set_C       </span><span style="color: #D75F5F;">  ↑: 5  </span><span style="color: #767676;">                                    </span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #080808; background-color: #AFAFFF;">       set_C       </span><span style="color: #D75F5F;">  ↑: 5  </span><span style="color: #767676;">                                    </span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #767676;">                                 </span><span style="color: #D75F5F;">         7         </span><span style="color: #0087D7;">  ↓: 2  </span><span style="color: #767676;">                                    </span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

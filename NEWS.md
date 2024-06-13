@@ -1,3 +1,24 @@
+# venndir 0.0.31.900
+
+* All `sp` and `rgeos` references were removed!
+* More work to be done to improve the use of `Venndir` objects internally,
+with "convenience functions" to help access and manipulate its data.
+
+## changes to existing functions
+
+* `add_orientation_JamPolygon()`, `area_JamPolygon()`, `plot.JamPolygon()`,
+`union_JamPolygon()`
+
+   * updated to improve detection of empty polygons
+
+## REMOVED a bunch of sp/rgeos dependent functions
+
+* Note: These functions were not, uh, functional anyway.
+* Most functions were called internally, are were replaced with new
+functions that call polyclip-based functions.
+* Removed all references to `sp` and `rgeos` package prefix, even
+in help text.
+
 # venndir 0.0.30.900
 
 **The polyclip update.** Removing all remnants of `sp` and `rgeos`.
@@ -39,7 +60,7 @@ need for direct list access.
 * replaced `venndir()` and `render_venndir()` with new versions,
 very temporarily moving previous functions to `venndir_OLD()` and
 `render_venndir_OLD()`.
-* new function for item label fill, previously called `sp::spsample()`.
+* new function for item label fill, previously called `spsample()`.
 
 
 ## new `JamPolygon` object and functions
@@ -437,7 +458,7 @@ item label scenarios to throw an error, turned out to be caused by lack
 of rownames on a matrix sorted by `jamba::mixedSortDF()`. The error
 occurred in an internal function `get_poly_points()` that iterates
 different labeling conditions until at least `n` label coordinates
-are returned. Apparently the function `sp::spsample()` does not
+are returned. Apparently the function `spsample()` does not
 guarantee returning the same number of coordinate points as requested.
 This error must have bitten someone else somewhere in the R world,
 requesting 15 sampled points, then receiving only 12.
@@ -748,7 +769,7 @@ create a buffer at half-width, for a polygon of any size.
 The purpose is to draw a line segment from outside the polygon
 to "just inside" the polygon, using an amount appropriate
 for the size and shape of the polygon.
-As `rgeos::gBuffer()` has no ability to scale relative
+As "rgeos" `gBuffer()` has no ability to scale relative
 to the polygon size and shape, `get_sp_buffer()` quickly
 runs a sweep to determine the `width` where an internal
 polygon is just barely non-zero, and defines that as
@@ -803,7 +824,7 @@ visually fits inside a polygon.
 * `venndir()` can accept polygon shapes to use as input,
 instead of defining its own or using those from
 `eulerr::euler()`. New argument `venn_sp` accepts any
-`sp::SpatialPolygons` compatible object, which must have
+`SpatialPolygons` compatible object, which must have
 at least as many polygons as there are sets in `setlist`.
 * `venndir()` now adds the Venn shapes to the output `venn_spdf`
 with `type="set"`; all other polygons have `type="overlap"`.
@@ -863,7 +884,7 @@ and returns the angular difference. Suitable for cases
 with angles like `c(355, 2, 12)` where the difference
 between `355` and `2` is `7`.
 * `sp_polylabelr()` is a simple wrapper function to
-`polylabelr::poi()` for `sp::SpatialPolygons` objects.
+`polylabelr::poi()` for `SpatialPolygons` objects.
 
 # venndir 0.0.7.900
 
@@ -883,7 +904,7 @@ version 5.3, but was installed with GCC 5.3.
 
 ## bug fixes
 
-* `render_venndir()` added `sp` prefix to `sp::plot()` for
+* `render_venndir()` added `sp` prefix to `plot()` for
 base R plotting.
 * `signed_overlaps()` was updated to allow using `sep="|"`.
 Previous this delimited was used to make unique rownames,
@@ -986,7 +1007,7 @@ alternative or supplement to using proportional Venn diagrams.
 * `ggrender_venndir()` renders a venndir diagram using ggplot2.
 Note that this function requires the package `sf`, and in future
 other objects internal to venndir may be converted from `sp` to `sf`.
-* `label_polyogn_fill()` takes a `sp::SpatialPolygons` object,
+* `label_polyogn_fill()` takes a `SpatialPolygons` object,
 a vector of labels, and returns coordinates to place labels
 inside the polygon. It has some adjustments to add buffer
 around polygon boundaries, but does not directly detect
@@ -997,14 +1018,14 @@ or returns coordinates suitable for ggplot2.
 
 The `rescale_*()` functions
 are intended to allow manipulation of numeric coordinates in
-each relevant object type, aimed at `sp::SpatialPolygons`
+each relevant object type, aimed at `SpatialPolygons`
 and the various sub-types.
 
-* `rescale_sp()` manipulates `sp::SpatialPolygons` which
-contains one or more `sp:Polygons` objects, and therefore calls:
-* `rescale_ps()` manipulates `sp:Polygons` which contains
-one or more `sp:Polygon` objects, and therefore calls:
-* `rescale_p()` manipulates `sp:Polygon` which contains
+* `rescale_sp()` manipulates `SpatialPolygons` which
+contains one or more `Polygons` objects, and therefore calls:
+* `rescale_ps()` manipulates `Polygons` which contains
+one or more `Polygon` objects, and therefore calls:
+* `rescale_p()` manipulates `Polygon` which contains
 numeric `matrix` coordinates, and therefore calls:
 * `rescale_coordinates()` manipulates numeric `matrix`
 coordinates.

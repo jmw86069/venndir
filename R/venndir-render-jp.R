@@ -367,6 +367,8 @@ render_venndir <- function
                venn_jp[i, ]
             });
             # new_xy <- polygon_label_segment(
+            # jamba::printDebug("render_venndir(): ", "test_xy:");print(test_xy);# debug
+            # jamba::printDebug("render_venndir(): ", "jp_list:");print(jp_list);# debug
             new_xy <- label_segment_JamPolygon(
                x0=test_xy$x0,
                y0=test_xy$y0,
@@ -755,55 +757,58 @@ render_venndir <- function
    if (any(show_label)) {
       #
       # g_labels <- gridtext::richtext_grob(
-      # print("gdf$padding:");print(gdf$padding);
-      g_labels <- gridtext_richtext_grob(
-         # default.units="snpc",
-         text=gdf$text,
-         x=adjx(gdf$x),
-         y=adjy(gdf$y),
-         default.units="snpc",
-         vjust=gdf$vjust,
-         hjust=gdf$hjust,
-         halign=gdf$halign,
-         rot=gdf$rot,
-         padding=grid::unit(gdf$padding,
-            gdf$padding_unit),
-         r=grid::unit(gdf$r,
-            gdf$r_unit),
-         gp=grid::gpar(
-            fontfamily=fontfamily,
-            col=gdf$label_col,
-            fontsize=gdf$fontsize
-         ),
-         box_gp=grid::gpar(
-            col=if(group_labels){NA}else{gdf$border_col},
-            # col=if(group_labels){NA}else{"black"},
-            fill=if(group_labels){NA}else{gdf$box_fill},
-            lty=gdf$box_lty,
-            lwd=gdf$box_lwd)
-      );
-      # draw grouped label background
-      if (TRUE %in% group_labels) {
-         grid::pushViewport(attr(jp, "viewport"));
-         g_labels <- tryCatch({
-            dgg <- draw_gridtext_groups(
-               g_labels=g_labels,
-               gdf=gdf,
-               segment_df=segment_df,
-               adjust_center=adjust_center,
-               do_draw=TRUE,
-               verbose=FALSE)
-            dgg$g_labels;
-         }, error=function(e){
-            print(e);
-            g_labels;
-         });
+      # jamba::printDebug("gdf:");print(gdf);# debug
+      # confirm gdf is not empty - (but why would it be empty?)
+      if (nrow(gdf) > 0) {
+         g_labels <- gridtext_richtext_grob(
+            # default.units="snpc",
+            text=gdf$text,
+            x=adjx(gdf$x),
+            y=adjy(gdf$y),
+            default.units="snpc",
+            vjust=gdf$vjust,
+            hjust=gdf$hjust,
+            halign=gdf$halign,
+            rot=gdf$rot,
+            padding=grid::unit(gdf$padding,
+               gdf$padding_unit),
+            r=grid::unit(gdf$r,
+               gdf$r_unit),
+            gp=grid::gpar(
+               fontfamily=fontfamily,
+               col=gdf$label_col,
+               fontsize=gdf$fontsize
+            ),
+            box_gp=grid::gpar(
+               col=if(group_labels){NA}else{gdf$border_col},
+               # col=if(group_labels){NA}else{"black"},
+               fill=if(group_labels){NA}else{gdf$box_fill},
+               lty=gdf$box_lty,
+               lwd=gdf$box_lwd)
+         );
+         # draw grouped label background
+         if (TRUE %in% group_labels) {
+            grid::pushViewport(attr(jp, "viewport"));
+            g_labels <- tryCatch({
+               dgg <- draw_gridtext_groups(
+                  g_labels=g_labels,
+                  gdf=gdf,
+                  segment_df=segment_df,
+                  adjust_center=adjust_center,
+                  do_draw=TRUE,
+                  verbose=FALSE)
+               dgg$g_labels;
+            }, error=function(e){
+               print(e);
+               g_labels;
+            });
+            grid::popViewport();
+         }
+         
+         grid::pushViewport(attr(jp, "viewport"))
+         grid::grid.draw(g_labels);
          grid::popViewport();
       }
-      
-      grid::pushViewport(attr(jp, "viewport"))
-      grid::grid.draw(g_labels);
-      grid::popViewport();
    }
    
    # segments
@@ -851,306 +856,11 @@ render_venndir <- function
       jp=jp,
       label_df=label_df,
       gdf=gdf));
-   
-   
-   # Render the different aspects of the venndir plot
-   if (!"sf" %in% class(venn_spdf)) {
-      vosf <- sf::st_as_sf(venn_spdf);
-   } else {
-      vosf <- venn_spdf;
-   }
-   if ("base" %in% plot_style) {
-      # Plot the Venn polygons
-      # Display the warning text label
-      g_label <- NULL;
-      vps <- NULL;
-      if (length(warning_label) > 0) {
-         cp <- jamba::coordPresets(preset="bottom",
-            preset_type="figure");
-         # new method using gridtext::
-         g_warning <- gridtext::textbox_grob(
-            text=gsub(": ", ":<br>", warning_label),
-            x=cp$x,
-            y=cp$y,
-            width=grid::unit(1, "npc"),
-            maxwidth=grid::unit(0.7, "npc"),
-            default.units="native",
-            padding=grid::unit(2, "pt"),
-            r=grid::unit(2, "pt"),
-            gp=grid::gpar(
-               fontfamily=fontfamily,
-               col="#444444",
-               fontsize=12 * font_cex
-            ),
-            box_gp=grid::gpar(
-               #col="#444444",
-               #fill="#FFEECC99",
-               col=NA,
-               fill=NA,
-               lty=1,
-               lwd=1)
-         );
-         if (length(dev.list()) > 0) {
-            vps <- gridBase::baseViewports();
-            grid::pushViewport(vps$inner, vps$figure, vps$plot);
-            grid::grid.draw(g_warning);
-            grid::popViewport(3);
-         }
-      }
-      # display count/set labels
-      g_labels <- NULL;
-      if (any(show_label)) {
-         #
-         # g_labels <- gridtext::richtext_grob(
-         # print("gdf$padding:");print(gdf$padding);
-         g_labels <- gridtext_richtext_grob(
-            default.units="native",
-            text=gdf$text,
-            x=grid::unit(gdf$x, "native"),
-            y=grid::unit(gdf$y, "native"),
-            vjust=gdf$vjust,
-            hjust=gdf$hjust,
-            halign=gdf$halign,
-            rot=gdf$rot,
-            padding=grid::unit(gdf$padding,
-               gdf$padding_unit),
-            r=grid::unit(gdf$r,
-               gdf$r_unit),
-            gp=grid::gpar(
-               fontfamily=fontfamily,
-               col=gdf$label_col,
-               fontsize=gdf$fontsize
-            ),
-            box_gp=grid::gpar(
-               col=if(group_labels){NA}else{gdf$border_col},
-               fill=if(group_labels){NA}else{gdf$box_fill},
-               lty=gdf$box_lty,
-               lwd=gdf$box_lwd)
-         );
-      }
-      # display item labels if available
-      g_labels_items <- NULL;
-      if (length(itemlabels_df) > 0) {
-         # display item label buffer
-         if (draw_buffer) {
-            for (isp in itemlabels_sp) {
-               try(
-                  sp::plot(isp,
-                     add=TRUE,
-                     col="#FFFFFF77",
-                     border="#FF999977",
-                     lwd=2,
-                     lty="dotted")
-               )
-            }
-         }
-         # display items
-         #item_color <- make_color_contrast(itemlabels_df$color,
-         #   bg=
-         if ("gridtext" %in% item_style) {
-            g_labels_items <- gridtext::richtext_grob(
-               x=itemlabels_df$x,
-               y=itemlabels_df$y,
-               text=itemlabels_df$text,
-               rot=-itemlabels_df$rot,
-               default.units="native",
-               padding=grid::unit(0, "pt"),
-               r=grid::unit(0, "pt"),
-               vjust=0.5,
-               hjust=0.5,
-               halign=0.5,
-               gp=grid::gpar(
-                  fontfamily=fontfamily,
-                  col=itemlabels_df$color,
-                  fontsize=itemlabels_df$fontsize
-               ),
-               box_gp=grid::gpar(
-                  col=itemlabels_df$border
-               )
-            );
-            if (length(dev.list()) > 0) {
-               vps <- gridBase::baseViewports();
-               grid::pushViewport(vps$inner, vps$figure, vps$plot);
-               grid::grid.draw(g_labels_items);
-               grid::popViewport(3);
-            }
-         } else {
-            # draw using text()
-            text(
-               x=itemlabels_df$x,
-               y=itemlabels_df$y,
-               labels=itemlabels_df$text,
-               # srt is a hack because text() only handles one srt per call
-               srt=-head(itemlabels_df$rot, 1),
-               #default.units="native",
-               #padding=grid::unit(0, "pt"),
-               #r=grid::unit(0, "pt"),
-               adj=c(0.5, 0.5),
-               # cex for now is a hack estimate of cex for a given fontsize
-               cex=itemlabels_df$fontsize / 12,
-               col=itemlabels_df$color,
-               # font could be used for fontfamily but mapping is unclear
-               # fontfamily
-               #
-               # itemlabels_df$border is currently not handled
-               ...
-            );
-         }
-      }
-   } else if ("gg" %in% plot_style) {
-      # create ggplot2 output
-      # convert spdf to sf
-      # vosf <- sf::st_as_sf(venn_spdf);
-      # Venn overlap polygons
-      ggv <- ggplot2::ggplot(data=vosf) + 
-         ggplot2::geom_sf(
-            ggplot2::aes(
-               fill=jamba::alpha2col(color, alpha=alpha),
-               linewidth=vosf$lwd,
-               color=border)) + 
-         ggplot2::scale_linewidth_identity() +
-         ggplot2::scale_fill_identity() +
-         ggplot2::scale_color_identity();
-      if (length(ggtheme) > 0) {
-         ggv <- ggv + ggtheme();
-      }
-      # optional segment to count labels
-      if (length(segment_df) > 0 && show_segments) {
-         segment_df <- unique(segment_df);
-         ggv <- ggv + ggplot2::geom_line(
-            data=segment_df,
-            inherit.aes=FALSE,
-            ggplot2::aes(x=x,
-               y=y,
-               group=group,
-               color=color)
-         );
-      }
-      # warning label
-      if (length(warning_label) > 0) {
-         warning_df <- data.frame(
-            check.names=FALSE,
-            stringsAsFactors=FALSE,
-            label=gsub(": ", ":<br>", warning_label),
-            x=-Inf,
-            y=-Inf,
-            hjust=-0.02,
-            vjust=-0.1
-         );
-         ggv <- ggv + ggtext::geom_textbox(
-            data=warning_df,
-            inherit.aes=FALSE,
-            ggplot2::aes(x=x,
-               y=y,
-               family=fontfamily,
-               hjust=hjust,
-               vjust=vjust,
-               label=label
-            ),
-            text.colour="#444444",
-            fill="#FFFFFF00",
-            box.colour="#FFFFFF00",
-            size=12 * 5/14 * font_cex,
-            box.padding=grid::unit(2, "pt"),
-            box.r=grid::unit(2, "pt"),
-            width=grid::unit(1, "npc"),
-            maxwidth=grid::unit(0.95, "npc"),
-            show.legend=FALSE
-         );
-      }
-      
-      # count labels
-      if (any(show_label)) {
-         #show_label_df <- subset(label_df, show_label %in% c(TRUE));
-         ggv <- ggv + ggtext::geom_richtext(
-            data=gdf,
-            ggplot2::aes(
-               x=x,
-               y=y,
-               label=text,
-               group=overlap_set,
-               hjust=hjust,
-               vjust=vjust,
-               #halign=halign,
-               family=fontfamily,
-               text.colour=label_col,
-               fill=box_fill,
-               label.colour=border_col),
-            label.padding=grid::unit(
-               gdf$padding,
-               gdf$padding_unit),
-            label.r=grid::unit(
-               gdf$r,
-               gdf$r_unit),
-            size=gdf$fontsize * 5/14
-         )
-      }
-      # optional item labels
-      if (length(itemlabels_df) > 0) {
-         if (draw_buffer) {
-            # optionally draw item polygon buffer
-            rbind_sp <- function(...){
-               sp::rbind.SpatialPolygons(..., makeUniqueIDs=TRUE)
-            }
-            buffer_sp <- do.call(rbind_sp, itemlabels_sp);
-            buffer_sf <- sf::st_as_sf(buffer_sp);
-            # Venn overlap polygons
-            ggv <- ggv + ggplot2::geom_sf(
-               data=buffer_sf,
-               ggplot2::aes(
-                  fill="#FFFFFF77",
-                  color="#FF999977"));
-         }
-         if ("gridtext" %in% item_style) {
-            ggitems <- ggtext::geom_richtext(
-               data=itemlabels_df,
-               ggplot2::aes(x=x,
-                  y=y,
-                  label=text,
-                  family=fontfamily,
-                  #group=group,
-                  angle=-rot,
-                  hjust=0.5,
-                  vjust=0.5,
-                  #halign=0.5,
-                  text.colour=color,
-                  fill=NA,
-                  label.colour=NA),
-               size=itemlabels_df$fontsize * 5/14);
-         } else {
-            ggitems <- ggplot2::geom_text(
-               data=itemlabels_df,
-               ggplot2::aes(x=x,
-                  y=y,
-                  label=text,
-                  family=fontfamily,
-                  #group=group,
-                  angle=-rot,
-                  hjust=0.5,
-                  vjust=0.5,
-                  #halign=0.5,
-                  #text.colour=color,
-                  colour=color,
-                  fill=NA),
-               size=itemlabels_df$fontsize * 5/14);
-         }
-         ggv <- ggv + ggitems;
-      }
-      
-      # optional xlim, ylim
-      if (length(xlim) > 0 & length(ylim) > 0) {
-         ggv <- ggv + ggplot2::coord_sf(xlim=xlim, ylim=ylim);
-      }
-      
-      print(ggv);
-      return(ggv);
-   }
-   
-   
-   return(invisible(list(venn_spdf=venn_spdf,
-      label_df=label_df,
-      gdf=gdf,
-      segment_df=segment_df,
-      g_labels=g_labels,
-      vosf=vosf)));
+
+   # return(invisible(list(venn_spdf=venn_spdf,
+   #    label_df=label_df,
+   #    gdf=gdf,
+   #    segment_df=segment_df,
+   #    g_labels=g_labels,
+   #    vosf=vosf)));
 }

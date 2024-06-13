@@ -269,9 +269,12 @@ venndir_label_style <- function
    # jamba::printDebug("sdim(venndir_output):");print(jamba::sdim(venndir_output));# debug
    if (length(vo) > 0) {
       jp_area <- area_JamPolygon(vo@jps);
+      # if (verbose) jamba::printDebug("venndir_label_style(): ", "jp_area:", jp_area);# debug
       union_jp <- union_JamPolygon(vo@jps);
+      # if (verbose) jamba::printDebug("venndir_label_style(): ", "union_jp:");print(union_jp);# debug
       total_jp_area <- area_JamPolygon(union_jp);
       sp_pct_area <- jp_area / total_jp_area * 100;
+      # if (verbose) jamba::printDebug("venndir_label_style(): ", "sp_pct_area:", sp_pct_area);# debug
    } else if ("venn_jps" %in% names(venndir_output)) {
       jp_area <- area_JamPolygon(venndir_output$venn_jps);
       # jamba::printDebug("jp_area:", jp_area);
@@ -288,7 +291,11 @@ venndir_label_style <- function
       inside_percent_threshold <- c(0)
    }
    label_area_ok <- (poly_pct_area >= inside_percent_threshold);
-
+   # if (verbose) jamba::printDebug("venndir_label_style(): ", "jp_area:", jp_area);# debug
+   # if (verbose) jamba::printDebug("venndir_label_style(): ", "total_jp_area:", total_jp_area);# debug
+   # if (verbose) jamba::printDebug("venndir_label_style(): ", "poly_pct_area:", poly_pct_area);# debug
+   # if (verbose) jamba::printDebug("venndir_label_style(): ", "label_area_ok:", label_area_ok);# debug
+   
    # we need the total counts per overlap_set in order to apply max_items
    main_label_df <- subset(venndir_output$label_df, type %in% "main");
    main_match <- match(venndir_output$label_df$overlap_set,
@@ -555,7 +562,7 @@ venndir_label_style <- function
             # jamba::printDebug("P:");print(P);
             # jamba::printDebug("test_jp:");print(test_jp);
             # confirm there are polygon coordinates before testing
-            if (length(unlist(test_jp@polygons$x)) > 0 &&
+            if (length(jamba::rmNA(unlist(test_jp@polygons$x))) > 0 &&
                   1 %in% point_in_JamPolygon(x=P, jp=test_jp)) {
                return(j)
             }
@@ -570,22 +577,23 @@ venndir_label_style <- function
             # jamba::printDebug("P:");print(P);
             # jamba::printDebug("test_jp:");print(test_jp);
             # confirm there are polygon coordinates before testing
-            if (length(unlist(test_jp@polygons$x)) > 0 &&
+            if (length(jamba::rmNA(unlist(test_jp@polygons$x))) > 0 &&
                1 %in% point_in_JamPolygon(x=P, jp=test_jp)) {
                return(j)
             }
          }
       } else {
-         spt <- sp::SpatialPoints(ixy);
-         venn_spdf <- venndir_output$venn_spdf[venndir_output$venn_spdf$type %in% "overlap",];
-         spwhich <- which(venndir_output$venn_spdf$type %in% "overlap")
-         for (j in spwhich) {
-            sp <- venndir_output$venn_spdf[j,];
-            # TODO: replace rgeos::gContains() with polyclip::pointinpolygon()
-            if (rgeos::gContains(sp, spt)) {
-               return(j);
-            }
-         }
+         stop("Input format not recognized. SpatialPoints are no longer supported.")
+         # spt <- sp::SpatialPoints(ixy);
+         # venn_spdf <- venndir_output$venn_spdf[venndir_output$venn_spdf$type %in% "overlap",];
+         # spwhich <- which(venndir_output$venn_spdf$type %in% "overlap")
+         # for (j in spwhich) {
+         #    sp <- venndir_output$venn_spdf[j,];
+         #    # TODO: replace rgeos::gContains() with polyclip::pointinpolygon()
+         #    if (rgeos::gContains(sp, spt)) {
+         #       return(j);
+         #    }
+         # }
       }
       return(NA)
    });

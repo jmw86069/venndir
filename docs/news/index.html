@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -57,6 +57,127 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.31.900" id="venndir-0031900">venndir 0.0.31.900<a class="anchor" aria-label="anchor" href="#venndir-0031900"></a></h2>
+<ul><li>All <code>sp</code> and <code>rgeos</code> references were removed!</li>
+<li>More work to be done to improve the use of <code>Venndir</code> objects internally, with “convenience functions” to help access and manipulate its data.</li>
+</ul><div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-31-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-31-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/add_orientation_JamPolygon.html">add_orientation_JamPolygon()</a></code>, <code><a href="../reference/area_JamPolygon.html">area_JamPolygon()</a></code>, <code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>, <code><a href="../reference/union_JamPolygon.html">union_JamPolygon()</a></code></p>
+<ul><li>updated to improve detection of empty polygons</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="removed-a-bunch-of-sprgeos-dependent-functions-0-0-31-900">REMOVED a bunch of sp/rgeos dependent functions<a class="anchor" aria-label="anchor" href="#removed-a-bunch-of-sprgeos-dependent-functions-0-0-31-900"></a></h3>
+<ul><li>Note: These functions were not, uh, functional anyway.</li>
+<li>Most functions were called internally, are were replaced with new functions that call polyclip-based functions.</li>
+<li>Removed all references to <code>sp</code> and <code>rgeos</code> package prefix, even in help text.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.30.900" id="venndir-0030900">venndir 0.0.30.900<a class="anchor" aria-label="anchor" href="#venndir-0030900"></a></h2>
+<p><strong>The polyclip update.</strong> Removing all remnants of <code>sp</code> and <code>rgeos</code>.</p>
+<p>Major change, all functions ported or rewritten not to rely upon <code>sp</code>, <code>rgeos</code>, and <code>sf</code>, since the migration to <code>sf</code> would also incur heavy burden of installing <code>sf</code> and all its map/geography-related system libraries.</p>
+<p>Backward compatibility is limited for pre-existing venndir output, since <code>rgeos</code> was removed from CRAN (ugh). In principle a pre-existing object could be re-run to produce the new object output.</p>
+<p>Attempts were made for <code><a href="../reference/venndir.html">venndir()</a></code> to produce output equivalent to previous versions, but it is unclear how practical that may be.</p>
+<p>All graphical output uses <code>grid</code>, no support for <code>base</code> or <code>ggplot2</code>. The <code>grid</code> output was chosen since it can be conveniently combined into panels using <code>patchwork</code> or <code>cowplot</code>, while offering more robust features to position graphical components, also keeping 1:1 aspect ratio so Venn circles remain circular.</p>
+<p>New S4 objects:</p>
+<ul><li>
+<code>JamPolygon</code> - makeshift polygon <code>data.frame</code> to hold one polygon per row (where one “polygon” may be represented as a multi-part polygon with optional holes or nested holes.) This object makes calling <code>polyclip</code> and <code>grid</code> functions more reliable, since they recognize slightly different formats.</li>
+<li>
+<code>Venndir</code> - replacement for <code>list</code> output, with equivalent content. Will transition to function accessors to obtain content, removing need for direct list access.</li>
+</ul><div class="section level3">
+<h3 id="venndir-package-changes-0-0-30-900">venndir package changes<a class="anchor" aria-label="anchor" href="#venndir-package-changes-0-0-30-900"></a></h3>
+<ul><li>added <code>pracma</code>, <code>polyclip</code>, <code>vwline</code> to Depends.</li>
+<li>removed <code>sf</code>, <code>sp</code>, <code>rgeos</code> from Depends. (Ack)</li>
+<li>removed <code>ggtext</code> from Depends, all output uses <code>gridtext</code> or <code>grid</code>.</li>
+<li>replaced <code><a href="../reference/venndir.html">venndir()</a></code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code> with new versions, very temporarily moving previous functions to <code>venndir_OLD()</code> and <code>render_venndir_OLD()</code>.</li>
+<li>new function for item label fill, previously called <code>spsample()</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-jampolygon-object-and-functions-0-0-30-900">new <code>JamPolygon</code> object and functions<a class="anchor" aria-label="anchor" href="#new-jampolygon-object-and-functions-0-0-30-900"></a></h3>
+<p>(It may eventually become its own R package.)</p>
+<ul><li>
+<p><code>JamPolygon</code> is intended to provide a very basic mechanism to store polygon coordinates with the following design:</p>
+<ul><li>One “polygon” is stored on one row of a <code>data.frame</code>.</li>
+<li>One “polygon” can include multiple parts, for example including holes, nested polygons (polygon inside the hole of the parent polygon), and disjoint/separate polygon components. For example one “polygon” could represent multiple separate shapes, each with or without holes and enclosed polygons. The driving reason is to handle proportional Venn diagrams, which sometimes have a set fully enclosed inside another set which creates a hole in the larger set; sometimes two elliptical polygons overlap in the middle at an angle, so the unique portion of one ellipse is split into two parts.</li>
+<li>Multi-part polygons are assumed to be simplified, with no overlapping solid regions. (Polygons are combined with <code><a href="../reference/union_JamPolygon.html">union_JamPolygon()</a></code>.)</li>
+<li>Multi-part polygons always use <code>"evenodd"</code> logic, so any inner polygon is assumed to be a hole, and any polygon inside a hole is assumed to be solid. This logic is applied regardless the clockwise/counterclockwise orientation of points for each polygon (polyclip convention: solid is clockwise, holes are counter-clockwise). Calls to <code>polyclip</code> functions will adjust the polygon orientation as needed for the purpose of using <code>polyclip</code>, but these details are not important for <code>JamPolygon</code> itself.</li>
+<li>Other properties can be associated with the polygon row, to help maintain and view these associations in a convenient way: name, label, fill, border, border.lwd, fontsize, family, innerborder, innerborder.lwd.</li>
+<li>Optional properties can be added to describe multi-polygon rows: orientation, polygon_holes, polygon_clockwise, polygon_parent. They are mostly useful for internal functions.</li>
+<li>
+<code>innerborder</code> is a new feature, my selfish desire to enable borders that are not overdrawn with adjacent polygons (which share the same border but on different sides). It requires a brilliant package <code>vwline</code> to draw variable-width lines (thanks Paul Murrell). It also requires knowledge of the direction lines are drawn, in order to define left/right border relative to the path taken when rendering the border.</li>
+<li>All plot rendering uses <code>grid</code> graphics. All coordinates are encoded in the <code>JamPolygon</code> object, so they can be plotted separately, however <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> and <code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code> use <code>grid</code>.</li>
+</ul></li>
+<li>
+<p>Some supporting functions for <code>JamPolygon</code>:</p>
+<ul><li>
+<code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code> - <code>grid</code> draw function for <code>JamPolygon</code> objects</li>
+<li>
+<code>rbind2()</code> - generic function to combine multiple <code>JamPolygon</code> objects</li>
+<li>
+<code><a href="../reference/bbox_JamPolygon.html">bbox_JamPolygon()</a></code> - bounding box enclosing all polygons</li>
+<li>
+<code><a href="../reference/area_JamPolygon.html">area_JamPolygon()</a></code> - area for each row, accounting for holes and nested polygons.</li>
+<li>
+<code><a href="../reference/buffer_JamPolygon.html">buffer_JamPolygon()</a></code> - expand or shrink polygon borders</li>
+<li>
+<code><a href="../reference/point_in_JamPolygon.html">point_in_JamPolygon()</a></code> - test for point inside solid portion of polygons</li>
+<li>
+<code><a href="../reference/has_point_in_JamPolygon.html">has_point_in_JamPolygon()</a></code> - logical presence/absence of point in any solid polygon</li>
+<li>
+<code><a href="../reference/add_orientation_JamPolygon.html">add_orientation_JamPolygon()</a></code> - adds polygon/multipolygon orientation, including holes, clockwise, and parent enclosing polygon.</li>
+<li>
+<code><a href="../reference/labelr_JamPolygon.html">labelr_JamPolygon()</a></code> - define best label position within each polygon</li>
+<li>
+<code><a href="../reference/minus_JamPolygon.html">minus_JamPolygon()</a></code> - first polygon, removing subsequent polygons</li>
+<li>
+<code><a href="../reference/union_JamPolygon.html">union_JamPolygon()</a></code> - combine and simplify all polygons into one row</li>
+<li>
+<code><a href="../reference/intersect_JamPolygon.html">intersect_JamPolygon()</a></code> - first polygon, intersecting subsequent polygons</li>
+<li>
+<code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code> - define sample points within solid polygon</li>
+<li>
+<code><a href="../reference/split_JamPolygon.html">split_JamPolygon()</a></code> - split multi-part polygons onto separate rows. Note that holes become solid polygons during this step.</li>
+<li>
+<code><a href="../reference/polyclip_to_JamPolygon.html">polyclip_to_JamPolygon()</a></code> - convert <code><a href="https://rdrr.io/pkg/polyclip/man/polyclip.html" class="external-link">polyclip::polyclip()</a></code> output to <code>JamPolygon</code>.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-object-venndir-for-venndir-output-0-0-30-900">New object <code>Venndir</code> for venndir output<a class="anchor" aria-label="anchor" href="#new-object-venndir-for-venndir-output-0-0-30-900"></a></h3>
+<ul><li>Intended to replace previous <code>list</code> format, with data accessor functions instead of direct access to list components.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.29.900" id="venndir-0029900">venndir 0.0.29.900<a class="anchor" aria-label="anchor" href="#venndir-0029900"></a></h2>
+<ul><li>bumped version dependency for colorjam (&gt;= 0.0.26.900)</li>
+<li>added steps for plan to migrate from <code>sp</code> to <code>polyclip</code>, avoiding heavy dependencies on GDAL, GEOS, LWGEOM software libraries which are unrelated to venndir’s use of polygon geometry functions.</li>
+</ul><div class="section level3">
+<h3 id="new-functions-0-0-29-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-29-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir_to_df.html">venndir_to_df()</a></code></p>
+<ul><li>intended to convert Venn diagrams to <code>data.frame</code> or a user-friendly <code>kable</code> formatted table suitable in RMarkdown.</li>
+<li>removes <code>"&lt;br&gt;"</code> from setlist names when relevant.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-29-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-29-900"></a></h3>
+<ul><li>several functions have new argument <code>blend_preset</code> to enforce <code>colorjam::blend_preset()</code> using the RYB color preset.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.28.900" id="venndir-0028900">venndir 0.0.28.900<a class="anchor" aria-label="anchor" href="#venndir-0028900"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-28-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-28-900"></a></h3>
+<ul><li>
+<code>polygon_label_fill()</code> threw an error when supplied with an empty polygon, now returns <code>NULL</code> so the upstream function can deal with the lack of labels. The issue appears to arise from proportional diagrams that use item labels, where the item label has no suitable polygon to use. Presumably something from the updated <code>eulerr</code> package that creates overlap circles/ellipses to use in these diagrams.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-0-28-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-28-900"></a></h3>
+<ul><li>Not released: <code><a href="../reference/reposition_venn_gridtext_labels.html">reposition_venn_gridtext_labels()</a></code> intended to help adjust and re-position gridtext labels relative to optional incoming line segments, and with goal of enabling different layouts for combinations of labels.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.27.900" id="venndir-0027900">venndir 0.0.27.900<a class="anchor" aria-label="anchor" href="#venndir-0027900"></a></h2>
 <div class="section level3">
@@ -198,7 +319,7 @@
 <ul><li>
 <p><code><a href="../reference/venndir.html">venndir()</a></code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code> new argument <code>item_buffer</code></p>
 <ul><li>goal is to make this option easier to modify</li>
-<li>It is passed to <code><a href="../reference/polygon_label_fill.html">polygon_label_fill()</a></code> as argument <code>scale_width</code> which was otherwise very hard to find.</li>
+<li>It is passed to <code>polygon_label_fill()</code> as argument <code>scale_width</code> which was otherwise very hard to find.</li>
 </ul></li>
 <li>
 <p><code><a href="../reference/render_venndir.html">render_venndir()</a></code> will now auto-calculate an appropriate <code>item_cex</code></p>
@@ -222,12 +343,12 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-20-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-20-900"></a></h3>
 <p>Proportional Venn diagrams have been a bit of a challenge for labeling. Some edge cases were resolved finally, mostly relevant when certain Venn overlap wedges were razor thin, or when an overlap was represented by more than one polygon in the resulting geometry.</p>
-<p>Also, label placement outside the Venn circle was inconsistent, some of the options in <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> appear to work poorly together. Its default values were adjusted to be more consistently “pleasing”.</p>
+<p>Also, label placement outside the Venn circle was inconsistent, some of the options in <code>polygon_label_outside()</code> appear to work poorly together. Its default values were adjusted to be more consistently “pleasing”.</p>
 <ul><li>
 <code><a href="../reference/render_venndir.html">render_venndir()</a></code> had a bug that caused proportional Venn labels for single-set overlaps to be assigned to the wrong set polygon when the label was being positioned outside. The line segment would sometimes be visibly ambiguous. It would point the setA line segment to the full setA instead of the smaller non-overlap polygon representing unique setA items. In most cases the workaround was to use <code>segment_buffer=0</code> so the label arrow is drawn to the edge of the circle. When the overall Venn diagram had reasonable proportions the visual effect was not that obvious. With extreme Venn diagrams (small sliver of unique items for some sets) the output was not as intended.</li>
 <li>
-<code><a href="../reference/get_largest_polygon.html">get_largest_polygon()</a></code> was updated to work with <code>SpatialPolygonsDataFrame</code>, previously it did not subset the polygons, returning the full set of polygons. It contributed to set labels being weirdly placed, specifically in rare cases where an overlap set (for example <code>setA&amp;setB</code>) was represented by two polygons where setA and setB uniquely overlap, and where one of those polygons was extremely small. In the weird test case, the smaller polygon had area 0.2, while the larger polygon had area 150. The label is intended to point to the largest available polygon for each overlap, however with objects <code>SpatialPolygonsDataFrame</code> it was returning all polygons for each overlap, and the first polygon was labeled. The issue showed up only when the first of multiple polygons happened to be the smaller one, and substantially smaller.</li>
-</ul><p>Lightweight change: <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> was moved into a separate .R file. The <code>venndir-sp.R</code> file has too many functions, it will be split into pieces eventually.</p>
+<code>get_largest_polygon()</code> was updated to work with <code>SpatialPolygonsDataFrame</code>, previously it did not subset the polygons, returning the full set of polygons. It contributed to set labels being weirdly placed, specifically in rare cases where an overlap set (for example <code>setA&amp;setB</code>) was represented by two polygons where setA and setB uniquely overlap, and where one of those polygons was extremely small. In the weird test case, the smaller polygon had area 0.2, while the larger polygon had area 150. The label is intended to point to the largest available polygon for each overlap, however with objects <code>SpatialPolygonsDataFrame</code> it was returning all polygons for each overlap, and the first polygon was labeled. The issue showed up only when the first of multiple polygons happened to be the smaller one, and substantially smaller.</li>
+</ul><p>Lightweight change: <code>polygon_label_outside()</code> was moved into a separate .R file. The <code>venndir-sp.R</code> file has too many functions, it will be split into pieces eventually.</p>
 </div>
 </div>
     <div class="section level2">
@@ -235,12 +356,12 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-19-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-19-900"></a></h3>
 <ul><li>
-<code><a href="../reference/polygon_label_fill.html">polygon_label_fill()</a></code>: At last fixed an elusive bug causing certain item label scenarios to throw an error, turned out to be caused by lack of rownames on a matrix sorted by <code><a href="https://rdrr.io/pkg/jamba/man/mixedSortDF.html" class="external-link">jamba::mixedSortDF()</a></code>. The error occurred in an internal function <code>get_poly_points()</code> that iterates different labeling conditions until at least <code>n</code> label coordinates are returned. Apparently the function <code><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">sp::spsample()</a></code> does not guarantee returning the same number of coordinate points as requested. This error must have bitten someone else somewhere in the R world, requesting 15 sampled points, then receiving only 12.</li>
+<code>polygon_label_fill()</code>: At last fixed an elusive bug causing certain item label scenarios to throw an error, turned out to be caused by lack of rownames on a matrix sorted by <code><a href="https://rdrr.io/pkg/jamba/man/mixedSortDF.html" class="external-link">jamba::mixedSortDF()</a></code>. The error occurred in an internal function <code>get_poly_points()</code> that iterates different labeling conditions until at least <code>n</code> label coordinates are returned. Apparently the function <code>spsample()</code> does not guarantee returning the same number of coordinate points as requested. This error must have bitten someone else somewhere in the R world, requesting 15 sampled points, then receiving only 12.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-19-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-19-900"></a></h3>
 <ul><li>
-<p><code><a href="../reference/rescale_sp.html">rescale_sp()</a></code> argument <code>rotate_degrees</code> will now recognized a named vector.</p>
+<p><code>rescale_sp()</code> argument <code>rotate_degrees</code> will now recognized a named vector.</p>
 <ul><li>names are expected to match polygon names stored in the <code>sp</code> object in the ID slotName of each individual <code>Polygons</code> object, for example the first polygon in a <code>SpatialPolygon</code> object would have name stored as: <code>sp@polygons[[1]]@ID</code>. When <code>rotate_degrees</code> contains names, only names that match the polygons will be applied, which allows rotating individual polygons within a <code>SpatialPolygons</code> object.</li>
 <li>
 <code>share_polygon_center=TRUE</code> new argument intended for multi-polygon <code>Polygons</code> objects, which happens when there are two disconnected parts inside one <code>Polygons</code> element. When this occurs, by default the two parts are rotated as if they were one unit, around their own local center, by default. When <code>share_polygon_center=FALSE</code> each polygon is rotated about its own personal center.</li>
@@ -278,7 +399,7 @@
 <ul><li>
 <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> corrected an error when supplied with empty overlaps, which previously included at least one delimiter even for empty sets. Entries were added to the tests to confirm this behavior.</li>
 <li>
-<code><a href="../reference/polygon_label_fill.html">polygon_label_fill()</a></code> small bug in how label placement used rotation, the polygon center was not properly re-used when un-rotating labels to the original orientation. The default was -20 degrees, so the effect was subtle.</li>
+<code>polygon_label_fill()</code> small bug in how label placement used rotation, the polygon center was not properly re-used when un-rotating labels to the original orientation. The default was -20 degrees, so the effect was subtle.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-16-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-16-900"></a></h3>
@@ -291,7 +412,7 @@
 <li>
 <code>"detect"</code> will display the overlap count inside when item labels are not being displayed, otherwise the overlap count is outside when item labels are displayed.</li>
 </ul></li>
-<li><p><code><a href="../reference/polygon_label_fill.html">polygon_label_fill()</a></code> new argument <code>ref_sp</code> used to know the relative size of the polygon being labeled, to account for the adjustment when <code>apply_n_scale=TRUE</code>: the buffer polygon is generally smaller for fewer labels, but the new adjustment prevents polygons from being shrunk when the polygon is already very small.</p></li>
+<li><p><code>polygon_label_fill()</code> new argument <code>ref_sp</code> used to know the relative size of the polygon being labeled, to account for the adjustment when <code>apply_n_scale=TRUE</code>: the buffer polygon is generally smaller for fewer labels, but the new adjustment prevents polygons from being shrunk when the polygon is already very small.</p></li>
 <li><p><code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> new default <code>overlap_type="default"</code> which attempts to choose a reasonable option. When all values are <code>c(0, 1)</code> it will choose <code>overlap_type="overlap"</code> which does not use directionality. When the input contains <code>numeric</code> or <code>integer</code> values it will enforce <code><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign()</a></code> so the comparison is done with the sign and not decimal values by default.</p></li>
 </ul></div>
 </div>
@@ -360,7 +481,7 @@
 <h3 id="updates-to-existing-functions-0-0-12-900">updates to existing functions<a class="anchor" aria-label="anchor" href="#updates-to-existing-functions-0-0-12-900"></a></h3>
 <ul><li>Added new function categories: “spatial”, “label”, “conversion”, “plotly”.</li>
 <li>Several functions were updated with newer examples.</li>
-<li>Renamed function <code>label_polygon_fill()</code> to <code><a href="../reference/polygon_label_fill.html">polygon_label_fill()</a></code> to be consistent with <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> and <code><a href="../reference/polygon_label_segment.html">polygon_label_segment()</a></code> – also before anyone happens to start using this function!</li>
+<li>Renamed function <code>label_polygon_fill()</code> to <code>polygon_label_fill()</code> to be consistent with <code>polygon_label_outside()</code> and <code>polygon_label_segment()</code> – also before anyone happens to start using this function!</li>
 <li>Fixed issue where <code>fontfamily</code> was not being used with item labels, breaking display of unicode characters in some sessions.</li>
 </ul></div>
 <div class="section level3">
@@ -405,7 +526,7 @@
 <ul><li>
 <code><a href="../reference/signed_counts2setlist.html">signed_counts2setlist()</a></code> is an import method similar to <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> but to allow importing directional overlaps.</li>
 <li>
-<code><a href="../reference/get_sp_buffer.html">get_sp_buffer()</a></code> applies a buffer width to the interior of a polygon, either with fixed width, or relative width based upon the minimum width required to make the polygon disappear. The relative value means <code>sp_buffer=0.5</code> can be used to create a buffer at half-width, for a polygon of any size. The purpose is to draw a line segment from outside the polygon to “just inside” the polygon, using an amount appropriate for the size and shape of the polygon. As <code><a href="https://rdrr.io/pkg/rgeos/man/rgeos-deprecated.html" class="external-link">rgeos::gBuffer()</a></code> has no ability to scale relative to the polygon size and shape, <code><a href="../reference/get_sp_buffer.html">get_sp_buffer()</a></code> quickly runs a sweep to determine the <code>width</code> where an internal polygon is just barely non-zero, and defines that as <code>sp_buffer=-1</code>.</li>
+<code>get_sp_buffer()</code> applies a buffer width to the interior of a polygon, either with fixed width, or relative width based upon the minimum width required to make the polygon disappear. The relative value means <code>sp_buffer=0.5</code> can be used to create a buffer at half-width, for a polygon of any size. The purpose is to draw a line segment from outside the polygon to “just inside” the polygon, using an amount appropriate for the size and shape of the polygon. As “rgeos” <code>gBuffer()</code> has no ability to scale relative to the polygon size and shape, <code>get_sp_buffer()</code> quickly runs a sweep to determine the <code>width</code> where an internal polygon is just barely non-zero, and defines that as <code>sp_buffer=-1</code>.</li>
 <li>
 <code><a href="../reference/mean_degrees.html">mean_degrees()</a></code> takes a vector of angles in degrees and returns the mean angle based upon the sum of unit vectors. It adds a small random bit to prevent vectors from exactly cancelling out, and an argument <code>seed</code> that makes the randomness reproducible.</li>
 <li>
@@ -426,11 +547,11 @@
 <div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-9-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-9-900"></a></h3>
 <ul><li><p>New argument <code>inside_percent_threshold</code> added to <code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code>, and <code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> used to position labels outside a polygon when its size is below this percent of the total polygon size. It works as a reasonable alternative for determining if the label visually fits inside a polygon.</p></li>
-<li><p><code><a href="../reference/venndir.html">venndir()</a></code> can accept polygon shapes to use as input, instead of defining its own or using those from <code><a href="https://jolars.github.io/eulerr/reference/euler.html" class="external-link">eulerr::euler()</a></code>. New argument <code>venn_sp</code> accepts any <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygons</a></code> compatible object, which must have at least as many polygons as there are sets in <code>setlist</code>.</p></li>
+<li><p><code><a href="../reference/venndir.html">venndir()</a></code> can accept polygon shapes to use as input, instead of defining its own or using those from <code><a href="https://jolars.github.io/eulerr/reference/euler.html" class="external-link">eulerr::euler()</a></code>. New argument <code>venn_sp</code> accepts any <code>SpatialPolygons</code> compatible object, which must have at least as many polygons as there are sets in <code>setlist</code>.</p></li>
 <li><p><code><a href="../reference/venndir.html">venndir()</a></code> now adds the Venn shapes to the output <code>venn_spdf</code> with <code>type="set"</code>; all other polygons have <code>type="overlap"</code>. The shapes will serve as an anchor for set labels, in the event we want to label one or more circles – like when one circle is fully contained inside another.</p></li>
-<li><p><code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> now determines a reasonable text alignment <code>adj</code> based upon the angle offset, to help minimize label overlap with the line segment.</p></li>
-<li><p><code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> was updated to correct some internal use of coordinates. New argument <code>sp_buffer</code> to allow the line segment to end slightly inside each polygon.</p></li>
-<li><p><code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code> default 4-way Venn ellipses were slightly adjusted so the middle ellipses broke the outer ellipses into two polygons. This change helps the automated position of labels by <code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> with certain settings.</p></li>
+<li><p><code>polygon_label_outside()</code> now determines a reasonable text alignment <code>adj</code> based upon the angle offset, to help minimize label overlap with the line segment.</p></li>
+<li><p><code>polygon_label_outside()</code> was updated to correct some internal use of coordinates. New argument <code>sp_buffer</code> to allow the line segment to end slightly inside each polygon.</p></li>
+<li><p><code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code> default 4-way Venn ellipses were slightly adjusted so the middle ellipses broke the outer ellipses into two polygons. This change helps the automated position of labels by <code>polygon_label_outside()</code> with certain settings.</p></li>
 <li><p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> was refactored to be able to position labels inside or outside the polygon, for four types of labels:</p></li>
 <li><p><code>"set"</code> - e.g. <code>"set_A"</code></p></li>
 <li><p><code>"overlap"</code> - e.g. <code>"set_A&amp;set_B"</code> normally this label is not shown</p></li>
@@ -445,7 +566,7 @@
 <div class="section level3">
 <h3 id="new-functions-0-0-8-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-8-900"></a></h3>
 <ul><li>
-<code><a href="../reference/polygon_label_outside.html">polygon_label_outside()</a></code> defines label placement outside a polygon, one of two methods: “label” positions outside using relative label positioning; “bbox” positions outside using relative polygon position within the bounding box.</li>
+<code>polygon_label_outside()</code> defines label placement outside a polygon, one of two methods: “label” positions outside using relative label positioning; “bbox” positions outside using relative polygon position within the bounding box.</li>
 <li>
 <code><a href="../reference/expand_range.html">expand_range()</a></code> is a simple function to expand a numeric range by <code>expand_fraction</code>, mainly for R plots to have space to render labels outside a central Venn diagram.</li>
 <li>
@@ -455,7 +576,7 @@
 <li>
 <code><a href="../reference/diff_degrees.html">diff_degrees()</a></code> takes a vector of angles in degrees, and returns the angular difference. Suitable for cases with angles like <code>c(355, 2, 12)</code> where the difference between <code>355</code> and <code>2</code> is <code>7</code>.</li>
 <li>
-<code><a href="../reference/sp_polylabelr.html">sp_polylabelr()</a></code> is a simple wrapper function to <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> for <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygons</a></code> objects.</li>
+<code>sp_polylabelr()</code> is a simple wrapper function to <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> for <code>SpatialPolygons</code> objects.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -476,13 +597,13 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-7-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-7-900"></a></h3>
 <ul><li>
-<code><a href="../reference/render_venndir.html">render_venndir()</a></code> added <code>sp</code> prefix to <code>sp::plot()</code> for base R plotting.</li>
+<code><a href="../reference/render_venndir.html">render_venndir()</a></code> added <code>sp</code> prefix to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for base R plotting.</li>
 <li>
 <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> was updated to allow using <code>sep="|"</code>. Previous this delimited was used to make unique rownames, and needed to be parsed properly to prevent errors.</li>
 <li>
 <code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>sep</code> which is now properly passed to <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> and <code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code>.</li>
 <li>
-<code><a href="../reference/find_vennpoly_overlaps.html">find_vennpoly_overlaps()</a></code>, <code><a href="../reference/overlaplist2setlist.html">overlaplist2setlist()</a></code>, <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> now call <code>strsplit(..., fixed=TRUE)</code> so the <code>sep</code> character is not treated like a regular expression, thus allowing delimiter <code>sep="|"</code> if specified.</li>
+<code>find_vennpoly_overlaps()</code>, <code><a href="../reference/overlaplist2setlist.html">overlaplist2setlist()</a></code>, <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> now call <code>strsplit(..., fixed=TRUE)</code> so the <code>sep</code> character is not treated like a regular expression, thus allowing delimiter <code>sep="|"</code> if specified.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-7-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-7-900"></a></h3>
@@ -530,7 +651,7 @@
 <li>
 <code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> new function to control the visual style of count labels, with option to fill and draw a border around labels.</li>
 <li>
-<code><a href="../reference/polygon_label_segment.html">polygon_label_segment()</a></code> is used when moving a label from inside a polygon to somewhere that may or may not be inside that polygon. When it is moved outside, it returns the point on the polygon boundary along that line segment. It can be used with <code>sp_buffer</code> so the line can be drawn slightly inside the polygon boundary.</li>
+<code>polygon_label_segment()</code> is used when moving a label from inside a polygon to somewhere that may or may not be inside that polygon. When it is moved outside, it returns the point on the polygon boundary along that line segment. It can be used with <code>sp_buffer</code> so the line can be drawn slightly inside the polygon boundary.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -538,7 +659,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-5-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-5-900"></a></h3>
 <ul><li>
-<code><a href="../reference/sp_ellipses.html">sp_ellipses()</a></code> argument renamed from <code>radius</code> to <code>xradius</code> and <code>yradius</code>.</li>
+<code>sp_ellipses()</code> argument renamed from <code>radius</code> to <code>xradius</code> and <code>yradius</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="display-item-labels-inside-venn-polygons-0-0-5-900">display item labels inside Venn polygons<a class="anchor" aria-label="anchor" href="#display-item-labels-inside-venn-polygons-0-0-5-900"></a></h3>
@@ -550,17 +671,17 @@
 <ul><li>
 <code>ggrender_venndir()</code> renders a venndir diagram using ggplot2. Note that this function requires the package <code>sf</code>, and in future other objects internal to venndir may be converted from <code>sp</code> to <code>sf</code>.</li>
 <li>
-<code>label_polyogn_fill()</code> takes a <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygons</a></code> object, a vector of labels, and returns coordinates to place labels inside the polygon. It has some adjustments to add buffer around polygon boundaries, but does not directly detect label overlaps. It either plots labels in base R graphics, or returns coordinates suitable for ggplot2.</li>
+<code>label_polyogn_fill()</code> takes a <code>SpatialPolygons</code> object, a vector of labels, and returns coordinates to place labels inside the polygon. It has some adjustments to add buffer around polygon boundaries, but does not directly detect label overlaps. It either plots labels in base R graphics, or returns coordinates suitable for ggplot2.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-rescale_-functions-0-0-5-900">new <code>rescale_*()</code> functions<a class="anchor" aria-label="anchor" href="#new-rescale_-functions-0-0-5-900"></a></h3>
-<p>The <code>rescale_*()</code> functions are intended to allow manipulation of numeric coordinates in each relevant object type, aimed at <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygons</a></code> and the various sub-types.</p>
+<p>The <code>rescale_*()</code> functions are intended to allow manipulation of numeric coordinates in each relevant object type, aimed at <code>SpatialPolygons</code> and the various sub-types.</p>
 <ul><li>
-<code><a href="../reference/rescale_sp.html">rescale_sp()</a></code> manipulates <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">sp::SpatialPolygons</a></code> which contains one or more <code>sp:Polygons</code> objects, and therefore calls:</li>
+<code>rescale_sp()</code> manipulates <code>SpatialPolygons</code> which contains one or more <code>Polygons</code> objects, and therefore calls:</li>
 <li>
-<code><a href="../reference/rescale_ps.html">rescale_ps()</a></code> manipulates <code>sp:Polygons</code> which contains one or more <code>sp:Polygon</code> objects, and therefore calls:</li>
+<code>rescale_ps()</code> manipulates <code>Polygons</code> which contains one or more <code>Polygon</code> objects, and therefore calls:</li>
 <li>
-<code><a href="../reference/rescale_p.html">rescale_p()</a></code> manipulates <code>sp:Polygon</code> which contains numeric <code>matrix</code> coordinates, and therefore calls:</li>
+<code>rescale_p()</code> manipulates <code>Polygon</code> which contains numeric <code>matrix</code> coordinates, and therefore calls:</li>
 <li>
 <code><a href="../reference/rescale_coordinates.html">rescale_coordinates()</a></code> manipulates numeric <code>matrix</code> coordinates.</li>
 </ul><p>The <code>rescale_*()</code> operations enable three types of manipulations:</p>

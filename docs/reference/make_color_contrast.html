@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.27.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
       </span>
     </div>
 
@@ -71,12 +71,21 @@
 <span>  C_floor <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  L_hi <span class="op">=</span> <span class="fl">95</span>,</span>
 <span>  L_lo <span class="op">=</span> <span class="fl">40</span>,</span>
+<span>  blend_preset <span class="op">=</span> <span class="st">"ryb"</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cex <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div id="arguments">
+    <h2>Arguments</h2>
+    <dl><dt>blend_preset</dt>
+<dd><p><code>character</code> string passed as <code>preset</code> to
+<code><a href="https://rdrr.io/pkg/colorjam/man/blend_colors.html" class="external-link">colorjam::blend_colors()</a></code> to define the color wheel used
+during color blending operations.</p></dd>
+
+</dl></div>
     <div id="details">
     <h2>Details</h2>
     <p>This function provides a simple method to ensure a color
@@ -92,9 +101,7 @@ red.</p>
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir utility: 
 <code><a href="curate_venn_labels.html">curate_venn_labels</a>()</code>,
-<code><a href="eulerr2polys.html">eulerr2polys</a>()</code>,
 <code><a href="expand_range.html">expand_range</a>()</code>,
-<code><a href="find_vennpoly_overlaps.html">find_vennpoly_overlaps</a>()</code>,
 <code><a href="get_venn_shapes.html">get_venn_shapes</a>()</code>,
 <code><a href="gridtext_make_outer_box.html">gridtext_make_outer_box</a>()</code>,
 <code><a href="gridtext_richtext_grob.html">gridtext_richtext_grob</a>()</code>,
@@ -103,12 +110,11 @@ red.</p>
 <code><a href="match_list.html">match_list</a>()</code>,
 <code><a href="nudge_venndir_label.html">nudge_venndir_label</a>()</code>,
 <code><a href="print_color_df.html">print_color_df</a>()</code>,
-<code><a href="rescale_ps.html">rescale_ps</a>()</code>,
-<code><a href="rescale_p.html">rescale_p</a>()</code>,
 <code><a href="shrink_df.html">shrink_df</a>()</code>,
-<code><a href="sp_percent_area.html">sp_percent_area</a>()</code>,
+<code><a href="three_point_angle.html">three_point_angle</a>()</code>,
 <code><a href="venndir_label_style.html">venndir_label_style</a>()</code>,
-<code><a href="venndir_legender.html">venndir_legender</a>()</code></p></div>
+<code><a href="venndir_legender.html">venndir_legender</a>()</code>,
+<code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
     </div>
 
     <div id="ref-examples">

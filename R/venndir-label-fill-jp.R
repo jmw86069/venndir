@@ -2,8 +2,7 @@
 #' 
 #' Arrange text labels inside a polygon
 #' 
-#' This function is modeled after `sp::spsample()` which is no longer
-#' available. It is intended to define points inside a polygon area
+#' This function is intended to define points inside a polygon area
 #' which are evenly spaced, used to place text labels also inside
 #' the polygon. There are limited options to define a buffer region
 #' so that labels do not overlap the polygon boundary.
@@ -166,95 +165,7 @@ label_fill_JamPolygon <- function
          ...)
    }
    #
-   
-   if (FALSE) {
-      ## resize polygon before applying labels
-      #ellYesDiffsmall11 <- shrinkPolygon(ellYesDiffsmall11,
-      #   scale=c(labelPolyScale[j]*parPinRatio, labelPolyScale[j]));
-      if (length(scale_width) == 0) {
-         scale_width <- -0.001;
-      }
-      
-      ## apply additional scaling based upon n
-      if (length(apply_n_scale) > 0 && apply_n_scale) {
-         # sp_pct is an adjustment for smaller polygons
-         # which reduces the effect of n on the n_scale
-         # starting at about 1/3 polygon area to total area
-         if (length(ref_sp) > 0) {
-            sp_pct1 <- head(sp_percent_area(rbind(sp, ref_sp)), 1) / 100;
-            sp_pct <- jamba::noiseFloor(sp_pct1 * 3, ceiling=1);
-         } else {
-            sp_pct <- 1;
-         }
-         n_scale <- 1 - (1 / (sqrt(n)*2)) * sp_pct;
-         if (verbose) {
-            jamba::printDebug("polygon_label_fill(): ",
-               "n_scale:",
-               format(digits=4, n_scale));
-            jamba::printDebug("polygon_label_fill(): ",
-               "scale_width (before):",
-               format(digits=4, scale_width));
-         }
-         scale_width <- (scale_width + 1) * (1 - (1 - n_scale) * 1.1) - 1;
-      }
-      
-      ## Apply polygon buffer
-      if (verbose) {
-         jamba::printDebug("polygon_label_fill(): ",
-            "scale_width  (after):",
-            format(digits=4, scale_width));
-      }
-      if (scale_width != 0) {
-         for (sw in unique(seq(from=scale_width, to=0, length.out=5))) {
-            if (sw == 0) {
-               sp_buffer <- sp;
-            } else {
-               sp_buffer <- rgeos::gBuffer(sp,
-                  width=sw);
-            }
-            if (length(sp_buffer) > 0 && rgeos::gArea(sp_buffer) > 0) {
-               break;
-            }
-         }
-         scale_width <- sw;
-      } else {
-         sp_buffer <- sp;
-         scale_width <- 0;
-      }
-      
-      buffer_ws <- unique(c(0, buffer_w * c(-1, -0.5, 0.5, 1)));
-      buffer_hs <- unique(c(0, buffer_h * c(-1, -0.5, 0.5, 1)));
-      if (verbose) {
-         jamba::printDebug("polygon_label_fill(): ",
-            "buffer_ws:",
-            format(digits=2, buffer_ws));
-         jamba::printDebug("polygon_label_fill(): ",
-            "buffer_hs:",
-            format(digits=2, buffer_hs));
-      }
-      for (w1 in buffer_ws) {
-         for (h1 in buffer_hs) {
-            if (h1 != 0 || w1 != 0) {
-               sp_buffer_x <- rescale_sp(sp, shift=c(w1, h1));
-               sp_buffer <- rgeos::gIntersection(sp_buffer, sp_buffer_x);
-            }
-         }
-      }
-      
-      if (draw_buffer) {
-         # try(
-         #    sp::plot(sp_buffer,
-         #       add=TRUE,
-         #       col=buffer_fill,
-         #       border=buffer_border,
-         #       lwd=2,
-         #       lty="dotted")
-         # )
-      }
-      ## gArea(ellYesDiffDis[i]);
-   }
-   
-   
+
    ###################################################################
    # item coordinates
    # note that it sometimes requires iterations with increasing
@@ -266,30 +177,7 @@ label_fill_JamPolygon <- function
       xyratio=xyratio);
 
    label_xy <- do.call(cbind, label_sampled)
-   if (FALSE) {
-      label_xy <- tryCatch({
-         get_poly_points(sp_buffer,
-            n,
-            type=label_method,
-            iter=50,
-            rotate_degrees=layout_degrees,
-            singlet_polylabelr=TRUE,
-            ...);
-      }, error=function(e){
-         print("Error in get_poly_points()");
-         print(e);
-         # jamba::printDebug("sp:");print(sp);# debug
-         # jamba::printDebug("sp_buffer:");print(sp_buffer);# debug
-         NULL;
-      });
-      if (length(label_xy) == 0) {
-         plot(sp_buffer, add=TRUE, color="green");
-         print(n);
-         print(label_method);
-         label_xy <- sp::coordinates(sp_buffer);
-      }
-   }
-   
+
    ## prepare data.frame for re-use
    items_df <- data.frame(
       x=label_xy[,1],

@@ -45,8 +45,7 @@ label_fill_JamPolygon(
 Arrange text labels inside a polygon
 }
 \details{
-This function is modeled after \code{sp::spsample()} which is no longer
-available. It is intended to define points inside a polygon area
+This function is intended to define points inside a polygon area
 which are evenly spaced, used to place text labels also inside
 the polygon. There are limited options to define a buffer region
 so that labels do not overlap the polygon boundary.
@@ -110,17 +109,29 @@ A <- lapply(seq_along(test_x), function(i){
 }
 \seealso{
 Other JamPolygon: 
+\code{\link{JamPolygon-class}},
+\code{\link{Venndir-class}},
+\code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
+\code{\link{bbox_JamPolygon}()},
+\code{\link{buffer_JamPolygon}()},
+\code{\link{check_JamPolygon}()},
+\code{\link{check_Venndir}()},
+\code{\link{eulerr_to_JamPolygon}()},
 \code{\link{farthest_point_JamPolygon}()},
+\code{\link{find_venn_overlaps_JamPolygon}()},
 \code{\link{has_point_in_JamPolygon}()},
 \code{\link{intersect_JamPolygon}()},
 \code{\link{label_outside_JamPolygon}()},
+\code{\link{label_segment_JamPolygon}()},
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
+\code{\link{plot,JamPolygon,missing-method}},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},
 \code{\link{update_JamPolygon}()}

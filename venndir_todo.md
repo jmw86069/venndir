@@ -884,7 +884,7 @@ way to make it faster.
 * one idea: instead of calling `gridtext` for each polygon, aggregate
 them into a `data.frame` then display them in one call. Doubtful this
 change will be much faster.
-* another idea: the `sp::spsample()` function success rate is fairly
+* another idea: the "sp" `spsample()` function success rate is fairly
 low, requiring iterating with higher `n + i` labels in order to
 get `n` coordinates inside the polygon area. This iteration might
 be rate-limiting with large `n`.
@@ -894,7 +894,7 @@ be rate-limiting with large `n`.
 
 * Currently `ggtext::geom_richtext()` is not compatible with
 `plotly::ggplotly()` but probably just lacks the `to_basic`
-wrapper function. (See `splicejam::to_basic.GeomShape()` for
+wrapper function. (See "splicejam" `to_basic.GeomShape()` for
 an example workaround.)
 * This feature may require text labels at 0 or 90 degrees.
 
@@ -941,7 +941,7 @@ chooses something away from the center.
    * Note that sometimes the `polylabelr::poi()` point is outside
    the polygon, which happens sometimes when the polygon has a hole
    or otherwise "weird" shape. The method checks for that and uses
-   the buffer polygon `sp::spsample()` approach if the `polylabelr::poi()`
+   the buffer polygon `spsample()` approach if the `polylabelr::poi()`
    point is not contained in the source polygon.
 
 

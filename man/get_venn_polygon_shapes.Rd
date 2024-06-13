@@ -81,22 +81,29 @@ plot_polygon_list(venn_polygon_list, col=venn_colors)
 # TODO: examples showing circle_nudge, rotate_degrees
 jpdf <- get_venn_polygon_shapes(counts, return_type="JamPolygon")
 
+counts4 <- c(A=1, B=2, `A&B`=3, C=4, `C&D`=2, D=3, `A&C`=2, `A&D`=1, `A&B&C&D`=3)
+jpdf <- get_venn_polygon_shapes(counts4, return_type="JamPolygon")
+
 }
 \seealso{
 Other venndir polygons: 
+\code{\link{bbox_polygon_list}()},
 \code{\link{eulerr_to_polygon_list}()},
 \code{\link{get_largest_polygon_list}()},
-\code{\link{get_polygon_buffer}()},
 \code{\link{intersect_polygon_list}()},
+\code{\link{labelr_polygon_list}()},
 \code{\link{minus_polygon_list}()},
+\code{\link{nudge_polygon_coords}()},
 \code{\link{nudge_polygon_list}()},
+\code{\link{plot_polygon_list}()},
 \code{\link{polygon_areas}()},
 \code{\link{polygon_circles}()},
 \code{\link{polygon_ellipses}()},
 \code{\link{polygon_list_labelr}()},
 \code{\link{polygon_list_to_xy_list}()},
 \code{\link{rescale_polygon_list}()},
+\code{\link{simple_ellipse}()},
 \code{\link{union_polygon_list}()},
-\code{\link{xy_list_to_coord_list}()}
+\code{\link{xy_list_to_polygon_list}()}
 }
 \concept{venndir polygons}
