@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -87,7 +87,7 @@
 <span>  venn_jp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  inside_percent_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  item_cex <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text"</span>, <span class="st">"gridtext"</span><span class="op">)</span>,</span>
+<span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"text"</span>, <span class="st">"gridtext"</span><span class="op">)</span>,</span>
 <span>  item_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>,</span>
 <span>  sign_count_delim <span class="op">=</span> <span class="st">": "</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>,</span>
@@ -286,7 +286,10 @@ in the order they appear in <code><a href="signed_overlaps.html">signed_overlaps
 
 <dt>item_style</dt>
 <dd><p><code>character</code> string (default "text") indicating
-the style to display item labels when they are enabled.</p><ul><li><p><code>"text"</code> option is substantially faster, but does not allow
+the style to display item labels when they are enabled.</p><ul><li><p><code>"default"</code> detects whether item labels contain <code>"&lt;br&gt;"</code> for newlines,
+and uses <code>"gridtext"</code> if that is the case, otherwise it uses <code>"text"</code>
+which is markedly faster.</p></li>
+<li><p><code>"text"</code> option is substantially faster, but does not allow
 markdown.</p></li>
 <li><p><code>"gridtext"</code>:  substantially slower for a large number of labels,
 but enables use of limited markdown by calling
@@ -356,6 +359,16 @@ of the Venn diagram. Not yet re-implemented after version 0.0.30.900.</p></dd>
 <dd><p>additional arguments are passed to <code><a href="render_venndir.html">render_venndir()</a></code>.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p><code>Venndir</code> object with slots:</p><ul><li><p><code>"jps"</code>: <code>JamPolygon</code> which contains each set polygon, and each
+overlap polygon defined for the Venn diagram.</p></li>
+<li><p><code>"label_df"</code>: <code>data.frame</code> which contains the coordinates for each
+Venn set, and Venn overlap label.</p></li>
+<li><p><code>"setlist"</code>: <code>list</code> as input to <code>venndir()</code>. This entry may be empty.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir core: 
@@ -373,16 +386,10 @@ of the Venn diagram. Not yet re-implemented after version 0.0.30.900.</p></dd>
 <span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="venndir-1.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/sdim.html" class="external-link">sdim</a></span><span class="op">(</span><span class="va">vo</span><span class="op">)</span>;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           rows cols      class</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> vo           1         Venndir</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gg           3            list</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> venn_jps    10      JamPolygon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> nlabel_df    7   25 data.frame</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> label_df    21   25 data.frame</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> nCounts      7         numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gCounts      7            list</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gdf         14    4 data.frame</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> glist        8            list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          rows cols      class</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> jps        10      JamPolygon</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> label_df   21   40 data.frame</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> setlist     3            list</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">vobase</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>, debug<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="venndir-2.png" alt="" width="768" height="768"></span>

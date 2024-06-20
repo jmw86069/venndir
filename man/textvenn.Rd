@@ -14,7 +14,7 @@ textvenn(
   inverse_title = TRUE,
   inverse_counts = FALSE,
   color_by_counts = TRUE,
-  return_items = FALSE,
+  return_items = TRUE,
   unicode = TRUE,
   big.mark = ",",
   sep = "&",
@@ -48,10 +48,9 @@ to inverse the color, when \code{inverse_title=TRUE} then each Venn
 set is printed on colored background, when \code{inverse_title=FALSE},
 each set is printed with colored text with no background color.}
 
-\item{return_items}{\code{logical} passed to \code{signed_overlaps()} to
-indicate whether to include items with each Venn set. This data
-is returned using \code{invisible()}, and is relevant only when
-storing the return value.}
+\item{return_items}{\code{logical} default TRUE, whether to return items
+in the \code{data.frame} in column \code{"items"}.
+This argument is passed to \code{signed_overlaps()}.}
 
 \item{unicode}{\code{logical} passed to \code{curate_venn_labels()}
 indicating whether the directional label can include special

@@ -14,7 +14,31 @@
 #' to be on a white background, using argument `bg`.
 #' 
 #' @family venndir utility
-#' 
+#'  
+#'  @param venndir_output `Venndir` object as returned by `venndir()`
+#'     or `render_venndir()`.
+#' @param show_labels `character` string to describe which count labels
+#'    to display, and where. The presence of each letter enables each
+#'    label, and UPPERCASE places the label outside the Venn diagram,
+#'    while lowercase places the label inside.
+#'    The default `"Ncs"` displays _N_ame (outside), _c_ount (inside),
+#'    and _s_igned count (inside). When `overlap_type="overlap"` then
+#'    the signed label is hidden by default.
+#'    
+#'    The label types are defined below:
+#'    * _N_ame: "n" or "N" - the set name, by default it is displayed.
+#'    * _O_verlap: "o" or "O" - the overlap name, by default it is hidden,
+#'    because these labels can be very long, also the overlap should be
+#'    evident in the Venn diagram already.
+#'    * _c_ount: "c" or "C" - overlap count, independent of the sign
+#'    * _p_ercentage: "p" or "P" - overlap percentage, by default hidden,
+#'    but available as an option
+#'    * _s_igned count: "s" or "S" - the signed overlap count, tabulated
+#'    based upon `overlap_type` ("each", "concordant", "agreement", etc/)
+#'    * _i_tems: "i" only, by default hidden. When enabled, item labels
+#'    defined by `show_items` are spread across the specific Venn overlap
+#'    region.
+#' @param label_preset DEPRECATED in favor of `show_labels`.
 #' @param label_style `character` string indicating the style of label
 #'    to display. The values `"basic","none","shaded","lite","fill"`
 #'    style the label background fill, while presence of `"box"` in
@@ -24,6 +48,42 @@
 #'    `"fill"` uses opaque fill with the overlap set color,
 #'    `"shaded"` uses slightly transparent fill with overlap set color,
 #'    `"box"` displays border around the label.
+#' @param lite `character` color used when `label_preset` contains `"lite"`.
+#' @param bg `character` color used as the background color of the
+#'    figure, used with outside labels to determine whether the text
+#'    should be light or dark for proper visual contrast.
+#' @param set,overlap,percent,count,signed,items DEPRECATED in favor
+#'    of `show_labels`.
+#' @param percent_delim `character` string used only when both count
+#'    and percent labels are enabled, as a delimiter between the two
+#'    labels. The default `"<br>"` causes a newline, so the count
+#'    and percent values are on separate lines. Another suggestion is
+#'    `": "` which separates the two values with semicolon on one line.
+#' @param show_items `character` string for the item label content, used
+#'    only when items are displayed.
+#' @param max_items `numeric` maximum number of labels permitted when
+#'    items are displayed. When there are too many items, the item label
+#'    is suppressed.
+#' @param inside_percent_threshold `numeric` size for each polygon below
+#'    which labels are moved outside, for labels that would otherwise
+#'    be displayed inside. Item labels are not affected by this setting.
+#'    The threshold is calculated as a percent of the overall Venn diagram
+#'    polygon area.
+#' @param label_types `character` vector with one or more label types
+#'    to be affected by this function. By default `"count"` and `"signed"`
+#'    labels (all labels) are affected.
+#' @param show_zero `logical` indicating whether to display zero `0`
+#'    for empty overlaps for which the overlap polygon exists. Default FALSE
+#'    hides the display of zeros.
+#' @param sep `character` string used as delimiter between Venn set names.
+#'    This value should generally not be changed.
+#' @param useGrey `numeric` value used by `jamba::setTextContrastColor()`
+#'    to define an appropriate contrasting color which retains some color
+#'    saturation, default 15. Use `useGrey=0` would cause black or white
+#'    labels with no color saturation.
+#' @param verbose `logical` indicating whether to print verbose output.
+#' @param ... additional arguments are passed to internal functions such
+#'    as `make_color_contrast()`.
 #' 
 #' @export
 venndir_label_style <- function
@@ -70,9 +130,10 @@ venndir_label_style <- function
     "none"),
  items=c("none",
     "inside"),
+ percent_delim="<br>",
  show_items=c("none"),
  max_items=3000,
- inside_percent_threshold=5,
+ inside_percent_threshold=0,
  label_types=c("main", "signed"),
  show_zero=TRUE,
  sep="&",
@@ -83,7 +144,11 @@ venndir_label_style <- function
    ## validate show_labels: NOCPSI
    # - Name, Overlap, Count, Percent, Sign, Item
    if (length(show_labels) == 0) {
-      show_labels <- "";
+      if ("show_labels" %in% names(attributes(venndir_output))) {
+         show_labels <- attributes(venndir_output)$show_labels;
+      } else {
+         show_labels <- "";
+      }
    }
    use_nocpsi <- TRUE;
    if (use_nocpsi) {
@@ -136,7 +201,7 @@ venndir_label_style <- function
       several.ok=TRUE);   
    
    # handle Venndir or JamPolygon input
-   vo <- NULL;
+   vo <- list();
    if ("Venndir" %in% class(venndir_output)) {
       if (verbose) {
          jamba::printDebug("venndir_label_style(): ",
@@ -146,15 +211,17 @@ venndir_label_style <- function
       venndir_output <- list();
       venndir_output$venn_spdf <- vo@jps@polygons;
       venndir_output$label_df <- vo@label_df;
-   } else if ("JamPolygon" %in% class(venndir_output$venn_spdf)) {
-      if (verbose) {
-         jamba::printDebug("venndir_label_style(): ",
-            "list JamPolygon input.");
-      }
-      venndir_output$venn_jps <- venndir_output$venn_spdf;
-      venndir_output$venn_spdf <- venndir_output$venn_jps@polygons;
+   } else if ("list" %in% class(venndir_output) && "vo" %in% names(venndir_output)) {
+      ## legacy list with "vo" as Venndir object
+      # to be removed in future
+      vo <- venndir_output$vo;
+      venndir_output <- list();
+      venndir_output$venn_spdf <- vo@jps@polygons;
+      venndir_output$label_df <- vo@label_df;
    }
-
+   if (length(vo) == 0) {
+      stop("Input venndir_output was not recognized as 'Venndir' object.")
+   }
    # apply label_style to label_df
    label_style <- rep(head(label_style, 1),
       length.out=nrow(venndir_output$label_df));
@@ -227,6 +294,50 @@ venndir_label_style <- function
          ", items: ", items);
    }
    
+   ## Update venndir_output$label_df$text dependent upon percent
+   use_count <- rep(count, length.out=nrow(venndir_output$label_df));
+   use_percent <- rep(percent, length.out=nrow(venndir_output$label_df));
+   sum_counts <- sum(
+      subset(venndir_output$label_df,
+         type %in% "main")$venn_counts, na.rm=TRUE)
+   # jamba::printDebug("sum_counts:", sum_counts);# debug
+   use_text_df <- data.frame(
+      count=ifelse(use_count %in% "none", "",
+         jamba::formatInt(venndir_output$label_df$venn_counts, ...)),
+      percent=ifelse(use_percent %in% "none", "",
+         paste0(
+            round(venndir_output$label_df$venn_counts /
+                  sum_counts * 100), "%")))
+   # paste in order?
+   use_text <- jamba::pasteByRow(use_text_df,
+      sep=percent_delim);
+   if (length(show_labels) > 0 && any(nchar(show_labels) > 0)) {
+      use_text2 <- jamba::pasteByRow(use_text_df[, 2:1, drop=FALSE],
+         sep=percent_delim);
+      use_show_labels <- rep(show_labels,
+         length.out=nrow(venndir_output$label_df));
+      use_text <- ifelse(grepl("p.*c", ignore.case=TRUE, use_show_labels),
+         use_text2,
+         use_text)
+   }
+   # assign to "text" column only for label type="main"
+   venndir_output$label_df$text <- ifelse(
+      venndir_output$label_df$type %in% "main",
+      use_text,
+      venndir_output$label_df$text)
+   
+   # jamba::printDebug("use_count:");print(use_count);# debug
+   # jamba::printDebug("use_percent:");print(use_percent);# debug
+   # jamba::printDebug("use_text_df:");print(use_text_df);# debug
+   # jamba::printDebug("use_text:");print(use_text);# debug
+   # jamba::printDebug("label_df$venn_counts:");print(label_df$venn_counts);# debug
+   apply_count <- ifelse(use_count %in% "none",
+      ifelse(use_percent %in% "none",
+         "none",
+         use_percent),
+      use_count)
+   count <- apply_count;
+      
    # match rows in label_df with venn_spdf
    n <- length(venndir_output$venn_spdf$label) + 1;
    #sp_index <- (n - 
@@ -264,27 +375,11 @@ venndir_label_style <- function
    
    # check if there is room for label inside via inside_percent_threshold
    #
-   # Todo: calculate percent total area for "JamPolygon"
-   #
-   # jamba::printDebug("sdim(venndir_output):");print(jamba::sdim(venndir_output));# debug
-   if (length(vo) > 0) {
-      jp_area <- area_JamPolygon(vo@jps);
-      # if (verbose) jamba::printDebug("venndir_label_style(): ", "jp_area:", jp_area);# debug
-      union_jp <- union_JamPolygon(vo@jps);
-      # if (verbose) jamba::printDebug("venndir_label_style(): ", "union_jp:");print(union_jp);# debug
-      total_jp_area <- area_JamPolygon(union_jp);
-      sp_pct_area <- jp_area / total_jp_area * 100;
-      # if (verbose) jamba::printDebug("venndir_label_style(): ", "sp_pct_area:", sp_pct_area);# debug
-   } else if ("venn_jps" %in% names(venndir_output)) {
-      jp_area <- area_JamPolygon(venndir_output$venn_jps);
-      # jamba::printDebug("jp_area:", jp_area);
-      union_jp <- union_JamPolygon(venndir_output$venn_jps);
-      total_jp_area <- area_JamPolygon(union_jp);
-      sp_pct_area <- jp_area / total_jp_area * 100;
-   } else {
-      sp_pct_area <- sp_percent_area(venndir_output$venn_spdf);
-   }
-   
+   jp_area <- area_JamPolygon(vo@jps);
+   union_jp <- union_JamPolygon(vo@jps);
+   total_jp_area <- area_JamPolygon(union_jp);
+   sp_pct_area <- jp_area / total_jp_area * 100;
+
    poly_pct_area <- jamba::rmNA(sp_pct_area[sp_index],
       naValue=-1);
    if (length(inside_percent_threshold) == 0) {
@@ -304,7 +399,6 @@ venndir_label_style <- function
    
    # update label positions only when label_preset is not "custom"
    if (!"custom" %in% label_preset) {
-      
       # overlap labels
       if (any(c("none", "inside", "outside") %in% overlap)) {
          venndir_output$label_df$overlap <- ifelse(
@@ -598,6 +692,9 @@ venndir_label_style <- function
       return(NA)
    });
    
+   ## Update the input Venndir object in place
+   vo@jps@polygons <- venndir_output$venn_spdf;
+   
    # label_bg is the background color when the label is inside
    
    # jamba::printDebug("venndir_output$label_df:");print(head(venndir_output$label_df));
@@ -613,6 +710,7 @@ venndir_label_style <- function
             alpha=vo@jps@polygons$alpha[xy_overlaps])
       );
    } else if ("venn_jps" %in% names(venndir_output)) {
+      ## Todo: Omit these sections in favor of "Venndir" input
       label_bg <- ifelse(is.na(xy_overlaps),
          rep(bg, length.out=length(xy_overlaps)),
          jamba::alpha2col(
@@ -629,13 +727,7 @@ venndir_label_style <- function
    }
    
    # define color_sp_index
-   if (length(vo) > 0) {
-      color_sp_index <- jamba::unalpha(vo@jps@polygons$fill[sp_index]);
-   } else if ("venn_jps" %in% names(venndir_output)) {
-      color_sp_index <- jamba::unalpha(venndir_output$venn_jps@polygons$fill[sp_index]);
-   } else {
-      color_sp_index <- venndir_output$venn_spdf$color[sp_index];
-   }
+   color_sp_index <- jamba::unalpha(vo@jps@polygons$fill[sp_index]);
    # box is darker version of polygon color with alpha=0.8
    venndir_output$label_df$border[toupdate] <- ifelse(
       grepl("box", label_style),
@@ -724,6 +816,12 @@ venndir_label_style <- function
          )
       )
    )[toupdate];
+   vo@label_df <- venndir_output$label_df;
    
-   return(venndir_output);
+   # add attribute to help persist the default show_labels
+   if (length(show_labels) > 0 && any(nchar(show_labels) > 0)) {
+      attr(vo, "show_labels") <- show_labels;
+   }
+   
+   return(vo);
 }

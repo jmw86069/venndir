@@ -105,10 +105,10 @@ spread_degrees <- function
    # if all angles are less than min_degrees, evenly space all angles
    #ddf$abs_diff <- ddf$diff %% 360;
    if (all(abs(ddf$diff) < (min_degrees / 1.01))) {
-      #if (verbose) {
+      if (verbose) {
          jamba::printDebug("spread_degrees(): ",
             "spreading all angles equally");
-      #}
+      }
       seqdegree <- head(
          seq(from=ddf$degrees[1],
             to=ddf$degrees[1] + 360,

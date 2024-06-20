@@ -6,16 +6,28 @@
 #' @family venndir core
 #' 
 #' @inheritParams venndir
-#' @param venndir_output `Venndir` output from `venndir()`
+#' @param venndir_output `Venndir` output from `venndir()`, or
+#'    `list` with element `"vo"` as a `Venndir` object.
 #' @param expand_fraction `numeric` value indicating how much to
 #'    expand the figure range beyond the default calculated for
 #'    the Venn diagram. Values above zero cause the Venn diagram
 #'    to be slighly smaller.
+#' @param font_cex `numeric` scalar to adjust font sizes.
+#' @param item_cex `numeric` scalar applied to item labels in each overlap
+#'    in order. When `length(item_cex) == 1` it is applied uniformly
+#'    across all overlaps, otherwise it is recycled to the total
+#'    number of overlaps.
+#'    When provided, it is used instead of any adjustments to item label
+#'    sizes based upon proportional area of each overlap.
 #' @param item_cex_factor `numeric` value used to adjust pre-calculated
-#'    item fontsizes.
+#'    item fontsizes. This value is used to adjust the item label sizes,
+#'    which may also be adjusted proportional to the area of each overlap,
+#'    in which case `item_cex_factor` is used to adjust those relative
+#'    label sizes.
 #' @param plot_warning `logical` indicating whether to include a warning
 #'    when one or more non-zero overlap counts cannot be displayed
-#'    in the figure. Not yet re-implemented for version 0.0.30.900.
+#'    in the figure.
+#'    **Not yet re-implemented since version 0.0.30.900.**
 #' @param item_degrees `numeric` angle (default 0) in degrees used
 #'    to adjust item label display.
 #' @param show_segments `logical` (default TRUE) indicating whether to
@@ -42,13 +54,7 @@
 #' @export
 render_venndir <- function
 (venndir_output=NULL,
- # venn_jp=NULL,
- # label_df=NULL,
- # asp=1,
- # xlim=NULL,
- # ylim=NULL,
  expand_fraction=0,
- # xpd=NA,
  font_cex=1,
  item_cex=NULL,
  item_cex_factor=4,
@@ -74,7 +80,8 @@ render_venndir <- function
     "lite_box"),
  fontfamily="Arial",
  inside_percent_threshold=0,
- item_style=c("text",
+ item_style=c("default",
+    "text",
     "gridtext"),
  item_buffer=-0.15,
  group_labels=TRUE,
@@ -88,22 +95,35 @@ render_venndir <- function
  draw_buffer=FALSE,
  ...)
 {
+   # validate input
+   if ("list" %in% class(venndir_output) && "vo" %in% names(venndir_output)) {
+      venndir_output <- venndir_output$vo;
+   }
    if ("Venndir" %in% class(venndir_output)) {
       venn_jp <- venndir_output@jps;
       label_df <- venndir_output@label_df;
+      setlist <- venndir_output@setlist;
    } else {
+      # legacy input
       if (length(venndir_output) > 0 && is.list(venndir_output)) {
-         if (!any(c("venn_jp", "label_df") %in% names(venndir_output))) {
+         if (!any(c("jp", "label_df") %in% names(venndir_output))) {
             stop("List input must contain element names 'venn_jp' or 'label_df'.");
          }
-         if (!inherits(venndir_output[["venn_jp"]], "JamPolygon")) {
-            stop("Element 'venn_jp' must inherit from 'JamPolygon'.");
+         if (!inherits(venndir_output[["jp"]], "JamPolygon")) {
+            stop("Element 'jp' must inherit from 'JamPolygon'.");
          }
-         venn_jp <- venndir_output[["venn_jp"]];
+         venn_jp <- venndir_output[["jp"]];
          if (!inherits(venndir_output[["label_df"]], "data.frame")) {
             stop("Element 'label_df' must inherit from 'data.frame'.");
          }
          label_df <- venndir_output[["label_df"]];
+         setlist <- list();
+         venndir_output <- new("Venndir",
+            jps=venn_jp,
+            label_df=label_df,
+            setlist=list())
+      } else {
+         stop("Input must be 'Venndir' or legacy list with 'jp' and 'label_df'")
       }
    }
    show_items <- head(setdiff(label_df$show_items, c(NA, "none")), 1);
@@ -115,18 +135,21 @@ render_venndir <- function
    item_style <- match.arg(item_style);
    
    # Apply label_style
-   if (!"custom" %in% label_style) {
-      # venndir_output <- venndir_label_style(
-      vls <- venndir_label_style(
-         list(venn_spdf=venn_jp@polygons, label_df=label_df),
+   # - only if label_style is something other than "custom"
+   # OR
+   # - show_labels is something other than NULL or ""
+   if (!"custom" %in% label_style ||
+         (length(show_labels) > 0 && any(nchar(show_labels) > 0))) {
+      venndir_output <- venndir_label_style(
+         venndir_output=venndir_output,
          label_preset=label_preset,
          label_style=label_style,
          show_labels=show_labels,
          inside_percent_threshold=inside_percent_threshold,
          show_zero=show_zero,
          ...);
-      venn_jp@polygons <- vls$venn_spdf;
-      label_df <- vls$label_df;
+      venn_jp <- venndir_output@jps;
+      label_df <- venndir_output@label_df;
    }
    
    # Process existing JamPolygon
@@ -340,9 +363,31 @@ render_venndir <- function
             # sp_index <- (length(venn_spdf$label) + 1 - 
             #       match(offset_sets, 
             #          rev(venn_spdf$label)));
-            sp_index <- (length(venn_jp@polygons$label) + 1 - 
+            ## 0.0.32.900 - subset polygons for non-empty coordinates
+            polygon_nonempty <- sapply(venn_jp@polygons$x, function(ix1){
+               length(jamba::rmNA(unlist(ix1))) > 0
+            });
+            use_jp <- venn_jp[which(polygon_nonempty), ];
+            use_polygons <- use_jp@polygons;
+            use_polygons$rownum <- seq_len(nrow(use_polygons));
+            use_polygons$nsets <- lengths(strsplit(use_polygons$name, "&"));
+            use_polygons <- jamba::mixedSortDF(use_polygons, byCols=c("type", "nsets"));
+            ## define best available polygon to label
+            sp_index <- sapply(offset_sets, function(iset1){
+               kset1 <- head(grep(paste0("(^|&)", iset1, "($|&)"),
+                  use_polygons$label), 1)
+               use_polygons$rownum[kset1];
+            })
+            ## Old logic
+            sp_index1 <- (length(use_jp@polygons$label) + 1 - 
                   match(offset_sets, 
-                     rev(venn_jp@polygons$label)));
+                     rev(use_jp@polygons$label)));
+            # jamba::printDebug("venn_jp@polygons: ");print(venn_jp@polygons);# debug
+            # jamba::printDebug("use_jp@polygons: ");print(use_jp@polygons);# debug
+            # jamba::printDebug("sp_index:");print(sp_index);# debug
+            # jamba::printDebug("sp_index1:");print(sp_index1);# debug
+            # jamba::printDebug("offset_sets:");print(offset_sets);# debug
+            
             segment_buffer <- ifelse(label_df$items %in% "inside",
                label_df$segment_buffer / 2,
                label_df$segment_buffer);
@@ -358,15 +403,14 @@ render_venndir <- function
                label_color=label_df$color[use_offset],
                label_fill=label_df[use_offset, "fill"],
                label_border=label_df$border[use_offset],
-               poly_color=venn_jp@polygons$fill[sp_index],
-               poly_border=venn_jp@polygons$border[sp_index]);
+               poly_color=use_jp@polygons$fill[sp_index],
+               poly_border=use_jp@polygons$border[sp_index]);
             # jamba::printDebug("test_xy:");print(test_xy);# debug
             # sp_list <- lapply(sp_index, function(i){
             #    venn_spdf[i,]});
             jp_list <- lapply(sp_index, function(i){
-               venn_jp[i, ]
+               use_jp[i, ]
             });
-            # new_xy <- polygon_label_segment(
             # jamba::printDebug("render_venndir(): ", "test_xy:");print(test_xy);# debug
             # jamba::printDebug("render_venndir(): ", "jp_list:");print(jp_list);# debug
             new_xy <- label_segment_JamPolygon(
@@ -430,7 +474,7 @@ render_venndir <- function
          factor(items_dfs$overlap_set,
             levels=unique(items_dfs$overlap_set)));
       # jamba::printDebug("sdim(items_dfs):");print(jamba::sdim(items_dfs));# debug
-      # jamba::printDebug("items_dfs:");print(items_dfs);
+      # jamba::printDebug("items_dfs:");print(items_dfs);# debug
 
       #for (items_df1 in items_dfs) {
       itemlabels_list <- lapply(items_dfs, function(items_df1){
@@ -460,8 +504,10 @@ render_venndir <- function
          # show_items_order <- strsplit(show_items[1], "[- _.]")[[1]];
          show_items_order <- strsplit(use_show_items, "[- _.]")[[1]];
          for (dio in show_items_order) {
+            # jamba::printDebug("dio:", dio);# debug
             if (grepl("sign", dio)) {
                labels <- paste(labels, prefixes);
+               # jamba::printDebug("prefixes:", head(prefixes));# debug
             } else if (grepl("item", dio)) {
                labels <- paste(labels, items);
             }
@@ -714,19 +760,46 @@ render_venndir <- function
       itemlabels_df$color <- new_item_color;
       # jamba::printDebug("middle(itemlabels_df):");print(jamba::middle(itemlabels_df));
       #
-      text_grob <- grid::textGrob(
-         x=adjx(itemlabels_df$x),
-         y=adjy(itemlabels_df$y),
-         label=itemlabels_df$text,
-         rot=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
-         check.overlap=FALSE,
-         default.units="snpc",
-         gp=grid::gpar(
-            col=itemlabels_df$color,
-            fontsize=itemlabels_df$fontsize),
-         vp=jp_viewport,
-         hjust=0.5,
-         vjust=0.5);
+      if ("default" %in% item_style) {
+         # auto-detect
+         item_style <- "text";
+         # check for <br>, <span>, <sup>, <sub>, or *text* format
+         gridtext_check <- "<br>|<span|[*][^*]+[*]|<sup>|<sub>";
+         if (jamba::igrepHas(gridtext_check, itemlabels_df$text)) {
+            item_style <- "gridtext";
+         }
+      }
+      if ("text" %in% item_style) {
+         # jamba::printDebug("itemlabels_df:");print(itemlabels_df);# debug
+         text_grob <- grid::textGrob(
+            x=adjx(itemlabels_df$x),
+            y=adjy(itemlabels_df$y),
+            label=itemlabels_df$text,
+            rot=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
+            check.overlap=FALSE,
+            default.units="snpc",
+            gp=grid::gpar(
+               col=itemlabels_df$color,
+               fontsize=itemlabels_df$fontsize),
+            vp=jp_viewport,
+            hjust=0.5,
+            vjust=0.5);
+      } else if ("gridtext" %in% item_style) {
+         # jamba::printDebug("itemlabels_df:");print(itemlabels_df);# debug
+         text_grob <- gridtext::richtext_grob(
+            text=itemlabels_df$text,
+            x=adjx(itemlabels_df$x),
+            y=adjy(itemlabels_df$y),
+            rot=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
+            # check.overlap=FALSE,
+            default.units="snpc",
+            gp=grid::gpar(
+               col=itemlabels_df$color,
+               fontsize=itemlabels_df$fontsize),
+            vp=jp_viewport,
+            hjust=0.5,
+            vjust=0.5);
+      }
       # print(jamba::middle(itemlabels_df));
       grid::grid.draw(text_grob);
       # grid::grid.points(
@@ -838,10 +911,18 @@ render_venndir <- function
          vp=jp_viewport);
       grid::grid.draw(segments_grob);
    }
+
+   # prepare new Venndir object
+   vo_new <- new("Venndir",
+      jps=venn_jp,
+      label_df=label_df,
+      setlist=setlist)
    
    # venndir legender
    if (TRUE %in% draw_legend) {
-      venndir_legender(venndir_out=list(venn_jps=venn_jp),
+      venndir_legender(
+         venndir_output=vo_new,
+         # venndir_output=list(jps=venn_jp),
          x=legend_x,
          font_cex=legend_font_cex,
          ...)
@@ -851,11 +932,13 @@ render_venndir <- function
    if (length(warning_label) > 0) {
       jamba::printDebug("warning_label exists");
    }
-   # debug
-   return(list(
-      jp=jp,
-      label_df=label_df,
-      gdf=gdf));
+   # return Venndir object
+   return(invisible(vo_new));
+   return(invisible(
+      list(
+         jp=jp,
+         label_df=label_df,
+         gdf=gdf)));
 
    # return(invisible(list(venn_spdf=venn_spdf,
    #    label_df=label_df,

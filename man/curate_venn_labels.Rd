@@ -118,7 +118,6 @@ Other venndir utility:
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
 \code{\link{three_point_angle}()},
-\code{\link{venndir_label_style}()},
 \code{\link{venndir_legender}()},
 \code{\link{venndir_to_df}()}
 }

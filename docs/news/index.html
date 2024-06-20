@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -57,6 +57,36 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.32.900" id="venndir-0032900">venndir 0.0.32.900<a class="anchor" aria-label="anchor" href="#venndir-0032900"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-32-900">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-32-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Fixed regression that did not recognize updated output from <code><a href="../reference/venndir.html">venndir()</a></code>, addressing issues <a href="http://github.com/jmw86069/venndir/issues/7" class="external-link">#7</a> and <a href="http://github.com/jmw86069/venndir/issues/8" class="external-link">#8</a>.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-32-900">Changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-32-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Percent can now optionally be labeled for each overlap, with <code>show_labels</code> which includes the letter <code>"p"</code>. When <code>"c"</code> and <code>"p"</code> are both included, the two labels are included in the order they appear, separated using <code>percent_delimiter</code> which by default uses a newline. For now, percentage will always appear in the same location with counts <code>"c"</code>, unless counts are hidden. For example <code>show_labels="Ncp"</code> will place set names outside, and count and percent inside. Similarly <code>show_labels="Np"</code> will place set names outside, and only the percent will be displayed inside. Also, <code>show_labels="Npc"</code> will place the percentage first, then the overlap count.</li>
+<li>New argument default <code>item_style="default"</code> will auto-detect Markdown and imposes <code>item_style="gridtext"</code> when found, otherwise uses the faster <code>item_style="text"</code>.</li>
+<li>
+<code>show_items=NA</code> default is changed when items should be displayed, defined when <code>show_labels</code> contains <code>"i"</code>. In that case the <code>overlap_type</code> helps determine eithr <code>show_items="item"</code> or <code>show_items="sign item"</code>.</li>
+</ul></li>
+<li><p><code>Venndir-class</code> - additional documentation.</p></li>
+<li>
+<p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code></p>
+<ul><li>recognizes option to include (or hide) percent, in the same location as the overlap count label.</li>
+<li>Argument <code>percent_delim</code> controls the delimiter between count and percent, and takes effect only when both are visible. The default <code>"&lt;br&gt;"</code> places the second value on a new line.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="tests-0-0-32-900">tests<a class="anchor" aria-label="anchor" href="#tests-0-0-32-900"></a></h3>
+<ul><li>A series of small, simple unit tests were added for Venn diagrams, nested-proportional Venn, Venn with an empty set, etc.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.31.900" id="venndir-0031900">venndir 0.0.31.900<a class="anchor" aria-label="anchor" href="#venndir-0031900"></a></h2>
 <ul><li>All <code>sp</code> and <code>rgeos</code> references were removed!</li>

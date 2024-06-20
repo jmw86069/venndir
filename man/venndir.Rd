@@ -28,7 +28,7 @@ venndir(
   venn_jp = NULL,
   inside_percent_threshold = 0,
   item_cex = NULL,
-  item_style = c("text", "gridtext"),
+  item_style = c("default", "text", "gridtext"),
   item_buffer = -0.15,
   sign_count_delim = ": ",
   padding = c(3, 2),
@@ -201,6 +201,9 @@ in the order they appear in \code{signed_overlaps()}.
 \item{item_style}{\code{character} string (default "text") indicating
 the style to display item labels when they are enabled.
 \itemize{
+\item \code{"default"} detects whether item labels contain \code{"<br>"} for newlines,
+and uses \code{"gridtext"} if that is the case, otherwise it uses \code{"text"}
+which is markedly faster.
 \item \code{"text"} option is substantially faster, but does not allow
 markdown.
 \item \code{"gridtext"}:  substantially slower for a large number of labels,
@@ -245,6 +248,16 @@ re-implemented after the version 0.0.30.900 update.}
 of the Venn diagram. Not yet re-implemented after version 0.0.30.900.}
 
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
+}
+\value{
+\code{Venndir} object with slots:
+\itemize{
+\item \code{"jps"}: \code{JamPolygon} which contains each set polygon, and each
+overlap polygon defined for the Venn diagram.
+\item \code{"label_df"}: \code{data.frame} which contains the coordinates for each
+Venn set, and Venn overlap label.
+\item \code{"setlist"}: \code{list} as input to \code{venndir()}. This entry may be empty.
+}
 }
 \description{
 Directional Venn diagram

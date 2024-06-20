@@ -13,18 +13,79 @@ a venndir figure. The components in this object can be edited.
 
 Slots:
 \itemize{
-\item \strong{jps}: \code{JamPolygon} containing the set polygons (usually the full circle
+\item \strong{jps}: \code{JamPolygon} containing the set and overlap polygons.
+\itemize{
+\item Columns \code{"x"},\code{"y"} contain polygon coordinates, see
+\code{JamPolygon-class} for details on multi-part polygons, and polygons
+with holes.
+\item The polygon type is defined with column \code{type} and values
+\code{"set"} or \code{"overlap"}.
+\item The "set" polygons are intended to be the full circle for each
+set, but may be \code{NA} or \code{NULL} to indicate the set is empty.
+\item The "overlap" polygons are expected to be contained inside
+"set" polygons, and each overlap polygon may be multi-polygons
+with or without holes.
+For example, the "set" polygon for \code{set_A} which is a circle fully
+contained inside another set \code{set_B}.
+The "overlap" polygon for \code{set_A} would be empty, since there is no
+region unique to \code{set_A}.
+However the "overlap" polygon \code{set_A&set_B}
+would contain the full circle defined by "set" polygon \code{set_A}.
+Lastly the "overlap" polygon for \code{set_B} would be a circle with a hole
+located at "overlap" \code{set_A&set_B}.
+or ellipse. The overlap polygons are polygons, possibly multi-part
+with or without holes, or may be \code{NA} or \code{NULL} to indicate that
+this overlap does not have a corresponding polygon.
+\item The \code{name} column contains set or overlap
+names, where multiple sets are concatenated with \code{"&"} by default.
 or ellipse corresponding to each set in \code{setlist}), and the overlap
 polygons. Where an overlap does not exist, the polygon coordinates
 will be empty, or will have entirely \code{NA} values for "x" and "y".
-\item \strong{label_df}: \code{data.frame} containing detailed information about
-where to place Venn labels in the figure, what font to use, color,
-and items (when items are necessary for the figure). The "x" and "y"
-coordinates define the location of each label inside the polygon,
-the "x_offset" and "y_offset" are added to those coordinates to
-define the label position outside the polygon.
+}
+\item \strong{label_df}: \code{data.frame} which contains information about
+Venn labels placement and content.
+It should contain one row for each Venn overlap.
+When data contains signed overlaps, each overlap is sub-divided
+by the combination of overlap signs, with one row per overlap and
+overlap signs.
+Overlap signs are summarized based upon argument \code{overlap_type},
+see \code{signed_overlaps()}.
+\itemize{
+\item \code{"overlap_sign"} represents the combination of overlap name,
+and the overlap sign across all sets.
+\item \code{"text"} indicates the count label to be displayed.
+\item \code{"venn_counts"} indicates the numeric number of Venn overlaps
+in each row.
+\item \code{"item"} should be a \code{list} that contains \code{character} vectors
+of items in each overlap set. Column \code{"item"} is optional.
+\item \code{"nsets"} indicates the number of sets involved in the overlap.
+\item \code{"x"}, \code{"y"} represent the label coordinate to use inside
+each polygon overlap. When the label is displayed outside the polygon,
+the values \code{"x_offset"} and \code{"y_offset"} are added to \code{"x"} and \code{"y"},
+respectively. In this way, a line segment can be drawn from the outer
+label back to the corresponding polygon.
+\item \code{"color"} indicates the color for each label. Note the
+actual color may be modified based upon the background fill color
+to maximize the contrast and visibility of the color. For example
+blue on a dark background is displayed as light blue.
+\item \code{"fontsize"} indicates the base font size, prior to any
+optional adjustment with \code{font_cex}.
+\item \code{"fill"} indicates an optional color fill behind the count
+label. When \code{NULL} (default) there is no color fill. This value
+is usually populated by argument \code{label_style} which is passed to
+\code{venndir_label_preset()}.
+\item \code{"border"} indicates an optional border around count labels,
+and is handled similar to \code{"fill"}.
+\item \code{"padding"}, \code{"padding_unit"}, \code{"r"}, and \code{"r_unit"} are
+used with \code{gridtext::richtext_grob()} to define padding around count
+labels, and optional rounded corners when border is displayed.
+\item Other columns are intended for internal use by \code{render_venndir()}
+and are not yet fully editable.
+}
 \item \strong{setlist}: \code{list} with the \code{setlist} used to create the Venn overlaps.
-Previously this data could be inferred from \code{label_df} which was tedious.
+Previously this data could be inferred from \code{label_df} which was
+tedious, and required column \code{"item"} which is optional.
+That said, \code{setlist} can be an empty \code{list()}.
 }
 }
 \seealso{

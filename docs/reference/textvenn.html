@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -73,7 +73,7 @@
 <span>  inverse_title <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  inverse_counts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  color_by_counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  return_items <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  return_items <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unicode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  big.mark <span class="op">=</span> <span class="st">","</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">"&amp;"</span>,</span>
@@ -120,10 +120,9 @@ each set is printed with colored text with no background color.</p></dd>
 
 
 <dt>return_items</dt>
-<dd><p><code>logical</code> passed to <code><a href="signed_overlaps.html">signed_overlaps()</a></code> to
-indicate whether to include items with each Venn set. This data
-is returned using <code><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible()</a></code>, and is relevant only when
-storing the return value.</p></dd>
+<dd><p><code>logical</code> default TRUE, whether to return items
+in the <code>data.frame</code> in column <code>"items"</code>.
+This argument is passed to <code><a href="signed_overlaps.html">signed_overlaps()</a></code>.</p></dd>
 
 
 <dt>unicode</dt>

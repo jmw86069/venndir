@@ -111,6 +111,9 @@
 #'    in the order they appear in `signed_overlaps()`.
 #' @param item_style `character` string (default "text") indicating
 #'    the style to display item labels when they are enabled.
+#'    * `"default"` detects whether item labels contain `"<br>"` for newlines,
+#'    and uses `"gridtext"` if that is the case, otherwise it uses `"text"`
+#'    which is markedly faster.
 #'    * `"text"` option is substantially faster, but does not allow
 #'    markdown.
 #'    * `"gridtext"`:  substantially slower for a large number of labels,
@@ -146,6 +149,13 @@
 #' 
 #' @family venndir core
 #' 
+#' @returns `Venndir` object with slots:
+#'    * `"jps"`: `JamPolygon` which contains each set polygon, and each
+#'    overlap polygon defined for the Venn diagram.
+#'    * `"label_df"`: `data.frame` which contains the coordinates for each
+#'    Venn set, and Venn overlap label.
+#'    * `"setlist"`: `list` as input to `venndir()`. This entry may be empty.
+#' 
 #' @examples
 #' setlist <- make_venn_test(100, 3, do_signed=FALSE);
 #' 
@@ -168,7 +178,11 @@ venndir <- function
  proportional=FALSE,
  show_labels="Ncs",
  return_items=TRUE,
- show_items=c(NA, "none", "sign item", "sign", "item"),
+ show_items=c(NA,
+    "none",
+    "sign item",
+    "sign",
+    "item"),
  max_items=3000,
  show_zero=FALSE,
  font_cex=c(1, 1, 0.8),
@@ -190,7 +204,8 @@ venndir <- function
  venn_jp=NULL,
  inside_percent_threshold=0,
  item_cex=NULL,
- item_style=c("text",
+ item_style=c("default",
+    "text",
     "gridtext"),
  item_buffer=-0.15,
  sign_count_delim=": ",
@@ -785,7 +800,7 @@ venndir <- function
    }
    
    ## Optionally return items
-   if (return_items) {
+   if (TRUE %in% return_items) {
       sv_label <- paste0(sv$sets, "|", sv[[overlap_type]]);
       sv_match <- match(label_df$overlap_sign, sv_label);
       label_df$items <- I(sv$items[sv_match]);
@@ -799,25 +814,27 @@ venndir <- function
    
    ## venndir_label_style()
    #
-   # Workaround: Ignore venndir_label_style() for "JamPolygon" for now.
-   #
    # Todo: use real x_outside
    #
    if (TRUE) {
-      # label_df$x_outside <- label_df$x;
-      # label_df$y_outside <- label_df$y;
-      # label_df$x_offset <- 0;
-      # label_df$y_offset <- 0;
-      # venn_jps@polygons$x_outside <- jamba::rmNA(naValue=0, unlist(venn_jps@polygons$label_x));
-      # venn_jps@polygons$y_outside <- jamba::rmNA(naValue=0, unlist(venn_jps@polygons$label_y));
       # jamba::printDebug("venn_jps@polygons (before venndir_label_style)");print(venn_jps@polygons);# debug
       # jamba::printDebug("label_df (before venndir_label_style)");print(label_df);# debug
-      vls <- venndir_label_style(
+      ## 0.0.32.900 - ensure show_items is non-empty when "i" or "item" defined
+      if ((length(show_labels) > 0 && any(grepl("[iIsS]", show_labels))) ||
+         (length(label_preset) > 0 && any(grepl("item", ignore.case=TRUE, label_preset)))) {
+         if (any(show_items %in% c(NA, "none", "FALSE"))) {
+            if ("overlap" %in% overlap_type) {
+               show_items <- "item";
+            } else {
+               show_items <- "sign item";
+            }
+            # jamba::printDebug("venndir(): ", "show_items:", show_items);# debug
+         }
+      }
+      
+      ## Update Venndir object in place
+      vo <- venndir_label_style(
          venndir_output=vo,
-         old_venndir_output=list(
-            # venn_spdf=venn_spdfs,
-            venn_spdf=venn_jps,
-            label_df=label_df),
          show_labels=show_labels,
          show_items=show_items,
          label_preset=label_preset,
@@ -827,8 +844,8 @@ venndir <- function
          inside_percent_threshold=inside_percent_threshold,
          verbose=verbose,
          ...);
-      vo@label_df <- vls$label_df;
-      venn_jps@polygons <- vls$venn_spdf;
+      # vo@label_df <- vls$label_df;
+      # venn_jps@polygons <- vls$venn_spdf;
       # jamba::printDebug("venn_jps@polygons (after venndir_label_style)");print(venn_jps@polygons);# debug
       # jamba::printDebug("label_df (after venndir_label_style)");print(label_df);# debug
    }
@@ -878,25 +895,28 @@ venndir <- function
          show_items=show_items,
          show_zero=show_zero,
          display_counts=display_counts,
-         label_preset=label_preset,
-         show_labels=show_labels,
-         label_style="custom",
+         # label_preset=label_preset,
+         # show_labels=show_labels,
+         # label_style="custom",
          item_cex=item_cex,
          item_style=item_style,
          item_buffer=item_buffer,
          max_items=max_items,
          inside_percent_threshold=inside_percent_threshold,
          ...);
-      #label_df <- gg$label_df;
-      retlist$rv_label_df <- gg$label_df;
+      #label_df <- gg@label_df;
+      retlist$rv_label_df <- gg@label_df;
       retlist$gg <- gg;
    }
+   # return Venndir object
+   return(invisible(vo));
+   
    # for debug
    return(invisible(list(
       # venn_jp=venn_jp, venn_jpol=venn_jpol,
       vo=vo,
       gg=gg,
-      venn_jps=venn_jps,
+      # venn_jps=venn_jps,
       nlabel_df=nlabel_df,
       label_df=label_df,
       nCounts=nCounts, gCounts=gCounts, gdf=gdf,

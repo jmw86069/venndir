@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -59,13 +59,25 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
-<h2 id="id_12jun2024">12jun2024<a class="anchor" aria-label="anchor" href="#id_12jun2024"></a></h2>
+<h2 id="id_18jun2024">18jun2024<a class="anchor" aria-label="anchor" href="#id_18jun2024"></a></h2>
 <ul><li>
-<p><code><a href="reference/venn_meme.html">venn_meme()</a></code> - some visual adjustments are needed</p>
-<ul><li>Fix regression in <code>gridtext</code> for item labels, not recognizing <code>&lt;br&gt;</code>
-</li>
-<li>When one item label is present, use proper center position instead of patterned fill. Or change the default fill pattern being used. Current state: item label is placed near edges and not in the center.</li>
+<p>Outer label positions and line segments should be improved.</p>
+<ul><li>Sometimes the outer label is across the diagram from the count label, the line segment reaches to the far side. Test with nested proportional set Venn.</li>
+<li>should be influenced by the position of the relevant count label.</li>
 </ul></li>
+<li><p>Consider whether to include percent in the Venndir legend.</p></li>
+<li><p>Consider an option to include percent in <code><a href="reference/textvenn.html">textvenn()</a></code> output. It would appear on the line below the overlap count.</p></li>
+<li><p>Consider allowing vectorized <code>show_labels</code> to be applied to each overlap in order.</p></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_12jun2024">12jun2024<a class="anchor" aria-label="anchor" href="#id_12jun2024"></a></h2>
+<ul><li><p>DONE. <code><a href="reference/render_venndir.html">render_venndir()</a></code> - broken when provided with <code><a href="reference/venndir.html">venndir()</a></code> output separately.</p></li>
+<li>
+<p>DONE. <code><a href="reference/venn_meme.html">venn_meme()</a></code> - some visual adjustments are needed</p>
+<ul><li>DONE. Fix regression in <code>gridtext</code>, item labels do not recognize <code>&lt;br&gt;</code>.</li>
+<li>Center item labels in the polygon for few number of items (especially one). Current state: item label is placed near edges and not in the center. Current state: <code>item_buffer</code> is the best way to adjust manually. DONE for <code><a href="reference/venn_meme.html">venn_meme()</a></code> not for general use.</li>
+</ul></li>
+<li><p>DONE. Label segment for nested, nested sets, uses the full set as fallback. Ideally, it would use the region with the fewest overlaps with other areas.</p></li>
 </ul></div>
 <div class="section level2">
 <h2 id="id_11jun2024">11jun2024<a class="anchor" aria-label="anchor" href="#id_11jun2024"></a></h2>

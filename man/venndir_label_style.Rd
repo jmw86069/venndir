@@ -19,9 +19,10 @@ venndir_label_style(
   count = c("inside", "outside", "ifneeded", "detect", "none"),
   signed = c("inside", "outside", "ifneeded", "detect", "none"),
   items = c("none", "inside"),
+  percent_delim = "<br>",
   show_items = c("none"),
   max_items = 3000,
-  inside_percent_threshold = 5,
+  inside_percent_threshold = 0,
   label_types = c("main", "signed"),
   show_zero = TRUE,
   sep = "&",
@@ -31,6 +32,32 @@ venndir_label_style(
 )
 }
 \arguments{
+\item{show_labels}{\code{character} string to describe which count labels
+to display, and where. The presence of each letter enables each
+label, and UPPERCASE places the label outside the Venn diagram,
+while lowercase places the label inside.
+The default \code{"Ncs"} displays _N_ame (outside), _c_ount (inside),
+and _s_igned count (inside). When \code{overlap_type="overlap"} then
+the signed label is hidden by default.
+
+The label types are defined below:
+\itemize{
+\item _N_ame: "n" or "N" - the set name, by default it is displayed.
+\item _O_verlap: "o" or "O" - the overlap name, by default it is hidden,
+because these labels can be very long, also the overlap should be
+evident in the Venn diagram already.
+\item _c_ount: "c" or "C" - overlap count, independent of the sign
+\item _p_ercentage: "p" or "P" - overlap percentage, by default hidden,
+but available as an option
+\item _s_igned count: "s" or "S" - the signed overlap count, tabulated
+based upon \code{overlap_type} ("each", "concordant", "agreement", etc/)
+\item _i_tems: "i" only, by default hidden. When enabled, item labels
+defined by \code{show_items} are spread across the specific Venn overlap
+region.
+}}
+
+\item{label_preset}{DEPRECATED in favor of \code{show_labels}.}
+
 \item{label_style}{\code{character} string indicating the style of label
 to display. The values \verb{"basic","none","shaded","lite","fill"}
 style the label background fill, while presence of \code{"box"} in
@@ -40,6 +67,55 @@ the string will draw a border around the label:
 \code{"fill"} uses opaque fill with the overlap set color,
 \code{"shaded"} uses slightly transparent fill with overlap set color,
 \code{"box"} displays border around the label.}
+
+\item{lite}{\code{character} color used when \code{label_preset} contains \code{"lite"}.}
+
+\item{bg}{\code{character} color used as the background color of the
+figure, used with outside labels to determine whether the text
+should be light or dark for proper visual contrast.}
+
+\item{set, overlap, percent, count, signed, items}{DEPRECATED in favor
+of \code{show_labels}.}
+
+\item{percent_delim}{\code{character} string used only when both count
+and percent labels are enabled, as a delimiter between the two
+labels. The default \code{"<br>"} causes a newline, so the count
+and percent values are on separate lines. Another suggestion is
+\code{": "} which separates the two values with semicolon on one line.}
+
+\item{show_items}{\code{character} string for the item label content, used
+only when items are displayed.}
+
+\item{max_items}{\code{numeric} maximum number of labels permitted when
+items are displayed. When there are too many items, the item label
+is suppressed.}
+
+\item{inside_percent_threshold}{\code{numeric} size for each polygon below
+which labels are moved outside, for labels that would otherwise
+be displayed inside. Item labels are not affected by this setting.
+The threshold is calculated as a percent of the overall Venn diagram
+polygon area.}
+
+\item{label_types}{\code{character} vector with one or more label types
+to be affected by this function. By default \code{"count"} and \code{"signed"}
+labels (all labels) are affected.}
+
+\item{show_zero}{\code{logical} indicating whether to display zero \code{0}
+for empty overlaps for which the overlap polygon exists. Default FALSE
+hides the display of zeros.}
+
+\item{sep}{\code{character} string used as delimiter between Venn set names.
+This value should generally not be changed.}
+
+\item{useGrey}{\code{numeric} value used by \code{jamba::setTextContrastColor()}
+to define an appropriate contrasting color which retains some color
+saturation, default 15. Use \code{useGrey=0} would cause black or white
+labels with no color saturation.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{...}{additional arguments are passed to internal functions such
+as \code{make_color_contrast()}.}
 }
 \description{
 venndir label style
@@ -54,22 +130,7 @@ the label on top of dark or bright colors. If the label
 is positioned outside the \code{sp} polygons, the text is assumed
 to be on a white background, using argument \code{bg}.
 }
-\seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
-\code{\link{expand_range}()},
-\code{\link{get_venn_shapes}()},
-\code{\link{gridtext_make_outer_box}()},
-\code{\link{gridtext_richtext_grob}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
-\code{\link{match_list}()},
-\code{\link{nudge_venndir_label}()},
-\code{\link{print_color_df}()},
-\code{\link{shrink_df}()},
-\code{\link{three_point_angle}()},
-\code{\link{venndir_legender}()},
-\code{\link{venndir_to_df}()}
-}
-\concept{venndir utility}
+\concept{venndir utility
+
+@param venndir_output \code{Venndir} object as returned by \code{venndir()}
+or \code{render_venndir()}.}

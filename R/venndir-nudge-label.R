@@ -5,9 +5,7 @@
 #' 
 #' @family venndir utility
 #' 
-#' @param venndir_output output from `venndir()` as either:
-#'    * `Venndir` object
-#'    * `list` which contains `"vo"` as a `Venndir` object
+#' @param venndir_output output from `venndir()` as `Venndir` object.
 #' @param set `character` name of the set or overlap to adjust
 #' 
 #' @returns `Venndir` object as output from `venndir()`
@@ -20,15 +18,13 @@
 #'    return_items=TRUE,
 #'    label_style="lite_box",
 #'    main="Default venndir")
+#' render_venndir(vo1)
 #' 
 #' vo2 <- nudge_venndir_label(vo1,
 #'    set=c("set_A&set_B&set_C"),
-#'    x_offset=0.3,
-#'    y_offset=-0.3)
-#' vo1$vo@label_df[1:8, 1:12]
-#' vo2$vo@label_df[1:8, 1:12]
-#' render_venndir(vo1$vo)
-#' render_venndir(vo2$vo)
+#'    x_offset=0.05,
+#'    y_offset=-0.05)
+#' render_venndir(vo2)
 #' 
 #' @export
 nudge_venndir_label <- function
@@ -50,7 +46,7 @@ nudge_venndir_label <- function
    # validate input
    label_location <- match.arg(label_location);
    unit_type <- match.arg(unit_type);
-   if (!any(set %in% venndir_output$label_df$overlap_set)) {
+   if (!any(set %in% venndir_output@label_df$overlap_set)) {
       warning(paste0("No values found in label_df$overlap_set using set:",
          jamba::cPaste(paste0("'", set, "'"))));
       return(venndir_output);
@@ -60,12 +56,10 @@ nudge_venndir_label <- function
    show_label <- rep(show_label, length.out=length(set));
    
    # adjust by unit_type "relative" by using the bounding box dimensions
-   if ("list" %in% class(venndir_output)) {
-      vo <- venndir_output$vo;
-   } else if ("Venndir" %in% class(venndir_output)) {
+   if ("Venndir" %in% class(venndir_output)) {
       vo <- venndir_output;
    } else {
-      stop("Input must be Venndir or list with venndir_output$vo");
+      stop("Input must be a Venndir object.");
    }
    if ("relative" %in% unit_type) {
       unit_scalars <- apply(bbox_JamPolygon(vo@jps), 1, diff)
@@ -131,10 +125,6 @@ nudge_venndir_label <- function
             ", applied show_label: ", show_label[i])
          print(vo@label_df[voi, , drop=FALSE])
       }
-   }
-   if ("list" %in% class(venndir_output)) {
-      venndir_output$vo <- vo;
-      return(venndir_output)
    }
    return(vo);
 }

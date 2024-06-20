@@ -1,13 +1,33 @@
 # TODO for venndir
 
+## 18jun2024
+
+* Outer label positions and line segments should be improved.
+
+   * Sometimes the outer label is across the diagram from the count label,
+   the line segment reaches to the far side. Test with nested proportional
+   set Venn.
+   * should be influenced by the position of the relevant count label.
+
+* Consider whether to include percent in the Venndir legend.
+* Consider an option to include percent in `textvenn()` output. It would
+appear on the line below the overlap count.
+* Consider allowing vectorized `show_labels` to be applied to each overlap
+in order.
+
 ## 12jun2024
 
-* `venn_meme()` - some visual adjustments are needed
+* DONE. `render_venndir()` - broken when provided with `venndir()` output separately.
+* DONE. `venn_meme()` - some visual adjustments are needed
 
-   * Fix regression in `gridtext` for item labels, not recognizing `<br>`
-   * When one item label is present, use proper center position instead
-   of patterned fill. Or change the default fill pattern being used.
+   * DONE. Fix regression in `gridtext`, item labels do not recognize `<br>`.
+   * Center item labels in the polygon for few number of items (especially one).
    Current state: item label is placed near edges and not in the center.
+   Current state: `item_buffer` is the best way to adjust manually.
+   DONE for `venn_meme()` not for general use.
+
+* DONE. Label segment for nested, nested sets, uses the full set as fallback.
+Ideally, it would use the region with the fewest overlaps with other areas.
 
 ## 11jun2024
 

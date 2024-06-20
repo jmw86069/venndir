@@ -1,3 +1,50 @@
+# venndir 0.0.32.900
+
+## Bug fixes
+
+* `render_venndir()`
+
+   * Fixed regression that did not recognize updated output from `venndir()`,
+   addressing issues #7 and #8.
+
+## Changes to existing functions
+
+* `venndir()` and `render_venndir()`
+
+   * Percent can now optionally be labeled for each overlap,
+   with `show_labels` which includes the letter `"p"`.
+   When `"c"` and `"p"` are both included, the two labels are included
+   in the order they appear, separated using `percent_delimiter` which
+   by default uses a newline.
+   For now, percentage will always appear in the same location with
+   counts `"c"`, unless counts are hidden.
+   For example `show_labels="Ncp"` will place set names outside, and
+   count and percent inside.
+   Similarly `show_labels="Np"` will place set names outside, and only
+   the percent will be displayed inside.
+   Also, `show_labels="Npc"` will place the percentage first, then
+   the overlap count.
+   * New argument default `item_style="default"` will auto-detect Markdown
+   and imposes `item_style="gridtext"` when found, otherwise uses the faster
+   `item_style="text"`.
+   * `show_items=NA` default is changed when items should be displayed,
+   defined when `show_labels` contains `"i"`. In that case the `overlap_type`
+   helps determine eithr `show_items="item"` or `show_items="sign item"`.
+
+* `Venndir-class` - additional documentation.
+* `venndir_label_style()`
+
+   * recognizes option to include (or hide) percent, in the same location
+   as the overlap count label.
+   * Argument `percent_delim` controls the delimiter between count and
+   percent, and takes effect only when both are visible. The default
+   `"<br>"` places the second value on a new line.
+
+## tests
+
+* A series of small, simple unit tests were added for Venn diagrams,
+nested-proportional Venn, Venn with an empty set, etc.
+
 # venndir 0.0.31.900
 
 * All `sp` and `rgeos` references were removed!

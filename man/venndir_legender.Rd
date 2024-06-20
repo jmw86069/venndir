@@ -7,7 +7,7 @@
 venndir_legender(
   setlist = NULL,
   x = "bottomleft",
-  venndir_out = NULL,
+  venndir_output = NULL,
   set_colors = NULL,
   keep_newlines = FALSE,
   include_total = TRUE,
@@ -37,13 +37,13 @@ only to derive the number of elements.}
 \item{x}{\code{character} string indicating the position of the legend,
 as passed to \code{graphics::legend()} when \code{style="base"}.}
 
-\item{venndir_out}{\code{list} object returned by \code{venndir()}, which is used
+\item{venndir_output}{\code{Venndir} object returned by \code{venndir()}, which is used
 to generate the legend counts. When supplied, the \code{set_colors} are
 also defined by this object.}
 
 \item{set_colors}{\code{character} optional vector of R colors, whose names
 should match \code{names(setlist)}. When not supplied, colors are inferred
-from \code{venndir_out}, and when that is not supplied, colors are
+from \code{venndir_output}, and when that is not supplied, colors are
 defined using \code{colorjam::rainbowJam()}.}
 
 \item{keep_newlines}{\code{logical} indicating whether to keep newlines
@@ -175,7 +175,7 @@ vo <- venndir(setlist, legend_x="bottomleft")
 # turn off the default legend
 vo <- venndir(setlist, draw_legend=FALSE)
 venndir_legender(setlist=setlist,
-   venndir_out=vo,
+   venndir_output=vo,
    x="bottomleft")
 
 # test multi-line labels
@@ -185,7 +185,7 @@ names(setlist) <- c("Group A-<br>Group B",
 vo <- venndir(setlist,
    show_segments=FALSE)
 venndir_legender(setlist=setlist,
-   venndir_out=vo,
+   venndir_output=vo,
    x="bottomleft")
 
 # Same as above, showing how to render the legend_grob.
@@ -195,7 +195,7 @@ vo <- venndir(setlist,
    draw_legend=FALSE,
    font_cex=c(1, 1, 0.5, 0.5))
 legend_grob <- venndir_legender(setlist=setlist,
-   venndir_out=vo,
+   venndir_output=vo,
    draw_legend=FALSE,
    header_color="white",
    x="bottomleft")
@@ -206,7 +206,7 @@ vo <- venndir(setlist,
    show_segments=FALSE,
    draw_legend=FALSE)
 legend_grob <- venndir_legender(setlist=setlist,
-   venndir_out=vo,
+   venndir_output=vo,
    headers=FALSE,
    x="bottomright",
    table_theme=gridExtra::ttheme_default(base_size=11,
@@ -219,7 +219,7 @@ vo <- venndir(setlist,
    sets=c(4, 1, 2),
    show_segments=FALSE,
    draw_legend=FALSE)
-venndir_legender(venndir_out=vo,
+venndir_legender(venndir_output=vo,
    font_cex=0.8,
    setlist=setlist,
    labels=jamba::nameVector(
@@ -228,10 +228,10 @@ venndir_legender(venndir_out=vo,
 
 # Venn with no border, and more transparent colors
 vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
-vo124$vo@jps@polygons$border.lwd <- 0.1
-vo124$vo@jps@polygons$innerborder.lwd <- 0.1
-vor124 <- render_venndir(vo124$vo, draw_legend=FALSE)
-venndir_legender(setlist=setlist, venndir_out=vo124)
+vo124@jps@polygons$border.lwd <- 0.1
+vo124@jps@polygons$innerborder.lwd <- 0.1
+vor124 <- render_venndir(vo124, draw_legend=FALSE)
+venndir_legender(setlist=setlist, venndir_output=vo124)
 
 }
 \seealso{
@@ -249,7 +249,6 @@ Other venndir utility:
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
 \code{\link{three_point_angle}()},
-\code{\link{venndir_label_style}()},
 \code{\link{venndir_to_df}()}
 }
 \concept{venndir utility}

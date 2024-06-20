@@ -22,7 +22,7 @@ render_venndir(
   label_style = c("custom", "basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   fontfamily = "Arial",
   inside_percent_threshold = 0,
-  item_style = c("text", "gridtext"),
+  item_style = c("default", "text", "gridtext"),
   item_buffer = -0.15,
   group_labels = TRUE,
   adjust_center = FALSE,
@@ -36,41 +36,33 @@ render_venndir(
 )
 }
 \arguments{
-\item{venndir_output}{\code{Venndir} output from \code{venndir()}}
+\item{venndir_output}{\code{Venndir} output from \code{venndir()}, or
+\code{list} with element \code{"vo"} as a \code{Venndir} object.}
 
 \item{expand_fraction}{\code{numeric} value indicating how much to
 expand the figure range beyond the default calculated for
 the Venn diagram. Values above zero cause the Venn diagram
 to be slighly smaller.}
 
-\item{font_cex}{\code{numeric} vector recycled and applied in order:
-\enumerate{
-\item Set label
-\item Overlap count label
-\item Signed count label
-}
+\item{font_cex}{\code{numeric} scalar to adjust font sizes.}
 
-The default \code{c(1, 1, 0.8)} defines the signed count label slightly
-smaller than other labels.}
-
-\item{item_cex}{\code{numeric} value (default NULL) used to resize item labels.
-\itemize{
-\item When \code{item_cex} is a single value or \code{NULL}, auto-scaling is
-performed based upon the number of items in each overlap
-polygon, and the relative polygon areas.
-Any single \code{numeric} value for \code{item_cex} is multiplied by the
-auto-scaled value for each overlap region.
-\item When two or more values are supplied as a vector, the
-values are recycled and applied across all Venn overlap regions,
-in the order they appear in \code{signed_overlaps()}.
-}}
+\item{item_cex}{\code{numeric} scalar applied to item labels in each overlap
+in order. When \code{length(item_cex) == 1} it is applied uniformly
+across all overlaps, otherwise it is recycled to the total
+number of overlaps.
+When provided, it is used instead of any adjustments to item label
+sizes based upon proportional area of each overlap.}
 
 \item{item_cex_factor}{\code{numeric} value used to adjust pre-calculated
-item fontsizes.}
+item fontsizes. This value is used to adjust the item label sizes,
+which may also be adjusted proportional to the area of each overlap,
+in which case \code{item_cex_factor} is used to adjust those relative
+label sizes.}
 
 \item{plot_warning}{\code{logical} indicating whether to include a warning
 when one or more non-zero overlap counts cannot be displayed
-in the figure. Not yet re-implemented for version 0.0.30.900.}
+in the figure.
+\strong{Not yet re-implemented since version 0.0.30.900.}}
 
 \item{show_labels}{\code{character} string to define the labels to display,
 and where they should be displayed.
@@ -151,6 +143,9 @@ Values are expected to range from 0 to 100.}
 \item{item_style}{\code{character} string (default "text") indicating
 the style to display item labels when they are enabled.
 \itemize{
+\item \code{"default"} detects whether item labels contain \code{"<br>"} for newlines,
+and uses \code{"gridtext"} if that is the case, otherwise it uses \code{"text"}
+which is markedly faster.
 \item \code{"text"} option is substantially faster, but does not allow
 markdown.
 \item \code{"gridtext"}:  substantially slower for a large number of labels,

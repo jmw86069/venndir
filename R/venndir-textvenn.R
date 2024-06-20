@@ -30,10 +30,9 @@
 #'    to inverse the color, when `inverse_title=TRUE` then each Venn
 #'    set is printed on colored background, when `inverse_title=FALSE`,
 #'    each set is printed with colored text with no background color.
-#' @param return_items `logical` passed to `signed_overlaps()` to
-#'    indicate whether to include items with each Venn set. This data
-#'    is returned using `invisible()`, and is relevant only when
-#'    storing the return value.
+#' @param return_items `logical` default TRUE, whether to return items
+#'    in the `data.frame` in column `"items"`.
+#'    This argument is passed to `signed_overlaps()`.
 #' @param unicode `logical` passed to `curate_venn_labels()`
 #'    indicating whether the directional label can include special
 #'    Unicode characters.
@@ -75,7 +74,7 @@ textvenn <- function
  inverse_title=TRUE,
  inverse_counts=FALSE,
  color_by_counts=TRUE,
- return_items=FALSE,
+ return_items=TRUE,
  unicode=TRUE,
  big.mark=",",
  sep="&",

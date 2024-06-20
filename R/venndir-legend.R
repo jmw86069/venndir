@@ -33,12 +33,12 @@
 #'    only to derive the number of elements.
 #' @param x `character` string indicating the position of the legend,
 #'    as passed to `graphics::legend()` when `style="base"`.
-#' @param venndir_out `list` object returned by `venndir()`, which is used
+#' @param venndir_output `Venndir` object returned by `venndir()`, which is used
 #'    to generate the legend counts. When supplied, the `set_colors` are
 #'    also defined by this object.
 #' @param set_colors `character` optional vector of R colors, whose names
 #'    should match `names(setlist)`. When not supplied, colors are inferred
-#'    from `venndir_out`, and when that is not supplied, colors are
+#'    from `venndir_output`, and when that is not supplied, colors are
 #'    defined using `colorjam::rainbowJam()`.
 #' @param keep_newlines `logical` indicating whether to keep newlines
 #'    (line breaks) in the set labels used in the Venn legend.
@@ -120,7 +120,7 @@
 #' # turn off the default legend
 #' vo <- venndir(setlist, draw_legend=FALSE)
 #' venndir_legender(setlist=setlist,
-#'    venndir_out=vo,
+#'    venndir_output=vo,
 #'    x="bottomleft")
 #' 
 #' # test multi-line labels
@@ -130,7 +130,7 @@
 #' vo <- venndir(setlist,
 #'    show_segments=FALSE)
 #' venndir_legender(setlist=setlist,
-#'    venndir_out=vo,
+#'    venndir_output=vo,
 #'    x="bottomleft")
 #' 
 #' # Same as above, showing how to render the legend_grob.
@@ -140,7 +140,7 @@
 #'    draw_legend=FALSE,
 #'    font_cex=c(1, 1, 0.5, 0.5))
 #' legend_grob <- venndir_legender(setlist=setlist,
-#'    venndir_out=vo,
+#'    venndir_output=vo,
 #'    draw_legend=FALSE,
 #'    header_color="white",
 #'    x="bottomleft")
@@ -151,7 +151,7 @@
 #'    show_segments=FALSE,
 #'    draw_legend=FALSE)
 #' legend_grob <- venndir_legender(setlist=setlist,
-#'    venndir_out=vo,
+#'    venndir_output=vo,
 #'    headers=FALSE,
 #'    x="bottomright",
 #'    table_theme=gridExtra::ttheme_default(base_size=11,
@@ -164,7 +164,7 @@
 #'    sets=c(4, 1, 2),
 #'    show_segments=FALSE,
 #'    draw_legend=FALSE)
-#' venndir_legender(venndir_out=vo,
+#' venndir_legender(venndir_output=vo,
 #'    font_cex=0.8,
 #'    setlist=setlist,
 #'    labels=jamba::nameVector(
@@ -173,16 +173,16 @@
 #' 
 #' # Venn with no border, and more transparent colors
 #' vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
-#' vo124$vo@jps@polygons$border.lwd <- 0.1
-#' vo124$vo@jps@polygons$innerborder.lwd <- 0.1
-#' vor124 <- render_venndir(vo124$vo, draw_legend=FALSE)
-#' venndir_legender(setlist=setlist, venndir_out=vo124)
+#' vo124@jps@polygons$border.lwd <- 0.1
+#' vo124@jps@polygons$innerborder.lwd <- 0.1
+#' vor124 <- render_venndir(vo124, draw_legend=FALSE)
+#' venndir_legender(setlist=setlist, venndir_output=vo124)
 #' 
 #' @export
 venndir_legender <- function
 (setlist=NULL,
  x="bottomleft", 
- venndir_out=NULL, 
+ venndir_output=NULL, 
  set_colors=NULL,
  keep_newlines=FALSE,
  include_total=TRUE,
@@ -232,10 +232,10 @@ venndir_legender <- function
    # construct setlist if not provided
    total_items <- NULL;
    if (length(setlist) == 0) {
-      if (length(venndir_out) == 0) {
-         stop("Either setlist or venndir_out must be provided.");
+      if (length(venndir_output) == 0) {
+         stop("Either setlist or venndir_output must be provided.");
       }
-      vodf <- venndir_out$venn_jps@polygons;
+      vodf <- venndir_output@jps@polygons;
       vodf1 <- subset(vodf, type %in% "overlap");
       total_items <- sum(vodf1$venn_counts);
       # vodf1[, c("venn_name", "venn_counts")]
@@ -262,8 +262,8 @@ venndir_legender <- function
          darkFactor=1.2)
       vodf_lwd <- rep(0.5, length(vodf_color));
       names(vodf_lwd) <- names(vodf_color);
-   } else if (length(venndir_out) > 0) {
-      vodf_all <- venndir_out$venn_jps@polygons;
+   } else if (length(venndir_output) > 0) {
+      vodf_all <- venndir_output@jps@polygons;
       # jamba::printDebug("vodf_all:");print(vodf_all);# debug
       use_label <- head(intersect(c("label", "name"),
          colnames(vodf_all)), 1);
@@ -319,8 +319,8 @@ venndir_legender <- function
    
    # optionally include total unique items
    if (TRUE %in% include_total) {
-      if (length(venndir_out) > 0) {
-         # venndir_legender(setlist=setlist, venndir_out=vo, x="bottomright")
+      if (length(venndir_output) > 0) {
+         # venndir_legender(setlist=setlist, venndir_output=vo, x="bottomright")
          total_items <- sum(vodf_all$venn_counts, na.rm=TRUE);
       } else {
          sv <- signed_overlaps(setlist[sets],

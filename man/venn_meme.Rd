@@ -9,6 +9,7 @@ venn_meme(
   proportional = FALSE,
   item_cex = 1.4,
   item_degrees = 0,
+  item_buffer = -0.85,
   item_style = c("gridtext", "text"),
   plot_warning = FALSE,
   verbose = FALSE,
@@ -26,7 +27,7 @@ should be a list of item vectors. Note that if a \code{setlist}
 is passed to \code{overlaplist2setlist()} it will return
 the \code{setlist} unchanged.}
 
-\item{proportional, item_degrees, plot_style, plot_warning}{default arguments passed to \code{venndir()}.}
+\item{proportional, item_degrees, item_buffer, item_style, plot_warning}{arguments passed to \code{venndir()}.}
 
 \item{item_cex}{\code{numeric} passed to \code{venndir()}, however when
 \code{item_cex} is length=1, it is extended to length=2 in order
@@ -36,6 +37,8 @@ of each overlap polygon. In most cases this scaling is
 not helpful for Venn memes. To enable auto-scaling, use
 \code{item_cex=NULL}. See help text in \code{venndir()} for more
 details.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
 
 \item{...}{additional arguments are passed to \code{venndir()}.}
 }

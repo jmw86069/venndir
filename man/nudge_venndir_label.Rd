@@ -18,11 +18,7 @@ nudge_venndir_label(
 )
 }
 \arguments{
-\item{venndir_output}{output from \code{venndir()} as either:
-\itemize{
-\item \code{Venndir} object
-\item \code{list} which contains \code{"vo"} as a \code{Venndir} object
-}}
+\item{venndir_output}{output from \code{venndir()} as \code{Venndir} object.}
 
 \item{set}{\code{character} name of the set or overlap to adjust}
 }
@@ -40,15 +36,13 @@ vo1 <- venndir(setlist1,
    return_items=TRUE,
    label_style="lite_box",
    main="Default venndir")
+render_venndir(vo1)
 
 vo2 <- nudge_venndir_label(vo1,
    set=c("set_A&set_B&set_C"),
-   x_offset=0.3,
-   y_offset=-0.3)
-vo1$vo@label_df[1:8, 1:12]
-vo2$vo@label_df[1:8, 1:12]
-render_venndir(vo1$vo)
-render_venndir(vo2$vo)
+   x_offset=0.05,
+   y_offset=-0.05)
+render_venndir(vo2)
 
 }
 \seealso{
@@ -65,7 +59,6 @@ Other venndir utility:
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
 \code{\link{three_point_angle}()},
-\code{\link{venndir_label_style}()},
 \code{\link{venndir_legender}()},
 \code{\link{venndir_to_df}()}
 }

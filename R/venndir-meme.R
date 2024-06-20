@@ -50,8 +50,8 @@
 #'    should be a list of item vectors. Note that if a `setlist`
 #'    is passed to `overlaplist2setlist()` it will return
 #'    the `setlist` unchanged.
-#' @param proportional,item_degrees,plot_style,plot_warning
-#'    default arguments passed to `venndir()`.
+#' @param proportional,item_degrees,item_buffer,item_style,plot_warning
+#'    arguments passed to `venndir()`.
 #' @param item_cex `numeric` passed to `venndir()`, however when
 #'    `item_cex` is length=1, it is extended to length=2 in order
 #'    to prevent the auto-scaling adjustment typically used,
@@ -60,6 +60,7 @@
 #'    not helpful for Venn memes. To enable auto-scaling, use
 #'    `item_cex=NULL`. See help text in `venndir()` for more
 #'    details.
+#' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to `venndir()`.
 #' 
 #' @family venndir core
@@ -172,7 +173,7 @@ venn_meme <- function
  proportional=FALSE,
  item_cex=1.4,
  item_degrees=0,
- # plot_style=c("gg", "base"),
+ item_buffer=-0.85,
  item_style=c("gridtext", "text"),
  plot_warning=FALSE,
  verbose=FALSE,
@@ -228,6 +229,7 @@ venn_meme <- function
       # label_preset="meme",
       item_degrees=item_degrees,
       item_cex=item_cex,
+      item_buffer=item_buffer,
       item_style=item_style,
       plot_warning=plot_warning,
       verbose=verbose,

@@ -13,62 +13,6 @@ test_that("expand_range", {
       list(xlim=c(0.55, 10.45), ylim=c(-3.95, 104.95)))
 })
 
-test_that("venn_shapes", {
-   expect_equal(
-      length(get_venn_shapes(c(A=1))),
-      1)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1))),
-      2)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1, C=1))),
-      3)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1, C=1, D=1))),
-      4)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1, C=1, D=1, E=1))),
-      5)
-})
-
-test_that("eulerr_shapes", {
-   expect_equal(
-      length(get_venn_shapes(c(A=1),
-         proportional=TRUE)),
-      1)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1),
-         proportional=TRUE)),
-      2)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1, C=1),
-         proportional=TRUE)),
-      3)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1, C=1, D=1),
-         proportional=TRUE)),
-      4)
-   expect_equal(
-      length(get_venn_shapes(c(A=1, B=1, C=1, D=1, E=1,
-         `A&B`=1, `A&C`=1, `B&D`=1, `D&E`=1),
-         proportional=TRUE)),
-      5)
-})
-
-test_that("find_vennpoly_overlaps", {
-   # test 5-way Euler diagram has 9 overlap polygons
-   countlist <- c(A=1, B=1, C=1, D=1, E=1,
-      `A&B`=1, `A&C`=1, `B&D`=1, `D&E`=1);
-   sp <- get_venn_shapes(countlist,
-      proportional=TRUE);
-   fpo <- find_vennpoly_overlaps(sp=sp,
-      venn_counts=countlist)
-   length(fpo)
-   expect_equal(
-      length(fpo),
-      9)
-})
-
 test_that("make_venn_combn_df", {
    cdf3 <- make_venn_combn_df(letters[c(1,2,3)]);
    expect_equal(
@@ -120,11 +64,3 @@ test_that("match_list", {
       c(A=4, B=1, C=2))
 })
 
-test_that("sp_percent_area", {
-   sp <- get_venn_shapes(c(A=1, B=2));
-   sp <- find_vennpoly_overlaps(sp)
-   sp_percent_area(sp)
-   expect_equal(
-      round(sp_percent_area(sp)),
-      c(38, 38, 24))
-})

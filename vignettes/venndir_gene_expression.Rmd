@@ -228,13 +228,17 @@ if (do_limma) {
     lfc=4);
   # convert to signed list
   limmalist2 <- im_value2list(fit2decide2);
+  limmalist2 <- lapply(limmalist2, function(i){
+    jamba::nameVector(as.vector(i), names(i))
+  })
   # display item labels
   venndir(limmalist2,
     sets=c(1, 2),
     poly_alpha=0.3,
     show_labels="Ni",
     show_items="sign item",
-    item_cex=0.5,
+    item_cex=1,
+    item_degrees=4,
     max_items=1000);
 }
 ```
@@ -254,12 +258,12 @@ Use argument `show_items="sign"`.
 
 ```{r limma_6s}
 if (do_limma) {
-  venndir(limmalist2,
+  vo6s <- venndir(limmalist2,
     sets=c(1, 2),
     poly_alpha=0.3,
     show_labels="Ni",
     show_items="sign",
-    item_cex=0.7,
+    item_cex=1,
     max_items=1000);
 }
 ```
@@ -304,7 +308,7 @@ if (do_limma) {
     show_labels="Ni",
     show_items="sign item",
     poly_alpha=0.3,
-    item_cex=0.5,
+    item_cex=1,
     max_items=1000);
 }
 ```

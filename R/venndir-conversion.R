@@ -29,9 +29,6 @@
 #' setlist <- counts2setlist(combo)
 #' setlist;
 #' 
-#' # turn off warnings about GEOS
-#' options("warn"=-1)
-#' 
 #' # Venn diagram
 #' venndir(setlist)
 #' 
@@ -101,13 +98,15 @@ counts2setlist <- function
 #'    show_items="item",
 #'    label_preset="items",
 #'    item_degrees=0,
-#'    item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)))
+#'    item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)),
+#'    item_buffer=-0.95)
 #' 
 #' # Proportional Venn (Euler) diagram
 #' venndir(setlist,
 #'    show_items="item",
 #'    label_preset="items",
 #'    item_degrees=0,
+#'    item_buffer=-0.95,
 #'    proportional=TRUE)
 #' 
 #' @export
@@ -167,10 +166,20 @@ overlaplist2setlist <- function
 #'    )
 #' )
 #' setlist <- signed_counts2setlist(x)
-#' vo <- venndir(setlist, "each")
-#' venndir(setlist, "each", show_items="sign", item_degrees=-10)
+#' # default Venn diagram
+#' vo <- venndir(setlist, overlap_type="each")
+#' # show counts,percent outside, and sign for each item inside
+#' venndir(setlist,
+#'    overlap_type="each",
+#'    show_labels="NCSPi",
+#'    show_items="sign",
+#'    item_degrees=10)
 #' 
-#' vo <- venndir(setlist, proportional=TRUE, label_style="shaded_box", show_set="none")
+#' # show counts inside without set label (which is in the legend)
+#' vo <- venndir(setlist,
+#'    show_labels="cs",
+#'    proportional=TRUE,
+#'    label_style="fill_box")
 #' 
 #' @export
 signed_counts2setlist <- function

@@ -27,7 +27,6 @@ Other venndir utility:
 \code{\link{nudge_venndir_label}()},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
-\code{\link{venndir_label_style}()},
 \code{\link{venndir_legender}()},
 \code{\link{venndir_to_df}()}
 }

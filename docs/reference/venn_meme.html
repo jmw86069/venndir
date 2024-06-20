@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -68,6 +68,7 @@
 <span>  proportional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  item_cex <span class="op">=</span> <span class="fl">1.4</span>,</span>
 <span>  item_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  item_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.85</span>,</span>
 <span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gridtext"</span>, <span class="st">"text"</span><span class="op">)</span>,</span>
 <span>  plot_warning <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -89,8 +90,8 @@ is passed to <code><a href="overlaplist2setlist.html">overlaplist2setlist()</a><
 the <code>setlist</code> unchanged.</p></dd>
 
 
-<dt>proportional, item_degrees, plot_style, plot_warning</dt>
-<dd><p>default arguments passed to <code><a href="venndir.html">venndir()</a></code>.</p></dd>
+<dt>proportional, item_degrees, item_buffer, item_style, plot_warning</dt>
+<dd><p>arguments passed to <code><a href="venndir.html">venndir()</a></code>.</p></dd>
 
 
 <dt>item_cex</dt>
@@ -102,6 +103,10 @@ of each overlap polygon. In most cases this scaling is
 not helpful for Venn memes. To enable auto-scaling, use
 <code>item_cex=NULL</code>. See help text in <code><a href="venndir.html">venndir()</a></code> for more
 details.</p></dd>
+
+
+<dt>verbose</dt>
+<dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
 
 
 <dt>...</dt>

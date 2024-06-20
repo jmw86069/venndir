@@ -32,9 +32,6 @@ combo <- c(A = 2,
 setlist <- counts2setlist(combo)
 setlist;
 
-# turn off warnings about GEOS
-options("warn"=-1)
-
 # Venn diagram
 venndir(setlist)
 

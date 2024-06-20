@@ -279,6 +279,7 @@ The first example is the basic Venn overlap, without direction.
 # options("jam.htmlOut"=TRUE, "jam.comment"=FALSE)
 
 setlist <- make_venn_test(1000, 3, do_signed=TRUE)
+names(setlist) <- gsub("set_", "", names(setlist));
 textvenn(setlist, overlap_type="overlap")
 ```
 

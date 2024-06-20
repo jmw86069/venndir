@@ -41,13 +41,15 @@ venndir(setlist,
    show_items="item",
    label_preset="items",
    item_degrees=0,
-   item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)))
+   item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)),
+   item_buffer=-0.95)
 
 # Proportional Venn (Euler) diagram
 venndir(setlist,
    show_items="item",
    label_preset="items",
    item_degrees=0,
+   item_buffer=-0.95,
    proportional=TRUE)
 
 }

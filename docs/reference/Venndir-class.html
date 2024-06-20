@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -67,18 +67,75 @@
     <h2>Details</h2>
     <p>This object is intended to contain all the required data to produce
 a venndir figure. The components in this object can be edited.</p>
-<p>Slots:</p><ul><li><p><strong>jps</strong>: <code>JamPolygon</code> containing the set polygons (usually the full circle
+<p>Slots:</p><ul><li><p><strong>jps</strong>: <code>JamPolygon</code> containing the set and overlap polygons.</p><ul><li><p>Columns <code>"x"</code>,<code>"y"</code> contain polygon coordinates, see
+<code>JamPolygon-class</code> for details on multi-part polygons, and polygons
+with holes.</p></li>
+<li><p>The polygon type is defined with column <code>type</code> and values
+<code>"set"</code> or <code>"overlap"</code>.</p></li>
+<li><p>The "set" polygons are intended to be the full circle for each
+set, but may be <code>NA</code> or <code>NULL</code> to indicate the set is empty.</p></li>
+<li><p>The "overlap" polygons are expected to be contained inside
+"set" polygons, and each overlap polygon may be multi-polygons
+with or without holes.
+For example, the "set" polygon for <code>set_A</code> which is a circle fully
+contained inside another set <code>set_B</code>.
+The "overlap" polygon for <code>set_A</code> would be empty, since there is no
+region unique to <code>set_A</code>.
+However the "overlap" polygon <code>set_A&amp;set_B</code>
+would contain the full circle defined by "set" polygon <code>set_A</code>.
+Lastly the "overlap" polygon for <code>set_B</code> would be a circle with a hole
+located at "overlap" <code>set_A&amp;set_B</code>.
+or ellipse. The overlap polygons are polygons, possibly multi-part
+with or without holes, or may be <code>NA</code> or <code>NULL</code> to indicate that
+this overlap does not have a corresponding polygon.</p></li>
+<li><p>The <code>name</code> column contains set or overlap
+names, where multiple sets are concatenated with <code>"&amp;"</code> by default.
 or ellipse corresponding to each set in <code>setlist</code>), and the overlap
 polygons. Where an overlap does not exist, the polygon coordinates
 will be empty, or will have entirely <code>NA</code> values for "x" and "y".</p></li>
-<li><p><strong>label_df</strong>: <code>data.frame</code> containing detailed information about
-where to place Venn labels in the figure, what font to use, color,
-and items (when items are necessary for the figure). The "x" and "y"
-coordinates define the location of each label inside the polygon,
-the "x_offset" and "y_offset" are added to those coordinates to
-define the label position outside the polygon.</p></li>
+</ul></li>
+<li><p><strong>label_df</strong>: <code>data.frame</code> which contains information about
+Venn labels placement and content.
+It should contain one row for each Venn overlap.
+When data contains signed overlaps, each overlap is sub-divided
+by the combination of overlap signs, with one row per overlap and
+overlap signs.
+Overlap signs are summarized based upon argument <code>overlap_type</code>,
+see <code><a href="signed_overlaps.html">signed_overlaps()</a></code>.</p><ul><li><p><code>"overlap_sign"</code> represents the combination of overlap name,
+and the overlap sign across all sets.</p></li>
+<li><p><code>"text"</code> indicates the count label to be displayed.</p></li>
+<li><p><code>"venn_counts"</code> indicates the numeric number of Venn overlaps
+in each row.</p></li>
+<li><p><code>"item"</code> should be a <code>list</code> that contains <code>character</code> vectors
+of items in each overlap set. Column <code>"item"</code> is optional.</p></li>
+<li><p><code>"nsets"</code> indicates the number of sets involved in the overlap.</p></li>
+<li><p><code>"x"</code>, <code>"y"</code> represent the label coordinate to use inside
+each polygon overlap. When the label is displayed outside the polygon,
+the values <code>"x_offset"</code> and <code>"y_offset"</code> are added to <code>"x"</code> and <code>"y"</code>,
+respectively. In this way, a line segment can be drawn from the outer
+label back to the corresponding polygon.</p></li>
+<li><p><code>"color"</code> indicates the color for each label. Note the
+actual color may be modified based upon the background fill color
+to maximize the contrast and visibility of the color. For example
+blue on a dark background is displayed as light blue.</p></li>
+<li><p><code>"fontsize"</code> indicates the base font size, prior to any
+optional adjustment with <code>font_cex</code>.</p></li>
+<li><p><code>"fill"</code> indicates an optional color fill behind the count
+label. When <code>NULL</code> (default) there is no color fill. This value
+is usually populated by argument <code>label_style</code> which is passed to
+<code>venndir_label_preset()</code>.</p></li>
+<li><p><code>"border"</code> indicates an optional border around count labels,
+and is handled similar to <code>"fill"</code>.</p></li>
+<li><p><code>"padding"</code>, <code>"padding_unit"</code>, <code>"r"</code>, and <code>"r_unit"</code> are
+used with <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> to define padding around count
+labels, and optional rounded corners when border is displayed.</p></li>
+<li><p>Other columns are intended for internal use by <code><a href="render_venndir.html">render_venndir()</a></code>
+and are not yet fully editable.</p></li>
+</ul></li>
 <li><p><strong>setlist</strong>: <code>list</code> with the <code>setlist</code> used to create the Venn overlaps.
-Previously this data could be inferred from <code>label_df</code> which was tedious.</p></li>
+Previously this data could be inferred from <code>label_df</code> which was
+tedious, and required column <code>"item"</code> which is optional.
+That said, <code>setlist</code> can be an empty <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>

@@ -15,8 +15,7 @@ Check Venndir object integrity
 \details{
 \subsection{Todo:}{
 \itemize{
-\item Write validation function.
-\item Consider whether to have \code{jp} (sets), \code{jps} (overlaps) in separate ojbects
+\item Write additional validation checks.
 }
 }
 }

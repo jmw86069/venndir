@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.31.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
       </span>
     </div>
 
@@ -78,9 +78,10 @@
 <span>  count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inside"</span>, <span class="st">"outside"</span>, <span class="st">"ifneeded"</span>, <span class="st">"detect"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  signed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inside"</span>, <span class="st">"outside"</span>, <span class="st">"ifneeded"</span>, <span class="st">"detect"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"inside"</span><span class="op">)</span>,</span>
+<span>  percent_delim <span class="op">=</span> <span class="st">"&lt;br&gt;"</span>,</span>
 <span>  show_items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  max_items <span class="op">=</span> <span class="fl">3000</span>,</span>
-<span>  inside_percent_threshold <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  inside_percent_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  label_types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"main"</span>, <span class="st">"signed"</span><span class="op">)</span>,</span>
 <span>  show_zero <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">"&amp;"</span>,</span>
@@ -92,7 +93,34 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>label_style</dt>
+    <dl><dt>show_labels</dt>
+<dd><p><code>character</code> string to describe which count labels
+to display, and where. The presence of each letter enables each
+label, and UPPERCASE places the label outside the Venn diagram,
+while lowercase places the label inside.
+The default <code>"Ncs"</code> displays _N_ame (outside), _c_ount (inside),
+and _s_igned count (inside). When <code>overlap_type="overlap"</code> then
+the signed label is hidden by default.</p>
+<p>The label types are defined below:</p><ul><li><p>_N_ame: "n" or "N" - the set name, by default it is displayed.</p></li>
+<li><p>_O_verlap: "o" or "O" - the overlap name, by default it is hidden,
+because these labels can be very long, also the overlap should be
+evident in the Venn diagram already.</p></li>
+<li><p>_c_ount: "c" or "C" - overlap count, independent of the sign</p></li>
+<li><p>_p_ercentage: "p" or "P" - overlap percentage, by default hidden,
+but available as an option</p></li>
+<li><p>_s_igned count: "s" or "S" - the signed overlap count, tabulated
+based upon <code>overlap_type</code> ("each", "concordant", "agreement", etc/)</p></li>
+<li><p>_i_tems: "i" only, by default hidden. When enabled, item labels
+defined by <code>show_items</code> are spread across the specific Venn overlap
+region.</p></li>
+</ul></dd>
+
+
+<dt>label_preset</dt>
+<dd><p>DEPRECATED in favor of <code>show_labels</code>.</p></dd>
+
+
+<dt>label_style</dt>
 <dd><p><code>character</code> string indicating the style of label
 to display. The values <code>"basic","none","shaded","lite","fill"</code>
 style the label background fill, while presence of <code>"box"</code> in
@@ -102,6 +130,81 @@ the string will draw a border around the label:
 <code>"fill"</code> uses opaque fill with the overlap set color,
 <code>"shaded"</code> uses slightly transparent fill with overlap set color,
 <code>"box"</code> displays border around the label.</p></dd>
+
+
+<dt>lite</dt>
+<dd><p><code>character</code> color used when <code>label_preset</code> contains <code>"lite"</code>.</p></dd>
+
+
+<dt>bg</dt>
+<dd><p><code>character</code> color used as the background color of the
+figure, used with outside labels to determine whether the text
+should be light or dark for proper visual contrast.</p></dd>
+
+
+<dt>set, overlap, percent, count, signed, items</dt>
+<dd><p>DEPRECATED in favor
+of <code>show_labels</code>.</p></dd>
+
+
+<dt>percent_delim</dt>
+<dd><p><code>character</code> string used only when both count
+and percent labels are enabled, as a delimiter between the two
+labels. The default <code>"&lt;br&gt;"</code> causes a newline, so the count
+and percent values are on separate lines. Another suggestion is
+<code>": "</code> which separates the two values with semicolon on one line.</p></dd>
+
+
+<dt>show_items</dt>
+<dd><p><code>character</code> string for the item label content, used
+only when items are displayed.</p></dd>
+
+
+<dt>max_items</dt>
+<dd><p><code>numeric</code> maximum number of labels permitted when
+items are displayed. When there are too many items, the item label
+is suppressed.</p></dd>
+
+
+<dt>inside_percent_threshold</dt>
+<dd><p><code>numeric</code> size for each polygon below
+which labels are moved outside, for labels that would otherwise
+be displayed inside. Item labels are not affected by this setting.
+The threshold is calculated as a percent of the overall Venn diagram
+polygon area.</p></dd>
+
+
+<dt>label_types</dt>
+<dd><p><code>character</code> vector with one or more label types
+to be affected by this function. By default <code>"count"</code> and <code>"signed"</code>
+labels (all labels) are affected.</p></dd>
+
+
+<dt>show_zero</dt>
+<dd><p><code>logical</code> indicating whether to display zero <code>0</code>
+for empty overlaps for which the overlap polygon exists. Default FALSE
+hides the display of zeros.</p></dd>
+
+
+<dt>sep</dt>
+<dd><p><code>character</code> string used as delimiter between Venn set names.
+This value should generally not be changed.</p></dd>
+
+
+<dt>useGrey</dt>
+<dd><p><code>numeric</code> value used by <code><a href="https://rdrr.io/pkg/jamba/man/setTextContrastColor.html" class="external-link">jamba::setTextContrastColor()</a></code>
+to define an appropriate contrasting color which retains some color
+saturation, default 15. Use <code>useGrey=0</code> would cause black or white
+labels with no color saturation.</p></dd>
+
+
+<dt>verbose</dt>
+<dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>additional arguments are passed to internal functions such
+as <code><a href="make_color_contrast.html">make_color_contrast()</a></code>.</p></dd>
 
 </dl></div>
     <div id="details">
@@ -113,25 +216,6 @@ overwriting the existing label style as necessary.</p>
 the label on top of dark or bright colors. If the label
 is positioned outside the <code>sp</code> polygons, the text is assumed
 to be on a white background, using argument <code>bg</code>.</p>
-    </div>
-    <div id="see-also">
-    <h2>See also</h2>
-    <div class="dont-index"><p>Other venndir utility: 
-<code><a href="curate_venn_labels.html">curate_venn_labels</a>()</code>,
-<code><a href="expand_range.html">expand_range</a>()</code>,
-<code><a href="get_venn_shapes.html">get_venn_shapes</a>()</code>,
-<code><a href="gridtext_make_outer_box.html">gridtext_make_outer_box</a>()</code>,
-<code><a href="gridtext_richtext_grob.html">gridtext_richtext_grob</a>()</code>,
-<code><a href="make_color_contrast.html">make_color_contrast</a>()</code>,
-<code><a href="make_venn_combn_df.html">make_venn_combn_df</a>()</code>,
-<code><a href="make_venn_test.html">make_venn_test</a>()</code>,
-<code><a href="match_list.html">match_list</a>()</code>,
-<code><a href="nudge_venndir_label.html">nudge_venndir_label</a>()</code>,
-<code><a href="print_color_df.html">print_color_df</a>()</code>,
-<code><a href="shrink_df.html">shrink_df</a>()</code>,
-<code><a href="three_point_angle.html">three_point_angle</a>()</code>,
-<code><a href="venndir_legender.html">venndir_legender</a>()</code>,
-<code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
     </div>
 
   </div>
