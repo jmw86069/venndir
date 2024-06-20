@@ -40,6 +40,12 @@
    percent, and takes effect only when both are visible. The default
    `"<br>"` places the second value on a new line.
 
+* `venn_meme()` change via hotfix:
+
+   * new argument `draw_legend=FALSE` to hide the Venn legend by default,
+   a change from the default for `venndir()` and `render_venndir()`,
+   since the legend is not relevant for `venn_meme()`.
+
 ## tests
 
 * A series of small, simple unit tests were added for Venn diagrams,

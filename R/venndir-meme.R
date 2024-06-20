@@ -60,6 +60,13 @@
 #'    not helpful for Venn memes. To enable auto-scaling, use
 #'    `item_cex=NULL`. See help text in `venndir()` for more
 #'    details.
+#' @param plot_warning `logical` passed to `render_venndir()` to determine
+#'    whether to plot any warnings caused by proportional Euler diagrams
+#'    which cannot display all overlapping regions. It should not be
+#'    relevant to `venn_meme()` and is `FALSE` by default.
+#' @param draw_legend `logical` indicating whether to draw the Venn diagram
+#'    legend, by default `FALSE` since it is not relevant to `venn_meme()`.
+#'    This argument is passed to `render_venndir()`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to `venndir()`.
 #' 
@@ -176,6 +183,7 @@ venn_meme <- function
  item_buffer=-0.85,
  item_style=c("gridtext", "text"),
  plot_warning=FALSE,
+ draw_legend=FALSE,
  verbose=FALSE,
  ...)
 {
@@ -232,6 +240,7 @@ venn_meme <- function
       item_buffer=item_buffer,
       item_style=item_style,
       plot_warning=plot_warning,
+      draw_legend=draw_legend,
       verbose=verbose,
       ...)
    return(invisible(vo))

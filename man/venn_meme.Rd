@@ -12,6 +12,7 @@ venn_meme(
   item_buffer = -0.85,
   item_style = c("gridtext", "text"),
   plot_warning = FALSE,
+  draw_legend = FALSE,
   verbose = FALSE,
   ...
 )
@@ -37,6 +38,15 @@ of each overlap polygon. In most cases this scaling is
 not helpful for Venn memes. To enable auto-scaling, use
 \code{item_cex=NULL}. See help text in \code{venndir()} for more
 details.}
+
+\item{plot_warning}{\code{logical} passed to \code{render_venndir()} to determine
+whether to plot any warnings caused by proportional Euler diagrams
+which cannot display all overlapping regions. It should not be
+relevant to \code{venn_meme()} and is \code{FALSE} by default.}
+
+\item{draw_legend}{\code{logical} indicating whether to draw the Venn diagram
+legend, by default \code{FALSE} since it is not relevant to \code{venn_meme()}.
+This argument is passed to \code{render_venndir()}.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
