@@ -4,24 +4,30 @@
 \alias{list2im_opt}
 \title{Optimized list to incidence matrix}
 \usage{
-list2im_opt(setlist, empty = 0, do_sparse = TRUE, ...)
+list2im_opt(setlist, empty = 0, do_sparse = FALSE, ...)
 }
 \arguments{
 \item{setlist}{\code{list} of vectors}
 
 \item{empty}{default single value used for empty/missing entries,
 the default \code{empty=0} uses zero for entries not present.
-Another alternative is \code{NA}.}
+Another alternative is \code{NA}.
+Providing a \code{character} value will convert the output to
+a \code{character} matrix, be warned.}
 
 \item{do_sparse}{\code{logical} indicating whether to coerce the output
-to sparse matrix class \code{"CsparseMatrix"} from the Matrix package.}
+to sparse matrix class \code{"CsparseMatrix"} from the Matrix package.
+The default is \code{FALSE} as of version 0.0.33.900, since the
+most common use case requires a regular matrix.
+For extremely large data, consider using a sparse matrix.}
 
 \item{...}{additional arguments are ignored.}
 }
 \value{
 \code{matrix} object with value \code{c(0, 1)} when \code{do_sparse=FALSE}
-(default), or when \code{do_sparse=TRUE}, returns a \code{Matrix} object class
-\code{"CsparseMatrix"} with \code{logical} values.
+(default), or when \code{do_sparse=TRUE}, it returns a \code{Matrix} object
+class \code{"CsparseMatrix"} with \code{logical} values, only when
+\code{Matrix} is available.
 }
 \description{
 Optimized conversion of list to incidence matrix

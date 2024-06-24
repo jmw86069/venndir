@@ -9,6 +9,8 @@ venndir(
   overlap_type = c("detect", "concordance", "each", "overlap", "agreement"),
   sets = NULL,
   set_colors = NULL,
+  setlist_labels = NULL,
+  legend_labels = NULL,
   proportional = FALSE,
   show_labels = "Ncs",
   return_items = TRUE,
@@ -69,6 +71,18 @@ all entries in \code{setlist}.}
 
 \item{set_colors}{\code{character} vector of R colors, or \code{NULL} (default) to
 use default colors defined by \code{colorjam::rainbowJam()}.}
+
+\item{setlist_labels}{\code{character} vector with optional custom labels
+to display in the Venn diagram. This option is intended when
+the \code{names(setlist)} are not suitable for display, but should
+still be maintained as the original names.}
+
+\item{legend_labels}{\code{character} vector with optional custom labels
+to display in the Venn legend. This option is intended when
+the \code{names(setlist)} are not suitable for a legend, but should
+still be maintained as the original names.
+The legend labels are typically single-line entries and should
+have relatively short text length.}
 
 \item{proportional}{\code{logical} (default FALSE) indicating whether
 to draw proportional Venn circles, also known as a Euler diagram.
@@ -269,7 +283,28 @@ setlist <- make_venn_test(100, 3, do_signed=TRUE);
 vo <- venndir(setlist)
 jamba::sdim(vo);
 
-vobase <- venndir(setlist, debug=3)
+# custom set labels
+vo <- venndir(setlist,
+   setlist_labels=paste("set", LETTERS[1:3]))
+
+# custom set labels with Markdown custom colors
+vo <- venndir(setlist,
+   setlist_labels=paste0("Set <span style='color:blue'>", LETTERS[1:3], "</span>"))
+
+# custom set and legend labels
+vo <- venndir(setlist,
+   setlist_labels=paste0("set<br>", LETTERS[1:3]),
+   legend_labels=paste("Set", LETTERS[1:3]))
+
+# custom set and legend labels
+# proportional
+# Set Name is inside with show_labels having lowercase "n"
+vo <- venndir(setlist,
+   proportional=TRUE,
+   show_labels="ncs",
+   label_style="lite box",
+   setlist_labels=paste0("Set: ", LETTERS[1:3]),
+   legend_labels=paste("Set", LETTERS[1:3]))
 
 }
 \seealso{

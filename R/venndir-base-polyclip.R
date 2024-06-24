@@ -10,6 +10,16 @@
 #'    all entries in `setlist`.
 #' @param set_colors `character` vector of R colors, or `NULL` (default) to
 #'    use default colors defined by `colorjam::rainbowJam()`.
+#' @param setlist_labels `character` vector with optional custom labels
+#'    to display in the Venn diagram. This option is intended when
+#'    the `names(setlist)` are not suitable for display, but should
+#'    still be maintained as the original names.
+#' @param legend_labels `character` vector with optional custom labels
+#'    to display in the Venn legend. This option is intended when
+#'    the `names(setlist)` are not suitable for a legend, but should
+#'    still be maintained as the original names.
+#'    The legend labels are typically single-line entries and should
+#'    have relatively short text length.
 #' @param proportional `logical` (default FALSE) indicating whether
 #'    to draw proportional Venn circles, also known as a Euler diagram.
 #'    Proportional circles are not guaranteed to represent all possible
@@ -163,7 +173,28 @@
 #' vo <- venndir(setlist)
 #' jamba::sdim(vo);
 #' 
-#' vobase <- venndir(setlist, debug=3)
+#' # custom set labels
+#' vo <- venndir(setlist,
+#'    setlist_labels=paste("set", LETTERS[1:3]))
+#' 
+#' # custom set labels with Markdown custom colors
+#' vo <- venndir(setlist,
+#'    setlist_labels=paste0("Set <span style='color:blue'>", LETTERS[1:3], "</span>"))
+#' 
+#' # custom set and legend labels
+#' vo <- venndir(setlist,
+#'    setlist_labels=paste0("set<br>", LETTERS[1:3]),
+#'    legend_labels=paste("Set", LETTERS[1:3]))
+#' 
+#' # custom set and legend labels
+#' # proportional
+#' # Set Name is inside with show_labels having lowercase "n"
+#' vo <- venndir(setlist,
+#'    proportional=TRUE,
+#'    show_labels="ncs",
+#'    label_style="lite box",
+#'    setlist_labels=paste0("Set: ", LETTERS[1:3]),
+#'    legend_labels=paste("Set", LETTERS[1:3]))
 #' 
 #' @export
 venndir <- function
@@ -175,6 +206,8 @@ venndir <- function
     "agreement"),
  sets=NULL,
  set_colors=NULL,
+ setlist_labels=NULL,
+ legend_labels=NULL,
  proportional=FALSE,
  show_labels="Ncs",
  return_items=TRUE,
@@ -256,7 +289,8 @@ venndir <- function
    if (length(font_cex) != 3) {
       font_cex <- rep(font_cex, length.out=3)
    }
-   
+
+   # optional subset of sets within setlist
    if (length(sets) == 0) {
       sets <- seq_along(setlist);
    } else if ("character" %in% class(sets)) {
@@ -265,6 +299,26 @@ venndir <- function
          stop("sets did not match any values in names(setlist)");
       }
    }
+   
+   # handle setlist names, labels, legend labels
+   if (length(setlist_labels) == 0) {
+      setlist_labels <- names(setlist);
+   } else {
+      if (length(setlist_labels) != length(setlist)) {
+         stop("length(setlist_labels) must equal length(setlist).");
+      }
+   }
+   names(setlist_labels) <- names(setlist);
+   # handle setlist names, labels, legend labels
+   if (length(legend_labels) == 0) {
+      legend_labels <- names(setlist);
+   } else {
+      if (length(legend_labels) != length(setlist)) {
+         stop("length(legend_labels) must equal length(setlist).");
+      }
+   }
+   names(legend_labels) <- names(setlist);
+   
    # define colors
    if (length(set_colors) == 0) {
       set_colors <- colorjam::rainbowJam(length(setlist),
@@ -323,11 +377,19 @@ venndir <- function
    }
    
    # get Venn circles
-   if (verbose) {
-      jamba::printDebug("venndir(): ",
-         "define Venn shapes");
-   }
-   if (length(venn_jp) == 0) {
+   if (length(venn_jp) > 0) {
+      if (verbose) {
+         jamba::printDebug("venndir(): ",
+            "User Venn shapes");
+      }
+      if (length(venn_jp) != length(setlist)) {
+         stop("length(venn_jp) must equal length(setlist).");
+      }
+      if (any(area_JamPolygon(venn_jp) == 0)) {
+         stop("Within venn_jp, every polygon must have non-zero area.");
+      }
+      rownames(venn_jp@polygons) <- paste0(names(setlist), "|set");
+   } else if (length(venn_jp) == 0) {
       if (verbose) {
          jamba::printDebug("venndir(): ",
             "get_venn_polygon_shapes()");
@@ -340,98 +402,29 @@ venndir <- function
          rotate_degrees=rotate_degrees,
          return_type="JamPolygon",
          ...);
-      
-      # Assign other attributes for consistency later on
       rownames(venn_jp@polygons) <- paste0(names(venn_jp), "|set");
-      venn_jp@polygons$venn_name <- names(venn_jp);
-      venn_jp@polygons$venn_counts <- NA;
-      venn_jp@polygons$venn_items <- I(lapply(seq_len(length(venn_jp)),
-         function(xi) character(0)));
-      venn_jp@polygons$venn_color <- set_color[venn_jp@polygons$venn_name];
-      border_dark_factor <- 1.1;
-      venn_jp@polygons$border <- jamba::makeColorDarker(
-         darkFactor=border_dark_factor,
-         set_color[venn_jp@polygons$venn_name]);
-      venn_jp@polygons$border.lwd <- 4;
-      venn_jp@polygons$fill <- NA;
-      venn_jp@polygons$label <- venn_jp@polygons$venn_name;
-      venn_jp@polygons$label_x <- NA;
-      venn_jp@polygons$label_y <- NA;
-      venn_jp@polygons$type <- "set";
-      venn_jp@polygons$innerborder <- NA;
-      venn_jp@polygons$innerborder.lwd <- 0;
-      
-      # venn_sp <- get_venn_shapes(counts=nCounts,
-      #    proportional=proportional,
-      #    circle_nudge=circle_nudge,
-      #    sep=sep,
-      #    ...);
-      
-      # optionally rotate the shapes
-      # if (length(rotate_degrees) > 0 && rotate_degrees != 0) {
-      #    venn_sp <- rescale_sp(sp=venn_sp,
-      #       share_center=TRUE,
-      #       rotate_degrees=rotate_degrees);
-      # }
-   } else {
-      # Todo: accept JamPolygon input
-      #
-      # TODO: Validate polyclip input as list of polyclip polygons
-      stop("venn_jp input is not yet implemented.");
-      if ("SpatialPolygonsDataFrame" %in% class(venn_sp)) {
-         venn_sp_names <- rownames(data.frame(venn_sp));
-         if (length(venn_sp_names) == 0) {
-            if (nrow(venn_sp) == length(setlist)) {
-               rownames(data.frame(venn_sp)) <- names(setlist);
-            } else if (nrow(venn_sp) == length(nCounts)) {
-               rownames(data.frame(venn_sp)) <- names(nCounts);
-            } else {
-               errmsg <- paste0("nrow(venn_sp)=",
-                  nrow(venn_sp),
-                  " must equal length(setlist)=",
-                  length(setlist),
-                  " or length(nCounts)=",
-                  length(nCounts));
-               stop(errmsg);
-            }
-         }
-         vennmatch <- match(names(nCounts),
-            rownames(data.frame(venn_sp)));
-         venn_sp <- venn_sp[vennmatch,];
-      } else {
-         # SpatialPolygons
-         venn_sp_names <- names(venn_sp);
-         #print(venn_sp_names);
-         if (length(venn_sp_names) == 0 || !any(names(setlist)[sets] %in% venn_sp_names)) {
-            #print("Adding names to venn_sp");
-            if (length(venn_sp) == length(setlist)) {
-               for (i in seq_along(venn_sp@polygons)) {
-                  venn_sp@polygons[[i]]@ID <- names(setlist)[i];
-               }
-            } else if (length(venn_sp) == length(sets)) {
-               for (i in seq_along(venn_sp@polygons)) {
-                  venn_sp@polygons[[i]]@ID <- names(setlist)[sets][i];
-               }
-            } else {
-               errmsg <- paste0("length(venn_sp)=",
-                  length(venn_sp),
-                  " must equal length(setlist)=",
-                  length(setlist),
-                  " or length(nCounts)=",
-                  length(nCounts));
-               stop(errmsg);
-            }
-         }
-         vennmatch <- match(names(setlist)[sets],
-            names(venn_sp));
-         if (FALSE) {
-            print(names(nCounts));
-            print(vennmatch);
-         }
-         venn_sp <- venn_sp[vennmatch];
-      }
    }
+      
+   # Assign other attributes for consistency later on
+   venn_jp@polygons$venn_name <- names(venn_jp);
+   venn_jp@polygons$venn_counts <- NA;
+   venn_jp@polygons$venn_items <- I(lapply(seq_len(length(venn_jp)),
+      function(xi) character(0)));
+   venn_jp@polygons$venn_color <- set_color[venn_jp@polygons$venn_name];
+   border_dark_factor <- 1.1;
+   venn_jp@polygons$border <- jamba::makeColorDarker(
+      darkFactor=border_dark_factor,
+      set_color[venn_jp@polygons$venn_name]);
+   venn_jp@polygons$border.lwd <- 4;
+   venn_jp@polygons$fill <- NA;
+   venn_jp@polygons$label <- venn_jp@polygons$venn_name;
+   venn_jp@polygons$label_x <- NA;
+   venn_jp@polygons$label_y <- NA;
+   venn_jp@polygons$type <- "set";
+   venn_jp@polygons$innerborder <- NA;
+   venn_jp@polygons$innerborder.lwd <- 0;
    
+
    # convert to venn overlap polygons
    if (verbose) {
       jamba::printDebug("venndir(): ",
@@ -452,7 +445,12 @@ venndir <- function
    
    # combine into one object
    venn_jps <- rbind2(venn_jp, venn_jpol);
-
+   
+   ## Add setlist_labels, legend_labels
+   matchset <- match(venn_jps@polygons$venn_name, names(setlist_labels));
+   venn_jps@polygons$venn_label <- setlist_labels[matchset];
+   venn_jps@polygons$legend_label <- legend_labels[matchset];
+   
    ## Todo:
    # - determine which overlap polygon can represent each set label
    #    - if set is fully inside another set, it must choose the least
@@ -469,8 +467,10 @@ venndir <- function
    # print(as.data.frame(venn_spdfs))
    # plot(venn_spdfs)
    
-   ## Todo: Adapt below to handle class "JamPolygon"
-   # which defines placement of labels outside the Venn diagram.
+   ## Todo:
+   # Consider making this section optional, in case there are too
+   # many outside labels to determine, and
+   # especially when no outside labels are required.
    if (TRUE) {
       # jamba::printDebug("whichset:", whichset);
       # print(venn_jps[whichset, ]);
@@ -540,52 +540,7 @@ venndir <- function
       venn_jps@polygons$show_set <- FALSE;
    }
    
-   ## Todo: verify this all can be skipped (below with nlabel_df):
-   #
-   # generate labels from nCounts and gCounts
-   if (FALSE) {
-      nlabel_df <- data.frame(label=names(nCounts),
-         venn_counts=nCounts,
-         stringsAsFactors=FALSE,
-         check.names=FALSE);
-      nlabel_df <- jamba::mergeAllXY(
-         #as.data.frame(venn_spdf),
-         subset(venn_jps@polygons, type %in% "overlap"),
-         nlabel_df);
-      # remove duplicate label rows
-      nmatch <- jamba::rmNA(match(names(nCounts),
-         nlabel_df$label));
-      nlabel_df <- nlabel_df[nmatch, , drop=FALSE];
-      nlabel_df$color <- jamba::rmNA(nlabel_df$color,
-         naValue="#FFFFFFFF");
-      nlabel_df$venn_color <- jamba::rmNA(nlabel_df$venn_color,
-         naValue="#FFFFFFFF");
-      # repair x_label and y_label stored as list
-      nlabel_df$x_label <- unlist(jamba::rmNULL(nlabel_df$x_label, nullValue=NA))
-      nlabel_df$y_label <- unlist(jamba::rmNULL(nlabel_df$y_label, nullValue=NA))
-      
-      # Now add the main count labels
-      nlabel_df$show_set <- ifelse(
-         grepl(sep, fixed=TRUE, x=nlabel_df$label) |
-            is.na(nlabel_df$type),
-         FALSE,
-         TRUE);
-      
-      venn_text <- jamba::formatInt(
-         jamba::rmNA(naValue=0,
-            nlabel_df$venn_counts));
-      
-      x_main <- nlabel_df$x_label;
-      y_main <- nlabel_df$y_label;
-      vjust_main <- rep(0.5, length(x_main));
-      halign_main <- rep(0.5, length(x_main));
-      #hjust_main <- ifelse(nchar(up_text) == 0 & nchar(dn_text) == 0, 0.5, 1);
-      hjust_main <- rep(1, length(x_main));
-      if ("overlap" %in% overlap_type) {
-         hjust_main <- rep(0.5, length(x_main));
-      }
-   }
-   
+
    # define main x,y label coordinates
    nlabel_df <- subset(venn_jps@polygons, type %in% "overlap")
    main_x <- unlist(nlabel_df$label_x);
@@ -688,6 +643,7 @@ venndir <- function
    venn_jps@polygons$alpha <- ifelse(vset,
       poly_alpha,
       0);
+
    # define inner border
    venn_jps@polygons$innerborder.lwd <- 2;
    # venn_jps@polygons$innerborder.lty <- 1;
@@ -699,6 +655,7 @@ venndir <- function
          darkFactor=border_dark_factor,
          sFactor=border_s_factor),
       NA);
+
    # define outer border
    venn_jps@polygons$border.lwd <- 2;
    # venn_jps@polygons$border.lty <- 1;
@@ -711,30 +668,18 @@ venndir <- function
    # define label font size
    venn_jps@polygons$fontsize <- 14 * head(font_cex, 1);
    
-   venn_jps@polygons$alpha <- poly_alpha;
-   # venn_spdf$lwd <- 2;
-   # venn_spdf$lty <- 1;
-   # venn_spdf$border <- jamba::makeColorDarker(
-   #    venn_spdf$color,
-   #    darkFactor=1.2,
-   #    sFactor=1.2);
-   # venn_spdf$fontsize <- 14 * font_cex[1];
-   
+   # venn_jps@polygons$alpha <- poly_alpha;
+
    # optionally apply alpha by venn_counts
    if (alpha_by_counts) {
-      venn_spdf$alpha <- jamba::normScale(
+      venn_jps@polygons$alpha <- jamba::normScale(
          sqrt(
-            jamba::rmNA(naValue=0, venn_spdf$venn_counts)),
+            jamba::rmNA(naValue=0, venn_jps@polygons$venn_counts)),
          low=0,
-         from=0.02,
-         to=1);
-      venn_spdfs$alpha <- jamba::normScale(
-         sqrt(
-            jamba::rmNA(naValue=0, venn_spdfs$venn_counts)),
-         low=0,
-         from=0.02,
+         from=0.05,
          to=1);
    }
+   
    # adjust fill color with alpha
    venn_jps@polygons$fill <- ifelse(vset,
       jamba::alpha2col(
@@ -787,6 +732,11 @@ venndir <- function
          names(gbase_signs));
    }
 
+   ## Apply setlist_labels, legend_labels
+   matchset <- match(label_df$overlap_set, venn_jps@polygons$venn_name)
+   label_df$venn_label <- venn_jps@polygons$venn_label[matchset];
+   # label_df$legend_label <- venn_jps@polygons$legend_label[matchset];
+   
    ## Check for missing signed labels, then we nudge main label to center
    #
    # Todo: verify this works properly when all rows are always present

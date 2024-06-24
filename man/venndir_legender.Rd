@@ -5,9 +5,9 @@
 \title{Add optional legend to venndir figures (developmental)}
 \usage{
 venndir_legender(
-  setlist = NULL,
-  x = "bottomleft",
   venndir_output = NULL,
+  x = "bottomleft",
+  setlist = NULL,
   set_colors = NULL,
   keep_newlines = FALSE,
   include_total = TRUE,
@@ -31,15 +31,16 @@ venndir_legender(
 )
 }
 \arguments{
-\item{setlist}{\code{list} used as input to \code{venndir()}, which is used
-only to derive the number of elements.}
+\item{venndir_output}{\code{Venndir} object returned by \code{venndir()}, which is used
+to generate the legend counts. When supplied, the \code{set_colors} are
+also defined by this object.}
 
 \item{x}{\code{character} string indicating the position of the legend,
 as passed to \code{graphics::legend()} when \code{style="base"}.}
 
-\item{venndir_output}{\code{Venndir} object returned by \code{venndir()}, which is used
-to generate the legend counts. When supplied, the \code{set_colors} are
-also defined by this object.}
+\item{setlist}{\code{list} DEPRECATED and no longer necessary when
+\code{venndir_output} is supplied as a \code{Venndir} object, which already
+contains the \code{setlist}.}
 
 \item{set_colors}{\code{character} optional vector of R colors, whose names
 should match \code{names(setlist)}. When not supplied, colors are inferred
@@ -179,10 +180,11 @@ venndir_legender(setlist=setlist,
    x="bottomleft")
 
 # test multi-line labels
-names(setlist) <- c("Group A-<br>Group B",
-   "Group B-<br>\nGroup C",
-   "Dex_KO-\nVeh_WT")
+names(setlist) <- c("Group B-<br>Group A",
+   "Group C-<br>\nGroup B",
+   "Group_C-<br>\nGroupA")
 vo <- venndir(setlist,
+   draw_legend=FALSE,
    show_segments=FALSE)
 venndir_legender(setlist=setlist,
    venndir_output=vo,

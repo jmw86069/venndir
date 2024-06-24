@@ -52,7 +52,8 @@ counts2setlist <- function
    combo_sets <- strsplit(names(x),
       fixed=TRUE,
       split=sep);
-   combo_im <- list2im_opt(combo_sets);
+   combo_im <- list2im_opt(combo_sets,
+      do_sparse=TRUE);
    set_names <- rownames(combo_im);
    set_values <- lapply(jamba::nameVector(set_names), function(i){
       j <- which(combo_im[i,]);
@@ -118,7 +119,8 @@ overlaplist2setlist <- function
    combo_sets <- strsplit(names(x),
       fixed=TRUE,
       split=sep);
-   combo_im <- list2im_opt(combo_sets);
+   combo_im <- list2im_opt(combo_sets,
+      do_sparse=TRUE);
    set_names <- rownames(combo_im);
    set_values <- lapply(jamba::nameVector(set_names), function(i){
       j <- which(combo_im[i,]);

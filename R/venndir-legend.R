@@ -29,17 +29,18 @@
 #' 
 #' @family venndir utility
 #' 
-#' @param setlist `list` used as input to `venndir()`, which is used
-#'    only to derive the number of elements.
-#' @param x `character` string indicating the position of the legend,
-#'    as passed to `graphics::legend()` when `style="base"`.
 #' @param venndir_output `Venndir` object returned by `venndir()`, which is used
 #'    to generate the legend counts. When supplied, the `set_colors` are
 #'    also defined by this object.
+#' @param x `character` string indicating the position of the legend,
+#'    as passed to `graphics::legend()` when `style="base"`.
 #' @param set_colors `character` optional vector of R colors, whose names
 #'    should match `names(setlist)`. When not supplied, colors are inferred
 #'    from `venndir_output`, and when that is not supplied, colors are
 #'    defined using `colorjam::rainbowJam()`.
+#' @param setlist `list` DEPRECATED and no longer necessary when
+#'    `venndir_output` is supplied as a `Venndir` object, which already
+#'    contains the `setlist`.
 #' @param keep_newlines `logical` indicating whether to keep newlines
 #'    (line breaks) in the set labels used in the Venn legend.
 #' @param box.lwd `numeric` used to define the box line width,
@@ -124,10 +125,11 @@
 #'    x="bottomleft")
 #' 
 #' # test multi-line labels
-#' names(setlist) <- c("Group A-<br>Group B",
-#'    "Group B-<br>\nGroup C",
-#'    "Dex_KO-\nVeh_WT")
+#' names(setlist) <- c("Group B-<br>Group A",
+#'    "Group C-<br>\nGroup B",
+#'    "Group_C-<br>\nGroupA")
 #' vo <- venndir(setlist,
+#'    draw_legend=FALSE,
 #'    show_segments=FALSE)
 #' venndir_legender(setlist=setlist,
 #'    venndir_output=vo,
@@ -180,9 +182,9 @@
 #' 
 #' @export
 venndir_legender <- function
-(setlist=NULL,
+(venndir_output=NULL, 
  x="bottomleft", 
- venndir_output=NULL, 
+ setlist=NULL,
  set_colors=NULL,
  keep_newlines=FALSE,
  include_total=TRUE,
@@ -207,15 +209,52 @@ venndir_legender <- function
 {
    style <- match.arg(style);
 
+   if (length(setlist) == 0) {
+      if (length(venndir_output) > 0 && "Venndir" %in% class(venndir_output)) {
+         setlist <- venndir_output@setlist;
+      }
+   }
+   # make sure setlist matches Venn displayed sets
+   if (length(venndir_output) > 0) {
+      use_setlist_names <- intersect(names(setlist),
+         venndir_output@label_df$overlap_set)
+      if (length(use_setlist_names) == 0) {
+         stop("label_df$overlap_set does not match names(setlist)");
+      }
+      setlist <- setlist[use_setlist_names];
+   }
+   legend_labels <- NULL;
+   if (length(venndir_output) > 0 &&
+         "legend_label" %in% colnames(venndir_output@jps@polygons)) {
+      matchset <- match(names(setlist),
+         venndir_output@jps@polygons$venn_name)
+      if (any(is.na(matchset))) {
+         stop("Venndir 'venn_name' does not match names(setlist).");
+         # Todo: recover by ignoring legend_labels
+      } else {
+         legend_labels <- jamba::nameVector(
+            venndir_output@jps@polygons$legend_label[matchset],
+            names(setlist));
+      }
+   }
+   if (length(legend_labels) == 0) {
+      legend_labels <- jamba::nameVector(names(setlist));
+   }
+   # jamba::printDebug("legend_labels:");print(legend_labels);# debug
+   
    # custom function to replace newline style with \n
    fix_setlist_names <- function
    (setlist,
     use_newline="\n",
-    keep_newlines=FALSE)
+    keep_newlines=FALSE,
+    use_labels=legend_labels)
    {
       if (FALSE %in% keep_newlines) {
          use_newline <- " ";
       }
+      # 0.0.33.900 - use custom labels
+      names(setlist) <- use_labels[names(setlist)];
+      # apply additional logic
       names(setlist) <- gsub(paste0("[", use_newline, "]+"),
          use_newline,
          gsub("<br>|\n",
@@ -248,7 +287,7 @@ venndir_legender <- function
          rep(1, length.out=i)
       })
    }
-
+   
    # pick out venn colors if available
    vodf_color <- NULL;
    vodf_border <- NULL;
@@ -342,12 +381,16 @@ venndir_legender <- function
 
    # fix names by converting newline from HTML <br> to \n
    # Note: This step must occur after subsetting by names(setlist)
+   # jamba::printDebug("setlist:");print(setlist);# debug
+   # jamba::printDebug("vodf_color:");print(vodf_color);# debug
    setlist <- fix_setlist_names(setlist,
       use_newline="\n",
       keep_newlines=keep_newlines)
    vodf_color <- fix_setlist_names(vodf_color,
       use_newline="\n",
       keep_newlines=keep_newlines)
+   # jamba::printDebug("setlist:");print(setlist);# debug
+   # jamba::printDebug("vodf_color:");print(vodf_color);# debug
    vodf_border <- fix_setlist_names(vodf_border,
       use_newline="\n",
       keep_newlines=keep_newlines)

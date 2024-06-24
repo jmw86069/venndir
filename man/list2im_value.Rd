@@ -20,7 +20,8 @@ the default \code{empty=0} uses zero for entries not present.
 Another alternative is \code{NA}.}
 
 \item{do_sparse}{\code{logical} indicating whether to coerce the output
-to sparse matrix class \code{"ngCMatrix"} from the Matrix package.}
+to sparse matrix class \code{"ngCMatrix"} from the Matrix package.
+The default is \code{FALSE}.}
 
 \item{...}{additional arguments are ignored.}
 

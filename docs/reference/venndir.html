@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.33.900</span>
       </span>
     </div>
 
@@ -68,6 +68,8 @@
 <span>  overlap_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"detect"</span>, <span class="st">"concordance"</span>, <span class="st">"each"</span>, <span class="st">"overlap"</span>, <span class="st">"agreement"</span><span class="op">)</span>,</span>
 <span>  sets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  set_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  setlist_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  legend_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  proportional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_labels <span class="op">=</span> <span class="st">"Ncs"</span>,</span>
 <span>  return_items <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -135,6 +137,22 @@ all entries in <code>setlist</code>.</p></dd>
 <dt>set_colors</dt>
 <dd><p><code>character</code> vector of R colors, or <code>NULL</code> (default) to
 use default colors defined by <code><a href="https://rdrr.io/pkg/colorjam/man/rainbowJam.html" class="external-link">colorjam::rainbowJam()</a></code>.</p></dd>
+
+
+<dt>setlist_labels</dt>
+<dd><p><code>character</code> vector with optional custom labels
+to display in the Venn diagram. This option is intended when
+the <code>names(setlist)</code> are not suitable for display, but should
+still be maintained as the original names.</p></dd>
+
+
+<dt>legend_labels</dt>
+<dd><p><code>character</code> vector with optional custom labels
+to display in the Venn legend. This option is intended when
+the <code>names(setlist)</code> are not suitable for a legend, but should
+still be maintained as the original names.
+The legend labels are typically single-line entries and should
+have relatively short text length.</p></dd>
 
 
 <dt>proportional</dt>
@@ -388,11 +406,35 @@ Venn set, and Venn overlap label.</p></li>
 <span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/sdim.html" class="external-link">sdim</a></span><span class="op">(</span><span class="va">vo</span><span class="op">)</span>;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          rows cols      class</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> jps        10      JamPolygon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> label_df   21   40 data.frame</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> label_df   21   41 data.frame</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> setlist     3            list</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">vobase</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>, debug<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># custom set labels</span></span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>
+<span class="r-in"><span>   setlist_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"set"</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="venndir-2.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># custom set labels with Markdown custom colors</span></span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>
+<span class="r-in"><span>   setlist_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Set &lt;span style='color:blue'&gt;"</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, <span class="st">"&lt;/span&gt;"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="venndir-3.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># custom set and legend labels</span></span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>
+<span class="r-in"><span>   setlist_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"set&lt;br&gt;"</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   legend_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Set"</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="venndir-4.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># custom set and legend labels</span></span></span>
+<span class="r-in"><span><span class="co"># proportional</span></span></span>
+<span class="r-in"><span><span class="co"># Set Name is inside with show_labels having lowercase "n"</span></span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>
+<span class="r-in"><span>   proportional<span class="op">=</span><span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>   show_labels<span class="op">=</span><span class="st">"ncs"</span>,</span></span>
+<span class="r-in"><span>   label_style<span class="op">=</span><span class="st">"lite box"</span>,</span></span>
+<span class="r-in"><span>   setlist_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Set: "</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   legend_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Set"</span>, <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="venndir-5.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

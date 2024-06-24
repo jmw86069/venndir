@@ -19,15 +19,21 @@
 #' @family venndir conversion
 #' 
 #' @return `matrix` object with value `c(0, 1)` when `do_sparse=FALSE`
-#'    (default), or when `do_sparse=TRUE`, returns a `Matrix` object class
-#'    `"CsparseMatrix"` with `logical` values.
+#'    (default), or when `do_sparse=TRUE`, it returns a `Matrix` object
+#'    class `"CsparseMatrix"` with `logical` values, only when
+#'    `Matrix` is available.
 #' 
 #' @param setlist `list` of vectors
 #' @param empty default single value used for empty/missing entries,
 #'    the default `empty=0` uses zero for entries not present.
 #'    Another alternative is `NA`.
+#'    Providing a `character` value will convert the output to
+#'    a `character` matrix, be warned.
 #' @param do_sparse `logical` indicating whether to coerce the output
 #'    to sparse matrix class `"CsparseMatrix"` from the Matrix package.
+#'    The default is `FALSE` as of version 0.0.33.900, since the
+#'    most common use case requires a regular matrix.
+#'    For extremely large data, consider using a sparse matrix.
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
@@ -43,7 +49,7 @@
 list2im_opt <- function
 (setlist,
  empty=0,
- do_sparse=TRUE,
+ do_sparse=FALSE,
  ...)
 {
    setnamesunion <- Reduce("union", setlist);
@@ -113,6 +119,7 @@ list2im_opt <- function
 #'    Another alternative is `NA`.
 #' @param do_sparse `logical` indicating whether to coerce the output
 #'    to sparse matrix class `"ngCMatrix"` from the Matrix package.
+#'    The default is `FALSE`.
 #' @param coerce_sign `logical` indicating whether to coerce numeric
 #'    vector values to the sign. When `coerce_sign=FALSE` the vector
 #'    values are stored directly. When `coerce_sign=TRUE` the signs of

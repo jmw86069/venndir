@@ -1,5 +1,32 @@
 # TODO for venndir
 
+## 22jun2024
+
+* DONE. Consider changing default to `do_sparse=FALSE` so the default behavior
+is to return a typical `matrix` class and not `Matrix` compressed form.
+* DONE. Consider removing `matrixStats` from dependencies, it is only used once.
+* DONE. Add examples to `rescale_coordinates()`.
+* DONE. Fix `alpha_by_counts=TRUE.`
+* DONE. Consider optional labels for `Venndir`
+
+   * `setlist_labels` - optional user-customized labels for the Venn diagram,
+   which may or may not match the name of the set.
+   * `legend_labels` - optional user-customized labels for the Venn legend,
+   again, these may be abbreviated or adjusted to be suitable for the legend.
+
+* Write more intensive validation for `Venndir` objects.
+* Consider option for black-and-white legend.
+* Write vignette with larger variety of examples for `venndir()`
+* Expand help docs for `JamPolygon`
+
+* Write brief vignette for `JamPolygon` objects
+* Consider moving `JamPolygon` to a separate R package.
+
+   * Painful but might make `JamPolygon` a lightweight standalone option,
+   usable in other Jam packages (without guilt).
+   * Dependencies: polyclip, polylabelr, vwline
+
+
 ## 18jun2024
 
 * Outer label positions and line segments should be improved.

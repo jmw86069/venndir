@@ -559,7 +559,13 @@ render_venndir <- function
       show_overlap_inside <- (label_df$overlap %in% "inside" & !is.na(label_df$x))
       show_count_outside <- (label_df$count %in% "outside" & !is.na(label_df$x))
       show_count_inside <- (label_df$count %in% "inside" & !is.na(label_df$x));
+      if (!"venn_label" %in% colnames(label_df)) {
+         label_df$venn_label <- label_df$overlap_set;
+      }
       overlap_set <- paste0("**", label_df$overlap_set, "**");
+      venn_label <- ifelse(!label_df$venn_label %in% c(NA, ""),
+         paste0("**", label_df$venn_label, "**"),
+         "")
       is_left <- (label_df$type %in% "main") * 1;
       # enhancement to apply fontsize from venn_spdf to main set labels
       label_df$overlap_fontsize <- label_df$fontsize;
@@ -599,10 +605,15 @@ render_venndir <- function
             label_df$overlap_set[show_count_outside],
             label_df$overlap_set[show_count_inside]),
          text=c(
-            overlap_set[show_overlap_outside],
-            overlap_set[show_overlap_inside],
+            venn_label[show_overlap_outside],
+            venn_label[show_overlap_inside],
             label_df$text[show_count_outside],
             label_df$text[show_count_inside]),
+         # text=c(
+         #    overlap_set[show_overlap_outside],
+         #    overlap_set[show_overlap_inside],
+         #    label_df$text[show_count_outside],
+         #    label_df$text[show_count_inside]),
          x=c(
             label_df$x[show_overlap_outside] + label_df$x_offset[show_overlap_outside],
             label_df$x[show_overlap_inside],

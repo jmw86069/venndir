@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.33.900</span>
       </span>
     </div>
 
@@ -58,6 +58,30 @@
 
 <div id="todo-for-venndir" class="section level1">
 
+<div class="section level2">
+<h2 id="id_22jun2024">22jun2024<a class="anchor" aria-label="anchor" href="#id_22jun2024"></a></h2>
+<ul><li><p>DONE. Consider changing default to <code>do_sparse=FALSE</code> so the default behavior is to return a typical <code>matrix</code> class and not <code>Matrix</code> compressed form.</p></li>
+<li><p>DONE. Consider removing <code>matrixStats</code> from dependencies, it is only used once.</p></li>
+<li><p>DONE. Add examples to <code><a href="reference/rescale_coordinates.html">rescale_coordinates()</a></code>.</p></li>
+<li><p>DONE. Fix <code>alpha_by_counts=TRUE.</code></p></li>
+<li>
+<p>DONE. Consider optional labels for <code>Venndir</code></p>
+<ul><li>
+<code>setlist_labels</code> - optional user-customized labels for the Venn diagram, which may or may not match the name of the set.</li>
+<li>
+<code>legend_labels</code> - optional user-customized labels for the Venn legend, again, these may be abbreviated or adjusted to be suitable for the legend.</li>
+</ul></li>
+<li><p>Write more intensive validation for <code>Venndir</code> objects.</p></li>
+<li><p>Consider option for black-and-white legend.</p></li>
+<li><p>Write vignette with larger variety of examples for <code><a href="reference/venndir.html">venndir()</a></code></p></li>
+<li><p>Expand help docs for <code>JamPolygon</code></p></li>
+<li><p>Write brief vignette for <code>JamPolygon</code> objects</p></li>
+<li>
+<p>Consider moving <code>JamPolygon</code> to a separate R package.</p>
+<ul><li>Painful but might make <code>JamPolygon</code> a lightweight standalone option, usable in other Jam packages (without guilt).</li>
+<li>Dependencies: polyclip, polylabelr, vwline</li>
+</ul></li>
+</ul></div>
 <div class="section level2">
 <h2 id="id_18jun2024">18jun2024<a class="anchor" aria-label="anchor" href="#id_18jun2024"></a></h2>
 <ul><li>

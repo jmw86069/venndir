@@ -46,7 +46,25 @@
 #' @family venndir spatial
 #' 
 #' @examples
-#' # Todo: migrate examples to use JamPolygon input
+#' pts <- matrix(ncol=2, c(1:4, 6, 8, 5, 7));
+#' rownames(pts) <- letters[1:4];
+#' plot(pts, pch=rownames(pts), asp=1)
+#' points(pts, pch=21, cex=3)
+#' 
+#' pts2 <- rescale_coordinates(pts, rotate_degrees=25);
+#' arrows(x0=pts[,1], x1=pts2[,1], y0=pts[,2], y1=pts2[,2], col="red")
+#' points(pts2, pch=21, cex=3, col="red", bg="white")
+#' points(pts2, pch=rownames(pts), col="red")
+#' 
+#' pts3 <- rescale_coordinates(pts2, scale=0.5);
+#' arrows(x0=pts2[,1], x1=pts3[,1], y0=pts2[,2], y1=pts3[,2], col="blue")
+#' points(pts3, pch=21, cex=3, col="blue", bg="white")
+#' points(pts3, pch=rownames(pts), col="blue")
+#' 
+#' pts4 <- rescale_coordinates(pts3, shift=c(0.5, 0.5));
+#' arrows(x0=pts3[,1], x1=pts4[,1], y0=pts3[,2], y1=pts4[,2], col="gold")
+#' points(pts4, pch=21, cex=3, col="gold", bg="white")
+#' points(pts4, pch=rownames(pts), col="gold")
 #' 
 #' @export
 rescale_coordinates <- function
@@ -77,7 +95,7 @@ rescale_coordinates <- function
    # define default center using colMeans of bounding box
    # which is the mean range
    if (length(center) == 0) {
-      center <- rowMeans(matrixStats::colRanges(x, na.rm=TRUE));
+      center <- colMeans(apply(x, 2, range, na.rm=TRUE));
    } else {
       center <- rep(center,
          length.out=ncol(x));

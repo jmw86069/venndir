@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.33.900</span>
       </span>
     </div>
 
@@ -57,6 +57,22 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.33.900" id="venndir-0033900">venndir 0.0.33.900<a class="anchor" aria-label="anchor" href="#venndir-0033900"></a></h2>
+<ul><li>Removed <code>matrixStats</code> from dependencies.</li>
+</ul><div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-33-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-33-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>New arguments: <code>setlist_labels</code> and <code>legend_labels</code> that use <code>names(setlist)</code> by default, but can be adjusted to be display-friendly. The <code>setlist_labels</code> are displayed on the Venn diagram itself. The <code>legend_labels</code> are displayed only in the Venn legend via <code><a href="../reference/venndir_legender.html">venndir_legender()</a></code>.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/list2im_opt.html">list2im_opt()</a></code> has a new default argument <code>do_sparse=FALSE</code>.</p>
+<ul><li>Previously all incidence matrix output used compressed <code>Matrix</code> class when available. In almost all cases, I immediately converted back to <code>matrix</code> or used <code>do_sparse=FALSE</code> anyway. Before wider use of the package, best to improve the default condition.</li>
+</ul></li>
+<li><p>Added examples to <code><a href="../reference/rescale_coordinates.html">rescale_coordinates()</a></code>.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.32.900" id="venndir-0032900">venndir 0.0.32.900<a class="anchor" aria-label="anchor" href="#venndir-0032900"></a></h2>
 <div class="section level3">

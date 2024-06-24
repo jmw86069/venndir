@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.32.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.33.900</span>
       </span>
     </div>
 
@@ -63,7 +63,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">list2im_opt</span><span class="op">(</span><span class="va">setlist</span>, empty <span class="op">=</span> <span class="fl">0</span>, do_sparse <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">list2im_opt</span><span class="op">(</span><span class="va">setlist</span>, empty <span class="op">=</span> <span class="fl">0</span>, do_sparse <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -75,12 +75,17 @@
 <dt>empty</dt>
 <dd><p>default single value used for empty/missing entries,
 the default <code>empty=0</code> uses zero for entries not present.
-Another alternative is <code>NA</code>.</p></dd>
+Another alternative is <code>NA</code>.
+Providing a <code>character</code> value will convert the output to
+a <code>character</code> matrix, be warned.</p></dd>
 
 
 <dt>do_sparse</dt>
 <dd><p><code>logical</code> indicating whether to coerce the output
-to sparse matrix class <code>"CsparseMatrix"</code> from the Matrix package.</p></dd>
+to sparse matrix class <code>"CsparseMatrix"</code> from the Matrix package.
+The default is <code>FALSE</code> as of version 0.0.33.900, since the
+most common use case requires a regular matrix.
+For extremely large data, consider using a sparse matrix.</p></dd>
 
 
 <dt>...</dt>
@@ -94,8 +99,9 @@ to sparse matrix class <code>"CsparseMatrix"</code> from the Matrix package.</p>
 <p><code>matrix</code> object with value <code>c(0, 1)</code> when <code>do_sparse=FALSE</code></p>
 
 
-<p>(default), or when <code>do_sparse=TRUE</code>, returns a <code>Matrix</code> object class
-<code>"CsparseMatrix"</code> with <code>logical</code> values.</p>
+<p>(default), or when <code>do_sparse=TRUE</code>, it returns a <code>Matrix</code> object
+class <code>"CsparseMatrix"</code> with <code>logical</code> values, only when
+<code>Matrix</code> is available.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -127,13 +133,12 @@ to run this function, the re-order rownames afterward.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   b<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two"</span>, <span class="st">"one"</span>, <span class="st">"four"</span>, <span class="st">"five"</span><span class="op">)</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu">list2im_opt</span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span>;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 x 2 sparse Matrix of class "ngCMatrix"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       A b</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> one   | |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> two   | |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> three | .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> four  . |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> five  . |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> one   1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> two   1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> three 1 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> four  0 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> five  0 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">list2im_opt</span><span class="op">(</span><span class="va">setlist</span>, do_sparse<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 x 2 sparse Matrix of class "ngCMatrix"</span>

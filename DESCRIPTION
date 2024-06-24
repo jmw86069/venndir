@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.32.900
+Version: 0.0.33.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -17,7 +17,6 @@ Imports: jamba(>= 0.0.90.900),
     polyclip,
     vwline,
     polylabelr,
-    matrixStats,
     gridtext,
     gridBase,
     data.table,

@@ -1,3 +1,26 @@
+# venndir 0.0.33.900
+
+* Removed `matrixStats` from dependencies.
+
+## changes to existing functions
+
+* `venndir()`
+
+   * New arguments: `setlist_labels` and `legend_labels` that use
+   `names(setlist)` by default, but can be adjusted to be display-friendly.
+   The `setlist_labels` are displayed on the Venn diagram itself.
+   The `legend_labels` are displayed only in the Venn legend via
+   `venndir_legender()`.
+
+* `list2im_opt()` has a new default argument `do_sparse=FALSE`.
+
+   * Previously all incidence matrix output used compressed `Matrix`
+   class when available. In almost all cases, I immediately converted
+   back to `matrix` or used `do_sparse=FALSE` anyway. Before wider
+   use of the package, best to improve the default condition.
+
+* Added examples to `rescale_coordinates()`.
+
 # venndir 0.0.32.900
 
 ## Bug fixes
