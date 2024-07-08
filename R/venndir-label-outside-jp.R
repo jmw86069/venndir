@@ -54,20 +54,29 @@ label_outside_JamPolygon <- function
    center_method <- match.arg(center_method);
    if (length(which_jp) == 0) {
       ## use only those entries with polygon coordinates
-      which_jp <- which(sapply(seq_len(nrow(jp@polygons)), function(ijp){
-         length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
-      }))
+      # which_jp <- which(sapply(seq_len(nrow(jp@polygons)), function(ijp){
+      #    length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
+      # }))
+      which_jp <- seq_len(length(jp));
       # jamba::printDebug("which_jp: ", which_jp);# debug
-      # which_jp <- seq_len(length(jp));
    } else {
       # use only those entries with polygon coordinates
-      which_jp_sub <- sapply(which_jp, function(ijp){
-         length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
-      })
+      ## 0.0.34.900 - do not subset which_jp so the function can always return
+      ## coordinates in the order requested, and for all entries provided,
+      ## even when an entry is empty
+      # which_jp_sub <- sapply(which_jp, function(ijp){
+      #    length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
+      # })
       # jamba::printDebug("table(which_jp_sub): ");print(table(which_jp_sub));# debug
-      which_jp <- which_jp[which_jp_sub];
+      # which_jp <- which_jp[which_jp_sub];
       # jamba::printDebug("which_jp: ", which_jp);# debug
    }
+   
+   ## check for empty polygons among which_jp
+   which_jp_is_empty <- sapply(which_jp, function(ijp){
+      length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) == 0
+   })
+   ## Todo: Check for all empty polygons, and return NA, NA if true
    
    # buffer
    if (length(buffer) == 0) {
@@ -121,20 +130,30 @@ label_outside_JamPolygon <- function
                y=mean(range(jp@polygons$label_y[which_jp], na.rm=TRUE)))
          } else {
             label_xy <- labelr_JamPolygon(jp[which_jp, ]);
+            # average from range of labels
+            # center <- cbind(
+            #    x=mean(range(label_xy[,1], na.rm=TRUE)),
+            #    y=mean(range(label_xy[,2], na.rm=TRUE)))
+            # average from all actual labels
             center <- cbind(
-               x=mean(range(label_xy[,1], na.rm=TRUE)),
-               y=mean(range(label_xy[,2], na.rm=TRUE)))
+               x=mean(label_xy[,1], na.rm=TRUE),
+               y=mean(label_xy[,2], na.rm=TRUE))
          }
       }
    } else {
       center <- matrix(ncol=2, head(center, 2));
    }
    colnames(center) <- c("x", "y");
+   # jamba::printDebug("center:");print(center);# debug
+   # jamba::printDebug("which_jp:");print(which_jp);# debug
+   # jamba::printDebug("jp:");print(jp);# debug
    
    # reference coordinate for each polygon
    polyref_xy <- jamba::rbindList(lapply(which_jp, function(iwhich){
       # get sub-polygon
       ijp <- jp[iwhich, ];
+      # jamba::printDebug("ijp:");print(ijp);# debug
+      # jamba::printDebug("ijp@polygons$x:");print(ijp@polygons$x);# debug
       if (length(jamba::rmNA(unlist(ijp@polygons$x))) == 0) {
          # no polygon present
          return(cbind(x=NA_integer_, y=NA_integer_))
@@ -145,13 +164,13 @@ label_outside_JamPolygon <- function
          # print(center);
          xymax <- farthest_point_JamPolygon(center, ijp);
       } else if ("label" %in% vector_method) {
-         xymax <- labelr_JamPolygon(isp);
+         xymax <- labelr_JamPolygon(ijp);
       }
       # Todo: Consider check if xymax == center
       xymax;
    }));
-   rownames(polyref_xy) <- names(jp)[which_jp];
    # jamba::printDebug("polyref_xy:");print(polyref_xy);# debug
+   rownames(polyref_xy) <- names(jp)[which_jp];
 
    # iterate multiple polygons to find angles
    angles1 <- sapply(which_jp, function(iwhich){

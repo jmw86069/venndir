@@ -1,5 +1,138 @@
 # TODO for venndir
 
+## 08jul2024
+
+* Currently `venndir()` does not store `item_cex` and `item_buffer`
+in the `Venndir` object, so calling `render_venndir()` does not
+retain these values.
+* Consider functions to adjust components of `Venndir` figure, to be
+visualized by `render_venndir()`.
+
+   * Nudge outer label position by set name, or `overlap_set`
+   
+      * When provided a value that matches `"label_df$ref_polygon"`, it should
+      affect all rows with that value.
+      * When provided a value that does not match `"label_df$ref_polygon"`,
+      it should look for corresponding value in `"label_df$name"` or
+      `"label_df$venn_name"`, then convert to `"label_df$ref_polygon"`.
+      Then proceed to update all rows with that `ref_polygon` value.
+
+   * Nudge inner label position, same syntax as above.
+   * Nudge a set shape (This workflow is lower priority for now.)
+   Best practice is to re-run `venndir()` using argument `circle_nudge`.
+   
+      * Second-best is a wrapper function that extracts data from `Venndir`
+      and just calls `venndir()` with corresponding arguments. It should
+      capture: `JamPolygons` for each set; `set_colors`; `setlist_labels`,
+      `legend_labels`, `sets`, etc.
+
+* Consider option to style item labels. Probably most useful for `venn_meme()`.
+For example, allow shading, rounded rectangle border, as with set labels.
+
+## 25jun2024
+
+* Fix bugs with proportional diagrams:
+
+   * One empty set in `setlist` causes an error.
+   * One set fully encompassed inside another set causes the set label
+   to be hidden.
+   * The two bugs are related:
+   
+      * The "set label" is assigned to appear where there is a unique
+      "overlap_set" - for example "set_A" should appear where there
+      is "set_A" unique overlaps that do not overlap another set.
+      * This condition is always valid for Venn diagrams.
+      * For proportional diagrams, sometimes "set_A" is fully inside "set_B".
+      We could call these "orphan set labels".
+      * Previously the label "set_A" was associated with
+      `overlap_set="set_A&set_B"`.
+      * This set label also used its own outside label position, the goal
+      was to allow potentially showing the set label "set_A", distinct
+      from the overlap label "set_A&set_B", both pointing to "set_A&set_B".
+      * Visually it could be confusing, when count labels were displayed
+      outside - there were two labels pointing to the same polygon region.
+      * The logic to assign an "orphan set label" to the best available
+      overlap set also occurred in multiple functions, nothing was stored
+      in the `Venndir` object to review this assignment.
+      * Finally, the collection of labels which should appear together
+      was complicated because the label position `hjust_inside`,
+      `hjust_outside`, `vjust_inside`, `vjust_outside` relied upon knowing
+      which labels were being placed together, and this logic failed.
+
+   * The fix (fixes):
+   
+      * Associate set label to `"ref_polygon"` and store in `Venndir@jps`.
+      * Update `render_venndir()` to recognize this association, instead
+      of re-determining the association.
+      * Update `venndir_label_style()` to recognize this association
+      so it can properly assign `hjust` and `vjust` to affected labels.
+      This function is one feasible place to make the changes.
+      * Another alternative `draw_gridtext_groups()` which assembles the
+      grouped labels into a "group" in order to draw one border around them.
+      This step may be ideal to place labels together in more flexible ways.
+      
+         * Labels are laid out within active `grid` viewport context,
+         then the observed dimensions in `grid` space are used to define
+         the extent of the resulting `grid::roundrectGrob()`.
+         * This step optionally re-centers the group of labels when
+         `adjust_center=TRUE`, so the center of the group is at the label
+         point, instead of the focal point of labels (normally the set name
+         is "topleft", the overlap count is "bottomleft", and signed counts
+         are "right").
+         * This function could provide a convenient way to assemble labels
+         without having to rely upon `hjust` and `vjust`.
+         * This function could also enable different layouts, like set label
+         at the top, counts at the bottom; set label at the top, then counts
+         bottomleft and signed counts bottomright.
+
+
+* Fix `venndir()` argument `rotate_degrees` which is currently not functioning.
+* Consider minor adjustments to `venndir_legender()` labeling.
+
+   * Option to hide the trailing colon `":"`
+   * Option to left-justify set labels
+
+* Consider returning the `viewport` from `render_venndir()`, and `venndir()`
+when it calls `render_venndir()` due to `do_plot=TRUE`.
+
+   * consider adding as an attribute of the `Venndir` object
+   * the `grid` `viewport` is useful when adding to or adjusting an existing
+   figure, otherwise the coordinate system is not usable.
+
+* Consider recognizing `title` or `main` to add a title to the figure.
+* Write more intensive validation for `Venndir` objects.
+* Consider option for black-and-white legend.
+* Write vignette with larger variety of examples for `venndir()`
+* Expand help docs for `JamPolygon`
+
+* Write brief vignette for `JamPolygon` objects
+* Tests for `JamPolygon` object functions
+
+   * generate test shapes: circle, circle with hole (donut),
+   two disjoin squares, square with hole and nested square inside the hole.
+   * `point_in_JamPolygon()`, `has_point_in_JamPolygon()`
+   points in the polygon, in the hole, in the nested internal solid area.
+   * `labelr_JamPolygon()` to generate label position inside solid polygon,
+   also test with `has_point_in_JamPolygon()`
+   * `nearest_point_JamPolygon()`, `farthest_point_JamPolygon()` to confirm
+   proper nearest/farthest points.
+   * `intersect_JamPolygon()`, `union_JamPolygon()`, `minus_JamPolygon()`
+   * `buffer_JamPolygon()` - confirm polygon with hole can become larger
+   polygon without a hole. Probably check `area_JamPolygon()` before/after
+   several use cases.
+
+* Consider moving `JamPolygon` to a separate R package.
+
+   * Painful but might make `JamPolygon` a lightweight standalone option,
+   usable in other Jam packages (without guilt).
+   * Dependencies: polyclip, polylabelr, vwline
+
+* Consider adding `JamPoints`, `JamLines` objects? Ugh. What have I done?
+
+   * There is currently no way to "Add a point" to a `JamPolygon` figure,
+   since the figure is created in `grid` using a `viewport`.
+
+
 ## 22jun2024
 
 * DONE. Consider changing default to `do_sparse=FALSE` so the default behavior
@@ -13,18 +146,6 @@ is to return a typical `matrix` class and not `Matrix` compressed form.
    which may or may not match the name of the set.
    * `legend_labels` - optional user-customized labels for the Venn legend,
    again, these may be abbreviated or adjusted to be suitable for the legend.
-
-* Write more intensive validation for `Venndir` objects.
-* Consider option for black-and-white legend.
-* Write vignette with larger variety of examples for `venndir()`
-* Expand help docs for `JamPolygon`
-
-* Write brief vignette for `JamPolygon` objects
-* Consider moving `JamPolygon` to a separate R package.
-
-   * Painful but might make `JamPolygon` a lightweight standalone option,
-   usable in other Jam packages (without guilt).
-   * Dependencies: polyclip, polylabelr, vwline
 
 
 ## 18jun2024

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.33.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
       </span>
     </div>
 
@@ -57,6 +57,32 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.34.900" id="venndir-0034900">venndir 0.0.34.900<a class="anchor" aria-label="anchor" href="#venndir-0034900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-34-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-34-900"></a></h3>
+<p>Main goal is to fix bug associated with empty or nested <code>setlist</code> entries when used with <code>proportional=TRUE</code>. This update is somewhat of a risk, several core components were updated in <code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code> and <code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code>, which could impact a number of downstream steps. Corresponding <code>testthis</code> entries have been added, hopefully to prevent occurrence of new bugs.</p>
+<ul><li><p>Added <code>vdiffr</code> to R package Suggests.</p></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code>, <code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code></p>
+<ul><li>All three functions now recognize a new column in <code>Venndir</code> slot <code>jps</code> with column <code>"ref_polygon"</code>. This new column associates the set name with an overlap polygon, which points the set label to the appropriate part of a polygon. For example, by default “set_A” will point to the overlap_set “set_A” which has no overlaps with other sets. For proportional diagrams, sometimes “set_A” is fully encompassed by “set_B”, in which case the label “set_A” will point to the overlap polygon which is (1) not empty of course, and (2) has the fewest overlaps.</li>
+<li>Without this association, the set label was not displayed, which was not intended.</li>
+<li>Further, the previous implementation was incorrect, causing some labels to appear in the wrong position. The line segment from label to overlap polygon still pointed to the correct position, but it was awkwardly placed outside the circle.</li>
+<li>It turns out that moving the set label affected other assumptions of the data model, namely that the set name “set_A” may be associated with <code>overlap_set</code> by a different name, for example <code>"set_A&amp;set_B"</code>. That change broke the label grouping logic, and needed to be resolved.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="added-test-cases-0-0-34-900">Added test cases<a class="anchor" aria-label="anchor" href="#added-test-cases-0-0-34-900"></a></h3>
+<ul><li>More <code>testthis</code> scenarios have been added, including the first examples that test consistent graphical output. Mainly these tests focus on proportional 2-, 3-, and 4-way Venn and Euler diagrams, with empty sets, or nested sets, or both.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-34-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-34-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venn_meme.html">venn_meme()</a></code></p>
+<ul><li>Partial fix for a bug that caused <code>item_cex</code> to be ignored.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.33.900" id="venndir-0033900">venndir 0.0.33.900<a class="anchor" aria-label="anchor" href="#venndir-0033900"></a></h2>
 <ul><li>Removed <code>matrixStats</code> from dependencies.</li>

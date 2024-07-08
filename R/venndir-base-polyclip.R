@@ -455,10 +455,43 @@ venndir <- function
    # - determine which overlap polygon can represent each set label
    #    - if set is fully inside another set, it must choose the least
    #      overlapping polygon overlap
-   whichset <- (length(venn_jps@polygons$label) + 1) -
-      match(unique(venn_jps@polygons$label),
-         rev(venn_jps@polygons$label));
-   # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
+   
+   ## Determine which polygon should be used when drawing each label
+   #
+   ## Previous logic below, only matched identical set and not subsets
+   # whichset1 <- (length(venn_jps@polygons$label) + 1) -
+   #    match(unique(venn_jps@polygons$label),
+   #       rev(venn_jps@polygons$label));
+   #
+   ## Updated logic prioritizes non-empty polygon, with fewest overlaps
+   venn_jps@polygons$is_empty <- sapply(venn_jps@polygons$x, function(ix1){
+      length(unique(jamba::rmNA(ix1))) == 0
+   }) * 1;
+   whichset <- sapply(unique(venn_jps@polygons$label), function(ilab){
+      ilabdf <- subset(venn_jps@polygons, grepl(paste0("(^|&)", ilab, "($|&)"), label))
+      if (nrow(ilabdf) == 0) {
+         return(NA)
+      }
+      ilabdf$num_sets <- lengths(strsplit(ilabdf$venn_name, "&"));
+      ilabdf <- jamba::mixedSortDF(ilabdf,
+         byCols=c("is_empty", "type", "num_sets"));
+      ilabdf <- subset(ilabdf, is_empty %in% 0);
+      if (nrow(ilabdf) == 0) {
+         return(NA)
+      }
+      head(match(rownames(ilabdf), rownames(venn_jps@polygons)), 1)
+   })
+   ## For convenience downstream, store the preferred reference polygon
+   ## for each row, otherwise we have to calculate it again and want
+   ## the result to be consistent.
+   matchwhichset <- match(venn_jps@polygons$label, names(whichset));
+   venn_jps@polygons$ref_polygon_num <- whichset[matchwhichset];
+   venn_jps@polygons$ref_polygon <- rownames(venn_jps@polygons)[
+      venn_jps@polygons$ref_polygon_num];
+   use_whichset <- whichset[!is.na(whichset)];
+   # jamba::printDebug("whichset:");print(whichset);# debug
+   # jamba::printDebug("use_whichset:");print(use_whichset);# debug
+   # stop("stopping here");
    
    # obtain outer label coordinates
    # consider adding sp_buffer=-0.1 here and relative=TRUE
@@ -478,21 +511,30 @@ venndir <- function
          jamba::printDebug("venndir(): ",
             "started label_outside_JamPolygon()");
       }
-      ploxy <- label_outside_JamPolygon(jp=venn_jps[whichset, ],
-         which_jp=seq_along(whichset),
+      # ploxy is named by names(use_whichset) - which are non-NA polygon rows
+      ploxy <- label_outside_JamPolygon(
+         # jp=venn_jps[whichset, ],
+         jp=venn_jps[use_whichset, ],
+         which_jp=seq_along(use_whichset),
          distance=segment_distance,
+         # center_method="label",
          verbose=verbose,
          buffer=-0.9,
          ...)
+      names(ploxy) <- names(use_whichset);
       if (verbose) {
          jamba::printDebug("venndir(): ",
             "completed label_outside_JamPolygon()");
       }
       venn_jps@polygons$x_offset <- 0;
       venn_jps@polygons$y_offset <- 0;
-      ploxy_match <- match(venn_jps@polygons$label,
-         venn_jps@polygons$label[whichset]);
-      # jamba::printDebug("ploxy_match:", ploxy_match);
+      # ploxy_match <- match(venn_jps@polygons$label,
+      #    venn_jps@polygons$label[whichset]);
+      ploxy_match <- match(venn_jps@polygons$label, names(ploxy));
+      # jamba::printDebug("whichset:");print(whichset);# debug
+      # jamba::printDebug("ploxy:");print(ploxy);# debug
+      # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
+      # jamba::printDebug("ploxy_match:", ploxy_match);# debug
       ploxy_label_x <- sapply(ploxy, function(ixy){ixy["border", 1]});
       ploxy_label_y <- sapply(ploxy, function(ixy){ixy["border", 2]});
       ploxy_outside_x <- sapply(ploxy, function(ixy){ixy["label", 1]});
@@ -511,13 +553,15 @@ venndir <- function
       # define label positioning relative to the coordinate point
       venn_jps@polygons$vjust <- 0.5;
       venn_jps@polygons$hjust <- 0.5;
-      venn_jps@polygons$vjust[whichset] <- sapply(ploxy, function(ixy){
+      venn_jps@polygons$vjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
          ixy["label", "adjx"]
       });
-      venn_jps@polygons$hjust[whichset] <- sapply(ploxy, function(ixy){
-         ixy["label","adjy"]
+      venn_jps@polygons$hjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
+         ixy["label", "adjy"]
       });
-      # print(venn_jps);# debug
+      # jamba::printDebug("venn_jps[whichset, ]@polygons:");print(venn_jps[whichset, ]@polygons);# debug
+      # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
+      # stop("Stopped after outside labels.");# debug
    }
    
    # show_set: whether to display each overlap label
@@ -723,6 +767,8 @@ venndir <- function
       stringsAsFactors=FALSE,
       check.names=FALSE
    );
+   # jamba::printDebug("venndir() label_df:");print(label_df);# debug
+   # stop("Stopping here");# debug
    
    if ("overlap" %in% overlap_type) {
       sv_match <- match(label_df$overlap_set, sv$sets);
@@ -731,6 +777,10 @@ venndir <- function
       label_df$overlap_sign <- c(rep("", length(main_x)),
          names(gbase_signs));
    }
+
+   # 0.0.34.900 -  experiment by adding poly_ref_name
+   matchjps <- match(label_df$overlap_set, rownames(venn_jps@polygons));
+   label_df$ref_polygon <- venn_jps@polygons$ref_polygon[matchjps];
 
    ## Apply setlist_labels, legend_labels
    matchset <- match(label_df$overlap_set, venn_jps@polygons$venn_name)
@@ -783,6 +833,7 @@ venndir <- function
       }
       
       ## Update Venndir object in place
+      # jamba::printDebug("venndir() before venndir_label_style() vo@label_df:");print(vo@label_df);# debug
       vo <- venndir_label_style(
          venndir_output=vo,
          show_labels=show_labels,
@@ -794,6 +845,7 @@ venndir <- function
          inside_percent_threshold=inside_percent_threshold,
          verbose=verbose,
          ...);
+      # jamba::printDebug("venndir() after venndir_label_style() vo@label_df:");print(vo@label_df);# debug
       # vo@label_df <- vls$label_df;
       # venn_jps@polygons <- vls$venn_spdf;
       # jamba::printDebug("venn_jps@polygons (after venndir_label_style)");print(venn_jps@polygons);# debug

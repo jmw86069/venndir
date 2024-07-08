@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.33.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
       </span>
     </div>
 
@@ -59,6 +59,99 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_08jul2024">08jul2024<a class="anchor" aria-label="anchor" href="#id_08jul2024"></a></h2>
+<ul><li><p>Currently <code><a href="reference/venndir.html">venndir()</a></code> does not store <code>item_cex</code> and <code>item_buffer</code> in the <code>Venndir</code> object, so calling <code><a href="reference/render_venndir.html">render_venndir()</a></code> does not retain these values.</p></li>
+<li>
+<p>Consider functions to adjust components of <code>Venndir</code> figure, to be visualized by <code><a href="reference/render_venndir.html">render_venndir()</a></code>.</p>
+<ul><li>
+<p>Nudge outer label position by set name, or <code>overlap_set</code></p>
+<ul><li>When provided a value that matches <code>"label_df$ref_polygon"</code>, it should affect all rows with that value.</li>
+<li>When provided a value that does not match <code>"label_df$ref_polygon"</code>, it should look for corresponding value in <code>"label_df$name"</code> or <code>"label_df$venn_name"</code>, then convert to <code>"label_df$ref_polygon"</code>. Then proceed to update all rows with that <code>ref_polygon</code> value.</li>
+</ul></li>
+<li><p>Nudge inner label position, same syntax as above.</p></li>
+<li>
+<p>Nudge a set shape (This workflow is lower priority for now.) Best practice is to re-run <code><a href="reference/venndir.html">venndir()</a></code> using argument <code>circle_nudge</code>.</p>
+<ul><li>Second-best is a wrapper function that extracts data from <code>Venndir</code> and just calls <code><a href="reference/venndir.html">venndir()</a></code> with corresponding arguments. It should capture: <code>JamPolygons</code> for each set; <code>set_colors</code>; <code>setlist_labels</code>, <code>legend_labels</code>, <code>sets</code>, etc.</li>
+</ul></li>
+</ul></li>
+<li><p>Consider option to style item labels. Probably most useful for <code><a href="reference/venn_meme.html">venn_meme()</a></code>. For example, allow shading, rounded rectangle border, as with set labels.</p></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_25jun2024">25jun2024<a class="anchor" aria-label="anchor" href="#id_25jun2024"></a></h2>
+<ul><li>
+<p>Fix bugs with proportional diagrams:</p>
+<ul><li><p>One empty set in <code>setlist</code> causes an error.</p></li>
+<li><p>One set fully encompassed inside another set causes the set label to be hidden.</p></li>
+<li>
+<p>The two bugs are related:</p>
+<ul><li>The “set label” is assigned to appear where there is a unique “overlap_set” - for example “set_A” should appear where there is “set_A” unique overlaps that do not overlap another set.</li>
+<li>This condition is always valid for Venn diagrams.</li>
+<li>For proportional diagrams, sometimes “set_A” is fully inside “set_B”. We could call these “orphan set labels”.</li>
+<li>Previously the label “set_A” was associated with <code>overlap_set="set_A&amp;set_B"</code>.</li>
+<li>This set label also used its own outside label position, the goal was to allow potentially showing the set label “set_A”, distinct from the overlap label “set_A&amp;set_B”, both pointing to “set_A&amp;set_B”.</li>
+<li>Visually it could be confusing, when count labels were displayed outside - there were two labels pointing to the same polygon region.</li>
+<li>The logic to assign an “orphan set label” to the best available overlap set also occurred in multiple functions, nothing was stored in the <code>Venndir</code> object to review this assignment.</li>
+<li>Finally, the collection of labels which should appear together was complicated because the label position <code>hjust_inside</code>, <code>hjust_outside</code>, <code>vjust_inside</code>, <code>vjust_outside</code> relied upon knowing which labels were being placed together, and this logic failed.</li>
+</ul></li>
+<li>
+<p>The fix (fixes):</p>
+<ul><li><p>Associate set label to <code>"ref_polygon"</code> and store in <code>Venndir@jps</code>.</p></li>
+<li><p>Update <code><a href="reference/render_venndir.html">render_venndir()</a></code> to recognize this association, instead of re-determining the association.</p></li>
+<li><p>Update <code><a href="reference/venndir_label_style.html">venndir_label_style()</a></code> to recognize this association so it can properly assign <code>hjust</code> and <code>vjust</code> to affected labels. This function is one feasible place to make the changes.</p></li>
+<li>
+<p>Another alternative <code><a href="reference/draw_gridtext_groups.html">draw_gridtext_groups()</a></code> which assembles the grouped labels into a “group” in order to draw one border around them. This step may be ideal to place labels together in more flexible ways.</p>
+<ul><li>Labels are laid out within active <code>grid</code> viewport context, then the observed dimensions in <code>grid</code> space are used to define the extent of the resulting <code><a href="https://rdrr.io/r/grid/grid.roundrect.html" class="external-link">grid::roundrectGrob()</a></code>.</li>
+<li>This step optionally re-centers the group of labels when <code>adjust_center=TRUE</code>, so the center of the group is at the label point, instead of the focal point of labels (normally the set name is “topleft”, the overlap count is “bottomleft”, and signed counts are “right”).</li>
+<li>This function could provide a convenient way to assemble labels without having to rely upon <code>hjust</code> and <code>vjust</code>.</li>
+<li>This function could also enable different layouts, like set label at the top, counts at the bottom; set label at the top, then counts bottomleft and signed counts bottomright.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>Fix <code><a href="reference/venndir.html">venndir()</a></code> argument <code>rotate_degrees</code> which is currently not functioning.</p></li>
+<li>
+<p>Consider minor adjustments to <code><a href="reference/venndir_legender.html">venndir_legender()</a></code> labeling.</p>
+<ul><li>Option to hide the trailing colon <code>":"</code>
+</li>
+<li>Option to left-justify set labels</li>
+</ul></li>
+<li>
+<p>Consider returning the <code>viewport</code> from <code><a href="reference/render_venndir.html">render_venndir()</a></code>, and <code><a href="reference/venndir.html">venndir()</a></code> when it calls <code><a href="reference/render_venndir.html">render_venndir()</a></code> due to <code>do_plot=TRUE</code>.</p>
+<ul><li>consider adding as an attribute of the <code>Venndir</code> object</li>
+<li>the <code>grid</code> <code>viewport</code> is useful when adding to or adjusting an existing figure, otherwise the coordinate system is not usable.</li>
+</ul></li>
+<li><p>Consider recognizing <code>title</code> or <code>main</code> to add a title to the figure.</p></li>
+<li><p>Write more intensive validation for <code>Venndir</code> objects.</p></li>
+<li><p>Consider option for black-and-white legend.</p></li>
+<li><p>Write vignette with larger variety of examples for <code><a href="reference/venndir.html">venndir()</a></code></p></li>
+<li><p>Expand help docs for <code>JamPolygon</code></p></li>
+<li><p>Write brief vignette for <code>JamPolygon</code> objects</p></li>
+<li>
+<p>Tests for <code>JamPolygon</code> object functions</p>
+<ul><li>generate test shapes: circle, circle with hole (donut), two disjoin squares, square with hole and nested square inside the hole.</li>
+<li>
+<code><a href="reference/point_in_JamPolygon.html">point_in_JamPolygon()</a></code>, <code><a href="reference/has_point_in_JamPolygon.html">has_point_in_JamPolygon()</a></code> points in the polygon, in the hole, in the nested internal solid area.</li>
+<li>
+<code><a href="reference/labelr_JamPolygon.html">labelr_JamPolygon()</a></code> to generate label position inside solid polygon, also test with <code><a href="reference/has_point_in_JamPolygon.html">has_point_in_JamPolygon()</a></code>
+</li>
+<li>
+<code><a href="reference/nearest_point_JamPolygon.html">nearest_point_JamPolygon()</a></code>, <code><a href="reference/farthest_point_JamPolygon.html">farthest_point_JamPolygon()</a></code> to confirm proper nearest/farthest points.</li>
+<li>
+<code><a href="reference/intersect_JamPolygon.html">intersect_JamPolygon()</a></code>, <code><a href="reference/union_JamPolygon.html">union_JamPolygon()</a></code>, <code><a href="reference/minus_JamPolygon.html">minus_JamPolygon()</a></code>
+</li>
+<li>
+<code><a href="reference/buffer_JamPolygon.html">buffer_JamPolygon()</a></code> - confirm polygon with hole can become larger polygon without a hole. Probably check <code><a href="reference/area_JamPolygon.html">area_JamPolygon()</a></code> before/after several use cases.</li>
+</ul></li>
+<li>
+<p>Consider moving <code>JamPolygon</code> to a separate R package.</p>
+<ul><li>Painful but might make <code>JamPolygon</code> a lightweight standalone option, usable in other Jam packages (without guilt).</li>
+<li>Dependencies: polyclip, polylabelr, vwline</li>
+</ul></li>
+<li>
+<p>Consider adding <code>JamPoints</code>, <code>JamLines</code> objects? Ugh. What have I done?</p>
+<ul><li>There is currently no way to “Add a point” to a <code>JamPolygon</code> figure, since the figure is created in <code>grid</code> using a <code>viewport</code>.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_22jun2024">22jun2024<a class="anchor" aria-label="anchor" href="#id_22jun2024"></a></h2>
 <ul><li><p>DONE. Consider changing default to <code>do_sparse=FALSE</code> so the default behavior is to return a typical <code>matrix</code> class and not <code>Matrix</code> compressed form.</p></li>
 <li><p>DONE. Consider removing <code>matrixStats</code> from dependencies, it is only used once.</p></li>
@@ -70,16 +163,6 @@
 <code>setlist_labels</code> - optional user-customized labels for the Venn diagram, which may or may not match the name of the set.</li>
 <li>
 <code>legend_labels</code> - optional user-customized labels for the Venn legend, again, these may be abbreviated or adjusted to be suitable for the legend.</li>
-</ul></li>
-<li><p>Write more intensive validation for <code>Venndir</code> objects.</p></li>
-<li><p>Consider option for black-and-white legend.</p></li>
-<li><p>Write vignette with larger variety of examples for <code><a href="reference/venndir.html">venndir()</a></code></p></li>
-<li><p>Expand help docs for <code>JamPolygon</code></p></li>
-<li><p>Write brief vignette for <code>JamPolygon</code> objects</p></li>
-<li>
-<p>Consider moving <code>JamPolygon</code> to a separate R package.</p>
-<ul><li>Painful but might make <code>JamPolygon</code> a lightweight standalone option, usable in other Jam packages (without guilt).</li>
-<li>Dependencies: polyclip, polylabelr, vwline</li>
 </ul></li>
 </ul></div>
 <div class="section level2">

@@ -223,9 +223,9 @@ venn_meme <- function
    }
    setlist <- overlaplist2setlist(x);
 
-   if (length(item_cex) == 1) {
-      item_cex <- rep(item_cex, 2);
-   }
+   # if (length(item_cex) == 1) {
+   #    item_cex <- rep(item_cex, 2);
+   # }
    if (verbose) {
       jamba::printDebug("venn_meme(): ",
          "Calling venndir()");

@@ -259,7 +259,8 @@ draw_gridtext_groups <- function
          print(head(segment_df));
       }
    }
-   
+   # jamba::printDebug("segment_df:");print(segment_df);# debug
+   # jamba::printDebug("str(g_labels):");print(str(g_labels));# debug
    
    # iterate each group of labels and draw roundrect
    gdf$num <- seq_len(nrow(gdf));
@@ -268,10 +269,16 @@ draw_gridtext_groups <- function
          "gdf:");
       print(gdf);
    }
-   gdf_group <- paste0(gdf$overlap_set, "_",
+   # 0.0.34.900 - ignore overlap_set for now
+   gdf_group <- paste0(
+      gdf$ref_polygon, "_",
+      # gdf$overlap_set, "_",
       round(gdf$x, digits=3), "_",
       round(gdf$y, digits=3));
+   gdf$gdf_group <- gdf_group;
+   # jamba::printDebug("gdf:");print(gdf);# debug
    gdf_split <- split(gdf$num, gdf_group);
+   # jamba::printDebug("gdf_split:");print(gdf_split);# debug
    
    # text adjustment when line segments are drawn to the label
    adj_df <- jamba::rbindList(lapply(gdf_split, function(k){
@@ -287,7 +294,8 @@ draw_gridtext_groups <- function
       }
    }));
    rownames(adj_df) <- names(gdf_split);
-
+   # jamba::printDebug("adj_df:");print(adj_df);# debug
+   
    rr_grobs <- list();
    #rr_grobs <- lapply(split(gdf$num, gdf_group), function(k){
    for (ki in seq_along(gdf_split)) {

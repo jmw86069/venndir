@@ -126,6 +126,7 @@ render_venndir <- function
          stop("Input must be 'Venndir' or legacy list with 'jp' and 'label_df'")
       }
    }
+   # jamba::printDebug("render_venndir() label_df:");print(label_df);# debug
    show_items <- head(setdiff(label_df$show_items, c(NA, "none")), 1);
    if (length(show_items) == 0) {
       show_items <- NA;
@@ -150,6 +151,7 @@ render_venndir <- function
          ...);
       venn_jp <- venndir_output@jps;
       label_df <- venndir_output@label_df;
+      # jamba::printDebug("after venndir_label_style() label_df:");print(label_df);# debug
    }
    
    # Process existing JamPolygon
@@ -304,15 +306,29 @@ render_venndir <- function
       if (!"count" %in% colnames(label_df)) {
          label_df$count <- "inside";
       }
-      show_label <- (label_df$overlap %in% c("outside", "inside") |
-            label_df$count %in% c("outside", "inside"));
-      # jamba::printDebug("label_df:");print(label_df);
+      
+      # 0.0.34.900 - consider requiring non-zero venn_counts, for now leave as-is
+      show_label <- (
+         (label_df$overlap %in% c("outside", "inside") |
+            label_df$count %in% c("outside", "inside")))
+         # & label_df$venn_counts > 0);
+      
+      # 0.0.34.900 -  experiment by adding show_label
+      label_df$show_label <- show_label;
+      
+      # 0.0.34.900 -  experiment by adding poly_ref_name
+      if (!"ref_polygon" %in% colnames(label_df)) {
+         matchjps <- match(label_df$overlap_set, rownames(venn_jp@polygons));
+         label_df$ref_polygon <- venn_jp@polygons$ref_polygon[matchjps];
+      }
+      
+      # jamba::printDebug("label_df:");print(data.frame(check.names=FALSE, label_df, show_label=show_label));# debug
 
       # warn about hidden non-zero labels
       warn_rows <- (
          (label_df$x %in% NA |
                label_df$y %in% NA) &
-            label_df$venn_counts != 0 &
+            !label_df$venn_counts %in% c(NA, 0) &
             label_df$type %in% "main");
       #label_df_list <- split(label_df, label_df$overlap_set);
       #warn_by_set <- lapply(label_df_list, function(idf){
@@ -349,41 +365,62 @@ render_venndir <- function
          
          # Determine if any offset labels require line segment
          has_offset <- label_outside & (label_df$x_offset != 0 | label_df$y_offset != 0);
+         # jamba::printDebug("show offset data.frame summary:");print(data.frame(label_df.rownames=rownames(label_df), show_label=show_label, label_df.overlap=label_df$overlap, label_df.count=label_df$count, label_df.x=label_df$x, label_df.x_offset=label_df$x_offset, label_outside=label_outside, has_offset=has_offset));# debug
          #
          # Todo: Deal with has_offset, for now set to FALSE
-         # has_offset <- rep(FALSE, length(has_offset));
          # jamba::printDebug("label_outside:");print(table(label_outside));
          # jamba::printDebug("has_offset:");print(table(has_offset));
          #
+         # Handle labels outside
          if (any(show_label & has_offset)) {
             use_offset <- (show_label & has_offset);
+            # use_offset <- (show_label & has_offset & label_df$venn_counts > 0);
+            # jamba::printDebug("use_offset rows in label_df:");print(subset(label_df, use_offset));# debug
             offset_sets <- label_df$overlap_set[use_offset];
+            # jamba::printDebug("offset_sets: ");print(offset_sets);# debug
+            offset_ref_polygon <- venn_jp@polygons$ref_polygon[match(offset_sets, rownames(venn_jp@polygons))]
+            names(offset_ref_polygon) <- offset_sets;
+            # jamba::printDebug("offset_ref_polygon: ");print(offset_ref_polygon);# debug
+            sp_index <- match(offset_ref_polygon, rownames(venn_jp@polygons))
+            names(sp_index) <- offset_sets;
+            # jamba::printDebug("sp_index: ");print(sp_index);# debug
+            
             # 0.0.20.900 - fix order of preferred polygon labels
             #sp_index <- match(offset_sets, venn_spdf$label);
             # sp_index <- (length(venn_spdf$label) + 1 - 
             #       match(offset_sets, 
             #          rev(venn_spdf$label)));
             ## 0.0.32.900 - subset polygons for non-empty coordinates
-            polygon_nonempty <- sapply(venn_jp@polygons$x, function(ix1){
-               length(jamba::rmNA(unlist(ix1))) > 0
-            });
+            polygon_nonempty <- venn_jp@polygons$is_empty %in% 0;
+            # polygon_nonempty <- sapply(venn_jp@polygons$x, function(ix1){
+            #    length(jamba::rmNA(unlist(ix1))) > 0
+            # });
             use_jp <- venn_jp[which(polygon_nonempty), ];
             use_polygons <- use_jp@polygons;
             use_polygons$rownum <- seq_len(nrow(use_polygons));
             use_polygons$nsets <- lengths(strsplit(use_polygons$name, "&"));
             use_polygons <- jamba::mixedSortDF(use_polygons, byCols=c("type", "nsets"));
             ## define best available polygon to label
-            sp_index <- sapply(offset_sets, function(iset1){
+            
+            sp_index0 <- sapply(offset_sets, function(iset1){
+               # jamba::printDebug("paste0(\"(^|&)\", iset1, \"($|&)\"):");print(paste0("(^|&)", iset1, "($|&)"));# debug
                kset1 <- head(grep(paste0("(^|&)", iset1, "($|&)"),
                   use_polygons$label), 1)
-               use_polygons$rownum[kset1];
+               iset2 <- use_polygons$rownum[kset1];
+               # } else {
+               #    iset2 <- head(grep(paste0("(^|&)", iset1, "($|&)"),
+               #       venn_jp@polygons$label), 1)
+               # }
+               iset2
             })
             ## Old logic
             sp_index1 <- (length(use_jp@polygons$label) + 1 - 
                   match(offset_sets, 
                      rev(use_jp@polygons$label)));
+            # jamba::printDebug("use_offset: ");print(use_offset);# debug
+            # jamba::printDebug("use_polygons: ");print(use_polygons);# debug
             # jamba::printDebug("venn_jp@polygons: ");print(venn_jp@polygons);# debug
-            # jamba::printDebug("use_jp@polygons: ");print(use_jp@polygons);# debug
+            # jamba::printDebug("use_jp@polygons (non-empty venn_jp@polygons): ");print(use_jp@polygons);# debug
             # jamba::printDebug("sp_index:");print(sp_index);# debug
             # jamba::printDebug("sp_index1:");print(sp_index1);# debug
             # jamba::printDebug("offset_sets:");print(offset_sets);# debug
@@ -403,13 +440,18 @@ render_venndir <- function
                label_color=label_df$color[use_offset],
                label_fill=label_df[use_offset, "fill"],
                label_border=label_df$border[use_offset],
-               poly_color=use_jp@polygons$fill[sp_index],
-               poly_border=use_jp@polygons$border[sp_index]);
+               # 0.0.34.900 - use modified sp_index, which might use incorrect colors?
+               poly_color=venn_jp@polygons$fill[sp_index],
+               poly_border=venn_jp@polygons$border[sp_index]);
+               # poly_color=use_jp@polygons$fill[sp_index],
+               # poly_border=use_jp@polygons$border[sp_index]);
             # jamba::printDebug("test_xy:");print(test_xy);# debug
             # sp_list <- lapply(sp_index, function(i){
             #    venn_spdf[i,]});
             jp_list <- lapply(sp_index, function(i){
-               use_jp[i, ]
+               # use_jp[i, ]
+               # 0.0.34.900 - use modified sp_index
+               venn_jp[i, ]
             });
             # jamba::printDebug("render_venndir(): ", "test_xy:");print(test_xy);# debug
             # jamba::printDebug("render_venndir(): ", "jp_list:");print(jp_list);# debug
@@ -422,6 +464,7 @@ render_venndir <- function
                buffer=test_xy$segment_buffer,
                verbose=FALSE,
                ...);
+            rownames(new_xy) <- names(sp_index);
             # jamba::printDebug("new_xy:");print(new_xy);# debug
             # non-NULL result means we draw a line segment
             if (any(!is.na(new_xy[,1]))) {
@@ -555,8 +598,11 @@ render_venndir <- function
    gdf <- NULL;
    if (any(show_label)) {
       # generate data.frame of label coordinates
-      show_overlap_outside <- (label_df$overlap %in% "outside" & !is.na(label_df$x))
-      show_overlap_inside <- (label_df$overlap %in% "inside" & !is.na(label_df$x))
+      # 0.0.34.900 - hide label unless explicitly shown
+      show_overlap_outside <- (label_df$overlap %in% "outside" & !is.na(label_df$x) & show_label)
+      show_overlap_inside <- (label_df$overlap %in% "inside" & !is.na(label_df$x) & show_label)
+      # show_overlap_outside <- (label_df$overlap %in% "outside" & !is.na(label_df$x))
+      # show_overlap_inside <- (label_df$overlap %in% "inside" & !is.na(label_df$x))
       show_count_outside <- (label_df$count %in% "outside" & !is.na(label_df$x))
       show_count_inside <- (label_df$count %in% "inside" & !is.na(label_df$x));
       if (!"venn_label" %in% colnames(label_df)) {
@@ -599,11 +645,21 @@ render_venndir <- function
                sum(show_overlap_inside),
                sum(show_count_outside),
                sum(show_count_inside))),
+         label_df_rowname=c(
+            rownames(label_df)[show_overlap_outside],
+            rownames(label_df)[show_overlap_inside],
+            rownames(label_df)[show_count_outside],
+            rownames(label_df)[show_count_inside]),
          overlap_set=c(
             label_df$overlap_set[show_overlap_outside],
             label_df$overlap_set[show_overlap_inside],
             label_df$overlap_set[show_count_outside],
             label_df$overlap_set[show_count_inside]),
+         ref_polygon=c(
+            label_df$ref_polygon[show_overlap_outside],
+            label_df$ref_polygon[show_overlap_inside],
+            label_df$ref_polygon[show_count_outside],
+            label_df$ref_polygon[show_count_inside]),
          text=c(
             venn_label[show_overlap_outside],
             venn_label[show_overlap_inside],
@@ -728,6 +784,7 @@ render_venndir <- function
          # y=omatch_fill)
       ## update all labels
       gdf$label_col <- new_label_col;
+      # jamba::printDebug("gdf:");print(gdf);# debug
    }
    
    #############################################
@@ -873,6 +930,7 @@ render_venndir <- function
          # draw grouped label background
          if (TRUE %in% group_labels) {
             grid::pushViewport(attr(jp, "viewport"));
+            # jamba::printDebug("g_labels:");print(g_labels);# debug
             g_labels <- tryCatch({
                dgg <- draw_gridtext_groups(
                   g_labels=g_labels,

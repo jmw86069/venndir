@@ -1,3 +1,50 @@
+# venndir 0.0.34.900
+
+## changes to existing functions
+
+Main goal is to fix bug associated with empty or nested `setlist` entries
+when used with `proportional=TRUE`. This update is somewhat of a risk,
+several core components were updated in `venndir()`, `render_venndir()`
+and `venndir_label_style()`, which could impact a number of downstream
+steps. Corresponding `testthis` entries have been added, hopefully to
+prevent occurrence of new bugs.
+
+* Added `vdiffr` to R package Suggests.
+* `venndir()`, `render_venndir()`, `venndir_label_style()`
+
+   * All three functions now recognize a new column in `Venndir` slot
+   `jps` with column `"ref_polygon"`. This new column associates the set
+   name with an overlap polygon, which points the set label to the
+   appropriate part of a polygon. For example, by default "set_A" will
+   point to the overlap_set "set_A" which has no overlaps with other sets.
+   For proportional diagrams, sometimes "set_A" is fully encompassed by "set_B",
+   in which case the label "set_A" will point to the overlap polygon
+   which is (1) not empty of course, and (2) has the fewest overlaps.
+   * Without this association, the set label was not displayed, which was
+   not intended.
+   * Further, the previous implementation was incorrect, causing some
+   labels to appear in the wrong position. The line segment from label
+   to overlap polygon still pointed to the correct position, but it was
+   awkwardly placed outside the circle.
+   * It turns out that moving the set label affected other assumptions
+   of the data model, namely that the set name "set_A" may be associated
+   with `overlap_set` by a different name, for example `"set_A&set_B"`.
+   That change broke the label grouping logic, and needed to be resolved.
+
+## Added test cases
+
+* More `testthis` scenarios have been added, including the first examples
+that test consistent graphical output. Mainly these tests focus on proportional
+2-, 3-, and 4-way Venn and Euler diagrams, with empty sets, or nested
+sets, or both.
+
+
+## bug fixes
+
+* `venn_meme()`
+
+   * Partial fix for a bug that caused `item_cex` to be ignored.
+
 # venndir 0.0.33.900
 
 * Removed `matrixStats` from dependencies.
