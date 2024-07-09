@@ -289,6 +289,21 @@ venndir <- function
    if (length(font_cex) != 3) {
       font_cex <- rep(font_cex, length.out=3)
    }
+   
+   # Validate names(setlist)
+   if (length(names(setlist)) == 0) {
+      names(setlist) <- as.character(seq_along(setlist));
+   }
+   # check for NA or duplicated names(setlist)
+   if (any(is.na(names(setlist))) || any(duplicated(names(setlist)))) {
+      names(setlist) <- jamba::makeNames(
+         jamba::rmNA(names(setlist),
+            naValue="set"));
+      if (any(duplicated(names(setlist)))) {
+         names(setlist) <- jamba::makeNames(names(setlist),
+            renameFirst=FALSE);
+      }
+   }
 
    # optional subset of sets within setlist
    if (length(sets) == 0) {
@@ -323,13 +338,19 @@ venndir <- function
    if (length(set_colors) == 0) {
       set_colors <- colorjam::rainbowJam(length(setlist),
          ...);
-      set_color <- set_colors[sets];
+      names(set_colors) <- names(setlist);
+   } else if (length(set_colors) == length(setlist)) {
+      if (!all(names(setlist) %in% names(set_colors))) {
+         names(set_colors) <- names(setlist);
+      }
+   } else if (length(set_colors) == length(sets)) {
+      names(set_colors) <- names(setlist)[sets];
    } else {
-      set_color <- rep(set_colors,
-         length.out=length(sets));
+      set_colors <- rep(set_colors,
+         length.out=length(setlist));
+      names(set_colors) <- names(setlist);
    }
-   names(set_color) <- names(setlist)[sets];
-   
+
    # get overlap data
    if (verbose) {
       jamba::printDebug("venndir(): ",
@@ -410,11 +431,11 @@ venndir <- function
    venn_jp@polygons$venn_counts <- NA;
    venn_jp@polygons$venn_items <- I(lapply(seq_len(length(venn_jp)),
       function(xi) character(0)));
-   venn_jp@polygons$venn_color <- set_color[venn_jp@polygons$venn_name];
+   venn_jp@polygons$venn_color <- set_colors[venn_jp@polygons$venn_name];
    border_dark_factor <- 1.1;
    venn_jp@polygons$border <- jamba::makeColorDarker(
       darkFactor=border_dark_factor,
-      set_color[venn_jp@polygons$venn_name]);
+      set_colors[venn_jp@polygons$venn_name]);
    venn_jp@polygons$border.lwd <- 4;
    venn_jp@polygons$fill <- NA;
    venn_jp@polygons$label <- venn_jp@polygons$venn_name;
@@ -435,7 +456,7 @@ venndir <- function
    venn_jpol <- find_venn_overlaps_JamPolygon(
       jp=venn_jp,
       venn_counts=nCounts,
-      venn_colors=set_color,
+      venn_colors=set_colors[names(venn_jp)],
       sep=sep,
       ...);
    # rownames(venn_jpol@polygons) <- names(venn_jpol);

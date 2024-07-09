@@ -1,5 +1,11 @@
 # TODO for venndir
 
+## 09jul2024
+
+* Fix bug where `sets` is properly subsetting `setlist` but is not
+properly subsetting `set_colors`. Verify other components are
+also properly subset as needed.
+
 ## 08jul2024
 
 * Currently `venndir()` does not store `item_cex` and `item_buffer`

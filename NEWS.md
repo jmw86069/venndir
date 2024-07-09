@@ -1,3 +1,25 @@
+# venndir 0.0.35.900
+
+* Added LICENSE and LICENSE.md.
+
+## changes to existing functions
+
+* `venndir()` - relatively minor update, fixes unnamed `setlist` or
+`setlist` with duplicate or `NA` names.
+
+   * Validates that `names(setlist)` are defined, otherwise
+   integer numbers are defined in order.
+   * Validates that `names(setlist)` are unique, and not `NA`,
+   otherwise it calls `jamba::makeNames()` to create unique names.
+
+## bug fixes
+
+* Fixed bug in `venndir()` when using `sets` to define a subset from `setlist`
+causing the colors to be out of sync.
+
+   * Added tests to confirm duplicated or `NA` for `names(setlist)` are
+   handled.
+
 # venndir 0.0.34.900
 
 ## changes to existing functions

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.35.900</span>
       </span>
     </div>
 
@@ -57,6 +57,25 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.35.900" id="venndir-0035900">venndir 0.0.35.900<a class="anchor" aria-label="anchor" href="#venndir-0035900"></a></h2>
+<ul><li>Added LICENSE and LICENSE.md.</li>
+</ul><div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-35-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-35-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code> - relatively minor update, fixes unnamed <code>setlist</code> or <code>setlist</code> with duplicate or <code>NA</code> names.</p>
+<ul><li>Validates that <code>names(setlist)</code> are defined, otherwise integer numbers are defined in order.</li>
+<li>Validates that <code>names(setlist)</code> are unique, and not <code>NA</code>, otherwise it calls <code><a href="https://rdrr.io/pkg/jamba/man/makeNames.html" class="external-link">jamba::makeNames()</a></code> to create unique names.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-35-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-35-900"></a></h3>
+<ul><li>
+<p>Fixed bug in <code><a href="../reference/venndir.html">venndir()</a></code> when using <code>sets</code> to define a subset from <code>setlist</code> causing the colors to be out of sync.</p>
+<ul><li>Added tests to confirm duplicated or <code>NA</code> for <code>names(setlist)</code> are handled.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.34.900" id="venndir-0034900">venndir 0.0.34.900<a class="anchor" aria-label="anchor" href="#venndir-0034900"></a></h2>
 <div class="section level3">
