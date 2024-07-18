@@ -31,6 +31,8 @@ render_venndir(
   legend_font_cex = 1,
   show_label = NA,
   display_counts = TRUE,
+  do_newpage = TRUE,
+  do_draw = TRUE,
   draw_buffer = FALSE,
   ...
 )
@@ -177,7 +179,32 @@ the position of the legend.}
 
 \item{legend_font_cex}{\code{numeric} scalar to adjust the legend font size.}
 
+\item{do_newpage}{\code{logical} (default TRUE) indicating whether to call
+\code{grid::grid.newpage()}. This option allows the figure to be rendered
+inside an active display device, or active \code{grid::viewport}.
+Note: When \code{do_draw=FALSE}, it also forces \code{do_newpage=FALSE}.}
+
+\item{do_draw}{\code{logical} indicating whether to call \code{grid::grid.draw()}.
+The \code{grid} graphical objects are returned in attributes:
+"gtree", "grob_list", "viewport", and can be drawn separately.}
+
 \item{...}{additional arguments are passed to \code{render_venndir()}.}
+}
+\value{
+\code{Venndir} object with attributes that contain underlying
+\code{grid} graphical objects (grobs):
+\itemize{
+\item \code{"gtree"}: a \code{grid::gTree} object suitable for drawing
+with \code{grid::grid.draw(attr(vo, "gtre"))}
+\item \code{"grob_list"}: a \code{list} of \code{grid} object components used to build
+the complete diagram, they can be plotted individually, or
+assembled with \code{do.call(grid::gList, grob_list)}.
+The \code{grid::gList} can be assembled into a \code{gTree} with:
+\verb{grid::grobTree(gList=do.call(grid::gList, grob_list)}
+\item \code{"viewport"}: the \code{grid::viewport} that holds important context
+for the graphical objects, specifically the use of coordinate
+\code{grid::unit} measure \code{"snpc"}, which maintains a fixed aspect ratio.
+}
 }
 \description{
 Render venndir output

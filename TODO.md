@@ -1,8 +1,103 @@
 # TODO for venndir
 
+## 18jul2024
+
+* Add documentation
+
+   * Examples using DESeq2 for RNA-seq data; limma for other omics data.
+   * Describe that the output is `grid::gTree` which can be drawn separately.
+   * Show how to draw two Venn diagrams in one figure using `patchwork`,
+   for example, do this twice, then add the results:
+   `patchwork::wrap_elements(grid::grid.draw(attr(vo, "gtree")))`
+   * Show how to change the setlist labels (as displayed in the figure),
+   and legend labels (as displayed in the legend).
+   * Show how to adjust the figure size to prevent overlap with legend.
+   * Show how to adjust font sizes, legend font size, legend row padding.
+   * Show how to supply custom colors.
+   * Show how colors can be defined for 8 sets, then display only a subset,
+   so the colors are consistent for each set displayed.
+   * Show how to convert input from hit matrix to setlist.
+   * Show how to convert input from overlap counts to setlist.
+   * Show how to convert input from signed overlap counts to setlist,
+   more complicated, can be useful when reproducing a figure.
+   * Show how to nudge proportional circles during `venndir()` call.
+   * Show how to display all labels inside, outside, or signed/count labels
+   inside/outside - with and without item labels.
+   * Show how to include percent overlap labels.
+   * Show how to move an outside label manually.
+
+* Add remaining features
+
+   * `rotate_degrees` is not yet functional.
+   * Consider `launch_venndir_shiny()` with R-Shiny front-end.
+
+* Investigate R crash - probably specific to Quartz on MacOS Sonoma 14.4, 14.5
+
+   * Reproducible workflow in RStudio:
+   ```R
+   library(venndir)
+   vo <- venndir(make_venn_test(100, 3, do_signed=TRUE), show_labels="ncs")
+   # open new device
+   dev.new()
+   # this time crashes
+   vo <- venndir(make_venn_test(100, 3, do_signed=TRUE), show_labels="ncs")
+   ```
+   * The crash occurs inconsistently from separate R console, same workflow.
+   The console prints this crash message:
+   `"Fatal error: Duplicate keys of type 'DisplayList' were found in a Dictionary."`
+   * Topic online suggests the error is linked with MacOS Sonoma 14.4, 14.5.
+   https://stackoverflow.com/questions/78615561/fatal-error-duplicate-keys-of-type-displaylist-were-found-in-a-dictionary
+   * The crash occurs with venndir-0.0.34.900, and venndir-0.0.36.900,
+   suggesting the risk was not added by updates in 0.0.36.900.
+   Therefore version 0.0.36.900 will be released once it passes other tests.
+
+* `venndir_legender()`
+
+   * Currently it is drawn using the plot viewport. But when drawn after
+   the viewport is closed (`grid::popViewport()`) the legend appears at
+   the edge of the figure region, which can be outside the venndir plot.
+   Consider option for the legend to use the figure viewport and not the
+   venndir plot viewport.
+
+## 15jul2024
+
+* Prepare for Bioconductor (or CRAN)
+
+   * DONE. Remove any calls to internal package functions, using `:::`
+   
+      * `gridtext_richtext_grob()` is a custom function, must be removed.
+      It calls internal functions in `gridtext` that can't be ported easily,
+      for example `.Call()`.
+      The custom function was solely intended to allow vectorized `padding`,
+      currently the bottom,left,top,right is applied to all labels,
+      and cannot be custom for each label.
+      The driving goal was to have smaller margins between signed count labels,
+      since they usually have smaller font size. Otherwise the distance
+      between signed labels, line-by-line, was too far.
+      First option, just call `gridtext::richtext_grob()` and remove the
+      ability to use different padding.
+      Second option, wrap the call inside `mapply()` which is what is done
+      inside gridtext for multiple grobs anyway. It won't be any slower.
+      Final option is to ask Dr. Claus Wilke to allow a list of vectors
+      as input for argument `padding`.
+
+* `plot.JamPolygon()`
+
+   * DONE. Consider option to return grid grobs instead of drawing them to the
+   graphical device.
+
+* `render_venndir()`, and `venndir()`
+
+   * DONE. Consider option to return the grid grobs to be rendered elsewhere.
+   Return the `viewport` as defined by `plot.JamPolygon()`.
+   * DONE. Consider something like post plot hook, to call a function after the
+   plot is rendered, before calling `grid::pop.viewport()`.
+   (Note: "DONE" means this functionality is possible, but because the `grid`
+   grobs make it possible for the user to do whatever they want.)
+
 ## 09jul2024
 
-* Fix bug where `sets` is properly subsetting `setlist` but is not
+* DONE. Fix bug where `sets` is properly subsetting `setlist` but is not
 properly subsetting `set_colors`. Verify other components are
 also properly subset as needed.
 

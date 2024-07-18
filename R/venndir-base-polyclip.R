@@ -145,10 +145,16 @@
 #'    between outside labels and the outer edge of the Venn diaram region.
 #'    Larger values place labels farther away, while also shrinking the
 #'    relative size of the Venn diagram.
-#' @param do_plot `logical (default TRUE) indicating whether to render the
-#'    plot, or return data without rendering the plot.
-#'    When `do_plot=FALSE` the returned data can later be passed to
-#'    `render_venndir()` to render the figure.
+#' @param do_plot `logical (default TRUE) indicating whether to generate the
+#'    the figure.
+#'    * When `do_plot=TRUE` it calls `render_venndir()` to create `grid`
+#'    objects to be displayed. Arguments in `...` are passed to
+#'    `render_venndir()`: To hide display, use `do_draw=FALSE`.
+#'    To prevent calling `grid::grid.newpage()` so the plot can
+#'    be drawn inside another active display device, use `do_newpage=FALSE`.
+#'    * When `do_plot=FALSE` the returned `Venndir` object can be passed to
+#'    `render_venndir()` to render the figure. Same points are valid
+#'    regarding `do_draw` and `do_newpage`, which are arguments
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param debug `numeric` optional internal debug.
 #' @param circle_nudge `list` of `numeric` x,y vectors. Not yet
@@ -165,6 +171,19 @@
 #'    * `"label_df"`: `data.frame` which contains the coordinates for each
 #'    Venn set, and Venn overlap label.
 #'    * `"setlist"`: `list` as input to `venndir()`. This entry may be empty.
+#'    
+#'    When `do_plot=TRUE` this function also calls `render_venndir()`,
+#'    and returns the `grid` graphical objects (grobs) in the attributes:
+#'    * `"gtree"`: a `grid::gTree` object suitable for drawing
+#'    with `grid::grid.draw(attr(vo, "gtre"))`
+#'    * `"grob_list"`: a `list` of `grid` object components used to build
+#'    the complete diagram, they can be plotted individually, or
+#'    assembled with `do.call(grid::gList, grob_list)`.
+#'    The `grid::gList` can be assembled into a `gTree` with:
+#'    `grid::grobTree(gList=do.call(grid::gList, grob_list)`
+#'    * `"viewport"`: the `grid::viewport` that holds important context
+#'    for the graphical objects, specifically the use of coordinate
+#'    `grid::unit` measure `"snpc"`, which maintains a fixed aspect ratio.
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 3, do_signed=FALSE);
@@ -509,6 +528,13 @@ venndir <- function
    venn_jps@polygons$ref_polygon_num <- whichset[matchwhichset];
    venn_jps@polygons$ref_polygon <- rownames(venn_jps@polygons)[
       venn_jps@polygons$ref_polygon_num];
+   
+   ## Manually enforce type="overlap" must be the same ref_polygon
+   # - this approach was incorrect, it must be resolved in render_venndir()
+   # overlap_rows <- (venn_jps@polygons$type %in% "overlap")
+   # venn_jps@polygons$ref_polygon[overlap_rows] <- (
+   #    venn_jps@polygons$venn_name)[overlap_rows]
+   
    use_whichset <- whichset[!is.na(whichset)];
    # jamba::printDebug("whichset:");print(whichset);# debug
    # jamba::printDebug("use_whichset:");print(use_whichset);# debug
@@ -782,7 +808,7 @@ venndir <- function
          c(length(main_x), length(signed_x))),
       padding_unit=rep("pt", label_n),
       r=rep(
-         c(padding[1] * font_cex[2], padding[1] * font_cex[3]),
+         c(padding[1] * font_cex[2], padding[2] * font_cex[3] * 1),
          c(length(main_x), length(signed_x))),
       r_unit=rep("pt", label_n),
       stringsAsFactors=FALSE,
@@ -872,6 +898,7 @@ venndir <- function
       # jamba::printDebug("venn_jps@polygons (after venndir_label_style)");print(venn_jps@polygons);# debug
       # jamba::printDebug("label_df (after venndir_label_style)");print(label_df);# debug
    }
+
    # jamba::printDebug("venndir(): ", "vo@label_df:");print(vo@label_df);# debug
    # jamba::printDebug("venndir(): ", "venn_jps@polygons:");print(venn_jps@polygons);# debug
    
@@ -928,8 +955,17 @@ venndir <- function
          inside_percent_threshold=inside_percent_threshold,
          ...);
       #label_df <- gg@label_df;
-      retlist$rv_label_df <- gg@label_df;
-      retlist$gg <- gg;
+      # retlist$rv_label_df <- gg@label_df;
+      # retlist$gg <- gg;
+      if ("gtree" %in% names(attributes(gg))) {
+         attr(vo, "gtree") <- attr(gg, "gtree")
+      }
+      if ("grob_list" %in% names(attributes(gg))) {
+         attr(vo, "grob_list") <- attr(gg, "grob_list")
+      }
+      if ("viewport" %in% names(attributes(gg))) {
+         attr(vo, "viewport") <- attr(gg, "viewport")
+      }
    }
    # return Venndir object
    return(invisible(vo));

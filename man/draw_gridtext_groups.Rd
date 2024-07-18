@@ -7,8 +7,12 @@
 draw_gridtext_groups(
   g_labels,
   gdf,
+  groupdf = NULL,
   segment_df = NULL,
+  realign = TRUE,
   adjust_center = FALSE,
+  adjx_fn = c,
+  adjy_fn = c,
   do_draw = TRUE,
   verbose = FALSE,
   ...
@@ -28,7 +32,20 @@ The row in \code{gdf} with the highest \code{"r"} value is the
 reference row, for the \code{"r"} radius, and the \code{"border_col"}
 and \code{"box_fill"} values.}
 
+\item{groupdf}{\code{data.frame} with information about label groupings,
+with columns: overlap_set, counttype, type, location, roworder,
+label_df_rowname, name, childName, gdf_group.
+Importantly, it must be in identical row order as \code{gdf}.}
+
 \item{segment_df}{\code{data.frame} with segment coordinates, optional.}
+
+\item{realign}{\code{logical} experimental feature indicating whether to
+realign grouped labels, thus ignoring the hjust/vjust for each
+label, instead arranging the labels using \code{groupdf}.
+In principle, overlap label (set name) should be top-center,
+and counts should be centered below. When there are main counts
+and signed counts, they should be in two columns, collectively
+centered below the main label.}
 
 \item{adjust_center}{\code{logical} indicating whether to adjust the x-centering
 for a group of labels when \code{adjx=0.5}, using the total width of the

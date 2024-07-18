@@ -50,6 +50,26 @@
 #' @param legend_x `character` passed to `venndir_legender()` to customize
 #'    the position of the legend.
 #' @param legend_font_cex `numeric` scalar to adjust the legend font size.
+#' @param do_draw `logical` indicating whether to call `grid::grid.draw()`.
+#'    The `grid` graphical objects are returned in attributes:
+#'    "gtree", "grob_list", "viewport", and can be drawn separately.
+#' @param do_newpage `logical` (default TRUE) indicating whether to call
+#'    `grid::grid.newpage()`. This option allows the figure to be rendered
+#'    inside an active display device, or active `grid::viewport`.
+#'    Note: When `do_draw=FALSE`, it also forces `do_newpage=FALSE`.
+#' 
+#' @returns `Venndir` object with attributes that contain underlying
+#'    `grid` graphical objects (grobs):
+#'    * `"gtree"`: a `grid::gTree` object suitable for drawing
+#'    with `grid::grid.draw(attr(vo, "gtre"))`
+#'    * `"grob_list"`: a `list` of `grid` object components used to build
+#'    the complete diagram, they can be plotted individually, or
+#'    assembled with `do.call(grid::gList, grob_list)`.
+#'    The `grid::gList` can be assembled into a `gTree` with:
+#'    `grid::grobTree(gList=do.call(grid::gList, grob_list)`
+#'    * `"viewport"`: the `grid::viewport` that holds important context
+#'    for the graphical objects, specifically the use of coordinate
+#'    `grid::unit` measure `"snpc"`, which maintains a fixed aspect ratio.
 #' 
 #' @export
 render_venndir <- function
@@ -89,9 +109,10 @@ render_venndir <- function
  draw_legend=TRUE,
  legend_x="bottomright",
  legend_font_cex=1,
-
  show_label=NA,
  display_counts=TRUE,
+ do_newpage=TRUE,
+ do_draw=TRUE,
  draw_buffer=FALSE,
  ...)
 {
@@ -299,7 +320,7 @@ render_venndir <- function
       # TODO:
       # - if x,y + x_offset,y_offset is outside the polygon, allow
       #   show_label=NA --> show_label=TRUE when show_items=TRUE
-
+      
       if (!"overlap" %in% colnames(label_df)) {
          label_df$overlap <- "inside";
       }
@@ -322,7 +343,7 @@ render_venndir <- function
          label_df$ref_polygon <- venn_jp@polygons$ref_polygon[matchjps];
       }
       
-      # jamba::printDebug("label_df:");print(data.frame(check.names=FALSE, label_df, show_label=show_label));# debug
+      # jamba::printDebug("label_df:");print(label_df);# debug
 
       # warn about hidden non-zero labels
       warn_rows <- (
@@ -413,18 +434,7 @@ render_venndir <- function
                # }
                iset2
             })
-            ## Old logic
-            sp_index1 <- (length(use_jp@polygons$label) + 1 - 
-                  match(offset_sets, 
-                     rev(use_jp@polygons$label)));
-            # jamba::printDebug("use_offset: ");print(use_offset);# debug
-            # jamba::printDebug("use_polygons: ");print(use_polygons);# debug
-            # jamba::printDebug("venn_jp@polygons: ");print(venn_jp@polygons);# debug
-            # jamba::printDebug("use_jp@polygons (non-empty venn_jp@polygons): ");print(use_jp@polygons);# debug
-            # jamba::printDebug("sp_index:");print(sp_index);# debug
-            # jamba::printDebug("sp_index1:");print(sp_index1);# debug
-            # jamba::printDebug("offset_sets:");print(offset_sets);# debug
-            
+
             segment_buffer <- ifelse(label_df$items %in% "inside",
                label_df$segment_buffer / 2,
                label_df$segment_buffer);
@@ -670,6 +680,11 @@ render_venndir <- function
          #    overlap_set[show_overlap_inside],
          #    label_df$text[show_count_outside],
          #    label_df$text[show_count_inside]),
+         type=c(
+            label_df$type[show_overlap_outside],
+            label_df$type[show_overlap_inside],
+            label_df$type[show_count_outside],
+            label_df$type[show_count_inside]),
          x=c(
             label_df$x[show_overlap_outside] + label_df$x_offset[show_overlap_outside],
             label_df$x[show_overlap_inside],
@@ -693,8 +708,8 @@ render_venndir <- function
          halign=c(
             label_df$halign[show_overlap_outside],
             label_df$halign[show_overlap_inside],
-            label_df$halign[show_count_outside],
-            label_df$halign[show_count_inside]),
+            (label_df$halign[show_count_outside] > 0) * 1,
+            (label_df$halign[show_count_inside] > 0) * 1),
          rot=c(
             label_df$rot[show_overlap_outside],
             label_df$rot[show_overlap_inside],
@@ -804,6 +819,7 @@ render_venndir <- function
       xlim=jp_xrange,
       ylim=jp_yrange,
       show_labels=FALSE,
+      do_draw=FALSE, # experimental
       do_pop_viewport=TRUE);
       # do_pop_viewport=FALSE);
    # on.exit(grid::popViewport());
@@ -811,7 +827,11 @@ render_venndir <- function
    adjx <- attr(jp, "adjx");
    adjy <- attr(jp, "adjy");
    jp_viewport <- attr(jp, "viewport");
-   
+   # jp_gTree has the polygon grobs
+   jp_gTree <- attr(jp, "grob_tree");
+   jp_grobList <- list()
+   jp_grobList$jps <- jp_gTree;
+
    ############################################
    # Item labels
    # draw using text()
@@ -868,8 +888,8 @@ render_venndir <- function
             hjust=0.5,
             vjust=0.5);
       }
-      # print(jamba::middle(itemlabels_df));
-      grid::grid.draw(text_grob);
+      jp_grobList$item_labels <- text_grob;
+      # grid::grid.draw(text_grob);
       # grid::grid.points(
       #    x=adjx(itemlabels_df$x),
       #    y=adjy(itemlabels_df$y),
@@ -901,55 +921,137 @@ render_venndir <- function
       # jamba::printDebug("gdf:");print(gdf);# debug
       # confirm gdf is not empty - (but why would it be empty?)
       if (nrow(gdf) > 0) {
-         g_labels <- gridtext_richtext_grob(
-            # default.units="snpc",
-            text=gdf$text,
-            x=adjx(gdf$x),
-            y=adjy(gdf$y),
-            default.units="snpc",
-            vjust=gdf$vjust,
-            hjust=gdf$hjust,
-            halign=gdf$halign,
-            rot=gdf$rot,
-            padding=grid::unit(gdf$padding,
-               gdf$padding_unit),
-            r=grid::unit(gdf$r,
-               gdf$r_unit),
-            gp=grid::gpar(
-               fontfamily=fontfamily,
-               col=gdf$label_col,
-               fontsize=gdf$fontsize
-            ),
-            box_gp=grid::gpar(
-               col=if(group_labels){NA}else{gdf$border_col},
-               # col=if(group_labels){NA}else{"black"},
-               fill=if(group_labels){NA}else{gdf$box_fill},
-               lty=gdf$box_lty,
-               lwd=gdf$box_lwd)
-         );
-         # draw grouped label background
+         # 0.0.36.900 - use a list
+         gdf$roworder <- seq_len(nrow(gdf));
+         # jamba::printDebug("head(gdf, 10):");print(head(gdf, 10));# debug
+         gdf_list <- split(gdf,
+            jamba::pasteByRow(gdf[, c("padding", "r"), drop=FALSE]));
+         ## Push viewport in case that helps grob size estimates
+         # grid::pushViewport(jp_viewport);
+         g_labels_list <- lapply(gdf_list, function(igdf){
+            # jamba::printDebug("igdf");print(igdf);# debug
+            g_labels <- gridtext::richtext_grob(
+               text=igdf$text,
+               x=adjx(igdf$x),
+               y=adjy(igdf$y),
+               default.units="snpc",
+               vjust=igdf$vjust,
+               hjust=igdf$hjust,
+               halign=igdf$halign,
+               rot=igdf$rot,
+               padding=grid::unit(igdf$padding,
+                  igdf$padding_unit),
+               r=grid::unit(igdf$r,
+                  igdf$r_unit),
+               vp=jp_viewport,
+               gp=grid::gpar(
+                  fontfamily=fontfamily,
+                  col=igdf$label_col,
+                  fontsize=igdf$fontsize
+               ),
+               box_gp=grid::gpar(
+                  col=if(group_labels){NA}else{igdf$border_col},
+                  fill=if(group_labels){NA}else{igdf$box_fill},
+                  # col=igdf$border_col,
+                  # fill=igdf$box_fill,
+                  lty=igdf$box_lty,
+                  lwd=igdf$box_lwd)
+            );
+            # attempt to re-assign custom childNames to the grobs
+            # jamba::printDebug("childNames(g_labels):");print(childNames(g_labels));# debug
+            # jamba::printDebug("igdf:");print(igdf);# debug
+            new_childNames <- paste0(
+               igdf$overlap_set, ":",
+               igdf$type, ":",
+               gsub("(count|overlap)_", "\\1:", igdf$location), ":",
+               igdf$roworder, ":",
+               igdf$label_df_rowname);
+            templist <- lapply(grid::childNames(g_labels), function(iname){
+               grid::getGrob(g_labels, iname);
+            })
+            names(templist) <- new_childNames;
+            templist
+            # tempgList <- do.call(grid::gList, templist);
+            # g_labels <- grid::setChildren(g_labels, children=tempgList)
+            # # g_labels$childrenOrder <- jamba::nameVector(new_childNames);
+            # jamba::printDebug("childNames(g_labels):");print(childNames(g_labels));# debug
+            # g_labels;
+         });
+         # grid::popViewport();
+         # assemble g_labels_list into gTree
+         g_labels_gTree <- grid::grobTree(
+            vp=jp_viewport,
+            do.call(grid::gList, unlist(unname(g_labels_list), recursive=FALSE)),
+            name="labels");
+         g_labels_groupdf <- data.frame(check.names=FALSE,
+            jamba::rbindList(strsplit(names(grid::childNames(g_labels_gTree)), ":"),
+               newColnames=c("overlap_set",
+                  "counttype",
+                  "type",
+                  "location",
+                  "roworder",
+                  "label_df_rowname")))
+         g_labels_groupdf$roworder <- as.numeric(g_labels_groupdf$roworder);
+         g_labels_groupdf$name <- names(grid::childNames(g_labels_gTree));
+         g_labels_groupdf$childName <- grid::childNames(g_labels_gTree);
+         g_labels_groupdf <- jamba::mixedSortDF(g_labels_groupdf,
+            byCols=c(1, 4, -3, 2, 5, 6));
+         # jp_grobList$g_labels_list <- g_labels_list;
+         # jp_grobList$g_labels_groupdf <- g_labels_groupdf;
+         # jp_grobList$g_labels_gTree <- g_labels_gTree;
+         # jamba::printDebug("g_labels_groupdf:");print(g_labels_groupdf);# debug
+         ## Strategy: group labels
          if (TRUE %in% group_labels) {
-            grid::pushViewport(attr(jp, "viewport"));
-            # jamba::printDebug("g_labels:");print(g_labels);# debug
-            g_labels <- tryCatch({
+            # jamba::printDebug("unique(segment_df):");print(unique(segment_df));# debug
+            # grid::pushViewport(attr(jp, "viewport"));
+            grouped_labels_list <- tryCatch({
                dgg <- draw_gridtext_groups(
-                  g_labels=g_labels,
-                  gdf=gdf,
-                  segment_df=segment_df,
+                  g_labels=g_labels_gTree,
+                  gdf=gdf[g_labels_groupdf$roworder, , drop=FALSE],
+                  groupdf=g_labels_groupdf,
+                  segment_df=unique(segment_df),
                   adjust_center=adjust_center,
-                  do_draw=TRUE,
+                  adjx=adjx,
+                  adjy=adjy,
+                  do_draw=FALSE,
                   verbose=FALSE)
-               dgg$g_labels;
+               # dgg$g_labels;
+               dgg
             }, error=function(e){
                print(e);
                g_labels;
             });
-            grid::popViewport();
+            # grid::popViewport();
+            # jp_grobList$grouped_labels_list <- grouped_labels_list;
+            # roundedRect around grouped labels
+            g_labels_grobs <- grouped_labels_list$grobs;
+            # adjusted positions for grouped labels
+            g_labels <- grouped_labels_list$g_labels;
+            
+            ## do not draw here
+            # grid::pushViewport(attr(jp, "viewport"));
+            ## draw roundedrect outlines
+            # lapply(g_labels_grobs, grid::grid.draw);
+            ## draw re-positioned grouped labels
+            # grid::grid.draw(g_labels);
+            # grid::popViewport();
+            
+            ## Todo: Consider combining label_borders and labels
+            jp_grobList$label_borders <- grid::grobTree(
+               do.call(grid::gList, g_labels_grobs),
+               vp=jp_viewport,
+               name="label_borders");
+            jp_grobList$labels <- grid::grobTree(
+               g_labels,
+               vp=jp_viewport,
+               name="labels");
+         } else {
+            ## do not draw here
+            # grid::pushViewport(attr(jp, "viewport"))
+            # grid::grid.draw(g_labels_gTree);
+            # grid::popViewport();
+            # jp_grobList$labels <- g_labels_gTree;
          }
-         
-         grid::pushViewport(attr(jp, "viewport"))
-         grid::grid.draw(g_labels);
-         grid::popViewport();
       }
    }
    
@@ -978,41 +1080,61 @@ render_venndir <- function
          gp=grid::gpar(col=segment_wide$color,
             lwd=segment_wide$lwd),
          vp=jp_viewport);
-      grid::grid.draw(segments_grob);
+      ## do not draw here
+      # grid::grid.draw(segments_grob);
+      jp_grobList$segments <- grid::grobTree(
+         vp=jp_viewport,
+         name="segments",
+         grid::gList(segments_grob));
    }
+   
+   ## grobs drawn
+   # text_grob
+   # g_labels
+   # segments_grob
 
    # prepare new Venndir object
    vo_new <- new("Venndir",
       jps=venn_jp,
       label_df=label_df,
       setlist=setlist)
-   
+
    # venndir legender
    if (TRUE %in% draw_legend) {
-      venndir_legender(
+      ## Todo: Consider returning grobs from this function also
+      legend_grob <- venndir_legender(
          venndir_output=vo_new,
-         # venndir_output=list(jps=venn_jp),
          x=legend_x,
          font_cex=legend_font_cex,
+         draw_legend=FALSE,
+         vp=jp_viewport,
          ...)
+      jp_grobList$legend <- legend_grob;
    }
+
+   ## Assemble into gTree
+   venndir_gtree <- grid::grobTree(
+      do.call(grid::gList, jp_grobList),
+      vp=jp_viewport,
+      name="venndir_gTree")
+   attr(vo_new, "gtree") <- venndir_gtree;
+   attr(vo_new, "grob_list") <- jp_grobList;
+   attr(vo_new, "viewport") <- jp_viewport;
    
+   ## Draw the rest of the owl
+   if (TRUE %in% do_draw) {
+      if (TRUE %in% do_newpage) {
+         grid::grid.newpage();
+      }
+      grid::grid.draw(venndir_gtree);
+   }
+
+   ## Todo: Consider displaying message on the plot.
+   ## Perhaps the number of hidden overlap labels?
    # warning in case not all overlaps can be displayed
    if (length(warning_label) > 0) {
       jamba::printDebug("warning_label exists");
    }
    # return Venndir object
    return(invisible(vo_new));
-   return(invisible(
-      list(
-         jp=jp,
-         label_df=label_df,
-         gdf=gdf)));
-
-   # return(invisible(list(venn_spdf=venn_spdf,
-   #    label_df=label_df,
-   #    gdf=gdf,
-   #    segment_df=segment_df,
-   #    g_labels=g_labels,
-   #    vosf=vosf)));
 }

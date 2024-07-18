@@ -18,6 +18,7 @@
   do_newpage = TRUE,
   do_viewport = TRUE,
   do_pop_viewport = TRUE,
+  do_draw = TRUE,
   verbose = FALSE,
   debug = FALSE,
   ...
@@ -32,8 +33,19 @@
 range to be rendered. When \code{NULL} they are defined using the
 observed range of values.}
 
-\item{flip_sign}{\code{numeric} where \code{-1} or \code{TRUE} reverses the orientation of
-inner/outer border; or \code{1} keeps the orientation unchanged.}
+\item{flip_sign}{\code{logical} indicating whether to flip the polygon
+orientation, or \code{numeric} where the sign is multiplied by the
+polygon orientation.
+The polygon orientation is used to define inner/outer border, relative
+to whether the border represents a solid inner polygon, or the hole
+inside a solid polygon. In most cases, the orientation is automatically
+recognized and applied appropriately.
+Specifically:
+\itemize{
+\item \code{TRUE} or \code{-1} reverses the polygon orientation of
+inner/outer border
+\item \code{FALSE} or \code{1} keeps the polygon orientation unchanged.
+}}
 
 \item{render_vectorized}{\code{logical} indicating whether to render all
 polygons in one call, thereby ignoring \code{innerborder} values. All
@@ -64,9 +76,14 @@ and push a new \code{grid} viewport with \code{grid::grid.pushViewport()}.}
 
 \item{do_pop_viewport}{\code{logical} (default TRUE) indicating whether to
 close/pop the \code{grid} viewport with \code{grid::popViewport()}.
-This option is only relevant when \code{do_viewport=TRUE}.
+This action is only performed when \code{do_viewport=TRUE}.
 This option is intended to allow layering multiple calls to this
 or other \code{grid} functions.}
+
+\item{do_draw}{\code{logical} (default TRUE) indicating whether to call
+\code{grid::grid.draw()} for each graphical object.
+When \code{do_draw=FALSE}, it also forces \code{do_newpage=FALSE},
+\code{do_viewport=FALSE}, and \code{do_pop_viewport=FALSE}.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
@@ -87,6 +104,9 @@ the corresponding \code{grid} units in \code{"snpc"}.
 the same viewport in order to add features to an existing plot.
 \item \code{"xrange"},\code{"yrange"}: x- and y-axis ranges used to determine
 the viewport to be used.
+\item \code{"grob_tree"}: a \code{grid::gTree} object suitable to call
+\code{grid::grid.draw()}. It includes the same \code{viewport}, so it
+does not need to have the viewport defined.
 }
 }
 \description{

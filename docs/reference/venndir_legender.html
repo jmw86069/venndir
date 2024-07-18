@@ -19,7 +19,7 @@ again in an upcoming release."><!-- mathjax --><script src="https://cdnjs.cloudf
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
       </span>
     </div>
 
@@ -78,8 +78,8 @@ again in an upcoming release.</p>
 <span>  style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid"</span>, <span class="st">"data.frame"</span><span class="op">)</span>,</span>
 <span>  item_type <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  header_color <span class="op">=</span> <span class="st">"#000000"</span>,</span>
-<span>  header_bg <span class="op">=</span> <span class="st">"#FFFFFF"</span>,</span>
-<span>  header_border <span class="op">=</span> <span class="st">"#FFFFFF"</span>,</span>
+<span>  header_bg <span class="op">=</span> <span class="st">"#FFFFFF00"</span>,</span>
+<span>  header_border <span class="op">=</span> <span class="st">"#FFFFFF00"</span>,</span>
 <span>  lwd <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  x_inset <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
 <span>  y_inset <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
@@ -89,6 +89,9 @@ again in an upcoming release.</p>
 <span>  draw_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  alias <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  legend_padding <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  set_suffix <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  vp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -217,6 +220,17 @@ Note: The most useful workflow would be to assign short aliases to
 label names as argument <code>labels</code> here.</p></dd>
 
 
+<dt>legend_padding</dt>
+<dd><p><code>numeric</code> or <code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a></code> used to define padding for
+each table cell. This value is only used when <code>table_theme</code> is not
+provided.</p></dd>
+
+
+<dt>set_suffix</dt>
+<dd><p><code>character</code> string (default <code>""</code>) used as optional
+suffix, and previously used <code>":"</code> but was changed to <code>""</code>.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
 
@@ -249,9 +263,8 @@ will have already been defined and stored into <code>legend_grob$vp</code>
 with x position <code>legend_grob$vp$x</code> and y position <code>legend_grob$vp$y</code>.
 Total legend width is: <code>sum(legend_grob$widths)</code>, and
 total legend height is: <code>sum(legend_grob$heights)</code>.</p>
-<p>Todo:</p><ul><li><p>Consider bottom-justifying text in each cell, so there is consistent
-alignment of labels that end in ":" with the numerical value.
-This adjustment would only affect multi-line labels.</p></li>
+<p>Todo:</p><ul><li><p>Consider bottom-justifying text in each cell, left-justifying text
+labels, and right-justifying numeric values.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>

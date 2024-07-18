@@ -239,6 +239,9 @@ setMethod("plot",
 #'    the same viewport in order to add features to an existing plot.
 #'    * `"xrange"`,`"yrange"`: x- and y-axis ranges used to determine
 #'    the viewport to be used.
+#'    * `"grob_tree"`: a `grid::gTree` object suitable to call
+#'    `grid::grid.draw()`. It includes the same `viewport`, so it
+#'    does not need to have the viewport defined.
 #' 
 #' @examples
 #' dfx <- data.frame(name=c("polygon1", "polygon2"),
@@ -284,8 +287,17 @@ setMethod("plot",
 #' @param xlim,ylim `numeric` optionally used to define the x- and y-axis
 #'    range to be rendered. When `NULL` they are defined using the
 #'    observed range of values.
-#' @param flip_sign `numeric` where `-1` or `TRUE` reverses the orientation of
-#'    inner/outer border; or `1` keeps the orientation unchanged.
+#' @param flip_sign `logical` indicating whether to flip the polygon
+#'    orientation, or `numeric` where the sign is multiplied by the
+#'    polygon orientation.
+#'    The polygon orientation is used to define inner/outer border, relative
+#'    to whether the border represents a solid inner polygon, or the hole
+#'    inside a solid polygon. In most cases, the orientation is automatically
+#'    recognized and applied appropriately.
+#'    Specifically:
+#'    * `TRUE` or `-1` reverses the polygon orientation of
+#'    inner/outer border
+#'    * `FALSE` or `1` keeps the polygon orientation unchanged.
 #' @param render_vectorized `logical` indicating whether to render all
 #'    polygons in one call, thereby ignoring `innerborder` values. All
 #'    `border` values are rendered as regular polygon borders. This option
@@ -308,9 +320,13 @@ setMethod("plot",
 #'    and push a new `grid` viewport with `grid::grid.pushViewport()`.
 #' @param do_pop_viewport `logical` (default TRUE) indicating whether to
 #'    close/pop the `grid` viewport with `grid::popViewport()`.
-#'    This option is only relevant when `do_viewport=TRUE`.
+#'    This action is only performed when `do_viewport=TRUE`.
 #'    This option is intended to allow layering multiple calls to this
 #'    or other `grid` functions.
+#' @param do_draw `logical` (default TRUE) indicating whether to call
+#'    `grid::grid.draw()` for each graphical object.
+#'    When `do_draw=FALSE`, it also forces `do_newpage=FALSE`,
+#'    `do_viewport=FALSE`, and `do_pop_viewport=FALSE`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param debug `logical` (default FALSE) indicating whether to enable
 #'    debug operations. When `debug=TRUE` it is also passed to `grid`
@@ -335,6 +351,7 @@ plot.JamPolygon <- function
  do_newpage=TRUE,
  do_viewport=TRUE,
  do_pop_viewport=TRUE,
+ do_draw=TRUE,
  verbose=FALSE,
  debug=FALSE,
  ...)
@@ -359,6 +376,17 @@ plot.JamPolygon <- function
       }
    }
    # grid options
+   # do_newpage: by default calls grid::grid.newpage()
+   if (length(do_draw) == 0) {
+      do_draw <- TRUE;
+   } else {
+      do_draw <- head(as.logical(do_draw), 1);
+   }
+   if (FALSE %in% do_draw) {
+      do_newpage <- FALSE;
+      do_viewport <- FALSE;
+      do_pop_viewport <- FALSE;
+   }
    # do_newpage: by default calls grid::grid.newpage()
    if (length(do_newpage) == 0) {
       do_newpage <- TRUE;
@@ -405,15 +433,21 @@ plot.JamPolygon <- function
          x <- labelr_JamPolygon(x, add_to_jp=TRUE);
       }
    }
-      ################################################
+   
+   ################################################
    # Todo:
    # - permit dots values to override other graphical parameters
    # - for now we assume all are defined via colnames(jp@polygons)
    opt_args <- c("fill",
       "label",
-      "border", "border.lwd", "border.lty",
-      "innerborder", "innerborder.lwd", "innerborder.lty",
-      "family", "fontsize");
+      "border",
+      "border.lwd",
+      "border.lty",
+      "innerborder",
+      "innerborder.lwd",
+      "innerborder.lty",
+      "family",
+      "fontsize");
    use_opt_args <- intersect(names(dots), opt_args);
    for (opt_arg in use_opt_args) {
       if (verbose) {
@@ -513,23 +547,32 @@ plot.JamPolygon <- function
    if (TRUE %in% do_newpage) {
       grid::grid.newpage();
    }
+   
+   use_vp <- grid::viewport(
+      width=grid::unit(1, "snpc"),
+      height=grid::unit(1, "snpc"),
+      xscale=c(0, 1),
+      yscale=c(0, 1));
+   
+   ## Note the viewport is included even when not used here
+   attr(x, "viewport") <- use_vp;
    if (TRUE %in% do_viewport) {
-      use_vp <- grid::viewport(
-         width=grid::unit(1, "snpc"),
-         height=grid::unit(1, "snpc"),
-         xscale=c(0, 1),
-         yscale=c(0, 1));
-      attr(x, "viewport") <- use_vp;
       grid::pushViewport(use_vp);
    }
+   
+   grob_list <- list();
    # polygon fill - all polygons rendered at once
    if (TRUE %in% render_vectorized) {
       # note the border is not rendered here
-      grid::grid.path(rule="evenodd",
+      grobname <- paste0("vectorized", ":", "pathGrob"); # rowname:grob
+      path_grob <- grid::pathGrob(
+         rule="evenodd",
          x=adjx(coords_df$x),
          y=adjy(coords_df$y),
          pathId=coords_df$pathId,
          id=coords_df$id,
+         name=grobname,
+         vp=use_vp,
          gp=grid::gpar(
             fill=rep(df$fill, polygon_defined),
             lwd=rep(df$border.lwd, polygon_defined),
@@ -537,6 +580,11 @@ plot.JamPolygon <- function
             col=NA)
             # col=rep(df$border, polygon_defined))
       )
+      if (TRUE %in% do_draw) {
+         grid::grid.draw(path_grob)
+      }
+      grob_list <- c(grob_list,
+         setNames(list(path_grob), grobname));
    }
    
    # polygon inner border (experimental)
@@ -553,6 +601,8 @@ plot.JamPolygon <- function
       #
       # iterate each row
       for (irow in seq_len(length(x))) {
+         irowname <- rownames(x@polygons)[irow];
+         # jamba::printDebug("irow:", irow, ", irowname:", irowname);# debug
          # render each polygon
          if (FALSE %in% render_vectorized) {
             if (verbose) {
@@ -569,16 +619,27 @@ plot.JamPolygon <- function
                #    y=adjy(use_coords_df$y),
                #    pathId=use_coords_df$pathId,
                #    id=use_coords_df$id));# debug
-               grid::grid.path(rule="evenodd",
+               # grobname <- paste0("path.", irow); # grob:rownum
+               grobname <- paste0(irowname, ":", "pathGrob"); # rowname:grob
+               path_grob <- grid::pathGrob(
+                  rule="evenodd",
                   x=adjx(use_coords_df$x),
                   y=adjy(use_coords_df$y),
                   pathId=use_coords_df$pathId,
                   id=use_coords_df$id,
+                  name=grobname,
+                  vp=use_vp,
                   gp=grid::gpar(
                      fill=df$fill[irow],
                      lwd=df$border.lwd[irow],
                      lty=df$border.lty[irow],
                      col=NA))
+               # jamba::printDebugI("grobname:", grobname, ", df$fill[irow]", fgText=df$fill[irow]);# debug
+               if (TRUE %in% do_draw) {
+                  grid::grid.draw(path_grob)
+               }
+               grob_list <- c(grob_list,
+                  setNames(list(path_grob), grobname));
             }
          }
          
@@ -639,9 +700,12 @@ plot.JamPolygon <- function
                      # lwd_pts * (part_orientation != 0),
                      npts), "pt")));
                # use_w <- grid::unit(rep(lwd_pts * (part_orientation != 0), npts), "pt");
-               # render the border
+               # grobname <- paste0("vwline.", irow, ".", border_type, ".", ipart);# old style
+               grobname <- paste0(irowname, ":vwlineGrob:",
+                  border_type, ":", ipart); # rowname:grob:type:num
+               ## render the border
                # vwline::grid.vwXspline(
-               vwline::grid.vwline(
+               vwline_grob <- vwline::vwlineGrob(
                   x=adjx(part_x),
                   y=adjy(part_y),
                   w=use_w,
@@ -651,24 +715,45 @@ plot.JamPolygon <- function
                   linejoin=linejoin,
                   lineend="butt",
                   debug=debug,
+                  name=grobname,
+                  # vp=use_vp,
                   gp=grid::gpar(
                      fill=use_border,
                      col=NA,
                      lwd=1))
+               ## define the viewport manually
+               vwline_grob$vp <- use_vp;
+               if (TRUE %in% do_draw) {
+                  grid::grid.draw(vwline_grob);
+               }
+               # jamba::printDebug("Adding vwline grob irow:", irow, ".", border_type, ", ipart:", ipart);# debug
+               grob_list <- c(grob_list,
+                  setNames(list(vwline_grob), grobname));
                
                if (TRUE) {
                   # consider whether to draw a thin border as below
-                  grid::grid.path(x=adjx(part_x),
+                  # grobname <- paste0("border.", irow, ".", border_type, ".", ipart);# old style
+                  grobname <- paste0(irowname, ":pathGrob:",
+                     "border", ":", ipart); # rowname:grob:border:num
+                  path_grob2 <- grid::pathGrob(x=adjx(part_x),
                      y=adjy(part_y),
                      rule="evenodd",
                      pathId=rep(1, length(part_x)),
                      id=rep(1, length(part_x)),
+                     name=grobname,
+                     vp=use_vp,
                      gp=grid::gpar(
                         fill=NA,
                         col="#00000066",
                         lty=lty_pts,
                         lwd=0.5));
+                  if (TRUE %in% do_draw) {
+                     grid::grid.draw(path_grob2);
+                  }
+                  grob_list <- c(grob_list,
+                     setNames(list(path_grob2), grobname));
                }
+               
                if (FALSE) {
                   # for debug only, print "1" at first point in polygon
                   grid::grid.text(
@@ -710,30 +795,62 @@ plot.JamPolygon <- function
                nchar(df$label) > 0);
          if (length(which_label) > 0) {
             # label gpar
-            label_gp <- c("fontsize", "family", "label_color");
+            label_gp <- c("fontsize",
+               "family",
+               "fontfamily",
+               "label_color");
             if (any(label_gp %in% colnames(df))) {
                use_label_gp <- jamba::nameVector(
                   intersect(label_gp, colnames(df)));
                gp_values <- lapply(use_label_gp, function(igp){
                   ivalues <- df[[igp]][which_label];
                   ivalues;
-               })
+               });
+               if ("family" %in% names(gp_values) &&
+                     !"fontfamily" %in% names(gp_values)) {
+                  matchf <- match("family", names(gp_values));
+                  names(gp_values)[matchf] <- "fontfamily";
+               }
                names(gp_values) <- gsub("color", "col",
                   gsub("^label_", "",
                      names(gp_values)));
+               ## if any duplicates, use the first occurrence (for now)
+               if (any(duplicated(names(gp_values)))) {
+                  matchgn <- match(unique(names(gp_values)),
+                     names(gp_values));
+                  gp_values <- gp_values[matchgn];
+               }
+               ## assemble into gpar object
                use_gp <- do.call(grid::gpar, gp_values);
                # print(use_gp);
             } else {
                use_gp <- grid::gpar();
             }
-            grid::grid.text(
+            # grobname <- "label";# old style
+            grobname <- paste0(irowname, ":textGrob:",
+               "labels"); # rowname:grob:labels
+            text_grob <- grid::textGrob(
                x=adjx(unlist(df$label_x)[which_label]),
                y=adjy(unlist(df$label_y)[which_label]),
                label=df$label[which_label],
+               name=grobname,
+               vp=use_vp,
                gp=use_gp)
+            if (TRUE %in% do_draw) {
+               grid::grid.draw(text_grob);
+            }
+            grob_list <- c(grob_list,
+               setNames(list(text_grob), grobname));
          }
       }
    }
+   ## Convert to gTree
+   attr(x, "grob_list") <- grob_list;
+   grob_tree <- do.call(grid::grobTree,
+      c(grob_list,
+         alist(vp=use_vp,
+            name="jps")));
+   attr(x, "grob_tree") <- grob_tree;
    
    if (TRUE %in% do_pop_viewport) {
       grid::popViewport();

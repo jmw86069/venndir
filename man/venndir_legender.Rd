@@ -15,8 +15,8 @@ venndir_legender(
   style = c("grid", "data.frame"),
   item_type = "",
   header_color = "#000000",
-  header_bg = "#FFFFFF",
-  header_border = "#FFFFFF",
+  header_bg = "#FFFFFF00",
+  header_border = "#FFFFFF00",
   lwd = 1,
   x_inset = grid::unit(2, "lines"),
   y_inset = grid::unit(2, "lines"),
@@ -26,6 +26,9 @@ venndir_legender(
   draw_legend = TRUE,
   alias = NULL,
   labels = NULL,
+  legend_padding = 3,
+  set_suffix = "",
+  vp = NULL,
   verbose = FALSE,
   ...
 )
@@ -126,6 +129,13 @@ Note: The most useful workflow would be to assign short aliases to
 \code{names(setlist)} when calling \code{venndir()}, then use the original long
 label names as argument \code{labels} here.}
 
+\item{legend_padding}{\code{numeric} or \code{grid::unit} used to define padding for
+each table cell. This value is only used when \code{table_theme} is not
+provided.}
+
+\item{set_suffix}{\code{character} string (default \code{""}) used as optional
+suffix, and previously used \code{":"} but was changed to \code{""}.}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
 \item{...}{additional arguments are passed to subsequent functions.}
@@ -160,9 +170,8 @@ total legend height is: \code{sum(legend_grob$heights)}.
 
 Todo:
 \itemize{
-\item Consider bottom-justifying text in each cell, so there is consistent
-alignment of labels that end in ":" with the numerical value.
-This adjustment would only affect multi-line labels.
+\item Consider bottom-justifying text in each cell, left-justifying text
+labels, and right-justifying numeric values.
 }
 }
 \examples{

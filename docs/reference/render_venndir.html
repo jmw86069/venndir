@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
       </span>
     </div>
 
@@ -90,6 +90,8 @@
 <span>  legend_font_cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  show_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  display_counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  do_newpage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  draw_buffer <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -277,10 +279,39 @@ the position of the legend.</p></dd>
 <dd><p><code>numeric</code> scalar to adjust the legend font size.</p></dd>
 
 
+<dt>do_newpage</dt>
+<dd><p><code>logical</code> (default TRUE) indicating whether to call
+<code><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid::grid.newpage()</a></code>. This option allows the figure to be rendered
+inside an active display device, or active <code><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">grid::viewport</a></code>.
+Note: When <code>do_draw=FALSE</code>, it also forces <code>do_newpage=FALSE</code>.</p></dd>
+
+
+<dt>do_draw</dt>
+<dd><p><code>logical</code> indicating whether to call <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code>.
+The <code>grid</code> graphical objects are returned in attributes:
+"gtree", "grob_list", "viewport", and can be drawn separately.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments are passed to <code>render_venndir()</code>.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p><code>Venndir</code> object with attributes that contain underlying
+<code>grid</code> graphical objects (grobs):</p><ul><li><p><code>"gtree"</code>: a <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">grid::gTree</a></code> object suitable for drawing
+with <code>grid::grid.draw(attr(vo, "gtre"))</code></p></li>
+<li><p><code>"grob_list"</code>: a <code>list</code> of <code>grid</code> object components used to build
+the complete diagram, they can be plotted individually, or
+assembled with <code>do.call(grid::gList, grob_list)</code>.
+The <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">grid::gList</a></code> can be assembled into a <code>gTree</code> with:
+<code>grid::grobTree(gList=do.call(grid::gList, grob_list)</code></p></li>
+<li><p><code>"viewport"</code>: the <code><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">grid::viewport</a></code> that holds important context
+for the graphical objects, specifically the use of coordinate
+<code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a></code> measure <code>"snpc"</code>, which maintains a fixed aspect ratio.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir core: 

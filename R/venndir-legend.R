@@ -23,9 +23,8 @@
 #' 
 #' Todo:
 #' 
-#' * Consider bottom-justifying text in each cell, so there is consistent
-#' alignment of labels that end in ":" with the numerical value.
-#' This adjustment would only affect multi-line labels.
+#' * Consider bottom-justifying text in each cell, left-justifying text
+#' labels, and right-justifying numeric values.
 #' 
 #' @family venndir utility
 #' 
@@ -102,6 +101,11 @@
 #'    Note: The most useful workflow would be to assign short aliases to
 #'    `names(setlist)` when calling `venndir()`, then use the original long
 #'    label names as argument `labels` here.
+#' @param legend_padding `numeric` or `grid::unit` used to define padding for
+#'    each table cell. This value is only used when `table_theme` is not
+#'    provided.
+#' @param set_suffix `character` string (default `""`) used as optional
+#'    suffix, and previously used `":"` but was changed to `""`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to subsequent functions.
 #' 
@@ -193,8 +197,8 @@ venndir_legender <- function
     "data.frame"),
  item_type="",
  header_color="#000000",
- header_bg="#FFFFFF",
- header_border="#FFFFFF",
+ header_bg="#FFFFFF00",
+ header_border="#FFFFFF00",
  lwd=1,
  x_inset=grid::unit(2, "lines"),
  y_inset=grid::unit(2, "lines"),
@@ -204,6 +208,9 @@ venndir_legender <- function
  draw_legend=TRUE,
  alias=NULL,
  labels=NULL,
+ legend_padding=3,
+ set_suffix="",
+ vp=NULL,
  verbose=FALSE,
  ...)
 {
@@ -261,11 +268,6 @@ venndir_legender <- function
             use_newline,
             names(setlist)));
       return(setlist)
-   }
-   
-   # theme
-   if (length(table_theme) == 0) {
-      table_theme <- gridExtra::ttheme_default(base_size=12 * font_cex)
    }
    
    # construct setlist if not provided
@@ -440,7 +442,7 @@ venndir_legender <- function
       }
       legend_df$legend <- paste0(
          alias[names(setlist)], " - ",
-         names(setlist), ": ",
+         names(setlist), set_suffix, " ",
          jamba::formatInt(lengths(setlist)),
          " ",
          item_type)
@@ -475,7 +477,7 @@ venndir_legender <- function
    if ("grid" %in% style) {
       # prepare graphical object
       gridlegend_df_use <- gridlegend_df;
-      gridlegend_df_use$set <- paste0(gridlegend_df$set, ":");
+      gridlegend_df_use$set <- paste0(gridlegend_df$set, set_suffix);
       if (length(item_type) > 0 && nchar(item_type) > 0) {
          gridlegend_df_use$size <- paste0(
             jamba::formatInt(gridlegend_df$size),
@@ -488,9 +490,70 @@ venndir_legender <- function
       if (length(header_color) == 0 || nchar(header_color) == 0) {
          header_color <- "#00000000"
       }
+      
+      ## table theme
+      # - note the ugly hack to create whitespace before/after the
+      #   column text, and colnames() text
+      # - this hack is due to `gridExtra::tableGrob()` using `padding`
+      #   to define slightly wider text box, but not applying that padding
+      #   to the label position. So using `hjust=1` causes the text to
+      #   be placed at the border of the extended padded range, the very edge.
+      colnames(gridlegend_df_use) <- jamba::ucfirst(
+         colnames(gridlegend_df_use));
+      for (icol in head(colnames(gridlegend_df_use), -1)) {
+         gridlegend_df_use[[icol]] <- paste0("  ", gridlegend_df_use[[icol]]);
+         inum <- match(icol, colnames(gridlegend_df_use))
+         colnames(gridlegend_df_use)[inum] <- paste0("  ",
+            colnames(gridlegend_df_use)[inum]);
+      }
+      for (icol in tail(colnames(gridlegend_df_use), 1)) {
+         gridlegend_df_use[[icol]] <- paste0(gridlegend_df_use[[icol]], "  ");
+         inum <- match(icol, colnames(gridlegend_df_use))
+         colnames(gridlegend_df_use)[inum] <- paste0(
+            colnames(gridlegend_df_use)[inum],
+            "  ");
+      }
+      if (length(table_theme) == 0) {
+         # jamba::printDebug("gridlegend_df_use:");print(gridlegend_df_use);# debug
+         # align_list <- lapply(jamba::nameVectorN(gridlegend_df_use), function(icol){
+         #    list(fg_params=list(hjust=0))
+         # })
+         use_hjust1 <- rep(c(0, 1),
+            c(ncol(gridlegend_df_use) - 1, 1))
+         use_hjust <- rep(use_hjust1,
+            each=nrow(gridlegend_df_use))
+         if (length(legend_padding) == 0) {
+            legend_padding <- c(3, 3);
+         }
+         use_padding <- grid::unit(c(3, 3), "mm");
+         if (grid::is.unit(legend_padding)) {
+            use_padding <- legend_padding;
+         }
+         if (is.numeric(legend_padding)) {
+            legend_padding <- rep(legend_padding, length.out=2);
+            use_padding <- grid::unit(legend_padding, "mm");
+         }
+         table_theme <- gridExtra::ttheme_default(
+            base_size=12 * font_cex,
+            core=list(
+               fg_params=list(
+                  hjust=use_hjust,
+                  x=use_hjust),
+               padding=use_padding),
+            colhead=list(
+               fg_params=list(
+                  hjust=use_hjust1,
+                  x=use_hjust1),
+               padding=use_padding))
+            # colhead=list(fg_params=list(hjust=use_hjust, x=use_hjust))
+            # colhead=list(fg_params=list(hjust=1, x=0.95)))
+      }
+      
+      # create the tableGrob
       legend_grob <- gridExtra::tableGrob(
          rows=NULL,
          theme=table_theme,
+         vp=vp,
          d=gridlegend_df_use)
       
       # optionally color each row
@@ -516,6 +579,11 @@ venndir_legender <- function
          # adjust the top row
          for (icol in seq_len(ncol(gridlegend_df_use))) {
             ind <- find_cell(legend_grob, 1, icol, "colhead-bg")
+            use_hjust <- 0;
+            if (icol == ncol(gridlegend_df_use)) {
+               # right-align
+               use_hjust <- 1;
+            }
             if (length(ind) > 0) {
                legend_grob$grobs[ind][[1]][["gp"]] <- update_gpar_values(
                   gp=legend_grob$grobs[ind][[1]][["gp"]],

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   warning=FALSE,
   message=FALSE,
   comment = "#>",
-  fig.height=8,
+  fig.height=7,
   fig.width=8,
   fig.path = "man/figures/README-",
   out.width = "100%"
@@ -43,6 +43,24 @@ The development version of venndir can be installed with:
 remotes::install_github("jmw86069/venndir");
 ```
 
+## Why Venndir?
+
+Biological data often involves components, for example genes, and
+the direction of change, for example increase or decrease. It is not
+enough to compare genes affected by two experiments, it is critical
+to compare the direction of change. How else can we discriminate
+the effects of disease from the effects of a cure?
+
+```{r venn_intro}
+# silence the warnings
+options("warn"=-1)
+
+library(venndir)
+vo <- venndir(make_venn_test(100, 2, do_signed=TRUE),
+   proportional=TRUE,
+   overlap_type="each", font_cex=1.2)
+
+```
 
 ## Features of venndir
 
@@ -55,10 +73,6 @@ To illustrate the point, `make_venn_test()` is used
 to create test `setlist` data.
 
 ```{r venn_setlist}
-# silence the warnings
-options("warn"=-1)
-
-library(venndir)
 setlist <- make_venn_test(100, 3)
 setlist
 ```
@@ -322,7 +336,8 @@ overlaps <- c(set_A=187, set_B=146, set_C=499,
 # convert to setlist
 setlist_o <- counts2setlist(overlaps)
 
-venndir(setlist_o,
+vn <- venndir(setlist_o,
+   expand_fraction=0.15,
    proportional=TRUE,
    font_cex=1.4,
    set_colors=c("firebrick2", "dodgerblue", "#9999AA"))
@@ -335,6 +350,8 @@ coordinates direction.
 
 ```{r nudge_2}
 vo_nudge <- venndir(setlist_o,
+   expand_fraction=0.15,
+   # label_style="lite box",
    font_cex=1.4,
    proportional=TRUE,
    circle_nudge=list(set_A=c(1, 0), set_B=c(-1, 0)),
@@ -406,6 +423,7 @@ venndir(setlist,
    show_labels="Ni",
    show_items="sign",
    item_cex=2,
+   expand_fraction=0.1,
    show_segments=FALSE,
    max_items=10000);
 ```
@@ -418,7 +436,8 @@ venndir(setlist,
    show_labels="Ni",
    overlap_type="each",
    show_items="sign",
-   item_cex=4,
+   item_cex=2,
+   expand_fraction=0.1,
    max_items=10000,
    show_segments=FALSE,
    proportional=TRUE)

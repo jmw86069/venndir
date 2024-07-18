@@ -21,6 +21,26 @@ The development version of venndir can be installed with:
 remotes::install_github("jmw86069/venndir");
 ```
 
+## Why Venndir?
+
+Biological data often involves components, for example genes, and the
+direction of change, for example increase or decrease. It is not enough
+to compare genes affected by two experiments, it is critical to compare
+the direction of change. How else can we discriminate the effects of
+disease from the effects of a cure?
+
+``` r
+# silence the warnings
+options("warn"=-1)
+
+library(venndir)
+vo <- venndir(make_venn_test(100, 2, do_signed=TRUE),
+   proportional=TRUE,
+   overlap_type="each", font_cex=1.2)
+```
+
+<img src="man/figures/README-venn_intro-1.png" width="100%" />
+
 ## Features of venndir
 
 The core is `venndir()` which takes a `setlist` as input and produces a
@@ -31,10 +51,6 @@ To illustrate the point, `make_venn_test()` is used to create test
 `setlist` data.
 
 ``` r
-# silence the warnings
-options("warn"=-1)
-
-library(venndir)
 setlist <- make_venn_test(100, 3)
 setlist
 #> $set_A
@@ -299,20 +315,21 @@ The first example is the basic Venn overlap, without direction.
 # options("jam.htmlOut"=TRUE, "jam.comment"=FALSE)
 
 setlist <- make_venn_test(1000, 3, do_signed=TRUE)
+names(setlist) <- gsub("set_", "", names(setlist));
 textvenn(setlist, overlap_type="overlap")
-#>                                 set_A&set_B                                     
-#>                                     27                                          
-#>    set_A                                                              set_B     
-#>     31                                                                 390      
-#>                                                                                 
-#>                              set_A&set_B&set_C                                  
-#>                                      7                                          
-#>              set_A&set_C                              set_B&set_C               
-#>                   6                                       76                    
-#>                                                                                 
-#>                                                                                 
-#>                                    set_C                                        
-#>                                     71
+#>                    A&B                         
+#>                    27                          
+#>    A                                    B      
+#>    31                                  390     
+#>                                                
+#>                   A&B&C                        
+#>                     7                          
+#>           A&C                  B&C             
+#>            6                   76              
+#>                                                
+#>                                                
+#>                     C                          
+#>                    71
 ```
 
 But of course direction is helpful, so here it is with the default
@@ -320,19 +337,19 @@ But of course direction is helpful, so here it is with the default
 
 ``` r
 textvenn(setlist, overlap_type="concordance")
-#>                                         set_A&set_B     ↑↑: 9                                          
-#>                                             27          ↓↓: 12                                         
-#>    set_A  ↑: 19                                          X: 6                           set_B  ↑: 185  
-#>     31    ↓: 12                                                                          390   ↓: 205  
-#>                                                                                                        
-#>                                      set_A&set_B&set_C  ↑↑↑: 2                                         
-#>                                              7           X: 5                                          
-#>                  set_A&set_C  ↑↑: 2                                set_B&set_C  ↑↑: 39                 
-#>                       6       ↓↓: 3                                    76       ↓↓: 21                 
-#>                               X: 1                                              X: 16                  
-#>                                                                                                        
-#>                                            set_C        ↑: 30                                          
-#>                                             71          ↓: 41
+#>                            A&B   ↑↑: 9                                
+#>                            27    ↓↓: 12                               
+#>    A   ↑: 19                      X: 6                    B   ↑: 185  
+#>    31  ↓: 12                                             390  ↓: 205  
+#>                                                                       
+#>                           A&B&C  ↑↑↑: 2                               
+#>                             7     X: 5                                
+#>               A&C  ↑↑: 2                    B&C  ↑↑: 39               
+#>                6   ↓↓: 3                    76   ↓↓: 21               
+#>                    X: 1                          X: 16                
+#>                                                                       
+#>                             C    ↑: 30                                
+#>                            71    ↓: 41
 ```
 
 Not all consoles can display Unicode arrows, so you can use ASCII output
@@ -340,19 +357,19 @@ only with `unicode=FALSE`:
 
 ``` r
 textvenn(setlist, overlap_type="concordance", unicode=FALSE)
-#>                                         set_A&set_B     ^^: 9                                          
-#>                                             27          vv: 12                                         
-#>    set_A  ^: 19                                          X: 6                           set_B  ^: 185  
-#>     31    v: 12                                                                          390   v: 205  
-#>                                                                                                        
-#>                                      set_A&set_B&set_C  ^^^: 2                                         
-#>                                              7           X: 5                                          
-#>                  set_A&set_C  ^^: 2                                set_B&set_C  ^^: 39                 
-#>                       6       vv: 3                                    76       vv: 21                 
-#>                               X: 1                                              X: 16                  
-#>                                                                                                        
-#>                                            set_C        ^: 30                                          
-#>                                             71          v: 41
+#>                            A&B   ^^: 9                                
+#>                            27    vv: 12                               
+#>    A   ^: 19                      X: 6                    B   ^: 185  
+#>    31  v: 12                                             390  v: 205  
+#>                                                                       
+#>                           A&B&C  ^^^: 2                               
+#>                             7     X: 5                                
+#>               A&C  ^^: 2                    B&C  ^^: 39               
+#>                6   vv: 3                    76   vv: 21               
+#>                    X: 1                          X: 16                
+#>                                                                       
+#>                             C    ^: 30                                
+#>                            71    v: 41
 ```
 
 ``` r
@@ -381,7 +398,8 @@ overlaps <- c(set_A=187, set_B=146, set_C=499,
 # convert to setlist
 setlist_o <- counts2setlist(overlaps)
 
-venndir(setlist_o,
+vn <- venndir(setlist_o,
+   expand_fraction=0.15,
    proportional=TRUE,
    font_cex=1.4,
    set_colors=c("firebrick2", "dodgerblue", "#9999AA"))
@@ -389,7 +407,7 @@ venndir(setlist_o,
 
 <img src="man/figures/README-nudge_1-1.png" width="100%" />
 
-    #> ##  (19:02:56) 11Jun2024:   warning_label exists
+    #> ##  (17:42:03) 18Jul2024:   warning_label exists
 
 The argument `circle_nudge` lets you nudge (move) a Venn circle given
 x,y coordinates. Provide a `list` named by the set you want to move,
@@ -397,6 +415,8 @@ with a `numeric` vector for the `x,y` coordinates direction.
 
 ``` r
 vo_nudge <- venndir(setlist_o,
+   expand_fraction=0.15,
+   # label_style="lite box",
    font_cex=1.4,
    proportional=TRUE,
    circle_nudge=list(set_A=c(1, 0), set_B=c(-1, 0)),
@@ -471,6 +491,7 @@ venndir(setlist,
    show_labels="Ni",
    show_items="sign",
    item_cex=2,
+   expand_fraction=0.1,
    show_segments=FALSE,
    max_items=10000);
 ```
@@ -484,7 +505,8 @@ venndir(setlist,
    show_labels="Ni",
    overlap_type="each",
    show_items="sign",
-   item_cex=4,
+   item_cex=2,
+   expand_fraction=0.1,
    max_items=10000,
    show_segments=FALSE,
    proportional=TRUE)

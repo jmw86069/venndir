@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
       </span>
     </div>
 
@@ -78,6 +78,7 @@
 <span>  do_newpage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_pop_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -101,8 +102,17 @@ observed range of values.</p></dd>
 
 
 <dt>flip_sign</dt>
-<dd><p><code>numeric</code> where <code>-1</code> or <code>TRUE</code> reverses the orientation of
-inner/outer border; or <code>1</code> keeps the orientation unchanged.</p></dd>
+<dd><p><code>logical</code> indicating whether to flip the polygon
+orientation, or <code>numeric</code> where the sign is multiplied by the
+polygon orientation.
+The polygon orientation is used to define inner/outer border, relative
+to whether the border represents a solid inner polygon, or the hole
+inside a solid polygon. In most cases, the orientation is automatically
+recognized and applied appropriately.
+Specifically:</p><ul><li><p><code>TRUE</code> or <code>-1</code> reverses the polygon orientation of
+inner/outer border</p></li>
+<li><p><code>FALSE</code> or <code>1</code> keeps the polygon orientation unchanged.</p></li>
+</ul></dd>
 
 
 <dt>render_vectorized</dt>
@@ -149,9 +159,16 @@ and push a new <code>grid</code> viewport with <code>grid::grid.pushViewport()</
 <dt>do_pop_viewport</dt>
 <dd><p><code>logical</code> (default TRUE) indicating whether to
 close/pop the <code>grid</code> viewport with <code><a href="https://rdrr.io/r/grid/viewports.html" class="external-link">grid::popViewport()</a></code>.
-This option is only relevant when <code>do_viewport=TRUE</code>.
+This action is only performed when <code>do_viewport=TRUE</code>.
 This option is intended to allow layering multiple calls to this
 or other <code>grid</code> functions.</p></dd>
+
+
+<dt>do_draw</dt>
+<dd><p><code>logical</code> (default TRUE) indicating whether to call
+<code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> for each graphical object.
+When <code>do_draw=FALSE</code>, it also forces <code>do_newpage=FALSE</code>,
+<code>do_viewport=FALSE</code>, and <code>do_pop_viewport=FALSE</code>.</p></dd>
 
 
 <dt>verbose</dt>
@@ -180,6 +197,9 @@ the corresponding <code>grid</code> units in <code>"snpc"</code>.</p></li>
 the same viewport in order to add features to an existing plot.</p></li>
 <li><p><code>"xrange"</code>,<code>"yrange"</code>: x- and y-axis ranges used to determine
 the viewport to be used.</p></li>
+<li><p><code>"grob_tree"</code>: a <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">grid::gTree</a></code> object suitable to call
+<code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code>. It includes the same <code>viewport</code>, so it
+does not need to have the viewport defined.</p></li>
 </ul></div>
     <div id="details">
     <h2>Details</h2>

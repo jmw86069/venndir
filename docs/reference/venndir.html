@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.34.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
       </span>
     </div>
 
@@ -352,7 +352,16 @@ the default is <code>"&amp;"</code>.</p></dd>
 
 
 <dt>do_plot</dt>
-<dd><p><code>logical (default TRUE) indicating whether to render the plot, or return data without rendering the plot. When </code>do_plot=FALSE<code>the returned data can later be passed to</code>render_venndir()` to render the figure.</p></dd>
+<dd><p>`logical (default TRUE) indicating whether to generate the
+the figure.</p><ul><li><p>When <code>do_plot=TRUE</code> it calls <code><a href="render_venndir.html">render_venndir()</a></code> to create <code>grid</code>
+objects to be displayed. Arguments in <code>...</code> are passed to
+<code><a href="render_venndir.html">render_venndir()</a></code>: To hide display, use <code>do_draw=FALSE</code>.
+To prevent calling <code><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid::grid.newpage()</a></code> so the plot can
+be drawn inside another active display device, use <code>do_newpage=FALSE</code>.</p></li>
+<li><p>When <code>do_plot=FALSE</code> the returned <code>Venndir</code> object can be passed to
+<code><a href="render_venndir.html">render_venndir()</a></code> to render the figure. Same points are valid
+regarding <code>do_draw</code> and <code>do_newpage</code>, which are arguments</p></li>
+</ul></dd>
 
 
 <dt>verbose</dt>
@@ -386,6 +395,17 @@ overlap polygon defined for the Venn diagram.</p></li>
 <li><p><code>"label_df"</code>: <code>data.frame</code> which contains the coordinates for each
 Venn set, and Venn overlap label.</p></li>
 <li><p><code>"setlist"</code>: <code>list</code> as input to <code>venndir()</code>. This entry may be empty.</p></li>
+</ul><p>When <code>do_plot=TRUE</code> this function also calls <code><a href="render_venndir.html">render_venndir()</a></code>,
+and returns the <code>grid</code> graphical objects (grobs) in the attributes:</p><ul><li><p><code>"gtree"</code>: a <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">grid::gTree</a></code> object suitable for drawing
+with <code>grid::grid.draw(attr(vo, "gtre"))</code></p></li>
+<li><p><code>"grob_list"</code>: a <code>list</code> of <code>grid</code> object components used to build
+the complete diagram, they can be plotted individually, or
+assembled with <code>do.call(grid::gList, grob_list)</code>.
+The <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">grid::gList</a></code> can be assembled into a <code>gTree</code> with:
+<code>grid::grobTree(gList=do.call(grid::gList, grob_list)</code></p></li>
+<li><p><code>"viewport"</code>: the <code><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">grid::viewport</a></code> that holds important context
+for the graphical objects, specifically the use of coordinate
+<code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a></code> measure <code>"snpc"</code>, which maintains a fixed aspect ratio.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>

@@ -492,7 +492,10 @@ venndir_label_style <- function
          ifelse(
             venndir_output$label_df$type %in% "main",
             ifelse(
-               venndir_output$label_df$venn_counts > 0 | show_zero,
+               # it must have non-zero counts, or we set show_zero=TRUE
+               (venndir_output$label_df$venn_counts > 0 | show_zero) &
+                  # overlap_set must equal ref_polygon so counts are only shown for the precise overlap
+                  (venndir_output$label_df$overlap_set == venndir_output$label_df$ref_polygon),
                ifelse(
                   any(c("inside", "ifneeded", "detect") %in% count),
                   "inside",
@@ -501,7 +504,10 @@ venndir_label_style <- function
                "none"
             ),
             ifelse(
-               venndir_output$label_df$venn_counts > 0 | show_zero,
+               # it must have non-zero counts, or we set show_zero=TRUE
+               (venndir_output$label_df$venn_counts > 0 | show_zero) &
+                  # overlap_set must equal ref_polygon so counts are only shown for the precise overlap
+                  (venndir_output$label_df$overlap_set == venndir_output$label_df$ref_polygon),
                ifelse(
                   any(c("inside", "ifneeded", "detect") %in% signed),
                   "inside",
@@ -514,7 +520,10 @@ venndir_label_style <- function
          ifelse(
             venndir_output$label_df$type %in% "main",
             ifelse(
-               venndir_output$label_df$venn_counts > 0 | show_zero,
+               # it must have non-zero counts, or we set show_zero=TRUE
+               (venndir_output$label_df$venn_counts > 0 | show_zero) &
+                  # overlap_set must equal ref_polygon so counts are only shown for the precise overlap
+                  (venndir_output$label_df$overlap_set == venndir_output$label_df$ref_polygon),
                ifelse(
                   any(c("detect", "outside") %in% count),
                   "outside",
@@ -523,7 +532,10 @@ venndir_label_style <- function
                "none"
             ),
             ifelse(
-               venndir_output$label_df$venn_counts > 0 | show_zero,
+               # it must have non-zero counts, or we set show_zero=TRUE
+               (venndir_output$label_df$venn_counts > 0 | show_zero) &
+                  # overlap_set must equal ref_polygon so counts are only shown for the precise overlap
+                  (venndir_output$label_df$overlap_set == venndir_output$label_df$ref_polygon),
                ifelse(
                   any(c("detect", "outside") %in% signed),
                   "outside",

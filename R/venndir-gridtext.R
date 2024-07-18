@@ -125,7 +125,8 @@ gridtext_make_outer_box <- function
    )
 }
 
-
+gt_text_info_cache <- new.env(parent=emptyenv())
+gt_font_info_cache <- new.env(parent=emptyenv())
 
 #' Custom gridtext richtext grob
 #' 
@@ -173,6 +174,207 @@ gridtext_richtext_grob <- function
    margin_pt <- rep(0, 4)
    margin_pt[c(1, 3)] <- grid::convertHeight(margin[c(1, 3)], "pt", valueOnly=TRUE)
    margin_pt[c(2, 4)] <- grid::convertWidth(margin[c(2, 4)], "pt", valueOnly=TRUE)
+
+   ## gridtext custom functions
+   gt_recycle_gpar <- function(gp=NULL, n=1) {
+      make_gpar <- function(n, ...) {
+         structure(list(...), class="gpar")
+      }
+      args <- c(list(make_gpar, n=seq_len(n)), gp, list(SIMPLIFY=FALSE))
+      do.call(mapply, args)
+   }
+   gt_unit_to_list <- function(u) {
+      lapply(seq_along(u), function(i) u[i])
+   }
+   gt_update_gpar <- function(gp, gp_new) {
+      names_new <- names(gp_new)
+      names_old <- names(gp)
+      gp[c(intersect(names_old, names_new), "fontface")] <- NULL
+      gp_new["fontface"] <- NULL
+      do.call(grid::gpar, c(gp, gp_new))
+   }
+   gt_text_info <- function (label, fontkey, fontfamily, font, fontsize, cache) 
+   {
+      key <- paste0(label, fontkey)
+      info <- gt_text_info_cache[[key]]
+      if (is.null(info)) {
+         ascent_pt <- grid::convertHeight(
+            grid::grobHeight(
+               grid::textGrob(label=label,
+                  gp=grid::gpar(fontsize=fontsize,
+                     fontfamily=fontfamily,
+                     font=font,
+                     cex=1))), "pt", valueOnly=TRUE);
+         width_pt <- grid::convertWidth(
+            grid::grobWidth(
+               grid::textGrob(label=label,
+                  gp=grid::gpar(fontsize=fontsize,
+                     fontfamily=fontfamily,
+                     font=font,
+                     cex=1))), "pt", valueOnly=TRUE);
+         info <- list(width_pt=width_pt, ascent_pt=ascent_pt)
+         if (cache) {
+            gt_text_info_cache[[key]] <- info
+         }
+      }
+      info
+   }
+   gt_font_info <- function (fontkey, fontfamily, font, fontsize, cache) {
+      info <- gt_font_info_cache[[fontkey]]
+      if (is.null(info)) {
+         descent_pt <- grid::convertHeight(
+            grid::grobDescent(
+               grid::textGrob(label="gjpqyQ",
+                  gp=grid::gpar(fontsize=fontsize,
+                     fontfamily=fontfamily,
+                     font=font,
+                     cex=1))), "pt", valueOnly=TRUE);
+         space_pt <- grid::convertWidth(
+            grid::grobWidth(
+               grid::textGrob(label=" ",
+                  gp=grid::gpar(fontsize=fontsize,
+                     fontfamily=fontfamily,
+                     font=font,
+                     cex=1))), "pt", valueOnly=TRUE);
+         info <- list(descent_pt=descent_pt, space_pt=space_pt)
+         if (cache) {
+            gt_font_info_cache[[fontkey]] <- info
+         }
+      }
+      info
+   }
+   gt_text_details <- function (label, gp=grid::gpar()) {
+      fontfamily <- gp$fontfamily
+      if (is.null(gp$fontfamily)) {
+         fontfamily <- grid::get.gpar("fontfamily")$fontfamily
+      }
+      font <- gp$font
+      if (is.null(gp$font)) {
+         font <- grid::get.gpar("font")$font
+      }
+      fontsize <- gp$fontsize
+      if (is.null(gp$fontsize)) {
+         fontsize <- grid::get.gpar("fontsize")$fontsize
+      }
+      devname <- names(grDevices::dev.cur())
+      fontkey <- paste0(devname, fontfamily, font, fontsize)
+      if (devname == "null device") {
+         cache <- FALSE
+      } else {
+         cache <- TRUE
+      }
+      if (length(fontkey) != 1 || length(label) != 1) {
+         stop("Function `text_details()` is not vectorized.", call.=FALSE)
+      }
+      l1 <- gt_text_info(label, fontkey, fontfamily, font, fontsize, cache)
+      l2 <- gt_font_info(fontkey, fontfamily, font, fontsize, cache)
+      c(l1, l2)
+   }
+   gt_update_context <- function (drawing_context, ...) {
+      dc_new <- list(...)
+      names_new <- names(dc_new)
+      names_old <- names(drawing_context)
+      drawing_context[intersect(names_old, names_new)] <- NULL
+      c(drawing_context, dc_new)
+   }
+   gt_set_context_gp <- function(drawing_context, gp=NULL) {
+      gp <- gt_update_gpar(drawing_context$gp, gp)
+      font_info <- gt_text_details("", gp)
+      linespacing_pt <- gp$lineheight * gp$fontsize
+      em_pt <- gp$fontsize
+      gt_update_context(drawing_context,
+         gp=gp,
+         ascent_pt=font_info$ascent_pt,
+         descent_pt=font_info$descent_pt,
+         linespacing_pt=linespacing_pt,
+         em_pt=em_pt)
+   }
+   gt_setup_context <- function(fontsize=12, fontfamily="", fontface="plain",
+      color="black", lineheight=1.2, halign=0, word_wrap=TRUE, gp=NULL) {
+      if (is.null(gp)) {
+         gp <- grid::gpar(fontsize=fontsize,
+            fontfamily=fontfamily, 
+            fontface=fontface,
+            col=color,
+            cex=1,
+            lineheight=lineheight)
+      }
+      gp <- gt_update_gpar(grid::get.gpar(), gp)
+      gt_set_context_gp(
+         list(yoff_pt=0,
+            halign=halign,
+            word_wrap=word_wrap),
+         gp)
+   }
+   ## Note: bl_make_text_box cannot be reproduced because it uses .Call()
+   gt_process_text <- function (node, drawing_context) {
+      tokens <- stringr::str_split(stringr::str_squish(node),
+         "[[:space:]]+")[[1]]
+      boxes <- lapply(tokens, function(token) {
+         list(
+            gridtext:::bl_make_text_box(token,
+               drawing_context$gp,
+               drawing_context$yoff_pt), 
+            gridtext:::bl_make_regular_space_glue(drawing_context$gp))
+      })
+      if (isTRUE(grepl("^[[:space:]]", node))) {
+         boxes <- c(list(
+            gridtext:::bl_make_regular_space_glue(drawing_context$gp)),
+            boxes)
+      }
+      boxes <- unlist(boxes, recursive=FALSE)
+      if (!isTRUE(grepl("[[:space:]]$", node))) {
+         boxes[[length(boxes)]] <- NULL
+      }
+      boxes
+   }
+   gt_dispatch_tag <- function (node, tag, drawing_context) {
+      if (is.null(tag) || tag == "") {
+         gt_process_text(node, drawing_context)
+      } else {
+         switch(tag,
+            b=gridtext:::process_tag_b(node, drawing_context),
+            strong=gridtext:::process_tag_b(node, drawing_context),
+            br=gridtext:::process_tag_br(node, drawing_context),
+            i=gridtext:::process_tag_i(node, drawing_context),
+            img=gridtext:::process_tag_img(node, drawing_context),
+            em=gridtext:::process_tag_i(node, drawing_context),
+            p=gridtext:::process_tag_p(node, drawing_context),
+            span=gridtext:::process_tag_span(node, drawing_context),
+            sup=gridtext:::process_tag_sup(node, drawing_context),
+            sub=gridtext:::process_tag_sub(node, drawing_context),
+            stop(paste0("gridtext has encountered a tag that isn't",
+               " supported yet: <",
+               tag, ">\n",
+               "Only a very limited number of tags are currently supported."),
+               call.=FALSE))
+      }
+   }
+   gt_process_tags <- function (node, drawing_context) {
+      tags <- names(node)
+      boxes <- list()
+      for (i in seq_along(node)) {
+         boxes[[i]] <- gt_dispatch_tag(node[[i]], tags[i], drawing_context)
+      }
+      unlist(boxes, recursive=FALSE)
+   }
+   ## Note: bl_make_vbox cannot be reproduced because it uses .Call()
+   gt_make_inner_box <- function(text, halign, valign, use_markdown, gp) {
+      if (use_markdown) {
+         text <- markdown::markdownToHTML(text=text,
+            options=c("use_xhtml", "fragment_only"))
+      }
+      doctree <- xml2::read_html(paste0("<!DOCTYPE html>", text))
+      drawing_context <- gt_setup_context(gp=gp,
+         halign=halign,
+         word_wrap=FALSE)
+      boxlist <- gt_process_tags(xml2::as_list(doctree)$html$body, 
+         drawing_context)
+      vbox_inner <- gridtext:::bl_make_vbox(boxlist,
+         vjust=0,
+         width_policy="native")
+      vbox_inner
+   }
    
    # alternate handling of padding
    if (!length(padding) == 4 &&
@@ -185,10 +387,18 @@ gridtext_richtext_grob <- function
       length.out=length(x) * 4)
    pad_seq <- seq(from=1, to=length(padding), by=4)
    padding_pt <- rep(0, length(padding))
-   padding_pt[pad_seq] <- grid::convertHeight(padding[pad_seq], "pt", valueOnly=TRUE)
-   padding_pt[pad_seq + 1] <- grid::convertWidth(padding[pad_seq + 1], "pt", valueOnly=TRUE)
-   padding_pt[pad_seq + 2] <- grid::convertHeight(padding[pad_seq + 2], "pt", valueOnly=TRUE)
-   padding_pt[pad_seq + 3] <- grid::convertWidth(padding[pad_seq + 3], "pt", valueOnly=TRUE)
+   padding_pt[pad_seq] <- grid::convertHeight(padding[pad_seq],
+      "pt",
+      valueOnly=TRUE)
+   padding_pt[pad_seq + 1] <- grid::convertWidth(padding[pad_seq + 1],
+      "pt",
+      valueOnly=TRUE)
+   padding_pt[pad_seq + 2] <- grid::convertHeight(padding[pad_seq + 2],
+      "pt",
+      valueOnly=TRUE)
+   padding_pt[pad_seq + 3] <- grid::convertWidth(padding[pad_seq + 3],
+      "pt",
+      valueOnly=TRUE)
    
    padding_list <- split(padding,
       rep(seq_along(x), each=4));
@@ -204,17 +414,19 @@ gridtext_richtext_grob <- function
    # make sure text, x, and y have the same length
    n <- unique(length(text), length(x), length(y))
    if (length(n) > 1) {
-      stop("Arguments `text`, `x`, and `y` must have the same length.", call. = FALSE)
+      stop("Arguments `text`, `x`, and `y` must have the same length.",
+         call.=FALSE)
    }
-   gp_list <- gridtext:::recycle_gpar(gp, n)
-   box_gp_list <- gridtext:::recycle_gpar(box_gp, n)
+   
+   gp_list <- gt_recycle_gpar(gp, n)
+   box_gp_list <- gt_recycle_gpar(box_gp, n)
+   
    # need to convert x and y to lists so mapply can handle them properly
-   x_list <- gridtext:::unit_to_list(x)
-   y_list <- gridtext:::unit_to_list(y)
+   x_list <- gt_unit_to_list(x)
+   y_list <- gt_unit_to_list(y)
    
    inner_boxes <- mapply(
-      # gridtext_make_inner_box,
-      gridtext:::make_inner_box,
+      gt_make_inner_box,
       text,
       halign,
       valign,

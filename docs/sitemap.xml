@@ -121,6 +121,21 @@
     <loc>/reference/gridtext_richtext_grob.html</loc>
   </url>
   <url>
+    <loc>/reference/grobs_exts.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grobs_stack.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grobs_tile.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grobs_xalign.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grobs_yalign.html</loc>
+  </url>
+  <url>
     <loc>/reference/has_point_in_JamPolygon.html</loc>
   </url>
   <url>

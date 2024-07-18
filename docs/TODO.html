@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.35.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
       </span>
     </div>
 
@@ -58,6 +58,49 @@
 
 <div id="todo-for-venndir" class="section level1">
 
+<div class="section level2">
+<h2 id="id_18jul2024">18jul2024<a class="anchor" aria-label="anchor" href="#id_18jul2024"></a></h2>
+<ul><li>
+<p>Investigate R crash - might be specific to Quartz on MacOS Sonoma 14.4, 14.5</p>
+<ul><li>Reproducible workflow in RStudio:</li>
+</ul><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jmw86069/venndir" class="external-link">venndir</a></span><span class="op">)</span></span>
+<span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, show_labels<span class="op">=</span><span class="st">"ncs"</span><span class="op">)</span></span>
+<span><span class="co"># open new device</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.new</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># this time crashes</span></span>
+<span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, show_labels<span class="op">=</span><span class="st">"ncs"</span><span class="op">)</span></span></code></pre></div>
+<ul><li>The crash occurs inconsistently from separate R console, same workflow. The console prints this crash message: <code>"Fatal error: Duplicate keys of type 'DisplayList' were found in a Dictionary."</code>
+</li>
+<li>Topic online suggests the error is linked with MacOS Sonoma 14.4, 14.5. <a href="https://stackoverflow.com/questions/78615561/fatal-error-duplicate-keys-of-type-displaylist-were-found-in-a-dictionary" class="external-link uri">https://stackoverflow.com/questions/78615561/fatal-error-duplicate-keys-of-type-displaylist-were-found-in-a-dictionary</a>
+</li>
+<li>The crash occurs with venndir-0.0.34.900, and venndir-0.0.36.900, suggesting the risk was not added by updates in 0.0.36.900. Therefore version 0.0.36.900 will be released once it passes other tests.</li>
+</ul></li>
+<li>
+<p><code><a href="reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>Currently it is drawn using the plot viewport. But when drawn after the viewport is closed (<code><a href="https://rdrr.io/r/grid/viewports.html" class="external-link">grid::popViewport()</a></code>) the legend appears at the edge of the figure region, which can be outside the venndir plot. Consider option for the legend to use the figure viewport and not the venndir plot viewport.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_15jul2024">15jul2024<a class="anchor" aria-label="anchor" href="#id_15jul2024"></a></h2>
+<ul><li>
+<p>Prepare for Bioconductor (or CRAN)</p>
+<ul><li>
+<p>Remove any calls to internal package functions, using <code>:::</code></p>
+<ul><li>
+<code><a href="reference/gridtext_richtext_grob.html">gridtext_richtext_grob()</a></code> is a custom function, must be removed. It calls internal functions in <code>gridtext</code> that can’t be ported easily, for example <code><a href="https://rdrr.io/r/base/CallExternal.html" class="external-link">.Call()</a></code>. The custom function was solely intended to allow vectorized <code>padding</code>, currently the bottom,left,top,right is applied to all labels, and cannot be custom for each label. The driving goal was to have smaller margins between signed count labels, since they usually have smaller font size. Otherwise the distance between signed labels, line-by-line, was too far. First option, just call <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> and remove the ability to use different padding. Second option, wrap the call inside <code><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply()</a></code> which is what is done inside gridtext for multiple grobs anyway. It won’t be any slower. Final option is to ask Dr. Claus Wilke to allow a list of vectors as input for argument <code>padding</code>.</li>
+</ul></li>
+</ul></li>
+<li>
+<p><code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
+<ul><li>Consider option to return grid grobs instead of drawing them to the graphical device.</li>
+</ul></li>
+<li>
+<p><code><a href="reference/render_venndir.html">render_venndir()</a></code>, and <code><a href="reference/venndir.html">venndir()</a></code></p>
+<ul><li>Consider option to return the grid grobs to be rendered elsewhere. Return the <code>viewport</code> as defined by <code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>.</li>
+<li>Consider something like post plot hook, to call a function after the plot is rendered, before calling <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::pop.viewport()</a></code>.</li>
+</ul></li>
+</ul></div>
 <div class="section level2">
 <h2 id="id_09jul2024">09jul2024<a class="anchor" aria-label="anchor" href="#id_09jul2024"></a></h2>
 <ul><li>Fix bug where <code>sets</code> is properly subsetting <code>setlist</code> but is not properly subsetting <code>set_colors</code>. Verify other components are also properly subset as needed.</li>
@@ -588,7 +631,7 @@
 <ul><li>calculation appears to use the overall percentage items.</li>
 <li>The default layout would place percentage velow the main counts:</li>
 </ul></li>
-</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
+</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
 </tr></thead><tbody><tr class="odd"><td align="right">overlap_count</td>
 <td rowspan="2" align="left">
 <p>^: up_counts</p>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.35.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
       </span>
     </div>
 
@@ -57,6 +57,53 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.36.900" id="venndir-0036900">venndir 0.0.36.900<a class="anchor" aria-label="anchor" href="#venndir-0036900"></a></h2>
+<p>Substantial changes.</p>
+<p>The method of assembling labels now arranges labels adjacent to each other, removing an important dependency on internal <code>gridtext</code> functions (which are not permitted in CRAN/Bioconductor). It also allows more flexible labeling in future, e.g. different overlap metrics, optional overlap names.</p>
+<p>Labels use a more aesthetic layout: * The main set label is always top-center of a group of labels. * Count labels are split into left/right columns, for main/signed counts, respectively. They are middle-aligned left-to-right. * Set label and count labels are arranged top/bottom, also centered. * One region is defined for the group of labels. * The previous arrangement can be see with <code>group_labels=FALSE</code>.</p>
+<p>All graphics are returned as <code>grid</code> graphical objects (grobs), which enables flexible options for drawing the figure. For example it can be drawn inside a <code><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">grid::viewport</a></code>, or included with <code>patchwork</code> or <code>cowplot</code> as a figure panel. Or, the <code>grobs</code> can be directly manipulated.</p>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-36-900">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-36-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code></p>
+<ul><li>Fixed issue that associated a count label to an interior overlap set, a rare occurrence. Caused by the method used to associate an orphan set label, where there is no “uniquely set_B” overlap polygon so it associates “set_B” to an overlap region that contains set_B. That method incorrectly also allowed an overlap count to appear for sets that do not have an overlap region - which occurs when proportional circles fail to find a solution that contains every overlap observed. The fix is to hide overlap count labels when the overlap is not represented, while still displaying the main set label when some overlap exists that contains that set.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-36-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-36-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>returns attributes <code>"gtree"</code>, <code>"grob_list"</code>, <code>"viewport"</code> when <code>do_plot=TRUE</code>
+</li>
+<li>assigns <code>padding</code> and <code>radius</code> using the same values.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Returns attributes <code>"gtree"</code>, <code>"grob_list"</code>, <code>"viewport"</code>
+</li>
+<li>The figure is rendered with one call to <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> instead of being done piecemeal, making it appear faster.</li>
+<li>No longer calls custom <code><a href="../reference/gridtext_richtext_grob.html">gridtext_richtext_grob()</a></code>, since that also calls functions internal to the gridtext package. It was done in order to supply vector of different <code>padding</code> values.</li>
+<li>Instead calls <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> in a list.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>Now left-aligns the text label columns, and right-aligns the count value column.</li>
+<li>New argument <code>legend_padding</code> to control the table cell size.</li>
+<li>A bug in <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::tableGrob()</a></code> calculation of padding caused left-aligned text to appear at the very left edge of the text box, without a padded region shown. The padding is only used to extend the box itself, but still allows the label to be aligned relative to the extended box, and not the inner region. This bug was sidestepped by enfocing leading/trailing whitespace.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
+<ul><li>Modified to return <code>grid</code> graphical objects, and the <code>viewport</code> defined.</li>
+<li>New argument <code>do_draw</code> to control whether the figure is drawn, or only the graphical objects should be returned.</li>
+</ul></li>
+<li><p><code><a href="../reference/draw_gridtext_groups.html">draw_gridtext_groups()</a></code> - substantial changes, most all previous processing has been changed. It is used internally.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-internal-functions-0-0-36-900">New internal functions<a class="anchor" aria-label="anchor" href="#new-internal-functions-0-0-36-900"></a></h3>
+<p>Not terribly exciting, but useful nonetheless. Several new functions were added to help manipulate <code>grid</code> grobs, to stack, tile, xalign, yalign grobs relative to each other, using units that keep them aligned even when the plot device is resized. These functions are probably dependent upon <code>gridtext</code> labels, since they are used to create individual overlap and count labels, and define <code>xext</code>,<code>yext</code> with the “true” <code>grid</code> dimensions for each label. These functions make it possible to center the grouped label on the original label point, or align the left column with the right column, etc.</p>
+</div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.35.900" id="venndir-0035900">venndir 0.0.35.900<a class="anchor" aria-label="anchor" href="#venndir-0035900"></a></h2>
 <ul><li>Added LICENSE and LICENSE.md.</li>

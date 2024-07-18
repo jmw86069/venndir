@@ -1,3 +1,94 @@
+# venndir 0.0.36.900
+
+Substantial changes.
+
+The method of assembling labels now arranges labels adjacent to each
+other, removing an important dependency on internal `gridtext` functions
+(which are not permitted in CRAN/Bioconductor).
+It also allows more flexible labeling in future, e.g.
+different overlap metrics, optional overlap names.
+
+Labels use a more aesthetic layout:
+* The main set label is always top-center of a group of labels.
+* Count labels are split into left/right columns, for main/signed counts,
+respectively. They are middle-aligned left-to-right.
+* Set label and count labels are arranged top/bottom, also centered.
+* One region is defined for the group of labels.
+* The previous arrangement can be see with `group_labels=FALSE`.
+
+All graphics are returned as `grid` graphical objects (grobs), which
+enables flexible options for drawing the figure. For example it can
+be drawn inside a `grid::viewport`, or included with `patchwork` or
+`cowplot` as a figure panel. Or, the `grobs` can be directly manipulated.
+
+## Bug fixes
+
+* `venndir_label_style()`
+
+   * Fixed issue that associated a count label to an interior overlap set,
+   a rare occurrence. Caused by the method used to associate an orphan set
+   label, where there is no "uniquely set_B" overlap polygon so it
+   associates "set_B" to an overlap region that contains set_B. That method
+   incorrectly also allowed an overlap count to appear for sets that do
+   not have an overlap region - which occurs when proportional circles
+   fail to find a solution that contains every overlap observed.
+   The fix is to hide overlap count labels when the overlap is not represented,
+   while still displaying the main set label when some overlap exists
+   that contains that set.
+
+## changes to existing functions
+
+* `venndir()`
+
+   * returns attributes `"gtree"`, `"grob_list"`, `"viewport"` when
+   `do_plot=TRUE`
+   * assigns `padding` and `radius` using the same values.
+   
+* `render_venndir()`
+
+   * Returns attributes `"gtree"`, `"grob_list"`, `"viewport"`
+   * The figure is rendered with one call to `grid::grid.draw()` instead
+   of being done piecemeal, making it appear faster.
+   * No longer calls custom `gridtext_richtext_grob()`, since that also
+   calls functions internal to the gridtext package. It was done in
+   order to supply vector of different `padding` values.
+   * Instead calls `gridtext::richtext_grob()` in a list.
+
+* `venndir_legender()`
+
+   * Now left-aligns the text label columns, and right-aligns the count
+   value column.
+   * New argument `legend_padding` to control the table cell size.
+   * A bug in `gridExtra::tableGrob()` calculation of padding
+   caused left-aligned text to appear at the very left edge
+   of the text box, without a padded region shown. The padding is only
+   used to extend the box itself, but still allows the label to be
+   aligned relative to the extended box, and not the inner region.
+   This bug was sidestepped by enfocing leading/trailing whitespace.
+
+* `plot.JamPolygon()`
+
+   * Modified to return `grid` graphical objects, and the `viewport` defined.
+   * New argument `do_draw` to control whether the figure is drawn, or
+   only the graphical objects should be returned.
+
+* `draw_gridtext_groups()` - substantial changes, most all previous
+processing has been changed. It is used internally.
+
+## New internal functions
+
+Not terribly exciting, but useful nonetheless.
+Several new functions were added to help manipulate `grid` grobs,
+to stack, tile, xalign, yalign grobs relative to each other, using
+units that keep them aligned even when the plot device is resized.
+These functions are probably dependent upon `gridtext` labels, since they
+are used to create individual overlap and count labels, and define
+`xext`,`yext` with the "true" `grid` dimensions for each label.
+These functions make it possible to center the grouped label on the
+original label point, or align the left column with the right column, etc.
+
+
+
 # venndir 0.0.35.900
 
 * Added LICENSE and LICENSE.md.

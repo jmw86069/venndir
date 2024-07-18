@@ -249,7 +249,18 @@ relative size of the Venn diagram.}
 \item{sep}{\code{character} used as a delimiter between set names,
 the default is \code{"&"}.}
 
-\item{do_plot}{\verb{logical (default TRUE) indicating whether to render the plot, or return data without rendering the plot. When }do_plot=FALSE\verb{the returned data can later be passed to}render_venndir()` to render the figure.}
+\item{do_plot}{`logical (default TRUE) indicating whether to generate the
+the figure.
+\itemize{
+\item When \code{do_plot=TRUE} it calls \code{render_venndir()} to create \code{grid}
+objects to be displayed. Arguments in \code{...} are passed to
+\code{render_venndir()}: To hide display, use \code{do_draw=FALSE}.
+To prevent calling \code{grid::grid.newpage()} so the plot can
+be drawn inside another active display device, use \code{do_newpage=FALSE}.
+\item When \code{do_plot=FALSE} the returned \code{Venndir} object can be passed to
+\code{render_venndir()} to render the figure. Same points are valid
+regarding \code{do_draw} and \code{do_newpage}, which are arguments
+}}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
@@ -271,6 +282,21 @@ overlap polygon defined for the Venn diagram.
 \item \code{"label_df"}: \code{data.frame} which contains the coordinates for each
 Venn set, and Venn overlap label.
 \item \code{"setlist"}: \code{list} as input to \code{venndir()}. This entry may be empty.
+}
+
+When \code{do_plot=TRUE} this function also calls \code{render_venndir()},
+and returns the \code{grid} graphical objects (grobs) in the attributes:
+\itemize{
+\item \code{"gtree"}: a \code{grid::gTree} object suitable for drawing
+with \code{grid::grid.draw(attr(vo, "gtre"))}
+\item \code{"grob_list"}: a \code{list} of \code{grid} object components used to build
+the complete diagram, they can be plotted individually, or
+assembled with \code{do.call(grid::gList, grob_list)}.
+The \code{grid::gList} can be assembled into a \code{gTree} with:
+\verb{grid::grobTree(gList=do.call(grid::gList, grob_list)}
+\item \code{"viewport"}: the \code{grid::viewport} that holds important context
+for the graphical objects, specifically the use of coordinate
+\code{grid::unit} measure \code{"snpc"}, which maintains a fixed aspect ratio.
 }
 }
 \description{
