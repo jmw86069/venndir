@@ -2,9 +2,10 @@
 
 ## 18jul2024
 
-* Add documentation
+* Add documentation. Here is a laundry list of tips:
 
-   * Examples using DESeq2 for RNA-seq data; limma for other omics data.
+   * Show examples with DESeq2 results; edgeR; limma.
+   * Show how to import a list from a file.
    * Describe that the output is `grid::gTree` which can be drawn separately.
    * Show how to draw two Venn diagrams in one figure using `patchwork`,
    for example, do this twice, then add the results:
@@ -25,11 +26,61 @@
    inside/outside - with and without item labels.
    * Show how to include percent overlap labels.
    * Show how to move an outside label manually.
+   * Show how to supply a custom set of `JamPolygon` shapes instead of
+   using pre-defined fixed shapes, or shapes from `eulerr::eulerr()`.
+   * Show how to set `shape="ellipse"` with proportional diagrams.
+   * Show effect of `set.seed(123)` for reproducibility.
+   * Show how to customize `curate_venn_labels()` to use customized "signs".
+   * Show how to extract items for each overlap.
+   
+      * Placeholder:
+      ```R
+      itemlist_by_overlap <- split(vns@label_df$items,
+         factor(vns@label_df$overlap_set,
+            levels=unique(vns@label_df$overlap_set)))
+      ```
 
-* Add remaining features
+   * Show how to make an incidence matrix; or signed incidence matrix.
 
-   * `rotate_degrees` is not yet functional.
+* Add R package integration functions
+
+   * Probably most useful to integrate packages that produce setlist data,
+   or to Upset plots for people who also prefer that functionality.
+   Probably less useful to integrate with other Venn diagram packages.
+   * `stats_to_hitlist()` - consider generic function to convert stats table
+   to signed hits - generic function could be re-used for package-specific:
+   
+      * `DESeq_to_hitlist()` - consider converting DESeq2 results to hits
+      * `topTable_to_hitlist()` - convert `limma::topTable()`
+      * `edgeR_to_hitlist()`
+   
+   * `ChIPpeakAnno()` integration with `makeVennDiagram()`
+   
+      * It optionally includes labels with enrichment ratios
+   
+   * `to_VennDetail()`
+   * `to_ggVennDiagram()`
+   * `to_VennDiagram()`
+   * `to_UpsetR()` - send data to create an Upset plot
+   * `to_venn()` - send data to `venn` package
+   * `to_RVenn()` - send data to `RVenn` package
+
+* Add remaining small features
+
+   * `venndir()` argument `rotate_degrees` is not yet functional.
+   * `venndir()` add argument to control line width
    * Consider `launch_venndir_shiny()` with R-Shiny front-end.
+
+* Consider JamPolygons using `outerborder` instead of `border`
+
+   * Methods currently assume all borders are `outerborder`, the other option
+   is `innerborder`. This was a design decision, might need to change.
+   If there is need to display just a `border` (not inner, not outer) on
+   the line itself, there is not a mechanism to do so currently.
+   * Need changes to `find_venn_overlaps_JamPolygon()` and `venndir()`
+   to use `outerborder` instead of `border`.
+   * Need changes to `plot.JamPolygon()` to use `border` instead of thin border,
+   and `outerborder` instead of `border`.
 
 * Investigate R crash - probably specific to Quartz on MacOS Sonoma 14.4, 14.5
 

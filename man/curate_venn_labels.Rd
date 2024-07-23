@@ -108,8 +108,6 @@ jamba::printDebug(as.list(curate_venn_labels(venn_labels, "sign")),
 Other venndir utility: 
 \code{\link{expand_range}()},
 \code{\link{get_venn_shapes}()},
-\code{\link{gridtext_make_outer_box}()},
-\code{\link{gridtext_richtext_grob}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},

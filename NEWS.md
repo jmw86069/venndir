@@ -1,3 +1,35 @@
+# venndir 0.0.37.900
+
+## changes
+
+* Added tests for hidden count labels, hidden signed count labels,
+and corresponding overlap counts for good measure.
+* Added laundry list of topics to document.
+* Removed `gridtext_richtext_grob()` and supporting functions.
+
+## changes to existing functions
+
+* `plot.JamPolygon()`
+
+   * New argument `render_thin_border` to control whether the thin line
+   between inner and outer border is drawn.
+   It may be hidden by default in future.
+   * `buffer` can now be vectorized, to shift the plot along each side
+   in order: (bottom, left, top, right). The default applies buffer to all
+   side, but sometimes it is useful to shift the plot away from one side,
+   for example `buffer=c(0.1, 0, 0, 0, 0)`. It still maintains proper
+   aspect ratio.
+   * Added checks for line width 0, and empty `""` line colors, both are
+   handled silently by drawing either line with width 0.01, or transparent
+   color, respectively.
+
+* `render_venndir()`
+
+   * passes `expand_fraction` to `plot.JamPolygon` using
+   argument `buffer` so it can shift the Venn diagram off-center.
+   * now passes `...` to `plot.JamPolygon()` so that optional
+   arguments will be recognized.
+
 # venndir 0.0.36.900
 
 Substantial changes.

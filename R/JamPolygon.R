@@ -302,6 +302,8 @@ setMethod("plot",
 #'    polygons in one call, thereby ignoring `innerborder` values. All
 #'    `border` values are rendered as regular polygon borders. This option
 #'    may be substantially faster for large collections of polygons.
+#' @param render_thin_border `logical` indicating whether to render a thin
+#'    border on the border itself, default `TRUE` renders a thin grey line.
 #' @param linejoin `character` string (default `"bevel"`) passed to
 #'    `grid::grid.path()` and `vwline::grid.vwline()` when rendering
 #'    polygons, and inner/outer polygon borders, respectively.
@@ -342,6 +344,7 @@ plot.JamPolygon <- function
  ylim=NULL,
  flip_sign=1,
  render_vectorized=FALSE,
+ render_thin_border=TRUE,
  linejoin=c("bevel",
     "mitre",
     "round"),
@@ -521,20 +524,32 @@ plot.JamPolygon <- function
    ## expand using buffer
    # maxspan <- max(c(xspan, yspan)) * (1 + buffer);
    #
-   ## fix to buffer to use only one value
    ## Todo: accept buffer on all four sides
-   buffer <- max(buffer, na.rm=TRUE);
-   maxspan <- max(c(xspan, yspan)) * (1 + buffer);
-   # jamba::printDebug("xspan:", xspan, ", yspan:", yspan, ", maxspan:", maxspan, ", buffer:", buffer);# debug
-      # (x - xrange[1]) / maxspan / 1.05 + 0.025;
-      # (x - xmid) / maxspan / (1 + buffer) + (buffer / 4) + 0.5;
-   adjx <- function(x){
-      (x - xmid) / maxspan / (1 + buffer) + 0.5;
+   if (length(buffer) == 0) {
+      buffer <- 0;
    }
-      # (y - yrange[1]) / maxspan / 1.05 + 0.025;
-      # (y - ymid) / maxspan / (1 + buffer) + (buffer / 4) + 0.5;
-   adjy <- function(y){
-      (y - ymid) / maxspan / (1 + buffer) + 0.5;
+   if (TRUE) {
+      ## somewhat experimental method to use four-sided buffer
+      buffer <- rep(buffer, length.out=4);
+      xspan1 <- xspan * (1 + buffer[2] + buffer[4]);
+      yspan1 <- yspan * (1 + buffer[1] + buffer[3]);
+      maxspan <- max(c(xspan1, yspan1));
+      adjx <- function(x){
+         (x - xmid) / (maxspan) + 0.5 + (buffer[2] - buffer[4]) / 2;
+      }
+      adjy <- function(y){
+         (y - ymid) / (maxspan) + 0.5 + (buffer[1] - buffer[3]) / 2
+      }
+   } else {
+      ## fix to buffer to use only one value
+      buffer <- max(buffer, na.rm=TRUE);
+      maxspan <- max(c(xspan, yspan)) * (1 + buffer);
+      adjx <- function(x){
+         (x - xmid) / maxspan / (1 + buffer) + 0.5;
+      }
+      adjy <- function(y){
+         (y - ymid) / maxspan / (1 + buffer) + 0.5;
+      }
    }
    
    # assign plot features as attributes
@@ -653,9 +668,13 @@ plot.JamPolygon <- function
                use_border <- x@polygons$innerborder[[irow]];
                osign <- -1;
             }
-            if (length(use_border) == 0 || any(is.na(use_border))) {
+            ## confirm use_border is a color
+            if (length(use_border) == 0 ||
+                  any(is.na(use_border)) ||
+                  !jamba::isColor(use_border)) {
                # skip rows with no border color
-               next;
+               # next;
+               use_border <- "#FFFFFF00";
             }
             if (verbose) {
                jamba::printDebug("Rendering ", border_type, " border: ",
@@ -690,6 +709,9 @@ plot.JamPolygon <- function
                      nullValue=1);
                }
                # define line width at each point
+               if (any(lwd_pts <= 0)) {
+                  lwd_pts[lwd_pts <= 0] <- 0.01;
+               }
                use_w <- vwline::widthSpec(list(
                   right=grid::unit(rep(
                      lwd_pts * ((osign * part_orientation) > 0),
@@ -697,14 +719,10 @@ plot.JamPolygon <- function
                      npts), "pt"),
                   left=grid::unit(rep(
                      lwd_pts * ((osign * part_orientation) < 0),
-                     # lwd_pts * (part_orientation != 0),
                      npts), "pt")));
-               # use_w <- grid::unit(rep(lwd_pts * (part_orientation != 0), npts), "pt");
-               # grobname <- paste0("vwline.", irow, ".", border_type, ".", ipart);# old style
                grobname <- paste0(irowname, ":vwlineGrob:",
                   border_type, ":", ipart); # rowname:grob:type:num
                ## render the border
-               # vwline::grid.vwXspline(
                vwline_grob <- vwline::vwlineGrob(
                   x=adjx(part_x),
                   y=adjy(part_y),
@@ -721,16 +739,15 @@ plot.JamPolygon <- function
                      fill=use_border,
                      col=NA,
                      lwd=1))
-               ## define the viewport manually
+               ## update the viewport manually
                vwline_grob$vp <- use_vp;
                if (TRUE %in% do_draw) {
                   grid::grid.draw(vwline_grob);
                }
-               # jamba::printDebug("Adding vwline grob irow:", irow, ".", border_type, ", ipart:", ipart);# debug
                grob_list <- c(grob_list,
                   setNames(list(vwline_grob), grobname));
                
-               if (TRUE) {
+               if (TRUE %in% render_thin_border) {
                   # consider whether to draw a thin border as below
                   # grobname <- paste0("border.", irow, ".", border_type, ".", ipart);# old style
                   grobname <- paste0(irowname, ":pathGrob:",
@@ -744,9 +761,9 @@ plot.JamPolygon <- function
                      vp=use_vp,
                      gp=grid::gpar(
                         fill=NA,
-                        col="#00000066",
+                        col="#00000022",
                         lty=lty_pts,
-                        lwd=0.5));
+                        lwd=0.25));
                   if (TRUE %in% do_draw) {
                      grid::grid.draw(path_grob2);
                   }

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
       </span>
     </div>
 
@@ -58,6 +58,30 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.37.900" id="venndir-0037900">venndir 0.0.37.900<a class="anchor" aria-label="anchor" href="#venndir-0037900"></a></h2>
+<div class="section level3">
+<h3 id="changes-0-0-37-900">changes<a class="anchor" aria-label="anchor" href="#changes-0-0-37-900"></a></h3>
+<ul><li>Added tests for hidden count labels, hidden signed count labels, and corresponding overlap counts for good measure.</li>
+<li>Added laundry list of topics to document.</li>
+<li>Removed <code>gridtext_richtext_grob()</code> and supporting functions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-37-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-37-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
+<ul><li>New argument <code>render_thin_border</code> to control whether the thin line between inner and outer border is drawn. It may be hidden by default in future.</li>
+<li>
+<code>buffer</code> can now be vectorized, to shift the plot along each side in order: (bottom, left, top, right). The default applies buffer to all side, but sometimes it is useful to shift the plot away from one side, for example <code>buffer=c(0.1, 0, 0, 0, 0)</code>. It still maintains proper aspect ratio.</li>
+<li>Added checks for line width 0, and empty <code>""</code> line colors, both are handled silently by drawing either line with width 0.01, or transparent color, respectively.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>passes <code>expand_fraction</code> to <code>plot.JamPolygon</code> using argument <code>buffer</code> so it can shift the Venn diagram off-center.</li>
+<li>now passes <code>...</code> to <code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code> so that optional arguments will be recognized.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.36.900" id="venndir-0036900">venndir 0.0.36.900<a class="anchor" aria-label="anchor" href="#venndir-0036900"></a></h2>
 <p>Substantial changes.</p>
 <p>The method of assembling labels now arranges labels adjacent to each other, removing an important dependency on internal <code>gridtext</code> functions (which are not permitted in CRAN/Bioconductor). It also allows more flexible labeling in future, e.g. different overlap metrics, optional overlap names.</p>
@@ -83,7 +107,7 @@
 <ul><li>Returns attributes <code>"gtree"</code>, <code>"grob_list"</code>, <code>"viewport"</code>
 </li>
 <li>The figure is rendered with one call to <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> instead of being done piecemeal, making it appear faster.</li>
-<li>No longer calls custom <code><a href="../reference/gridtext_richtext_grob.html">gridtext_richtext_grob()</a></code>, since that also calls functions internal to the gridtext package. It was done in order to supply vector of different <code>padding</code> values.</li>
+<li>No longer calls custom <code>gridtext_richtext_grob()</code>, since that also calls functions internal to the gridtext package. It was done in order to supply vector of different <code>padding</code> values.</li>
 <li>Instead calls <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> in a list.</li>
 </ul></li>
 <li>
@@ -404,15 +428,15 @@
 <li>
 <code>plot_warning</code> label is placed relative to the bottom of the plot figure, not the plot border, giving a bit more space below the typical proportional Venn diagram.</li>
 </ul></li>
-<li><p><code><a href="../reference/render_venndir.html">render_venndir()</a></code> calls <code><a href="../reference/gridtext_richtext_grob.html">gridtext_richtext_grob()</a></code> instead of <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> to enable vectorized <code>padding</code>.</p></li>
+<li><p><code><a href="../reference/render_venndir.html">render_venndir()</a></code> calls <code>gridtext_richtext_grob()</code> instead of <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> to enable vectorized <code>padding</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-functions-0-0-24-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-24-900"></a></h3>
 <p>Two temporary functions to customize gridtext. Both functions also call internel <code>gridtext</code> functions, so they cannot be maintained when <code>venndir</code> is prepared for CRAN. More likely these functions will become the basis for <code>gridtext</code> issue and/or pull request (PR).</p>
 <ul><li>
-<code><a href="../reference/gridtext_richtext_grob.html">gridtext_richtext_grob()</a></code> - apply <code>padding</code> in vectorized form, to enable distinct <code>padding</code> to be applied to each label. This function is modified to extend <code>padding</code> and call custom <code><a href="../reference/gridtext_make_outer_box.html">gridtext_make_outer_box()</a></code>.</li>
+<code>gridtext_richtext_grob()</code> - apply <code>padding</code> in vectorized form, to enable distinct <code>padding</code> to be applied to each label. This function is modified to extend <code>padding</code> and call custom <code>gridtext_make_outer_box()</code>.</li>
 <li>
-<code><a href="../reference/gridtext_make_outer_box.html">gridtext_make_outer_box()</a></code> - apply <code>padding</code> in vectorized form, to enable distinct <code>padding</code> to be applied to each label.</li>
+<code>gridtext_make_outer_box()</code> - apply <code>padding</code> in vectorized form, to enable distinct <code>padding</code> to be applied to each label.</li>
 </ul></div>
 </div>
     <div class="section level2">

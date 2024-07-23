@@ -11,6 +11,7 @@
   ylim = NULL,
   flip_sign = 1,
   render_vectorized = FALSE,
+  render_thin_border = TRUE,
   linejoin = c("bevel", "mitre", "round"),
   mitrelimit = -20,
   show_labels = TRUE,
@@ -51,6 +52,9 @@ inner/outer border
 polygons in one call, thereby ignoring \code{innerborder} values. All
 \code{border} values are rendered as regular polygon borders. This option
 may be substantially faster for large collections of polygons.}
+
+\item{render_thin_border}{\code{logical} indicating whether to render a thin
+border on the border itself, default \code{TRUE} renders a thin grey line.}
 
 \item{linejoin}{\code{character} string (default \code{"bevel"}) passed to
 \code{grid::grid.path()} and \code{vwline::grid.vwline()} when rendering

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.36.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
       </span>
     </div>
 
@@ -61,9 +61,78 @@
 <div class="section level2">
 <h2 id="id_18jul2024">18jul2024<a class="anchor" aria-label="anchor" href="#id_18jul2024"></a></h2>
 <ul><li>
-<p>Investigate R crash - might be specific to Quartz on MacOS Sonoma 14.4, 14.5</p>
-<ul><li>Reproducible workflow in RStudio:</li>
+<p>Add documentation. Here is a laundry list of tips:</p>
+<ul><li><p>Show examples with DESeq2 results; edgeR; limma.</p></li>
+<li><p>Show how to import a list from a file.</p></li>
+<li><p>Describe that the output is <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">grid::gTree</a></code> which can be drawn separately.</p></li>
+<li><p>Show how to draw two Venn diagrams in one figure using <code>patchwork</code>, for example, do this twice, then add the results: <code>patchwork::wrap_elements(grid::grid.draw(attr(vo, "gtree")))</code></p></li>
+<li><p>Show how to change the setlist labels (as displayed in the figure), and legend labels (as displayed in the legend).</p></li>
+<li><p>Show how to adjust the figure size to prevent overlap with legend.</p></li>
+<li><p>Show how to adjust font sizes, legend font size, legend row padding.</p></li>
+<li><p>Show how to supply custom colors.</p></li>
+<li><p>Show how colors can be defined for 8 sets, then display only a subset, so the colors are consistent for each set displayed.</p></li>
+<li><p>Show how to convert input from hit matrix to setlist.</p></li>
+<li><p>Show how to convert input from overlap counts to setlist.</p></li>
+<li><p>Show how to convert input from signed overlap counts to setlist, more complicated, can be useful when reproducing a figure.</p></li>
+<li><p>Show how to nudge proportional circles during <code><a href="reference/venndir.html">venndir()</a></code> call.</p></li>
+<li><p>Show how to display all labels inside, outside, or signed/count labels inside/outside - with and without item labels.</p></li>
+<li><p>Show how to include percent overlap labels.</p></li>
+<li><p>Show how to move an outside label manually.</p></li>
+<li><p>Show how to supply a custom set of <code>JamPolygon</code> shapes instead of using pre-defined fixed shapes, or shapes from <code><a href="https://jolars.github.io/eulerr/reference/eulerr-package.html" class="external-link">eulerr::eulerr()</a></code>.</p></li>
+<li><p>Show how to set <code>shape="ellipse"</code> with proportional diagrams.</p></li>
+<li><p>Show effect of <code>set.seed(123)</code> for reproducibility.</p></li>
+<li><p>Show how to customize <code><a href="reference/curate_venn_labels.html">curate_venn_labels()</a></code> to use customized “signs”.</p></li>
+<li>
+<p>Show how to extract items for each overlap.</p>
+<ul><li>Placeholder:</li>
 </ul><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">itemlist_by_overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">items</span>,</span>
+<span>   <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span>,</span>
+<span>      levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li><p>Show how to make an incidence matrix; or signed incidence matrix.</p></li>
+</ul></li>
+<li>
+<p>Add R package integration functions</p>
+<ul><li><p>Probably most useful to integrate packages that produce setlist data, or to Upset plots for people who also prefer that functionality. Probably less useful to integrate with other Venn diagram packages.</p></li>
+<li>
+<p><code>stats_to_hitlist()</code> - consider generic function to convert stats table to signed hits - generic function could be re-used for package-specific:</p>
+<ul><li>
+<code>DESeq_to_hitlist()</code> - consider converting DESeq2 results to hits</li>
+<li>
+<code>topTable_to_hitlist()</code> - convert <code><a href="https://rdrr.io/pkg/limma/man/toptable.html" class="external-link">limma::topTable()</a></code>
+</li>
+<li><code>edgeR_to_hitlist()</code></li>
+</ul></li>
+<li>
+<p><code>ChIPpeakAnno()</code> integration with <code>makeVennDiagram()</code></p>
+<ul><li>It optionally includes labels with enrichment ratios</li>
+</ul></li>
+<li><p><code>to_VennDetail()</code></p></li>
+<li><p><code>to_ggVennDiagram()</code></p></li>
+<li><p><code>to_VennDiagram()</code></p></li>
+<li><p><code>to_UpsetR()</code> - send data to create an Upset plot</p></li>
+<li><p><code>to_venn()</code> - send data to <code>venn</code> package</p></li>
+<li><p><code>to_RVenn()</code> - send data to <code>RVenn</code> package</p></li>
+</ul></li>
+<li>
+<p>Add remaining small features</p>
+<ul><li>
+<code><a href="reference/venndir.html">venndir()</a></code> argument <code>rotate_degrees</code> is not yet functional.</li>
+<li>
+<code><a href="reference/venndir.html">venndir()</a></code> add argument to control line width</li>
+<li>Consider <code>launch_venndir_shiny()</code> with R-Shiny front-end.</li>
+</ul></li>
+<li>
+<p>Consider JamPolygons using <code>outerborder</code> instead of <code>border</code></p>
+<ul><li>Methods currently assume all borders are <code>outerborder</code>, the other option is <code>innerborder</code>. This was a design decision, might need to change. If there is need to display just a <code>border</code> (not inner, not outer) on the line itself, there is not a mechanism to do so currently.</li>
+<li>Need changes to <code><a href="reference/find_venn_overlaps_JamPolygon.html">find_venn_overlaps_JamPolygon()</a></code> and <code><a href="reference/venndir.html">venndir()</a></code> to use <code>outerborder</code> instead of <code>border</code>.</li>
+<li>Need changes to <code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code> to use <code>border</code> instead of thin border, and <code>outerborder</code> instead of <code>border</code>.</li>
+</ul></li>
+<li>
+<p>Investigate R crash - probably specific to Quartz on MacOS Sonoma 14.4, 14.5</p>
+<ul><li>Reproducible workflow in RStudio:</li>
+</ul><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jmw86069/venndir" class="external-link">venndir</a></span><span class="op">)</span></span>
 <span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, show_labels<span class="op">=</span><span class="st">"ncs"</span><span class="op">)</span></span>
 <span><span class="co"># open new device</span></span>
@@ -86,24 +155,24 @@
 <ul><li>
 <p>Prepare for Bioconductor (or CRAN)</p>
 <ul><li>
-<p>Remove any calls to internal package functions, using <code>:::</code></p>
+<p>DONE. Remove any calls to internal package functions, using <code>:::</code></p>
 <ul><li>
-<code><a href="reference/gridtext_richtext_grob.html">gridtext_richtext_grob()</a></code> is a custom function, must be removed. It calls internal functions in <code>gridtext</code> that can’t be ported easily, for example <code><a href="https://rdrr.io/r/base/CallExternal.html" class="external-link">.Call()</a></code>. The custom function was solely intended to allow vectorized <code>padding</code>, currently the bottom,left,top,right is applied to all labels, and cannot be custom for each label. The driving goal was to have smaller margins between signed count labels, since they usually have smaller font size. Otherwise the distance between signed labels, line-by-line, was too far. First option, just call <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> and remove the ability to use different padding. Second option, wrap the call inside <code><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply()</a></code> which is what is done inside gridtext for multiple grobs anyway. It won’t be any slower. Final option is to ask Dr. Claus Wilke to allow a list of vectors as input for argument <code>padding</code>.</li>
+<code>gridtext_richtext_grob()</code> is a custom function, must be removed. It calls internal functions in <code>gridtext</code> that can’t be ported easily, for example <code><a href="https://rdrr.io/r/base/CallExternal.html" class="external-link">.Call()</a></code>. The custom function was solely intended to allow vectorized <code>padding</code>, currently the bottom,left,top,right is applied to all labels, and cannot be custom for each label. The driving goal was to have smaller margins between signed count labels, since they usually have smaller font size. Otherwise the distance between signed labels, line-by-line, was too far. First option, just call <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> and remove the ability to use different padding. Second option, wrap the call inside <code><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply()</a></code> which is what is done inside gridtext for multiple grobs anyway. It won’t be any slower. Final option is to ask Dr. Claus Wilke to allow a list of vectors as input for argument <code>padding</code>.</li>
 </ul></li>
 </ul></li>
 <li>
 <p><code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
-<ul><li>Consider option to return grid grobs instead of drawing them to the graphical device.</li>
+<ul><li>DONE. Consider option to return grid grobs instead of drawing them to the graphical device.</li>
 </ul></li>
 <li>
 <p><code><a href="reference/render_venndir.html">render_venndir()</a></code>, and <code><a href="reference/venndir.html">venndir()</a></code></p>
-<ul><li>Consider option to return the grid grobs to be rendered elsewhere. Return the <code>viewport</code> as defined by <code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>.</li>
-<li>Consider something like post plot hook, to call a function after the plot is rendered, before calling <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::pop.viewport()</a></code>.</li>
+<ul><li>DONE. Consider option to return the grid grobs to be rendered elsewhere. Return the <code>viewport</code> as defined by <code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>.</li>
+<li>DONE. Consider something like post plot hook, to call a function after the plot is rendered, before calling <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::pop.viewport()</a></code>. (Note: “DONE” means this functionality is possible, but because the <code>grid</code> grobs make it possible for the user to do whatever they want.)</li>
 </ul></li>
 </ul></div>
 <div class="section level2">
 <h2 id="id_09jul2024">09jul2024<a class="anchor" aria-label="anchor" href="#id_09jul2024"></a></h2>
-<ul><li>Fix bug where <code>sets</code> is properly subsetting <code>setlist</code> but is not properly subsetting <code>set_colors</code>. Verify other components are also properly subset as needed.</li>
+<ul><li>DONE. Fix bug where <code>sets</code> is properly subsetting <code>setlist</code> but is not properly subsetting <code>set_colors</code>. Verify other components are also properly subset as needed.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="id_08jul2024">08jul2024<a class="anchor" aria-label="anchor" href="#id_08jul2024"></a></h2>
@@ -631,7 +700,7 @@
 <ul><li>calculation appears to use the overall percentage items.</li>
 <li>The default layout would place percentage velow the main counts:</li>
 </ul></li>
-</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
+</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
 </tr></thead><tbody><tr class="odd"><td align="right">overlap_count</td>
 <td rowspan="2" align="left">
 <p>^: up_counts</p>

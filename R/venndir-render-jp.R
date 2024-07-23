@@ -488,7 +488,7 @@ render_venndir <- function
                   "label_color");
                seg_colors <- apply(test_xy[has_segment, sc_cols, drop=FALSE], 1,
                   function(sc1){
-                  sc2 <- jamba::rmNA(sc1);
+                  sc2 <- gsub("^$", "#00000000", jamba::rmNA(sc1));
                   sc2a <- jamba::col2alpha(sc2);
                   sc2 <- sc2[sc2a > 0];
                   head(sc2, 1)
@@ -820,7 +820,8 @@ render_venndir <- function
       ylim=jp_yrange,
       show_labels=FALSE,
       do_draw=FALSE, # experimental
-      do_pop_viewport=TRUE);
+      do_pop_viewport=TRUE,
+      ...);
       # do_pop_viewport=FALSE);
    # on.exit(grid::popViewport());
    # adjx,adjy are functions to transform x,y into grid "snpc" coordinates
