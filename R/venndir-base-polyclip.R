@@ -353,6 +353,15 @@ venndir <- function
    }
    names(legend_labels) <- names(setlist);
    
+   # 0.0.38.900 - ensure internal names do not contain "bad characters"
+   # such as ":"
+   if (any(grepl(":", names(setlist)))) {
+      names(setlist) <- gsub(":", ".", names(setlist));
+      names(setlist_labels) <- names(setlist);
+      names(legend_labels) <- names(setlist);
+   }
+   
+   
    # define colors
    if (length(set_colors) == 0) {
       set_colors <- colorjam::rainbowJam(length(setlist),

@@ -1763,15 +1763,21 @@ polyclip_to_JamPolygon <- function
 #' @param n `integer` number of points required
 #' @param xyratio `numeric` adjustment for the x/y ratio, numbers larger than
 #'    1 make the x-axis spacing larger than the y-axis spacing.
-#' @param spread `logical` when more then `n` points can be fit inside
-#'    `jp`, `spread=TRUE` spreads the points evenly across the available
-#'    points, while `spread=FALSE` only takes the first `n` points.
-#' @pattern `character` string indicating how to array the points:
+#' @param spread `logical` (default `TRUE`) when more then `n` points can
+#'    be fit inside the polygon, `spread=TRUE` spreads the points evenly
+#'    across the available points, while `spread=FALSE` simply uses
+#'    the first `n` points.
+#' @param n_ratio `numeric` ratio which must be `1` or higher, indicating
+#'    how many total sampled points should be defined, before choosing
+#'    the points to use. This option is used only when `spread=TRUE`,
+#'    which causes more points to be defined, from which it uses
+#'    evenly distributed values.
+#' @param pattern `character` string indicating how to array the points:
 #'    * `"offset"` (default) uses a rectangular grid where alternating
 #'    points on each row are offset slightly on the y-axis.
 #'    * `"rectangle"` uses a rectangular grid with points on each row
 #'    that share the same y-axis value.
-#' @pattern buffer `numeric` optional buffer used to adjust the `jp` polygon
+#' @param buffer `numeric` optional buffer used to adjust the `jp` polygon
 #'    size overall, where negative values will slightly shrink the
 #'    polygon border. Points are sampled after this adjustment.
 #' @param byCols `character` passed to `jamba::mixedSortDF()` to determine
@@ -1787,7 +1793,8 @@ sample_JamPolygon <- function
 (jp,
  n=100,
  xyratio=1.1,
- spread=FALSE,
+ spread=TRUE,
+ n_ratio=5,
  pattern=c("offset",
     "rectangle"),
  buffer=0,
@@ -1885,6 +1892,13 @@ sample_JamPolygon <- function
    #    "n_seq: ", n_seq);
    
    # define n points inside the polygon
+   n_ratio <- head(n_ratio, 1);
+   if (length(n_ratio) == 0 || any(n_ratio) < 1) {
+      n_ratio <- 1;
+   }
+   if (!TRUE %in% spread) {
+      n_ratio <- 1;
+   }
    for (try_n in n_seq) {
       A <- array_points(xyrange,
          n=try_n,
@@ -1898,7 +1912,7 @@ sample_JamPolygon <- function
             ", usable n:", sum(pip));
       }
       # print(table(pip))
-      if (sum(pip) >= n) {
+      if (sum(pip) >= (n * n_ratio)) {
          if (TRUE %in% spread) {
             pip_set <- which(pip);
             pip_seq <- pip_set[seq(from=1, to=length(pip_set), length.out=n)]

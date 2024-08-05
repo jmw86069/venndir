@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.38.900</span>
       </span>
     </div>
 
@@ -57,6 +57,30 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.38.900" id="venndir-0038900">venndir 0.0.38.900<a class="anchor" aria-label="anchor" href="#venndir-0038900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-38-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-38-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code></p>
+<ul><li>default changed to <code>spread=TRUE</code> so that item labels are more evenly distributed by default</li>
+<li>new argument <code>n_ratio</code> to control the target number of points, from which <code>spread=TRUE</code> will choose <code>n</code> evenly spaced. For now, the ratio is set <code>n_ratio=5</code> which seems to perform well.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code></p>
+<ul><li>used to display item labels inside the Venn diagram, passes <code>...</code> to <code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code>
+</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>
+<p>Change: <code>names(setlist)</code> will have any characters <code>":"</code> changed to <code>"."</code>.</p>
+<ul><li>The <code>":"</code> character is used by <code>grid</code> as a delimited to name <code>grobs</code>, which means <code>names(setlist)</code> that also contain <code>":"</code> create confusion. Easiest workaround is to maintain <code>":"</code> characters in the <code>setlist_labels</code> and <code>legend_labels</code> (for display) but to remove the <code>":"</code> characters from the internal representation of these names.</li>
+<li>In principle this should not create new bugs, however it is possible something else depends upon the internal names to match the original setlist names.</li>
+</ul></li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.37.900" id="venndir-0037900">venndir 0.0.37.900<a class="anchor" aria-label="anchor" href="#venndir-0037900"></a></h2>
 <div class="section level3">

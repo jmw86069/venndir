@@ -1,3 +1,34 @@
+# venndir 0.0.38.900
+
+## changes to existing functions
+
+* `sample_JamPolygon()`
+
+   * default changed to `spread=TRUE` so that item labels are more
+   evenly distributed by default
+   * new argument `n_ratio` to control the target number of points, from
+   which `spread=TRUE` will choose `n` evenly spaced. For now, the ratio
+   is set `n_ratio=5` which seems to perform well.
+
+* `label_fill_JamPolygon()`
+
+   * used to display item labels inside the Venn diagram, passes `...`
+   to `sample_JamPolygon()`
+
+* `venndir()`
+
+   * Change: `names(setlist)` will have any characters `":"` changed to `"."`.
+   
+      * The `":"` character is used by `grid` as a delimited to name `grobs`,
+      which means `names(setlist)` that also contain `":"` create confusion.
+      Easiest workaround is to maintain `":"` characters in the
+      `setlist_labels` and `legend_labels` (for display) but to remove the
+      `":"` characters from the internal representation of these names.
+      * In principle this should not create new bugs, however it is possible
+      something else depends upon the internal names to match the
+      original setlist names.
+
+
 # venndir 0.0.37.900
 
 ## changes

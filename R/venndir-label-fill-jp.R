@@ -174,7 +174,8 @@ label_fill_JamPolygon <- function
 
    label_sampled <- sample_JamPolygon(jp=jp,
       n=n,
-      xyratio=xyratio);
+      xyratio=xyratio,
+      ...);
 
    label_xy <- do.call(cbind, label_sampled)
 

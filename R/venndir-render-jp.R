@@ -984,6 +984,7 @@ render_venndir <- function
             vp=jp_viewport,
             do.call(grid::gList, unlist(unname(g_labels_list), recursive=FALSE)),
             name="labels");
+         # jamba::printDebug("names(grid::childNames(g_labels_gTree)):");print(names(grid::childNames(g_labels_gTree)));# debug
          g_labels_groupdf <- data.frame(check.names=FALSE,
             jamba::rbindList(strsplit(names(grid::childNames(g_labels_gTree)), ":"),
                newColnames=c("overlap_set",
@@ -991,7 +992,9 @@ render_venndir <- function
                   "type",
                   "location",
                   "roworder",
-                  "label_df_rowname")))
+                  "label_df_rowname",
+                  paste0("extra", seq_len(100)))))
+         # jamba::printDebug("render_venndir(): ", "g_labels_groupdf:");print(g_labels_groupdf);# debug
          g_labels_groupdf$roworder <- as.numeric(g_labels_groupdf$roworder);
          g_labels_groupdf$name <- names(grid::childNames(g_labels_gTree));
          g_labels_groupdf$childName <- grid::childNames(g_labels_gTree);

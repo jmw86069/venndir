@@ -1,5 +1,60 @@
 # TODO for venndir
 
+## 01aug2024
+
+* Consider adding argument `title` or `main` to add a title to the figure.
+
+   * Define title as a `grob` that can be manipulated if needed.
+   * The `grob` follows the figure, so multi-panel figures retain
+   the title relative to each figure.
+   * Consider options for placement: top, top-left, bottom, etc.;
+   and text alignment options: `just`, `hjust`, `vjust`.
+   * It may need its own simple wrapper function `venndir_title()` to
+   hold these options, with useful defaults. It simply returns a `grob`.
+
+
+## 29jul2024
+
+* Consider `clisymbols` to handle logic of Unicode arrow symbols.
+* Consider option not to sort item labels, which would allow user
+control over the order when displayed in the Venn diagram.
+* Document some "fancy" examples showing item labels:
+
+   * One-column item layout.
+   * Control over font sizes/colors via `gridtext` syntax.
+   * Try examples using short text phrases as "items" in each overlap region.
+   * Use of image instead of text label. It can be a mix of images and labels,
+   using `gridtext` features.
+
+## 24jul2024
+
+* Customize item fill logic
+
+   * Generally spread labels more to the center.
+   * Note: `xyratio` argument to `label_fill_JamPolygon()` is passed, but
+   high values `xyratio=10` cause labels to be placed too far at the top.
+   * Consider new rules:
+   
+      * When more positions are produced than required, evenly distribute
+      labels across that array of positions.
+
+* Consider improving how percent overlap is handled
+
+   * Currently appends to the `"text"` column.
+   * Undesired outcome: percent overlap uses the same font size as the count.
+   It could use slightly smaller font, or same font size as signed counts.
+   * It does not permit custom styling, fontsize, fontface, and only currently
+   permits percent overlap.
+   * Examples for optional style:
+      `"(24%)"`
+      `"(24%) J:0.24"`
+   * It could permit optional metrics: Jaccard overlap, concordance coefficient
+   * Consider adding column to include the label.
+   
+      * Jaccard.overlap=0.7
+      * Concordance.overlap=0.45
+      * {Name}.overlap=#
+
 ## 18jul2024
 
 * Add documentation. Here is a laundry list of tips:
@@ -251,7 +306,6 @@ when it calls `render_venndir()` due to `do_plot=TRUE`.
    * the `grid` `viewport` is useful when adding to or adjusting an existing
    figure, otherwise the coordinate system is not usable.
 
-* Consider recognizing `title` or `main` to add a title to the figure.
 * Write more intensive validation for `Venndir` objects.
 * Consider option for black-and-white legend.
 * Write vignette with larger variety of examples for `venndir()`
