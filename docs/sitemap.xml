@@ -37,6 +37,9 @@
     <loc>/reference/JamPolygon-class.html</loc>
   </url>
   <url>
+    <loc>/reference/JamPolygon-methods.html</loc>
+  </url>
+  <url>
     <loc>/reference/Venndir-class.html</loc>
   </url>
   <url>
@@ -206,6 +209,9 @@
   </url>
   <url>
     <loc>/reference/nearest_point_JamPolygon.html</loc>
+  </url>
+  <url>
+    <loc>/reference/nudge_JamPolygon.html</loc>
   </url>
   <url>
     <loc>/reference/nudge_polygon_coords.html</loc>

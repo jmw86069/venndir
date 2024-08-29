@@ -249,7 +249,6 @@ venndir_legender(setlist=setlist, venndir_output=vo124)
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{expand_range}()},
-\code{\link{get_venn_shapes}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},

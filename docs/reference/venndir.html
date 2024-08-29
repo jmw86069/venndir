@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
 <span>  font_cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
 <span>  show_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  display_counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  poly_alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  poly_alpha <span class="op">=</span> <span class="fl">0.6</span>,</span>
 <span>  alpha_by_counts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  label_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basic"</span>, <span class="st">"fill"</span>, <span class="st">"shaded"</span>, <span class="st">"shaded_box"</span>, <span class="st">"lite"</span>, <span class="st">"lite_box"</span><span class="op">)</span>,</span>
 <span>  label_preset <span class="op">=</span> <span class="st">"none"</span>,</span>
@@ -100,6 +100,7 @@
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  debug <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  circle_nudge <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  rotate_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -225,7 +226,7 @@ smaller than other labels.</p></dd>
 
 
 <dt>poly_alpha</dt>
-<dd><p><code>numeric</code> (default 0.8) value between 0 and 1, for
+<dd><p><code>numeric</code> (default 0.6) value between 0 and 1, for
 alpha transparency of the polygon fill color.
 This value is ignored when <code>alpha_by_counts=TRUE</code>.</p><ul><li><p><code>poly_alpha=1</code> is completely opaque (no transparency)</p></li>
 <li><p><code>poly_alpha=0.8</code> is 80% opaque</p></li>

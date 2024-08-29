@@ -6,6 +6,9 @@
 \usage{
 polyclip_to_JamPolygon(A, ...)
 }
+\arguments{
+\item{A}{output from \code{polyclip} functions.}
+}
 \description{
 Convert polyclip polygon to JamPolygon
 }
@@ -27,6 +30,7 @@ jpdf <- new("JamPolygon", polygons=df);
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -44,9 +48,11 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},

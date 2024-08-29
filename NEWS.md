@@ -1,3 +1,122 @@
+# venndir 0.0.39.900
+
+## changes to existing functions
+
+* `render_venndir()`
+
+   * Signed output now uses `":"` instead of `": "` between the directional
+   arrow and the count, for example `"^^:20"` instead of `"^^: 20"`.
+   Somehow the whitespace calculation is inconsistent, causing some
+   labels to be wider than others with `gridtext::richtext_grob()`,
+   with much wider whitespace than anticipated.
+   The effect was inconsistent even on the same machine, between RStudio
+   and R console, and differed across other machines also.
+   Workarounds include choosing different fonts, apparently some provide
+   more reliable whitespace calculations.
+   The change only occurs during rendering when `grobs` are created.
+   The underlying `Venndir` data is not changed.
+
+* `plot.JamPolygon()`, affecting `venndir()` and `render_venndir()`
+
+   * Now renders borders using `gridGeometry` thanks to suggestion from
+   pmur002. Borders are more consistent, without small visual artifacts.
+   * Added `"outerborder"` as a formal border type.
+   * All three types of borders can be rendered, in order: outer, inner, border
+   
+      * "outerborder" - begins at the outer edge of the boundary
+      * "border" - is centered on the boundary itself
+      * "innerborder" - begins at the inner edge of the boundary
+      * when `border` is not drawn, either the innerborder or outerborder
+      are drawn on the border itself to prevent a tiny artifact gap
+      between the innerborder and outerborder.
+
+* `venndir()`
+
+   * The `Venndir` object now uses `outerborder` instead of `border`,
+   and sets `border` to `NA`.
+   * New argument `lwd` controls default border line width.
+   * `unicode` (silent argument passed to `curate_venn_labels()` controls
+   the Unicode character with up/down arrows, disagreement, etc.
+   You can supply `unicode=2` for alternate symbols, though they are
+   font-dependent, R-dependent, and terminal-dependent. All things must
+   work well together (apparently). Use `unicode=FALSE` for simple text.
+   * New default `poly_alpha=0.6` makes background less intense.
+   * Now calls `make_color_contrast()` properly without forcing saturation,
+   previously caused blue to become cyan instead of light blue.
+
+* `sample_JamPolygon()` changed `n_ratio=1` after testing and disliking
+the previous `n_ratio=4`.
+* `venndir_to_df()` gained some new features:
+
+   * new argument `df_format` with three formats:
+   
+      * `"hits"` - essentially a hit matrix with 1, 0, -1 indicating direction
+      * `"items"` - each column of a data.frame contains items for a Venn
+      overlap.
+      * `"wide"` - intended as an RMarkdown summary - it uses grouped rows
+      to display items in each Venn overlap. Not sure it works very well.
+   
+   * argument `return_type`:
+   
+      * `"data.frame"` (default) - returns a data.frame
+      * `"kable"` - returns a colorized `kable` table for RMarkdown HTML
+
+* `textvenn()`
+
+   * now returns column `"color"` mainly used for `venndir_to_df()`
+   * calls `colorjam::col_linear_xf()` for better colorization of counts
+   when `color_by_counts=TRUE`.
+
+* `get_venn_polygon_shapes()`
+
+   * Changed default `return_type="JamPolygon"` since transition to JamPolygon,
+   removed the option for `"polygon_list"`.
+
+* `polygon_circles()`, `polygon_ellipses()` both now return `JamPolygon`.
+
+## new functions
+
+* `nudge_JamPolygon()` - simple function to adjust `JamPolygon` polygons
+
+
+## added generic functions
+
+* Cleaned up some generic function logic, probably more to do.
+* `Venndir` objects
+
+   * `plot()`
+   * `length()`
+
+* `rbind2.JamPolygon()`
+
+   * This function was enhanced to be able to combine multiple `JamPolygon`
+   objects either in a single `list`, multiple `list`, and will now
+   retain all colnames across all `JamPolygon` objects.
+
+## removed deprecated functions, mostly related to polygon_list data format
+
+The polygon_list format loosely conformed to `polyclip` data input/output,
+but had several exceptions that motivated me to use `JamPolygon`: simple
+polygons encoded as list, complex polygons encoded as nested list;
+solid polygon encoded as clockwise points, holes encoded counterclockwise.
+
+* `bbox_polygon_list()`
+* `get_largest_polygon_list()`
+* `intersect_polygon_list()`
+* `labelr_polygon_list()`
+* `minus_polygon_list()`
+* `plot_polygon_list()`
+* `polygon_list_labelr()`
+* `rescale_polygon_list()`
+* `union_polygon_list()`
+* `get_venn_shapes()`
+* `eulerr_to_polygon_list()`
+* `polygon_areas()`
+* `nudge_polygon_coords()`
+* `nudge_polygon_list()`
+* `polygon_list_to_xy_list()`
+* `xy_list_to_polygon_list()`
+
 # venndir 0.0.38.900
 
 ## changes to existing functions

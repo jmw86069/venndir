@@ -59,6 +59,7 @@ test_that("proportional_nested_figure", {
    set.seed(123)
    run_venndir <- function() {
       vo5p <- venndir(setlist=list(set_A=LETTERS, set_B=LETTERS[1:10], set_C=LETTERS[6:7]),
+         innerborder.lwd=0,
          proportional=TRUE, do_plot=TRUE, center_method="label")
    }
    if (jamba::check_pkg_installed("vdiffr")) {
@@ -70,7 +71,8 @@ test_that("proportional_nested_figure", {
    vo5p <- venndir(setlist=list(set_A=LETTERS, set_B=LETTERS[1:10], set_C=LETTERS[6:7]),
       proportional=TRUE, do_plot=FALSE, center_method="label")
    run_vo5p <- function() {
-      render_venndir(vo5p)
+      render_venndir(vo5p,
+         innerborder.lwd=0)
    }
    if (jamba::check_pkg_installed("vdiffr")) {
       vdiffr::expect_doppelganger("Proportional, nested render_venndir()", run_vo5p)

@@ -23,7 +23,7 @@ use in the circle.}
 \item{...}{additional arguments are ignored.}
 }
 \value{
-object \code{list} with a number of circles encoded as polygons.
+\code{JamPolygon} object
 }
 \description{
 Make polygon_list circles
@@ -32,30 +32,40 @@ Make polygon_list circles
 This function creates one or more circles as polygon_list \code{list} objects.
 }
 \examples{
-polygon_list <- polygon_circles(c(3, 2), c(2, 3))
-plot_polygon_list(polygon_list)
-points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
+circle_jp <- polygon_circles(c(3, 2), c(2, 3))
+plot(circle_jp, fill=c("red", "gold"))
 
 }
 \seealso{
-Other venndir polygons: 
-\code{\link{bbox_polygon_list}()},
-\code{\link{eulerr_to_polygon_list}()},
-\code{\link{get_largest_polygon_list}()},
-\code{\link{get_venn_polygon_shapes}()},
-\code{\link{intersect_polygon_list}()},
-\code{\link{labelr_polygon_list}()},
-\code{\link{minus_polygon_list}()},
-\code{\link{nudge_polygon_coords}()},
-\code{\link{nudge_polygon_list}()},
-\code{\link{plot_polygon_list}()},
-\code{\link{polygon_areas}()},
+Other JamPolygon: 
+\code{\link{JamPolygon-class}},
+\code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
+\code{\link{add_orientation_JamPolygon}()},
+\code{\link{area_JamPolygon}()},
+\code{\link{bbox_JamPolygon}()},
+\code{\link{buffer_JamPolygon}()},
+\code{\link{check_JamPolygon}()},
+\code{\link{check_Venndir}()},
+\code{\link{eulerr_to_JamPolygon}()},
+\code{\link{farthest_point_JamPolygon}()},
+\code{\link{find_venn_overlaps_JamPolygon}()},
+\code{\link{has_point_in_JamPolygon}()},
+\code{\link{intersect_JamPolygon}()},
+\code{\link{label_fill_JamPolygon}()},
+\code{\link{label_outside_JamPolygon}()},
+\code{\link{label_segment_JamPolygon}()},
+\code{\link{labelr_JamPolygon}()},
+\code{\link{minus_JamPolygon}()},
+\code{\link{nearest_point_JamPolygon}()},
+\code{\link{nudge_JamPolygon}()},
+\code{\link{plot.JamPolygon}()},
+\code{\link{point_in_JamPolygon}()},
+\code{\link{polyclip_to_JamPolygon}()},
 \code{\link{polygon_ellipses}()},
-\code{\link{polygon_list_labelr}()},
-\code{\link{polygon_list_to_xy_list}()},
-\code{\link{rescale_polygon_list}()},
-\code{\link{simple_ellipse}()},
-\code{\link{union_polygon_list}()},
-\code{\link{xy_list_to_polygon_list}()}
+\code{\link{sample_JamPolygon}()},
+\code{\link{split_JamPolygon}()},
+\code{\link{union_JamPolygon}()},
+\code{\link{update_JamPolygon}()}
 }
-\concept{venndir polygons}
+\concept{JamPolygon}

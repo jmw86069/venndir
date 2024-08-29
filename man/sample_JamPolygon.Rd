@@ -8,7 +8,8 @@ sample_JamPolygon(
   jp,
   n = 100,
   xyratio = 1.1,
-  spread = FALSE,
+  spread = TRUE,
+  n_ratio = 1,
   pattern = c("offset", "rectangle"),
   buffer = 0,
   byCols = c("-y", "x"),
@@ -25,9 +26,28 @@ sample_JamPolygon(
 \item{xyratio}{\code{numeric} adjustment for the x/y ratio, numbers larger than
 1 make the x-axis spacing larger than the y-axis spacing.}
 
-\item{spread}{\code{logical} when more then \code{n} points can be fit inside
-\code{jp}, \code{spread=TRUE} spreads the points evenly across the available
-points, while \code{spread=FALSE} only takes the first \code{n} points.}
+\item{spread}{\code{logical} (default \code{TRUE}) when more then \code{n} points can
+be fit inside the polygon, \code{spread=TRUE} spreads the points evenly
+across the available points, while \code{spread=FALSE} simply uses
+the first \code{n} points.}
+
+\item{n_ratio}{\code{numeric} ratio which must be \code{1} or higher, indicating
+how many total sampled points should be defined, before choosing
+the points to use. This option is used only when \code{spread=TRUE},
+which causes more points to be defined, from which it uses
+evenly distributed values.}
+
+\item{pattern}{\code{character} string indicating how to array the points:
+\itemize{
+\item \code{"offset"} (default) uses a rectangular grid where alternating
+points on each row are offset slightly on the y-axis.
+\item \code{"rectangle"} uses a rectangular grid with points on each row
+that share the same y-axis value.
+}}
+
+\item{buffer}{\code{numeric} optional buffer used to adjust the \code{jp} polygon
+size overall, where negative values will slightly shrink the
+polygon border. Points are sampled after this adjustment.}
 
 \item{byCols}{\code{character} passed to \code{jamba::mixedSortDF()} to determine
 how to sort the resulting coordinates. Default \code{byCols=c("-y", "x")}
@@ -88,6 +108,7 @@ sample_JamPolygon(jp3[1,], n=40, xyratio=1/1.5, do_plot=TRUE)
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -105,10 +126,12 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},
 \code{\link{update_JamPolygon}()}

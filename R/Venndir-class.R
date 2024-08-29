@@ -121,6 +121,55 @@ setClass("Venndir",
    validity=check_Venndir
 );
 
+
+#' Plot JamPolygon object
+#' 
+#' Plot JamPolygon object
+#' 
+#' @returns `Venndir` object, invisibly.
+#' 
+#' @docType methods
+#' @rdname `Venndir-methods`
+#' 
+#' @export
+setMethod("plot",
+   signature=c(x="Venndir", y="ANY"),
+   definition=function(x, y, ...) {
+      if (missing(y)) {
+         y <- 0;
+      }
+      render_venndir(x, ...)
+   })
+
 # Todo:
 # * print(), summary() functions
-# * plot function as wrapper to render_venndir()
+
+setMethod("length",
+   signature=c(x="Venndir"),
+   definition=function(x) {
+      length(x@setlist);
+   }
+)
+
+# if (!isGeneric("setlist")) {
+setGeneric("setlist", function(x) standardGeneric("setlist"))
+# }
+
+#' Extract setlist from a Venndir object
+#' 
+#' @param x `Venndir` object
+#' @docType methods
+#' @rdname `Venndir-method`
+#' @export
+setMethod("setlist",
+   signature(x="Venndir"),
+   function(x) {
+      x@setlist
+   })
+
+setMethod("names",
+   signature=c(x="Venndir"),
+   definition=function(x) {
+      names(x@setlist);
+   }
+)

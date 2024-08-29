@@ -1,41 +1,4 @@
 
-#' Convert euler output to polygons
-#' 
-#' Convert euler output to polygons
-#' 
-#' This function takes the output from `eulerr::euler()` and
-#' converts it to polygons in `list` format.
-#' 
-#' @return `list` polygon object with one polygon
-#'    for each Euler circle or ellipse.
-#' 
-#' @family venndir polygons
-#' 
-#' @param x output from `eulerr::euler()`
-#' 
-#' @returns `list` with polygons for each unique set defined by `names(x)`,
-#'    where each list contains `numeric` vectors named `"x"` and `"y"`.
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' 
-#' polygon_areas(polygon_list)
-#' 
-#' @export
-eulerr_to_polygon_list <- function
-(x)
-{
-   # x <- va
-   ellipses1 <- simple_ellipse(h=x$ellipses$h,
-      k=x$ellipses$k,
-      a=x$ellipses$a,
-      b=x$ellipses$b,
-      phi=x$ellipses$phi);
-   names(ellipses1) <- rownames(x$ellipses);
-   return(ellipses1);
-}
 
 #' Simple ellipse function
 #' 
@@ -151,10 +114,10 @@ eulerr_to_JamPolygon <- function
 #' plot(jp1)
 #' 
 #' xo <- find_venn_overlaps_JamPolygon(jp=jp1, venn_counts=test_counts)
-#' xo@polygons$border <- jamba::makeColorDarker(darkFactor=1.2,
+#' xo@polygons$outerborder <- jamba::makeColorDarker(darkFactor=1.2,
 #'    xo@polygons$venn_color)
-#'    xo@polygons$border.lwd <- 2;
-#' plot(xo, flip_sign=-1);
+#' xo@polygons$outerborder.lwd <- 4;
+#' plot(xo);
 #' 
 #' @export
 # find_venn_polygon_list_overlaps <- function
@@ -235,7 +198,6 @@ find_venn_overlaps_JamPolygon <- function
    }
 
    ## calculate venn overlap polygons
-   #vennCoords <- lapply(1:nrow(el1), function(j){
    venn_poly_coords <- lapply(seq_len(nrow(el1)), function(j){
       i <- el1[j,];
       if (verbose) {
@@ -289,7 +251,6 @@ find_venn_overlaps_JamPolygon <- function
             # print(jp[whichYes, ]);# debug
          }
          ellYes <- intersect_JamPolygon(jp[whichYes, ]);
-         # ellYes <- intersect_polygon_list(polygon_list[whichYes]);
       }
       if (length(ellYes) == 0) {
          ellUse <- list();
@@ -318,8 +279,10 @@ find_venn_overlaps_JamPolygon <- function
       ellUse@polygons$venn_color <- venn_color;
       ellUse@polygons$border <- NA;
       ellUse@polygons$border.lwd <- 1;
+      ellUse@polygons$outerborder <- NA;
+      ellUse@polygons$outerborder.lwd <- 1;
       ellUse@polygons$innerborder <- border;
-      ellUse@polygons$innerborder.lwd <- 3;
+      ellUse@polygons$innerborder.lwd <- 1;
       ellUse@polygons$fill <- venn_color;
       # attr(ellUse, "venn_name") <- poly_name;
       # attr(ellUse, "venn_count") <- venn_poly_count;
@@ -333,15 +296,13 @@ find_venn_overlaps_JamPolygon <- function
       # jamba::printDebug("ellUse:");print(ellUse);# debug
       ellUse;
    })
-   # jamba::printDebug("venn_poly_coords (before rbind2):");print(venn_poly_coords);# debug
-   # return(venn_poly_coords);
-   venn_poly_coords <- do.call(rbind2, venn_poly_coords);
+   # venn_poly_coords <- do.call(rbind2, venn_poly_coords);
+   # jamba::printDebug("venn_poly_coords:");print(venn_poly_coords);# debug
+   venn_poly_coords <- rbind2.JamPolygon(venn_poly_coords);
    # Note venn_poly_coords is JamPolygon
-   # jamba::printDebug("venn_poly_coords (after rbind2):");print(venn_poly_coords);# debug
    venn_poly_coords@polygons$name <- rownames(el1);
    rownames(venn_poly_coords@polygons) <- names(venn_poly_coords);
-   # names(venn_poly_coords) <- rownames(el1);
-   
+
    venn_poly_colors <- venn_poly_coords@polygons$venn_color;
    # venn_poly_counts <- venn_poly_coords@polygons$venn_count;
    venn_poly_items <- venn_poly_coords@polygons$venn_items;
@@ -353,98 +314,19 @@ find_venn_overlaps_JamPolygon <- function
          "vennUse:", vennUse,
          ", vennMissing:", vennMissing);
    }
-   # OMIT since JamPolygon already contains data.frame
-   # new data.frame format
-   # venn_xy_coords <- polygon_list_to_xy_list(venn_poly_coords);
-   # if (verbose > 1) {
-   #    jamba::printDebug("ssdim(venn_poly_coords):");print(jamba::ssdim(venn_poly_coords));# debug
-   #    jamba::printDebug("ssdim(venn_xy_coords):");print(jamba::ssdim(venn_xy_coords));# debug
-   # }
-   # return(invisible(venn_poly_coords));
-   
+
    venn_poly_coords@polygons$label <- names(venn_poly_coords);
-   
-   # venn_pcdf <- data.frame(check.names=FALSE,
-   #    stringsAsFactors=FALSE,
-   #    label=names(venn_poly_coords[vennUse]),
-   #    x=I(venn_xy_coords$x[vennUse]),
-   #    y=I(venn_xy_coords$y[vennUse]),
-   #    venn_poly_coords=I(venn_poly_coords[vennUse]),
-   #    color=venn_poly_colors[vennUse],
-   #    venn_counts=venn_poly_counts[vennUse],
-   #    venn_color=venn_poly_colors[vennUse])
    
    # Define label position for each polygon
    label_xy <- labelr_JamPolygon(venn_poly_coords);
    venn_poly_coords@polygons[, c("label_x", "label_y")] <- as.data.frame(
       label_xy);
-   # venn_pcdf[, c("x_label", "y_label")] <- jamba::rbindList(
-   #    polygon_list_labelr(venn_pcdf$venn_poly_coords));
-   
-   # Port this function: sp_polylabelr(i)
-   # which calls polylabelr::poi(x, y) on each polygon
+
    return(invisible(venn_poly_coords));
 
 }
 
 
-#' Intersect one or more polygons
-#' 
-#' Intersect one or more polygons
-#' 
-#' This function takes a `list` of polygons and iteratively
-#' calls `polyclip::polyclip(A, B, op="intersect")` to produce the intersect
-#' across one or more polygons, which otherwise only works with two
-#' polygons.
-#' 
-#' @return object `list` of polygons
-#' 
-#' @family venndir polygons
-#' 
-#' @param polygon_list `list` object that contains one or more polygons.
-#' @param ... additional arguments are ignored.
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' 
-#' circle_intersect <- intersect_polygon_list(polygon_list);
-#' jamba::ssdim(circle_intersect)
-#' circle_colors <- colorjam::rainbowJam(2);
-#' plot_polygon_list(polygon_list, col=circle_colors, main="intersect")
-#' plot_polygon_list(circle_intersect, col="#FFDD0088", border="red", lwd=3, add=TRUE)
-#' 
-#' @export
-intersect_polygon_list <- function
-(polygon_list,
- new_name=NULL,
- ...)
-{
-   # Purpose is to use polyclip::polyclip(A, B, op="intersect")
-   # on two or more polygons
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # convert xy_list to polygon_list
-      polygon_list <- xy_list_to_polygon_list(polygon_list);
-   }
-   if (length(polygon_list) <= 1) {
-      return(polygon_list);
-   }
-   output_polygon <- polygon_list[1];
-   
-   for (i in 2:length(polygon_list)) {
-      output_polygon <- polyclip::polyclip(
-         A=output_polygon,
-         B=polygon_list[i],
-         op="intersect");
-   }
-   if (length(new_name) == 1) {
-      names(output_polygon) <- new_name;
-   } else {
-      names(output_polygon) <- head(names(polygon_list), 1);
-   }
-   return(output_polygon);
-}
 
 #' Intersect one or more JamPolygon objects
 #' 
@@ -756,443 +638,9 @@ minus_JamPolygon <- function
 }
 
 
-#' Union one or more polygons
-#' 
-#' Union one or more polygons
-#' 
-#' This function takes a `list` of polygons and iteratively
-#' calls `polyclip::polyclip(A, B, op="union")` to produce a union
-#' across one or more polygons, which otherwise only works with two
-#' polygons.
-#' 
-#' @return object `list` of polygons
-#' 
-#' @family venndir polygons
-#' 
-#' @param polygon_list `list` object that contains one or more polygons.
-#' @param ... additional arguments are ignored.
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' 
-#' circle_union <- union_polygon_list(polygon_list);
-#' jamba::ssdim(circle_union)
-#' circle_colors <- colorjam::rainbowJam(2);
-#' plot_polygon_list(polygon_list, col=circle_colors, main="union")
-#' plot_polygon_list(circle_union, col="#FFDD0088", border="red", lwd=3, add=TRUE)
-#' 
-#' counts2 <- c(A=1, B=2, `A&B`=3, C=4)
-#' x2 <- eulerr::euler(counts2)
-#' polygon_list2 <- eulerr_to_polygon_list(x2)
-#' plot_polygon_list(polygon_list2)
-#' 
-#' @export
-union_polygon_list <- function
-(polygon_list,
- ...)
-{
-   # Purpose is to use polyclip::polyclip(A, B, op="union")
-   # on two or more polygons
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # convert xy_list to polygon_list
-      polygon_list <- xy_list_to_polygon_list(polygon_list);
-   }
-   if (length(polygon_list) <= 1) {
-      return(polygon_list);
-   }
-   output_polygon <- polygon_list[1];
-   
-   for (i in 2:length(polygon_list)) {
-      output_polygon <- polyclip::polyclip(
-         A=output_polygon,
-         B=polygon_list[i],
-         op="union");
-   }
-   names(output_polygon) <- head(names(polygon_list), 1);
-   return(output_polygon);
-}
 
 
-#' Subtract one or more polygons
-#' 
-#' Subtract one or more polygons
-#' 
-#' This function takes a `list` of polygons and iteratively
-#' calls `polyclip::polyclip(A, B, op="minus")` to produce a union
-#' across one or more polygons, which otherwise only works with two
-#' polygons.
-#' 
-#' @return object `list` of polygons
-#' 
-#' @family venndir polygons
-#' 
-#' @param polygon_list `list` object that contains one or more polygons.
-#' @param new_name `character` string with optional new name for the
-#'    output polygon.
-#' @param ... additional arguments are ignored.
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3)
-#' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' 
-#' circle_minus <- minus_polygon_list(polygon_list);
-#' circle_colors <- colorjam::rainbowJam(length(polygon_list), alpha=0.5);
-#' plot_polygon_list(polygon_list, col=circle_colors, main="minus")
-#' plot_polygon_list(circle_minus, col="#FFDD0088", border="red", lwd=3, add=TRUE)
-#' 
-#' circle_minus2 <- minus_polygon_list(polygon_list[c(2,1,3)]);
-#' plot_polygon_list(circle_minus2, col="#FFDD0088", border="blue", lwd=3, add=TRUE)
-#' @export
-minus_polygon_list <- function
-(polygon_list,
- new_name=NULL,
- ...)
-{
-   # Purpose is to use polyclip::polyclip(A, B, op="minus")
-   # on two or more polygons
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # convert xy_list to polygon_list
-      polygon_list <- xy_list_to_polygon_list(polygon_list);
-   }
-   if (length(polygon_list) <= 1) {
-      return(polygon_list);
-   }
-   output_polygon <- polygon_list[1];
-   
-   for (i in 2:length(polygon_list)) {
-      output_polygon <- polyclip::polyclip(
-         A=output_polygon,
-         B=polygon_list[i],
-         op="minus");
-   }
-   if (length(output_polygon) > 1) {
-      output_polygon <- list(output_polygon);
-   }
-   if (length(new_name) == 1) {
-      names(output_polygon) <- new_name;
-   } else {
-      names(output_polygon) <- head(names(polygon_list), 1);
-   }
-   return(output_polygon);
-}
 
-#' Plot polygon_list using base R
-#' 
-#' Plot polygon_list using base R
-#' 
-#' @family venndir polygons
-#'
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' plot_polygon_list(polygon_list,
-#'    col=colorjam::rainbowJam(length(polygon_list), alpha=0.5))
-#' 
-#' polygon_list2 <- list(A=polygon_list$A, BC=polygon_list[c("B", "C")])
-#' plot_polygon_list(polygon_list2,
-#'    col=colorjam::rainbowJam(length(polygon_list2), alpha=0.5))
-#' 
-#' @export
-plot_polygon_list <- function
-(polygon_list,
- col=NULL,
- border="black",
- lwd=1,
- add=FALSE,
- asp=1,
- bty="n",
- xaxt="n",
- yaxt="n",
- xlab="",
- ylab="",
- xlim=NULL,
- ylim=NULL,
- rule=c("evenodd", "none"),
- ...)
-{
-   # rule
-   rule <- match.arg(rule);
-   
-   #
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # input is xy_list format
-      xy_list <- polygon_list;
-      polygon_list <- xy_list_to_polygon_list(xy_list);
-   } else {
-      # input is polygon_list
-      xy_list <- polygon_list_to_xy_list(polygon_list);
-   }
-   if (FALSE %in% add) {
-      xy_ranges <- bbox_polygon_list(polygon_list);
-      if (length(xlim) == 0) {
-         xlim <- xy_ranges$x
-      }
-      if (length(ylim) == 0) {
-         ylim <- xy_ranges$y
-      }
-      plot(NULL,
-         xlim=xlim,
-         ylim=ylim,
-         asp=asp,
-         bty=bty,
-         xaxt=xaxt,
-         yaxt=yaxt,
-         xlab=xlab,
-         ylab=ylab,
-         ...)
-   }
-   if (length(col) >= 1) {
-      col <- rep(col,
-         length.out=length(polygon_list));
-   }
-   if (length(border) >= 1) {
-      border <- rep(border,
-         length.out=length(polygon_list));
-   }
-   for (i in seq_along(polygon_list)) {
-      if (is.list(polygon_list[[i]]) &&
-            !all(c("x", "y") %in% names(polygon_list[[i]]))) {
-         # option 1: plot each polygon component independently
-         if ("none" %in% rule) {
-            jamba::printDebug("polygon_list[[i]] as nested polygon, rule='none':");print(polygon_list[[i]]);
-            plot_polygon_list(
-               polygon_list=polygon_list[[i]],
-               col=col[[i]],
-               border=border[[i]],
-               lwd=lwd,
-               add=TRUE,
-               ...)
-         }
-         # option 2: graphics::polypath(x, y, rule="evenodd") to allow holes
-         # - convert polygon_list to xy_list then to coord_list
-         if ("evenodd" %in% rule) {
-            if (length(polygon_list[[i]]) == 1) {
-               # single polygon, no need for fancy polypath()
-               coord_list <- list(
-                  x=polygon_list[[i]][[1]]$x,
-                  y=polygon_list[[i]][[1]]$y);
-            } else {
-               coord_list <- list(
-                  x=head(unname(unlist(
-                     lapply(polygon_list[[i]], function(i){c(i$x, NA)}))), -1),
-                  y=head(unname(unlist(
-                     lapply(polygon_list[[i]], function(i){c(i$y, NA)}))), -1));
-            }
-            # use_xy_list <- polygon_list_to_xy_list(polygon_list[[i]])
-            # coord_list <- xy_list_to_coord_list(use_xy_list)
-            # jamba::printDebug("coord_list:");print(coord_list);# debug
-            polypath(x=coord_list$x,
-               y=coord_list$y,
-               rule=rule,
-               col=col[[i]],
-               border=border[[i]],
-               lwd=lwd,
-               ...)
-         }
-      } else {
-         polygon(
-            x=polygon_list[[i]],
-            col=col[[i]],
-            border=border[[i]],
-            lwd=lwd,
-            ...)
-      }
-   }
-}
-
-
-#' Bounding box for polygon list
-#' 
-#' Bounding box for polygon list
-#' 
-#' @family venndir polygons
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' bbox_polygon_list(polygon_list)
-#' 
-#' @export
-bbox_polygon_list <- function
-(polygon_list,
- ...)
-{
-   #
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # input is xy_list format
-      xy_list <- polygon_list;
-      polygon_list <- xy_list_to_polygon_list(xy_list);
-   } else {
-      # input is polygon_list
-      xy_list <- polygon_list_to_xy_list(polygon_list);
-   }
-   range_x <- range(unlist(xy_list$x), na.rm=TRUE);
-   range_y <- range(unlist(xy_list$y), na.rm=TRUE);
-   return(list(x=range_x, y=range_y))
-}
-
-
-#' Calculate polygon label positions using Pole of Inaccessibility
-#' 
-#' Calculate polygon label positions using Pole of Inaccessibility, otherwise
-#' known as the Visual Center.
-#' 
-#' This function is a wrapper for `polylabelr::poi()` except that it
-#' is applied to a `list` of polygons individually.
-#' 
-#' When any one polygon is composed of two smaller polygon components,
-#' as encoded with a nested list of coordinates,
-#' first the polygons are combined using `union_polygon_list()`.
-#' If the result is a single polygon, that is used to define the
-#' label position. If the result is multiple separate polygon
-#' components, the largest polygon component is used to find the label.
-#' 
-#' @param polygon_list `list` containing elements `"x"` and `"y"` each
-#'    with `numeric` vectors, or `list` of `numeric` vectors.
-#' @param add_labels `logical` indicating whether to plot the labels
-#'    using `text()`
-#' @param ... additional arguments are passed to `text()` when
-#'    `add_labels=TRUE`
-#' 
-#' @family venndir polygons
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' 
-#' # default is to label each polygon in its center
-#' plot_polygon_list(polygon_list,
-#'    col=colorjam::rainbowJam(length(polygon_list), alpha=0.5))
-#' labelr_polygon_list(polygon_list, add_labels=TRUE)
-#' 
-#' # create unique polygons for each label
-#' A_only <- minus_polygon_list(polygon_list, new_name="A_only");
-#' B_only <- minus_polygon_list(polygon_list[c(2,1,3)], new_name="B_only");
-#' C_only <- minus_polygon_list(polygon_list[c(3,1,2)], new_name="C_only");
-#' 
-#' plot_polygon_list(polygon_list,
-#'    col=colorjam::rainbowJam(length(polygon_list), alpha=0.5))
-#' ABC_only <- c(A_only, B_only, C_only);
-#' polygon_list_labelr(ABC_only, add_labels=TRUE)
-#' 
-#' # label ABC intersection
-#' ABC_int <- intersect_polygon_list(polygon_list[c(1,2,3)], new_name="ABC");
-#' plot_polygon_list(ABC_int, add=TRUE, col="gold")
-#' polygon_list_labelr(ABC_int, add_labels=TRUE)
-#' 
-#' # label AB intersection
-#' AB_only <- minus_polygon_list(
-#'    c(intersect_polygon_list(polygon_list[c(1,2)], new_name="BC_only"),
-#'       polygon_list[3]))
-#' plot_polygon_list(AB_only, add=TRUE, col="darkviolet")
-#' polygon_list_labelr(AB_only, add_labels=TRUE, col="white")
-#' 
-#' # label BC intersection
-#' BC_only <- minus_polygon_list(
-#'    c(intersect_polygon_list(polygon_list[c(2,3)], new_name="BC_only"),
-#'       polygon_list[1]))
-#' plot_polygon_list(BC_only, add=TRUE, col="skyblue")
-#' polygon_list_labelr(BC_only, add_labels=TRUE)
-#' 
-#' @export
-labelr_polygon_list <- function
-(polygon_list,
- add_labels=FALSE,
- ...)
-{
-   #
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # input is xy_list format
-      xy_list <- polygon_list;
-      polygon_list <- xy_list_to_polygon_list(xy_list);
-   } else {
-      # input is polygon_list
-      xy_list <- polygon_list_to_xy_list(polygon_list);
-   }
-   
-   polygon_seq <- jamba::nameVector(seq_along(polygon_list),
-      names(polygon_list));
-   xy_coords <- jamba::rbindList(lapply(polygon_seq, function(i){
-      if (is.list(polygon_list[[i]]) &&
-            !all(c("x", "y") %in% names(polygon_list[[i]]))) {
-         # jamba::printDebug("i: ", i, ", list(xy_list)")
-         union_poly <- union_polygon_list(polygon_list[[i]])
-         if (length(union_poly) > 1) {
-            union_poly <- get_largest_polygon_list(union_poly_areas)[[1]];
-         }
-         polylabelr::poi(union_poly)
-      } else {
-         # jamba::printDebug("i: ", i, ", xy_list")
-         polylabelr::poi(polygon_list[[i]])
-      }
-   }))
-   if (TRUE %in% add_labels) {
-      text(x=xy_coords[, "x"],
-         y=xy_coords[, "y"],
-         labels=rownames(xy_coords),
-         ...)
-   }
-}
-
-
-#' Largest polygon in a polygon list
-#' 
-#' Largest polygon in a polygon list
-#' 
-#' This function returns the largest polygon in a polygon list,
-#' intended when there are multiple polygons contained in one object.
-#' 
-#' If two polygons have identical area, the first
-#' polygon is returned.
-#' 
-#' ## Todo:
-#' 
-#' * Verify correct output when polygon(s) have holes.
-#' 
-#' @family venndir polygons
-#' 
-#' @returns `list` with polygon coordinates `"x"` and `"y"`
-#' 
-#' @param polygon_list `list` with `"x"` and `"y"` elements with
-#'    polygon coordinates.
-#' @param ... additional arguments are ignored.
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3, C=4)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' largest_poly <- get_largest_polygon_list(polygon_list)
-#' plot_polygon_list(polygon_list, col=colorjam::rainbowJam(3, alpha=0.5))
-#' plot_polygon_list(largest_poly, add=TRUE, border="red", lwd=3)
-#' 
-#' 
-#' @export
-get_largest_polygon_list <- function
-(polygon_list,
- ...)
-{
-   #
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # input is xy_list format
-      xy_list <- polygon_list;
-      polygon_list <- xy_list_to_polygon_list(xy_list);
-   } else {
-      # input is polygon_list
-      xy_list <- polygon_list_to_xy_list(polygon_list);
-   }
-   
-   # Subset multi-polygon entries to use the largest polygon
-   poly_areas <- polygon_areas(polygon_list, simplify=TRUE)
-   polygon_list <- polygon_list[which.max(poly_areas)]
-   return(polygon_list);
-}
 
 
 #' Make polygon_list circles
@@ -1201,9 +649,9 @@ get_largest_polygon_list <- function
 #' 
 #' This function creates one or more circles as polygon_list `list` objects.
 #' 
-#' @family venndir polygons
+#' @family JamPolygon
 #' 
-#' @return object `list` with a number of circles encoded as polygons.
+#' @returns `JamPolygon` object
 #' 
 #' @param xcenter,ycenter `numeric` vector that defines the x and y
 #'    coordinate position of the center of each circle.
@@ -1217,9 +665,8 @@ get_largest_polygon_list <- function
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
-#' polygon_list <- polygon_circles(c(3, 2), c(2, 3))
-#' plot_polygon_list(polygon_list)
-#' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
+#' circle_jp <- polygon_circles(c(3, 2), c(2, 3))
+#' plot(circle_jp, fill=c("red", "gold"))
 #' 
 #' @export
 polygon_circles <- function
@@ -1253,7 +700,12 @@ polygon_circles <- function
          x=xvals * radius[i] + xcenter[i],
          y=yvals * radius[i] + ycenter[i])
    })
-   return(polygon_list);
+   cjp <- rbind2.JamPolygon(lapply(polygon_list, function(i){
+      polyclip_to_JamPolygon(A=list(i), ...)
+   }))
+   names(cjp) <- setnames;
+   rownames(cjp@polygons) <- setnames;
+   return(cjp);
 }
 
 
@@ -1264,9 +716,9 @@ polygon_circles <- function
 #' 
 #' This function creates one or more ellipses as polygon_list `list` objects.
 #' 
-#' @family venndir polygons
+#' @family JamPolygon
 #' 
-#' @return object `list` with a number of circles encoded as polygons.
+#' @returns `JamPolygon` object
 #' 
 #' @param xcenter,ycenter `numeric` vector that defines the x and y
 #'    coordinate position of the center of each ellipse.
@@ -1284,11 +736,10 @@ polygon_circles <- function
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
-#' polygon_list <- polygon_ellipses(c(3, 2), c(2, 3),
+#' ejp <- polygon_ellipses(c(3, 2), c(2, 3),
 #'    xradius=c(1, 4),
 #'    yradius=c(5, 2))
-#' plot_polygon_list(polygon_list, col=c("#FF000077", "#FFDD0077"));
-#' points(x=c(3, 2), y=c(2, 3), pch=c("1", "2"), add=TRUE);
+#' plot(ejp, fill=c("#FF000077", "#FFDD0077"))
 #' 
 #' @export
 polygon_ellipses <- function
@@ -1334,420 +785,135 @@ polygon_ellipses <- function
    polygon_list <- lapply(x_seq, function(i){
       i_xvals <- (xvals * xradius[i]);
       i_yvals <- (yvals * yradius[i]);
-      e_xvals <- (i_xvals * cos(rotation_rad[i]) + i_yvals * sin(rotation_rad[i]));
-      e_yvals <- (i_yvals * cos(rotation_rad[i]) - i_xvals * sin(rotation_rad[i]));
+      e_xvals <- (i_xvals * cos(rotation_rad[i]) +
+            i_yvals * sin(rotation_rad[i]));
+      e_yvals <- (i_yvals * cos(rotation_rad[i]) -
+            i_xvals * sin(rotation_rad[i]));
       list(
          x=e_xvals + xcenter[i],
          y=e_yvals + ycenter[i])
    })
-   return(polygon_list);
+   cjp <- rbind2.JamPolygon(lapply(polygon_list, function(i){
+      polyclip_to_JamPolygon(A=list(i), ...)
+   }))
+   names(cjp) <- setnames;
+   rownames(cjp@polygons) <- setnames;
+   return(cjp);
 }
 
 
-#' Nudge polygon_list
+#' Nudge JamPolygon coordinates
 #' 
-#' Nudge polygon_list
+#' Nudge JamPolygon coordinates
 #' 
-#' This helper function is intended to take `list` polygon_list coordinates
-#' and "nudge" (move by adding a scalar value to each coordinate)
-#' only a subset of polygons identified by name.
+#' Polygon coordinates within a `JamPolygon` object are nudged by name
+#' or polygon number, such that all parts of each polygon are adjusted
+#' together. For multi-part polygons, and/or polygons with internal holes,
+#' all parts are moved the identical amount.
 #' 
-#' @family venndir polygons
+#' @family JamPolygon
 #' 
-#' @return object `list` polygon_list object with `"x"` and `"y"` elements.
-#' 
-#' @param polygon_list `list` object with `"x"` and `"y"` elements.
-#' @param nudge `list` whose names are found in `names(polygon_list)`,
-#'    and whose values are `x` and `y` coordinates to be moved.
-#' @param rotate_degrees `numeric` value in degrees (0, 360) to
-#'    rotate the `polygon_list` object and all contained polygons.
-#'    (Not yet implemented.)
-#' @param ... additional arguments are ignored.
+#' @param jp `JamPolygon` object
+#' @param nudge `list` whose names match `names(jp)`, containing `numeric`
+#'    vector with names `"x"` and `"y"`. For example:
+#'    `nudge=list(polyname1=c(x=1, y=0))`
+#' @param ... additional arguments are ignored
 #' 
 #' @examples
-#' D <- list(
-#'    x=c(-3, 3, 3, 0, -3),
-#'    y=c(-3, -3, 1.5, 4, 1.5))
-#' E <- list(
-#'    x=c(-3, 3, 3, -3),
-#'    y=c(-3, -3, 3, 3))
-#' DElist <- list(D=D, E=E, DE=list(D=D, E=E))
-#' nudge <- list(D=c(x=0, y=10), E=c(x=0, y=-10), DE=c(x=10, y=0))
-#' new_polygon_list <- nudge_polygon_list(polygon_list=DElist,
-#'    nudge=nudge)
-#' poly_colors <- colorjam::rainbowJam(3, alpha=0.5);
-#' plot_polygon_list(DElist, col=poly_colors)
-#' plot_polygon_list(new_polygon_list, col=poly_colors)
+#' DEdf <- data.frame(check.names=FALSE,
+#'    name=c("D", "E"),
+#'    x=I(list(
+#'       c(-3, 3, 3, 0, -3),
+#'       c(-4, 2, 2, -4))),
+#'    y=I(list(
+#'       c(-3, -3, 1.5, 4, 1.5),
+#'       c(-2, -2, 4, 4))),
+#'    fill=c("#FFD70055", "#B2222255"))
+#' DEjp <- new("JamPolygon", polygons=DEdf)
+#' plot(DEjp)
+#' nudge <- list(D=c(7, 1), E=c(-1, -1));
+#' DEjp_nudged <- nudge_JamPolygon(DEjp, nudge=nudge)
+#' plot(DEjp_nudged)
 #' 
-#' polygon_list <- polygon_ellipses(c(3, 2), c(2, 3),
-#'    xradius=c(1, 4),
-#'    yradius=c(5, 2))
-#' plot_polygon_list(polygon_list,
-#'    col=c("#FF000077", "#FFDD0000"),
-#'    xlim=c(-2, 9));
-#' polygon_list2 <- nudge_polygon_list(polygon_list,
-#'    nudge=list(`2`=c(x=3, y=-2))
-#' )
-#' plot_polygon_list(polygon_list2,
-#'    col=c("#FF000077", "#FFDD0077"),
-#'    add=TRUE,
-#'    xlim=c(-2, 9));
-#' 
-#' plot_polygon_list(polygon_list[2], border="blue", lty="dotted", lwd=3, add=TRUE);
-#' plot_polygon_list(polygon_list2[2], border="blue", lty="dotted", lwd=3, add=TRUE);
-#' arrows(x0=2, x1=5, y0=3, y1=1)
+#' plot(rbind2(DEjp, DEjp_nudged),
+#'    fill=c("#FFD70055", "#B2222255", "gold", "firebrick"),
+#'    label=c("D_old", "E_old", "D_new", "E_new"),
+#'    border.lty=c(2, 2, 1, 1))
 #' 
 #' @export
-nudge_polygon_list <- function
-(polygon_list=NULL,
+nudge_JamPolygon <- function
+(jp,
  nudge=NULL,
+ verbose=FALSE,
  ...)
 {
    #
-   if (length(polygon_list) == 0) {
-      return(polygon_list);
+   if (length(jp) == 0) {
+      return(jp)
    }
-   if (all(c("x", "y") %in% names(polygon_list) && length(polygon_list) == 2)) {
-      # input is xy_list format
-      xy_list <- polygon_list;
-      polygon_list <- xy_list_to_polygon_list(xy_list);
-   } else {
-      # input is polygon_list
-      xy_list <- polygon_list_to_xy_list(polygon_list);
-   }
-   
-   # Optionally nudge the polygon coordinates
-   polygon_names <- names(polygon_list);
-
-   ## shift by coordinates
-   if (length(nudge) > 0 &&
-         is.list(nudge) &&
-         any(names(nudge) %in% polygon_names)) {
-      use_nudge <- nudge[names(nudge) %in% polygon_names];
-      for (i in seq_along(use_nudge)) {
-         iname <- names(use_nudge)[i];
-         j <- match(iname, polygon_names);
-         i_nudge <- nudge[[i]];
-         polygon_list[[j]] <- nudge_polygon_coords(
-            polygon=polygon_list[[j]],
-            nudge=nudge[[i]])
-      }
-   }
-   
-   return(invisible(polygon_list));
-}
-
-#' Nudge polygon coordinates
-#' 
-#' Nudge polygon coordinates
-#' 
-#' This function differs from `nudge_polygon_list()` in that all polygons
-#' are nudged the exact same amount. If there are nested polygons, they
-#' are iteratively all nudged the same.
-#' 
-#' @family venndir polygons
-#' 
-#' @examples
-#' D <- list(
-#'    x=c(-3, 3, 3, 0, -3),
-#'    y=c(-3, -3, 1.5, 4, 1.5))
-#' E <- list(
-#'    x=c(-3, 3, 3, -3),
-#'    y=c(-3, -3, 3, 3))
-#' DElist <- list(D=D, E=E, DE=list(D=D, E=E))
-#' nudge <- c(x=10, y=-10)
-#' new_polygon_list <- nudge_polygon_coords(polygon_list=DElist, nudge=nudge)
-#' plot_polygon_list(new_polygon_list)
-#' 
-#' @export
-nudge_polygon_coords <- function
-(polygon_list,
- nudge,
- ...)
-{
-   #
-   if (length(nudge) == 1) {
-      nudge <- unname(rep(nudge, length.out=2))
+   if (length(nudge) == 0) {
+      return(jp)
    }
    if (length(names(nudge)) == 0) {
-      names(nudge) <- c("x", "y")
+      stop("There must be names(nudge).")
    }
-   if (is.list(polygon_list) &&
-         all(c("x", "y") %in% names(polygon_list))) {
-      # simple list with "x","y"
-      polygon_list$x <- polygon_list$x + nudge["x"];
-      polygon_list$y <- polygon_list$y + nudge["y"];
+   if (length(names(nudge)) == 0 && !any(names(nudge) %in% names(jp))) {
+      # check for numeric names
+      nudge_names <- as.integer(names(nudge));
+      use_nudge <- (!is.na(nudge_names) &
+            nudge_names == as.numeric(names(nudge)) &
+            nudge_names %in% seq_along(jp))
+      if (!all(use_nudge)) {
+         stop("names(nudge) must match names(jp) or seq_along(jp)")
+      }
+      nudge_names <- names(jp)[nudge_names]
    } else {
-      # nested list
-      polygon_list <- lapply(polygon_list, function(ipolygon_list){
-         nudge_polygon_coords(polygon_list=ipolygon_list,
-            nudge=nudge,
-            ...)
-      })
+      nudge_names <- intersect(names(nudge), names(jp))
    }
-   return(polygon_list);
-}
-
-
-#' Rescale a polygon_list object
-#' 
-#' Rescale a polygon_list object
-#' 
-#' This function simply applies `rescale_coordinates()` to an
-#' `list` polygon_list object.
-#' 
-#' @family venndir polygons
-#' 
-#' @return object `list` polygon_list
-#' 
-#' @inheritParams rescale_coordinates
-#' 
-#' @param polygon_list `list` object
-#' @param share_center `logical` indicating whether all polygons
-#'    should share the same center, where `share_center=TRUE` will
-#'    adjust everything collectively, and `share_center=FALSE` will
-#'    adjust each polygon independently relative to its own center
-#'    coordinate.
-#' 
-#' @examples
-#' polygon_list <- polygon_ellipses(c(3, 2), c(2, 3),
-#'    xradius=c(1, 4),
-#'    yradius=c(5, 2))
-#' polygon_list1 <- intersect_polygon_list(polygon_list);
-#' polygon_list2 <- minus_polygon_list(polygon_list[1:2]);
-#' polygon_list3 <- minus_polygon_list(polygon_list[2:1]);
-#' polygon_list123 <- c(polygon_list1,
-#'    polygon_list2,
-#'    polygon_list3);
-#' 
-#' polygon_list123a <- rescale_polygon_list(polygon_list123,
-#'    scale=c(1.5, 1.5),
-#'    share_center=TRUE);
-#' polygon_list123b <- rescale_polygon_list(polygon_list123,
-#'    scale=c(1.5, 1.5));
-#' col3 <- c("#FF000077", "#FFDD0077", "#0000DD77");
-#' par("mfrow"=c(2, 2));
-#' plot_polygon_list(polygon_list123,
-#'    col=col3,
-#'    main="original polygons",
-#'    xlim=c(-10, 15), ylim=c(-5, 10));
-#' axis(1, las=2); axis(2, las=2);
-#' plot_polygon_list(polygon_list123a,
-#'    col=col3,
-#'    main="share_center=TRUE",
-#'    xlim=c(-10, 15), ylim=c(-5, 10));
-#' axis(1, las=2); axis(2, las=2);
-#' plot_polygon_list(polygon_list123[1:2],
-#'    col=col3[1:2],
-#'    main="share_center=FALSE\nrescaling only the blue polygon",
-#'    xlim=c(-10, 15), ylim=c(-5, 10));
-#' axis(1, las=2); axis(2, las=2);
-#' plot_polygon_list(polygon_list123b[3],
-#'    col=col3[3],
-#'    add=TRUE);
-#' plot_polygon_list(polygon_list123[2:3],
-#'    col=col3[2:3],
-#'    main="share_center=FALSE\nrescaling only the red polygon",
-#'    xlim=c(-10, 15), ylim=c(-5, 10));
-#' axis(1, las=2); axis(2, las=2);
-#' plot_polygon_list(polygon_list123b[1],
-#'    col=col3[1],
-#'    add=TRUE);
-#' par("mfrow"=c(1, 1));
-#' 
-#' {par("mfrow"=c(2, 2));
-#' plot_polygon_list(polygon_list123, col=col3,
-#'    xlim=c(-4, 8), ylim=c(-4, 8))
-#' title(main="Original polygons", line=0);
-#' plot_polygon_list(rescale_polygon_list(polygon_list123, rotate_degrees=c(`11`=45, `12`=-10)), col=col3,
-#'    xlim=c(-4, 8), ylim=c(-4, 8))
-#' title(sub="yellow +45 degrees\nblue -10 degrees", line=0,
-#'    main="share_polygon_center=TRUE (default)")
-#' plot_polygon_list(rescale_polygon_list(polygon_list123, rotate_degrees=c(`11`=45, `12`=-10), share_polygon_center=FALSE), col=col3,
-#'    xlim=c(-4, 8), ylim=c(-4, 8))
-#' title(sub="yellow +45 degrees\nblue -10 degrees", line=0,
-#'    main="share_polygon_center=FALSE\n(each polygon uses its center)")
-#' plot_polygon_list(rescale_polygon_list(polygon_list123, rotate_degrees=c(`11`=45, `12`=-10), share_center=TRUE), col=col3,
-#'    xlim=c(-4, 8), ylim=c(-4, 8))
-#' title(sub="yellow +45 degrees\nblue -10 degrees", line=0,
-#'    main="share_center=TRUE\n(all polygons share one global center)")
-#' par("mfrow"=c(1, 1));}
-#' 
-#' 
-#' @export
-rescale_polygon_list <- function
-(polygon_list,
- rotate_degrees=0,
- scale=c(1, 1),
- shift=c(0, 0),
- center=NULL,
- share_center=FALSE,
- share_polygon_center=TRUE,
- ...)
-{
-   ## SpatialPolygons
-   if (length(center) == 0) {
-      if (share_center) {
-         center <- sapply(bbox_polygon_list(polygon_list), mean);
-         center <- rep(list(center),
-            length.out=length(polygon_list))
-         names(center) <- names(polygon_list);
-      } else if (share_polygon_center) {
-         center <- lapply(polygon_list, function(i){
-            sapply(bbox_polygon_list(i), mean)
+   
+   # custom function to apply nudge to nested numeric list
+   apply_nudge <- function(i, offset) {
+      if (is.list(i)) {
+         lapply(i, function(j){
+            apply_nudge(j, offset)
          })
-         share_center <- TRUE;
-      }
-   }
-   if (is.atomic(center)) {
-      center <- rep(list(center),
-         length.out=length(polygon_list))
-      names(center) <- names(polygon_list);
-   }
-   if (is.atomic(scale)) {
-      scale <- rep(list(scale),
-         length.out=length(polygon_list))
-      names(scale) <- names(polygon_list);
-   }
-   if (is.atomic(shift)) {
-      shift <- rep(list(shift),
-         length.out=length(polygon_list))
-      names(shift) <- names(polygon_list);
-   }
-   if (is.atomic(rotate_degrees)) {
-      rotate_degrees <- rep(rotate_degrees,
-         length.out=length(polygon_list))
-      names(rotate_degrees) <- names(polygon_list);
-   }
-   
-   poly_seq <- jamba::nameVector(seq_along(polygon_list),
-      names(polygon_list));
-   polygon_list <- lapply(poly_seq, function(i){
-      if (is.list(polygon_list[[i]]) &&
-            all(c("x", "y") %in% names(polygon_list[[i]]))) {
-         xym <- rescale_coordinates(x=do.call(cbind, polygon_list[[i]]),
-            scale=scale[[i]],
-            rotate_degrees=rotate_degrees[[i]],
-            shift=shift[[i]],
-            center=center[[i]],
-            ...)
-         list(x=xym[, "x"],
-            y=xym[, "y"])
       } else {
-         rescale_polygon_list(polygon_list=polygon_list[[i]],
-            scale=scale[[i]],
-            rotate_degrees=rotate_degrees[[i]],
-            shift=shift[[i]],
-            center=center[[i]],
-            ...)
+         i + offset
       }
-   })
-   
-   return(polygon_list);
+   }
+   for (nudge_name in nudge_names) {
+      n <- match(nudge_name, names(jp));
+      if (all(c("x", "y") %in% names(nudge[[nudge_name]]))) {
+         nudge_x <- nudge[[nudge_name]][["x"]];
+         nudge_y <- nudge[[nudge_name]][["y"]];
+      } else {
+         nudge_x <- nudge[[nudge_name]][[1]];
+         nudge_y <- nudge[[nudge_name]][[2]];
+      }
+      if (verbose) {
+         jamba::printDebug("nudge_JamPolygon(): ",
+            "applying nudge (", c(nudge_x, nudge_y), ") ",
+            "to '", nudge_name, "'");
+      }
+      if (!all(nudge_x %in% c(NA, 0))) {
+         old_x <- jp@polygons$x[n];
+         new_x <- apply_nudge(jp[nudge_name, ]@polygons$x, offset=nudge_x)
+         jp@polygons$x[n] <- new_x;
+      } else {
+         new_x <- jp[nudge_name, ]@polygons$x;
+      }
+      if (!all(nudge_y %in% c(NA, 0))) {
+         old_y <- jp@polygons$y[n];
+         new_y <- apply_nudge(jp[nudge_name, ]@polygons$y, offset=nudge_y)
+         jp@polygons$y[n] <- new_y;
+      } else {
+         new_y <- jp[nudge_name, ]@polygons$y;
+      }
+   }
+   return(jp);
 }
 
 
-#' Simple wrapper to polylabelr::poi() for polygon_list
-#' 
-#' @family venndir polygons
-#' 
-#' @returns `matrix` with nrow `length(polygon_list)` with x,y coordinates
-#'    representing the visual center of each polygon in the list.
-#' 
-#' @param polygon_list `list` object
-#' 
-#' @examples
-#' counts <- c(A=1, B=2, `A&B`=3, C=5, `B&C`=2, `A&C`=2, `A&B&C`=1)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' 
-#' # default is to label each polygon in its center
-#' plot_polygon_list(polygon_list,
-#'    col=colorjam::rainbowJam(length(polygon_list), alpha=0.5))
-#' polygon_list_labelr(polygon_list, add_labels=TRUE)
-#' 
-#' # create unique polygons for each label
-#' A_only <- minus_polygon_list(polygon_list, new_name="A_only");
-#' B_only <- minus_polygon_list(polygon_list[c(2,1,3)], new_name="B_only");
-#' C_only <- minus_polygon_list(polygon_list[c(3,1,2)], new_name="C_only");
-#' 
-#' plot_polygon_list(polygon_list,
-#'    col=colorjam::rainbowJam(length(polygon_list), alpha=0.5))
-#' ABC_only <- c(A_only, B_only, C_only);
-#' polygon_list_labelr(ABC_only, add_labels=TRUE)
-#' 
-#' # label ABC intersection
-#' ABC_int <- intersect_polygon_list(polygon_list[c(1,2,3)], new_name="ABC");
-#' plot_polygon_list(ABC_int, add=TRUE, col="gold")
-#' polygon_list_labelr(ABC_int, add_labels=TRUE)
-#' 
-#' # label AB intersection
-#' AB_only <- minus_polygon_list(
-#'    c(intersect_polygon_list(polygon_list[c(1,2)], new_name="BC_only"),
-#'       polygon_list[3]))
-#' plot_polygon_list(AB_only, add=TRUE, col="darkviolet")
-#' polygon_list_labelr(AB_only, add_labels=TRUE, col="white")
-#' 
-#' # label BC intersection
-#' BC_only <- minus_polygon_list(
-#'    c(intersect_polygon_list(polygon_list[c(2,3)], new_name="BC_only"),
-#'       polygon_list[1]))
-#' plot_polygon_list(BC_only, add=TRUE, col="skyblue")
-#' polygon_list_labelr(BC_only, add_labels=TRUE)
-#' 
-#' # test with fully overlapping polygon (to create a hole)
-#' counts <- c(A=5, B=0, C=3, `A&B`=1)
-#' x <- eulerr::euler(counts)
-#' polygon_list <- eulerr_to_polygon_list(x)
-#' plot_polygon_list(polygon_list[1:3], col=c("red"))
-#' A_only <- minus_polygon_list(polygon_list[c(1, 2, 3)], new_name="A_only");
-#' plot_polygon_list(A_only, col="gold", add=TRUE)
-#' polygon_list_labelr(A_only, add_labels=TRUE)
-#' 
-#' polygon_list_labelr(c(A_only, polygon_list[2:3]), add_labels=TRUE)
-#' @export
-polygon_list_labelr <- function
-(polygon_list,
- precision=1,
- add_labels=FALSE,
- ...)
-{
-   # validate input
-   if (all(c("x", "y") %in% names(polygon_list))) {
-      # input is xy_list format
-      xy_list <- polygon_list;
-      polygon_list <- xy_list_to_polygon_list(xy_list);
-   } else {
-      # input is polygon_list
-      xy_list <- polygon_list_to_xy_list(polygon_list);
-   }
-   
-   # iterate each polygon
-   label_xy_list <- lapply(polygon_list, function(ixy){
-      if (is.list(ixy) && !all(c("x", "y") %in% names(ixy))) {
-         ixy <- get_largest_polygon_list(ixy)[[1]];
-      }
-      ixy <- do.call(cbind, ixy);
-      # Todo: fallback plan using mean x- and y-ranges?
-      polylabelr::poi(ixy,
-         precision=precision)
-   })
-   # assemble into a matrix
-   label_xy_dist <- jamba::rbindList(label_xy_list,
-      newColnames=c("x", "y", "dist"))
-   xy_coords <- label_xy_dist[, c("x", "y"), drop=FALSE];
-   
-   # optionally plot labels
-   if (TRUE %in% add_labels) {
-      text(x=xy_coords[, "x"],
-         y=xy_coords[, "y"],
-         labels=rownames(xy_coords),
-         ...)
-   }
-   
-   
-   return(xy_coords);
-}
 
 #' Define label positions for JamPolygon using polylabelr::poi()
 #' 

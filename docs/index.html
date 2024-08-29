@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.38.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -364,9 +364,8 @@
 <span><span class="co">#&gt;                    X: 1                          X: 16                </span></span>
 <span><span class="co">#&gt;                                                                       </span></span>
 <span><span class="co">#&gt;                             C    ^: 30                                </span></span>
-<span><span class="co">#&gt;                            71    v: 41</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt;                            71    v: 41</span></span>
+<span></span>
 <span><span class="co"># Revert options</span></span>
 <span><span class="co"># options("jam.htmlOut"=FALSE, "jam.comment"=TRUE)</span></span></code></pre></div>
 <p>Sorry, no proportional text Venn diagrams (yet)!</p>
@@ -376,7 +375,7 @@
 </h2>
 <p>Another driving reason for this package is that sometimes proportional Venn (Euler) diagrams fail to produce circles that show all the overlaps. While sometimes it is mathematically impossible, other times are just… puzzling.</p>
 <p>See below, the overlap <code>set_A&amp;set_B</code> has 1 count, but is not displayed.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">overlaps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>set_A<span class="op">=</span><span class="fl">187</span>, set_B<span class="op">=</span><span class="fl">146</span>, set_C<span class="op">=</span><span class="fl">499</span>,</span>
 <span>   `set_A&amp;set_B`<span class="op">=</span><span class="fl">1</span>,</span>
 <span>   `set_A&amp;set_C`<span class="op">=</span><span class="fl">181</span>,</span>
@@ -391,9 +390,8 @@
 <span>   font_cex<span class="op">=</span><span class="fl">1.4</span>,</span>
 <span>   set_colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"firebrick2"</span>, <span class="st">"dodgerblue"</span>, <span class="st">"#9999AA"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-nudge_1-1.png" width="100%"></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co">#&gt; ##  (17:42:03) 18Jul2024:   warning_label exists</span></span></code></pre></div>
 <p>The argument <code>circle_nudge</code> lets you nudge (move) a Venn circle given x,y coordinates. Provide a <code>list</code> named by the set you want to move, with a <code>numeric</code> vector for the <code>x,y</code> coordinates direction.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vo_nudge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist_o</span>,</span>
 <span>   expand_fraction<span class="op">=</span><span class="fl">0.15</span>,</span>
 <span>   <span class="co"># label_style="lite box",</span></span>
@@ -431,7 +429,7 @@
 </ul>
 </li>
 </ol>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span>
 <span><span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
 <span>   poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
@@ -440,7 +438,7 @@
 <p><img src="reference/figures/README-vennitems_1-1.png" width="100%"></p>
 <p>Interestingly, the density of labels gives some indication of the relative overlaps.</p>
 <p>The same plot using proportional circles makes the label density effectively uniform. Note the option <code>show_items="sign"</code> displays only the directional arrow, and <code>item_cex=2</code> makes the arrows twice as large as normal.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span>
 <span><span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
 <span>   poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
@@ -450,7 +448,7 @@
 <span>   proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></code></pre></div>
 <p><img src="reference/figures/README-vennitems_1p-1.png" width="100%"></p>
 <p>The sign is an interesting visual summary when there are too many labels to display otherwise.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span>
 <span><span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
 <span>   show_labels<span class="op">=</span><span class="st">"Ni"</span>,</span>
@@ -461,7 +459,7 @@
 <span>   max_items<span class="op">=</span><span class="fl">10000</span><span class="op">)</span>;</span></code></pre></div>
 <p><img src="reference/figures/README-vennitems_2-1.png" width="100%"></p>
 <p>Again, proportional Venn circles effectively makes the density uniform.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
 <span>   show_labels<span class="op">=</span><span class="st">"Ni"</span>,</span>
 <span>   overlap_type<span class="op">=</span><span class="st">"each"</span>,</span>

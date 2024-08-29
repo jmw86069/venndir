@@ -20,6 +20,7 @@
   do_viewport = TRUE,
   do_pop_viewport = TRUE,
   do_draw = TRUE,
+  do_experimental = TRUE,
   verbose = FALSE,
   debug = FALSE,
   ...
@@ -88,6 +89,9 @@ or other \code{grid} functions.}
 \code{grid::grid.draw()} for each graphical object.
 When \code{do_draw=FALSE}, it also forces \code{do_newpage=FALSE},
 \code{do_viewport=FALSE}, and \code{do_pop_viewport=FALSE}.}
+
+\item{do_experimental}{\code{logical} indicating whether to use experimental
+rendering with \code{gridGeometry} as potential replacement for \code{vwline}.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
@@ -180,6 +184,23 @@ dfx <- data.frame(name=c("polygon1", "polygon2"),
 jpx <- new("JamPolygon", polygons=dfx);
 plot(jpx);
 
+# if you want to add to the plot, you must capture output
+# to use the viewport
+jpxout <- plot(jpx);
+vp <- attr(jpxout, "viewport");
+adjx <- attr(jpxout, "adjx");
+adjy <- attr(jpxout, "adjy");
+grid::grid.path(x=adjx(c(4, 5, 5, 4) + 0.5),
+   y=adjy(c(3, 3, 4, 4)),
+   vp=vp,
+   gp=grid::gpar(fill="purple", col="red1", lwd=2),
+   default.units="snpc")
+grid::grid.text(x=adjx(5), y=adjy(3.5),
+   label="new grob",
+   vp=vp,
+   gp=grid::gpar(col="yellow", fontsize=20),
+   default.units="snpc")
+
 dfz <- data.frame(name=c("polygon1", "polygon2", "polygon3"),
    x=I(list(
       list(c(1, 4, 4, 1),
@@ -200,8 +221,13 @@ dfz <- data.frame(name=c("polygon1", "polygon2", "polygon3"),
    fill=c("gold", "firebrick", "dodgerblue"));
 jpz <- new("JamPolygon", polygons=dfz);
 jpz@polygons[, c("label_x", "label_y")] <- as.data.frame(labelr_JamPolygon(jpz))
-jpz@polygons$border <- c("orange", "gold", "purple");
-jpz@polygons$border.lwd <- c(3, 4, 5);
+jpz@polygons$outerborder <- c("orange", "gold", "purple");
+jpz@polygons$outerborder.lwd <- 0;
+jpz@polygons$outerborder.lwd <- c(3, 4, 5);
+jpz@polygons$innerborder <- c("orange4", "gold3", "purple4");
+jpz@polygons$innerborder.lwd <- c(3, 4, 5);
+jpz@polygons$border.lwd <- 1;
+jpz@polygons$border.lty <- 2;
 #jpz <- add_orientation_JamPolygon(jpz);
 plot(jpz);
 
@@ -210,6 +236,7 @@ plot(jpz);
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -227,9 +254,11 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},

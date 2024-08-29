@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.38.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -58,6 +58,88 @@
 
 <div id="todo-for-venndir" class="section level1">
 
+<div class="section level2">
+<h2 id="id_28aug2024">28aug2024<a class="anchor" aria-label="anchor" href="#id_28aug2024"></a></h2>
+<ul><li><p>Hide single-set signed labels with concordance and agreement</p></li>
+<li>
+<p>Add generic convenience functions</p>
+<ul><li>
+<code>im()</code>, <code>im_value()</code> for <code>Venndir</code> objects: return incidence matrix, or signed-incidence matrix.</li>
+<li>
+<code>setlist()</code> - accessor for <code>setlist</code>
+</li>
+<li>
+<code>label_df()</code> - accessor for <code>label_df</code>
+</li>
+<li>
+<code>overlaps()</code> or <code>get_overlaps()</code> - some accessors for set overlaps</li>
+</ul></li>
+<li><p><code><a href="reference/nudge_JamPolygon.html">nudge_JamPolygon()</a></code> - extend with <code>scale</code>, <code>rotation</code>.</p></li>
+<li>
+<p>Consider <code>item_style</code> with similar presets as <code>label_style</code>.</p>
+<ul><li>Use case is to allow shading/border for item labels, <code><a href="reference/venndir.html">venndir()</a></code> and <code><a href="reference/venn_meme.html">venn_meme()</a></code>.</li>
+</ul></li>
+<li>
+<p>Consider adding validation for <code>Venndir</code></p>
+<ul><li>Probably only necessary when editing <code>jps</code> and <code>label_df</code>, which may be rare</li>
+<li>Check that <code>label_df</code> and <code>jps</code> are compatible</li>
+</ul></li>
+<li>
+<p>Consider <code><a href="reference/signed_overlaps.html">signed_overlaps()</a></code> S4 object?</p>
+<ul><li>Currently returns <code>data.frame</code> - usable but due to the fixed formatting. Could be useful to “lock it down” to add validation checks, and to provide convenience functions.</li>
+<li>Probably not worth the effort yet.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_22aug2024">22aug2024<a class="anchor" aria-label="anchor" href="#id_22aug2024"></a></h2>
+<ul><li>
+<p>Enhance <code><a href="reference/venndir_to_df.html">venndir_to_df()</a></code></p>
+<ul><li>
+<p>Add two additional formats:</p>
+<ol style="list-style-type: decimal"><li>Venn item format, one column for each overlap, with list of items in each column. This is “user-convenient” and easy way to find a list of items without having to filter the table.</li>
+<li>Hit format, with item rows, and one column for each <code>setlist</code> entry, with values <code>-1</code> or <code>1</code> indicating presence of that item. This format is programmatically easier to use, but requires some filtering of the table to find particular overlaps.</li>
+</ol></li>
+<li><p>Consider changing <code>return_type="data.frame"</code>, with <code>"kable"</code> optional.</p></li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_20aug2024">20aug2024<a class="anchor" aria-label="anchor" href="#id_20aug2024"></a></h2>
+<ul><li>
+<p>Convert from <code>vwline</code> to <code>gridGeometry</code>, per pmur002 (author of both)</p>
+<ul><li>Initial testing confirms it should work.</li>
+<li>Polygon offset is explained in detail here: <a href="https://www.stat.auckland.ac.nz/~paul/Reports/Geometry/offset/offset.html" class="external-link uri">https://www.stat.auckland.ac.nz/~paul/Reports/Geometry/offset/offset.html</a>
+</li>
+<li>gridGeometry explained here: <a href="https://www.stat.auckland.ac.nz/~paul/Reports/Geometry/gridgeometry/gridgeometry.html" class="external-link uri">https://www.stat.auckland.ac.nz/~paul/Reports/Geometry/gridgeometry/gridgeometry.html</a>
+</li>
+<li>Useful functions: <code>polyoffsetGrob()</code> - use <code>rule="evenodd"</code>
+</li>
+</ul></li>
+<li>
+<p>Consider formally recognizing three types of border:</p>
+<ul><li>
+<code>outerborder</code> - only appears outside the polygon boundary</li>
+<li>
+<code>innerborder</code> - only appears inside the polygon boundary</li>
+<li>
+<code>border</code> - appears exactly on the polygon boundary, default <code>NA</code>
+</li>
+<li>each use suffix parameters: <code>.lwd</code>, <code>.lty</code>
+</li>
+<li>requires changing <code><a href="reference/venndir.html">venndir()</a></code> to use <code>outerborder</code> and not <code>border</code>.</li>
+</ul></li>
+<li><p>Consider customizable <code>digits</code> for percent overlap label.</p></li>
+<li>
+<p><code><a href="reference/textvenn.html">textvenn()</a></code> quality of life</p>
+<ul><li>Accept optional input data in <code>...</code> for convenience</li>
+<li>Add option to display percent overlap</li>
+<li>Consider using something like <code>show_labels</code>
+</li>
+</ul></li>
+<li>
+<p>Consider adding example test cases:</p>
+<ul><li>Venn diagram labeled by gene symbol. Cho et al 2019, <a href="https://doi.org/10.1073/pnas.1919528117" class="external-link uri">https://doi.org/10.1073/pnas.1919528117</a> Figure 5A: Venn diagram showing +/-rapamycin ER-mito proteome. Genes are also colorized and highlighted, it might be too much as a visual, but is possible to replicate. It shows item labels outside the Venn diagram which may be useful <code>venndir</code> feature in future.</li>
+</ul></li>
+</ul></div>
 <div class="section level2">
 <h2 id="id_01aug2024">01aug2024<a class="anchor" aria-label="anchor" href="#id_01aug2024"></a></h2>
 <ul><li>
@@ -715,7 +797,7 @@
 <li>
 <code>find_vennpoly_overlaps()</code> -&gt; <code>venndir_descender()</code>, it descends the polygon overlap combinations.</li>
 <li>
-<code><a href="reference/get_venn_shapes.html">get_venn_shapes()</a></code> -&gt; <code>venndir_attender()</code>
+<code>get_venn_shapes()</code> -&gt; <code>venndir_attender()</code>
 </li>
 <li>
 <code><a href="reference/curate_venn_labels.html">curate_venn_labels()</a></code> -&gt; <code>venndir_amender()</code>

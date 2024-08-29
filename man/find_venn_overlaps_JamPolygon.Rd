@@ -89,16 +89,17 @@ jp1@polygons$fill <- polygon_colors;
 plot(jp1)
 
 xo <- find_venn_overlaps_JamPolygon(jp=jp1, venn_counts=test_counts)
-xo@polygons$border <- jamba::makeColorDarker(darkFactor=1.2,
+xo@polygons$outerborder <- jamba::makeColorDarker(darkFactor=1.2,
    xo@polygons$venn_color)
-   xo@polygons$border.lwd <- 2;
-plot(xo, flip_sign=-1);
+xo@polygons$outerborder.lwd <- 4;
+plot(xo);
 
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -115,10 +116,12 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},

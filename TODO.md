@@ -1,5 +1,87 @@
 # TODO for venndir
 
+## 28aug2024
+
+* Hide single-set signed labels with concordance and agreement
+* Add generic convenience functions
+
+   * `im()`, `im_value()` for `Venndir` objects: return incidence matrix,
+   or signed-incidence matrix.
+   * `setlist()` - accessor for `setlist`
+   * `label_df()` - accessor for `label_df`
+   * `overlaps()` or `get_overlaps()` - some accessors for set overlaps
+
+* `nudge_JamPolygon()` - extend with `scale`, `rotation`.
+* Consider `item_style` with similar presets as `label_style`.
+
+   * Use case is to allow shading/border for item labels,
+   `venndir()` and `venn_meme()`.
+
+* Consider adding validation for `Venndir`
+
+   * Probably only necessary when editing `jps` and `label_df`, which may be rare
+   * Check that `label_df` and `jps` are compatible
+
+* Consider `signed_overlaps()` S4 object?
+
+   * Currently returns `data.frame` - usable but due to the fixed formatting.
+   Could be useful to "lock it down" to add validation checks,
+   and to provide convenience functions.
+   * Probably not worth the effort yet.
+
+## 22aug2024
+
+* Enhance `venndir_to_df()`
+
+   * Add two additional formats:
+   
+      1. Venn item format, one column for each overlap, with list of items
+      in each column. This is "user-convenient" and easy way to find a list
+      of items without having to filter the table.
+      2. Hit format, with item rows, and one column for each `setlist` entry,
+      with values `-1` or `1` indicating presence of that item.
+      This format is programmatically easier to use, but requires some
+      filtering of the table to find particular overlaps.
+
+   * Consider changing `return_type="data.frame"`, with `"kable"` optional.
+
+## 20aug2024
+
+* Convert from `vwline` to `gridGeometry`, per pmur002 (author of both)
+
+   * Initial testing confirms it should work.
+   * Polygon offset is explained in detail here:
+   https://www.stat.auckland.ac.nz/~paul/Reports/Geometry/offset/offset.html
+   * gridGeometry explained here:
+   https://www.stat.auckland.ac.nz/~paul/Reports/Geometry/gridgeometry/gridgeometry.html
+   * Useful functions: `polyoffsetGrob()` - use `rule="evenodd"`
+
+* Consider formally recognizing three types of border:
+
+   * `outerborder` - only appears outside the polygon boundary
+   * `innerborder` - only appears inside the polygon boundary
+   * `border` - appears exactly on the polygon boundary, default `NA`
+   * each use suffix parameters: `.lwd`, `.lty`
+   * requires changing `venndir()` to use `outerborder` and not `border`.
+
+* Consider customizable `digits` for percent overlap label.
+* `textvenn()` quality of life
+
+   * Accept optional input data in `...` for convenience
+   * Add option to display percent overlap
+   * Consider using something like `show_labels`
+
+* Consider adding example test cases:
+
+   * Venn diagram labeled by gene symbol.
+   Cho et al 2019, https://doi.org/10.1073/pnas.1919528117
+   Figure 5A: Venn diagram showing +/-rapamycin ER-mito proteome.
+   Genes are also colorized and highlighted, it might be too much
+   as a visual, but is possible to replicate.
+   It shows item labels outside the Venn diagram which may
+   be useful `venndir` feature in future.
+
+
 ## 01aug2024
 
 * Consider adding argument `title` or `main` to add a title to the figure.

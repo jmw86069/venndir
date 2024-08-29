@@ -155,7 +155,12 @@ render_venndir <- function
    # jamba::printDebug("show_items: ", show_items);# debug
    # show_items <- head(show_items, 1);
    item_style <- match.arg(item_style);
-   
+
+   # validate other args
+   if (length(expand_fraction) == 0) {
+      expand_fraction <- 0;
+   }
+
    # Apply label_style
    # - only if label_style is something other than "custom"
    # OR
@@ -491,6 +496,8 @@ render_venndir <- function
                   sc2 <- gsub("^$", "#00000000", jamba::rmNA(sc1));
                   sc2a <- jamba::col2alpha(sc2);
                   sc2 <- sc2[sc2a > 0];
+                  sc2 <- jamba::alpha2col(alpha=(1 + jamba::col2alpha(sc2))/2,
+                     sc2);
                   head(sc2, 1)
                });
                segment_df <- data.frame(
@@ -501,8 +508,8 @@ render_venndir <- function
                   group=rep(venn_jp@polygons$label[test_xy$sp_index[has_segment]], each=2),
                   color=rep(seg_colors, each=2),
                   lwd=rep(jamba::rmNULL(
-                     venn_jp@polygons$border.lwd[test_xy$sp_index[has_segment]],
-                     nullValue=1), each=2),
+                     venn_jp@polygons$innerborder.lwd[test_xy$sp_index[has_segment]],
+                     nullValue=2), each=2),
                   point_order=c(1, 2)
                );
                # jamba::printDebug("segment_df:");print(segment_df);# debug
@@ -793,12 +800,18 @@ render_venndir <- function
       gdf$final_fill <- colorjam::blend_colors(todo_color_list);
 
       # adjust label color to contrast with the polygon fill color
-      new_label_col <- make_color_contrast(x=gdf$label_col,
-         L_threshold=63,
-         y=gdf$final_fill)
-         # y=omatch_fill)
+      if (TRUE) {
+         # assume signed labels were already adjusted, but not main labels
+         # Todo: adjust them all, consistently, in venndir_label_style()
+         new_label_col <- ifelse(gdf$type %in% "main",
+            make_color_contrast(x=gdf$label_col,
+               # L_threshold=63,
+               y=gdf$final_fill,
+               ...),
+            gdf$label_col);
+         gdf$label_col <- new_label_col;
+      }
       ## update all labels
-      gdf$label_col <- new_label_col;
       # jamba::printDebug("gdf:");print(gdf);# debug
    }
    
@@ -885,6 +898,9 @@ render_venndir <- function
             gp=grid::gpar(
                col=itemlabels_df$color,
                fontsize=itemlabels_df$fontsize),
+            r=grid::unit(c(0, 0, 0, 0), "pt"),
+            padding=grid::unit(c(0, 0, 0, 0), "pt"),
+            margin=grid::unit(c(0, 0, 0, 0), "pt"),
             vp=jp_viewport,
             hjust=0.5,
             vjust=0.5);
@@ -930,7 +946,10 @@ render_venndir <- function
          ## Push viewport in case that helps grob size estimates
          # grid::pushViewport(jp_viewport);
          g_labels_list <- lapply(gdf_list, function(igdf){
-            # jamba::printDebug("igdf");print(igdf);# debug
+            ## 0.0.39.900 - fix for inconsistent whitespace width
+            ## - seems to occur only with ": " and on certain output devices
+            igdf$text <- gsub(": ", ":", igdf$text);
+            # jamba::printDebug("igdf$text");print(igdf$text);# debug
             g_labels <- gridtext::richtext_grob(
                text=igdf$text,
                x=adjx(igdf$x),

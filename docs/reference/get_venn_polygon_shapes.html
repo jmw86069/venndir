@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -70,7 +70,7 @@
 <span>  circles_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  circle_nudge <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rotate_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  return_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"polygon_list"</span>, <span class="st">"JamPolygon"</span><span class="op">)</span>,</span>
+<span>  return_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"JamPolygon"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -145,24 +145,7 @@ be represented in the output.</p>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other venndir polygons: 
-<code><a href="bbox_polygon_list.html">bbox_polygon_list</a>()</code>,
-<code><a href="eulerr_to_polygon_list.html">eulerr_to_polygon_list</a>()</code>,
-<code><a href="get_largest_polygon_list.html">get_largest_polygon_list</a>()</code>,
-<code><a href="intersect_polygon_list.html">intersect_polygon_list</a>()</code>,
-<code><a href="labelr_polygon_list.html">labelr_polygon_list</a>()</code>,
-<code><a href="minus_polygon_list.html">minus_polygon_list</a>()</code>,
-<code><a href="nudge_polygon_coords.html">nudge_polygon_coords</a>()</code>,
-<code><a href="nudge_polygon_list.html">nudge_polygon_list</a>()</code>,
-<code><a href="plot_polygon_list.html">plot_polygon_list</a>()</code>,
-<code><a href="polygon_areas.html">polygon_areas</a>()</code>,
-<code><a href="polygon_circles.html">polygon_circles</a>()</code>,
-<code><a href="polygon_ellipses.html">polygon_ellipses</a>()</code>,
-<code><a href="polygon_list_labelr.html">polygon_list_labelr</a>()</code>,
-<code><a href="polygon_list_to_xy_list.html">polygon_list_to_xy_list</a>()</code>,
-<code><a href="rescale_polygon_list.html">rescale_polygon_list</a>()</code>,
-<code><a href="simple_ellipse.html">simple_ellipse</a>()</code>,
-<code><a href="union_polygon_list.html">union_polygon_list</a>()</code>,
-<code><a href="xy_list_to_polygon_list.html">xy_list_to_polygon_list</a>()</code></p></div>
+<code><a href="simple_ellipse.html">simple_ellipse</a>()</code></p></div>
     </div>
 
     <div id="ref-examples">
@@ -170,19 +153,15 @@ be represented in the output.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>A<span class="op">=</span><span class="fl">1</span>, B<span class="op">=</span><span class="fl">2</span>, `A&amp;B`<span class="op">=</span><span class="fl">3</span>, C<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">venn_colors</span> <span class="op">&lt;-</span> <span class="fu">colorjam</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/colorjam/man/rainbowJam.html" class="external-link">rainbowJam</a></span><span class="op">(</span><span class="fl">3</span>, alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">venn_polygon_list</span> <span class="op">&lt;-</span> <span class="fu">get_venn_polygon_shapes</span><span class="op">(</span><span class="va">counts</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_polygon_list.html">plot_polygon_list</a></span><span class="op">(</span><span class="va">venn_polygon_list</span>, col<span class="op">=</span><span class="va">venn_colors</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vjp</span> <span class="op">&lt;-</span> <span class="fu">get_venn_polygon_shapes</span><span class="op">(</span><span class="va">counts</span>, return_type<span class="op">=</span><span class="st">"JamPolygon"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vjp</span>, fill<span class="op">=</span><span class="va">venn_colors</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="get_venn_polygon_shapes-1.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">venn_polygon_list</span> <span class="op">&lt;-</span> <span class="fu">get_venn_polygon_shapes</span><span class="op">(</span><span class="va">counts</span>, proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_polygon_list.html">plot_polygon_list</a></span><span class="op">(</span><span class="va">venn_polygon_list</span>, col<span class="op">=</span><span class="va">venn_colors</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vjp</span> <span class="op">&lt;-</span> <span class="fu">get_venn_polygon_shapes</span><span class="op">(</span><span class="va">counts</span>,</span></span>
+<span class="r-in"><span>   return_type<span class="op">=</span><span class="st">"JamPolygon"</span>,</span></span>
+<span class="r-in"><span>   proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vjp</span>, fill<span class="op">=</span><span class="va">venn_colors</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="get_venn_polygon_shapes-2.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># TODO: examples showing circle_nudge, rotate_degrees</span></span></span>
-<span class="r-in"><span><span class="va">jpdf</span> <span class="op">&lt;-</span> <span class="fu">get_venn_polygon_shapes</span><span class="op">(</span><span class="va">counts</span>, return_type<span class="op">=</span><span class="st">"JamPolygon"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">counts4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>A<span class="op">=</span><span class="fl">1</span>, B<span class="op">=</span><span class="fl">2</span>, `A&amp;B`<span class="op">=</span><span class="fl">3</span>, C<span class="op">=</span><span class="fl">4</span>, `C&amp;D`<span class="op">=</span><span class="fl">2</span>, D<span class="op">=</span><span class="fl">3</span>, `A&amp;C`<span class="op">=</span><span class="fl">2</span>, `A&amp;D`<span class="op">=</span><span class="fl">1</span>, `A&amp;B&amp;C&amp;D`<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">jpdf</span> <span class="op">&lt;-</span> <span class="fu">get_venn_polygon_shapes</span><span class="op">(</span><span class="va">counts4</span>, return_type<span class="op">=</span><span class="st">"JamPolygon"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

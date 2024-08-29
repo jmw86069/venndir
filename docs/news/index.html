@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.38.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -57,6 +57,106 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.39.900" id="venndir-0039900">venndir 0.0.39.900<a class="anchor" aria-label="anchor" href="#venndir-0039900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-39-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-39-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Signed output now uses <code>":"</code> instead of <code>": "</code> between the directional arrow and the count, for example <code>"^^:20"</code> instead of <code>"^^: 20"</code>. Somehow the whitespace calculation is inconsistent, causing some labels to be wider than others with <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>, with much wider whitespace than anticipated. The effect was inconsistent even on the same machine, between RStudio and R console, and differed across other machines also. Workarounds include choosing different fonts, apparently some provide more reliable whitespace calculations. The change only occurs during rendering when <code>grobs</code> are created. The underlying <code>Venndir</code> data is not changed.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>, affecting <code><a href="../reference/venndir.html">venndir()</a></code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li><p>Now renders borders using <code>gridGeometry</code> thanks to suggestion from pmur002. Borders are more consistent, without small visual artifacts.</p></li>
+<li><p>Added <code>"outerborder"</code> as a formal border type.</p></li>
+<li>
+<p>All three types of borders can be rendered, in order: outer, inner, border</p>
+<ul><li>“outerborder” - begins at the outer edge of the boundary</li>
+<li>“border” - is centered on the boundary itself</li>
+<li>“innerborder” - begins at the inner edge of the boundary</li>
+<li>when <code>border</code> is not drawn, either the innerborder or outerborder are drawn on the border itself to prevent a tiny artifact gap between the innerborder and outerborder.</li>
+</ul></li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>The <code>Venndir</code> object now uses <code>outerborder</code> instead of <code>border</code>, and sets <code>border</code> to <code>NA</code>.</li>
+<li>New argument <code>lwd</code> controls default border line width.</li>
+<li>
+<code>unicode</code> (silent argument passed to <code><a href="../reference/curate_venn_labels.html">curate_venn_labels()</a></code> controls the Unicode character with up/down arrows, disagreement, etc. You can supply <code>unicode=2</code> for alternate symbols, though they are font-dependent, R-dependent, and terminal-dependent. All things must work well together (apparently). Use <code>unicode=FALSE</code> for simple text.</li>
+<li>New default <code>poly_alpha=0.6</code> makes background less intense.</li>
+<li>Now calls <code><a href="../reference/make_color_contrast.html">make_color_contrast()</a></code> properly without forcing saturation, previously caused blue to become cyan instead of light blue.</li>
+</ul></li>
+<li><p><code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code> changed <code>n_ratio=1</code> after testing and disliking the previous <code>n_ratio=4</code>.</p></li>
+<li>
+<p><code><a href="../reference/venndir_to_df.html">venndir_to_df()</a></code> gained some new features:</p>
+<ul><li>
+<p>new argument <code>df_format</code> with three formats:</p>
+<ul><li>
+<code>"hits"</code> - essentially a hit matrix with 1, 0, -1 indicating direction</li>
+<li>
+<code>"items"</code> - each column of a data.frame contains items for a Venn overlap.</li>
+<li>
+<code>"wide"</code> - intended as an RMarkdown summary - it uses grouped rows to display items in each Venn overlap. Not sure it works very well.</li>
+</ul></li>
+<li>
+<p>argument <code>return_type</code>:</p>
+<ul><li>
+<code>"data.frame"</code> (default) - returns a data.frame</li>
+<li>
+<code>"kable"</code> - returns a colorized <code>kable</code> table for RMarkdown HTML</li>
+</ul></li>
+</ul></li>
+<li>
+<p><code><a href="../reference/textvenn.html">textvenn()</a></code></p>
+<ul><li>now returns column <code>"color"</code> mainly used for <code><a href="../reference/venndir_to_df.html">venndir_to_df()</a></code>
+</li>
+<li>calls <code><a href="https://rdrr.io/pkg/colorjam/man/col_linear_xf.html" class="external-link">colorjam::col_linear_xf()</a></code> for better colorization of counts when <code>color_by_counts=TRUE</code>.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/get_venn_polygon_shapes.html">get_venn_polygon_shapes()</a></code></p>
+<ul><li>Changed default <code>return_type="JamPolygon"</code> since transition to JamPolygon, removed the option for <code>"polygon_list"</code>.</li>
+</ul></li>
+<li><p><code><a href="../reference/polygon_circles.html">polygon_circles()</a></code>, <code><a href="../reference/polygon_ellipses.html">polygon_ellipses()</a></code> both now return <code>JamPolygon</code>.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-0-39-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-39-900"></a></h3>
+<ul><li>
+<code><a href="../reference/nudge_JamPolygon.html">nudge_JamPolygon()</a></code> - simple function to adjust <code>JamPolygon</code> polygons</li>
+</ul></div>
+<div class="section level3">
+<h3 id="added-generic-functions-0-0-39-900">added generic functions<a class="anchor" aria-label="anchor" href="#added-generic-functions-0-0-39-900"></a></h3>
+<ul><li><p>Cleaned up some generic function logic, probably more to do.</p></li>
+<li>
+<p><code>Venndir</code> objects</p>
+<ul><li><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code></li>
+<li><code><a href="https://rdrr.io/r/base/length.html" class="external-link">length()</a></code></li>
+</ul></li>
+<li>
+<p><code><a href="../reference/JamPolygon-methods.html">rbind2.JamPolygon()</a></code></p>
+<ul><li>This function was enhanced to be able to combine multiple <code>JamPolygon</code> objects either in a single <code>list</code>, multiple <code>list</code>, and will now retain all colnames across all <code>JamPolygon</code> objects.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="removed-deprecated-functions-mostly-related-to-polygon_list-data-format-0-0-39-900">removed deprecated functions, mostly related to polygon_list data format<a class="anchor" aria-label="anchor" href="#removed-deprecated-functions-mostly-related-to-polygon_list-data-format-0-0-39-900"></a></h3>
+<p>The polygon_list format loosely conformed to <code>polyclip</code> data input/output, but had several exceptions that motivated me to use <code>JamPolygon</code>: simple polygons encoded as list, complex polygons encoded as nested list; solid polygon encoded as clockwise points, holes encoded counterclockwise.</p>
+<ul><li><code>bbox_polygon_list()</code></li>
+<li><code>get_largest_polygon_list()</code></li>
+<li><code>intersect_polygon_list()</code></li>
+<li><code>labelr_polygon_list()</code></li>
+<li><code>minus_polygon_list()</code></li>
+<li><code>plot_polygon_list()</code></li>
+<li><code>polygon_list_labelr()</code></li>
+<li><code>rescale_polygon_list()</code></li>
+<li><code>union_polygon_list()</code></li>
+<li><code>get_venn_shapes()</code></li>
+<li><code>eulerr_to_polygon_list()</code></li>
+<li><code>polygon_areas()</code></li>
+<li><code>nudge_polygon_coords()</code></li>
+<li><code>nudge_polygon_list()</code></li>
+<li><code>polygon_list_to_xy_list()</code></li>
+<li><code>xy_list_to_polygon_list()</code></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.38.900" id="venndir-0038900">venndir 0.0.38.900<a class="anchor" aria-label="anchor" href="#venndir-0038900"></a></h2>
 <div class="section level3">
@@ -741,7 +841,7 @@
 <li><p><code><a href="../reference/venndir.html">venndir()</a></code> now adds the Venn shapes to the output <code>venn_spdf</code> with <code>type="set"</code>; all other polygons have <code>type="overlap"</code>. The shapes will serve as an anchor for set labels, in the event we want to label one or more circles – like when one circle is fully contained inside another.</p></li>
 <li><p><code>polygon_label_outside()</code> now determines a reasonable text alignment <code>adj</code> based upon the angle offset, to help minimize label overlap with the line segment.</p></li>
 <li><p><code>polygon_label_outside()</code> was updated to correct some internal use of coordinates. New argument <code>sp_buffer</code> to allow the line segment to end slightly inside each polygon.</p></li>
-<li><p><code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code> default 4-way Venn ellipses were slightly adjusted so the middle ellipses broke the outer ellipses into two polygons. This change helps the automated position of labels by <code>polygon_label_outside()</code> with certain settings.</p></li>
+<li><p><code>get_venn_shapes()</code> default 4-way Venn ellipses were slightly adjusted so the middle ellipses broke the outer ellipses into two polygons. This change helps the automated position of labels by <code>polygon_label_outside()</code> with certain settings.</p></li>
 <li><p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code> was refactored to be able to position labels inside or outside the polygon, for four types of labels:</p></li>
 <li><p><code>"set"</code> - e.g. <code>"set_A"</code></p></li>
 <li><p><code>"overlap"</code> - e.g. <code>"set_A&amp;set_B"</code> normally this label is not shown</p></li>
@@ -791,7 +891,7 @@
 <li>
 <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> was updated to allow using <code>sep="|"</code>. Previous this delimited was used to make unique rownames, and needed to be parsed properly to prevent errors.</li>
 <li>
-<code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>sep</code> which is now properly passed to <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> and <code><a href="../reference/get_venn_shapes.html">get_venn_shapes()</a></code>.</li>
+<code><a href="../reference/venndir.html">venndir()</a></code> new argument <code>sep</code> which is now properly passed to <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> and <code>get_venn_shapes()</code>.</li>
 <li>
 <code>find_vennpoly_overlaps()</code>, <code><a href="../reference/overlaplist2setlist.html">overlaplist2setlist()</a></code>, <code><a href="../reference/counts2setlist.html">counts2setlist()</a></code> now call <code>strsplit(..., fixed=TRUE)</code> so the <code>sep</code> character is not treated like a regular expression, thus allowing delimiter <code>sep="|"</code> if specified.</li>
 </ul></div>

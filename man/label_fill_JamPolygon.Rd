@@ -99,18 +99,22 @@ df3 <- data.frame(name=c("polygon1", "polygon2"),
 jp3 <- new("JamPolygon", polygons=df3);
 plot(jp3);
 
-label_fill_JamPolygon(jp3[1,], labels=1:20)
-test_x <- jp3[1,]@polygons$x[[1]];
-test_y <- jp3[1,]@polygons$y[[1]];
-P <- list(x=c(3.5, 4.5), y=c(3.5, 4.5))
-A <- lapply(seq_along(test_x), function(i){
-   list(x=test_x[[i]], y=test_y[[i]])})
+lfj <- label_fill_JamPolygon(jp3[1,], labels=1:20)
+plot(lfj$items_df[, c("x", "y")], cex=0)
+text(lfj$items_df[, c("x", "y")], labels=lfj$items_df$text)
+
+#test_x <- jp3[1,]@polygons$x[[1]];
+#test_y <- jp3[1,]@polygons$y[[1]];
+#P <- list(x=c(3.5, 4.5), y=c(3.5, 4.5))
+#A <- lapply(seq_along(test_x), function(i){
+#   list(x=test_x[[i]], y=test_y[[i]])})
 
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -127,10 +131,12 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},

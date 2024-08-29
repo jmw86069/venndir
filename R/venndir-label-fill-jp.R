@@ -58,12 +58,15 @@
 #' jp3 <- new("JamPolygon", polygons=df3);
 #' plot(jp3);
 #' 
-#' label_fill_JamPolygon(jp3[1,], labels=1:20)
-#' test_x <- jp3[1,]@polygons$x[[1]];
-#' test_y <- jp3[1,]@polygons$y[[1]];
-#' P <- list(x=c(3.5, 4.5), y=c(3.5, 4.5))
-#' A <- lapply(seq_along(test_x), function(i){
-#'    list(x=test_x[[i]], y=test_y[[i]])})
+#' lfj <- label_fill_JamPolygon(jp3[1,], labels=1:20)
+#' plot(lfj$items_df[, c("x", "y")], cex=0)
+#' text(lfj$items_df[, c("x", "y")], labels=lfj$items_df$text)
+#' 
+#' #test_x <- jp3[1,]@polygons$x[[1]];
+#' #test_y <- jp3[1,]@polygons$y[[1]];
+#' #P <- list(x=c(3.5, 4.5), y=c(3.5, 4.5))
+#' #A <- lapply(seq_along(test_x), function(i){
+#' #   list(x=test_x[[i]], y=test_y[[i]])})
 #' 
 #' @export
 label_fill_JamPolygon <- function

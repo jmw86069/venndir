@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -80,6 +80,7 @@
 <span>  do_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_pop_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  do_experimental <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -177,6 +178,11 @@ When <code>do_draw=FALSE</code>, it also forces <code>do_newpage=FALSE</code>,
 <code>do_viewport=FALSE</code>, and <code>do_pop_viewport=FALSE</code>.</p></dd>
 
 
+<dt>do_experimental</dt>
+<dd><p><code>logical</code> indicating whether to use experimental
+rendering with <code>gridGeometry</code> as potential replacement for <code>vwline</code>.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
 
@@ -253,6 +259,7 @@ using <code>grid</code> functions.</p></li>
     <div class="dont-index"><p>Other JamPolygon: 
 <code><a href="JamPolygon-class.html">JamPolygon-class</a></code>,
 <code><a href="Venndir-class.html">Venndir-class</a></code>,
+<code><a href="JamPolygon-methods.html">[,JamPolygon-method</a></code>,
 <code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon</a>()</code>,
 <code><a href="area_JamPolygon.html">area_JamPolygon</a>()</code>,
 <code><a href="bbox_JamPolygon.html">bbox_JamPolygon</a>()</code>,
@@ -270,9 +277,11 @@ using <code>grid</code> functions.</p></li>
 <code><a href="labelr_JamPolygon.html">labelr_JamPolygon</a>()</code>,
 <code><a href="minus_JamPolygon.html">minus_JamPolygon</a>()</code>,
 <code><a href="nearest_point_JamPolygon.html">nearest_point_JamPolygon</a>()</code>,
-<code><a href="plot-JamPolygon-missing-method.html">plot,JamPolygon,missing-method</a></code>,
+<code><a href="nudge_JamPolygon.html">nudge_JamPolygon</a>()</code>,
 <code><a href="point_in_JamPolygon.html">point_in_JamPolygon</a>()</code>,
 <code><a href="polyclip_to_JamPolygon.html">polyclip_to_JamPolygon</a>()</code>,
+<code><a href="polygon_circles.html">polygon_circles</a>()</code>,
+<code><a href="polygon_ellipses.html">polygon_ellipses</a>()</code>,
 <code><a href="sample_JamPolygon.html">sample_JamPolygon</a>()</code>,
 <code><a href="split_JamPolygon.html">split_JamPolygon</a>()</code>,
 <code><a href="union_JamPolygon.html">union_JamPolygon</a>()</code>,
@@ -295,6 +304,24 @@ using <code>grid</code> functions.</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jpx</span><span class="op">)</span>;</span></span>
 <span class="r-plt img"><img src="plot.JamPolygon-1.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># if you want to add to the plot, you must capture output</span></span></span>
+<span class="r-in"><span><span class="co"># to use the viewport</span></span></span>
+<span class="r-in"><span><span class="va">jpxout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jpx</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">vp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">jpxout</span>, <span class="st">"viewport"</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">adjx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">jpxout</span>, <span class="st">"adjx"</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">adjy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">jpxout</span>, <span class="st">"adjy"</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid.path</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu">adjx</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">4</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   y<span class="op">=</span><span class="fu">adjy</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   vp<span class="op">=</span><span class="va">vp</span>,</span></span>
+<span class="r-in"><span>   gp<span class="op">=</span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"purple"</span>, col<span class="op">=</span><span class="st">"red1"</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   default.units<span class="op">=</span><span class="st">"snpc"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid.text</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu">adjx</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, y<span class="op">=</span><span class="fu">adjy</span><span class="op">(</span><span class="fl">3.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   label<span class="op">=</span><span class="st">"new grob"</span>,</span></span>
+<span class="r-in"><span>   vp<span class="op">=</span><span class="va">vp</span>,</span></span>
+<span class="r-in"><span>   gp<span class="op">=</span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>col<span class="op">=</span><span class="st">"yellow"</span>, fontsize<span class="op">=</span><span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   default.units<span class="op">=</span><span class="st">"snpc"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot.JamPolygon-2.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">dfz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>name<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"polygon1"</span>, <span class="st">"polygon2"</span>, <span class="st">"polygon3"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
@@ -315,11 +342,16 @@ using <code>grid</code> functions.</p></li>
 <span class="r-in"><span>   fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gold"</span>, <span class="st">"firebrick"</span>, <span class="st">"dodgerblue"</span><span class="op">)</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="va">jpz</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"JamPolygon"</span>, polygons<span class="op">=</span><span class="va">dfz</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label_x"</span>, <span class="st">"label_y"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="labelr_JamPolygon.html">labelr_JamPolygon</a></span><span class="op">(</span><span class="va">jpz</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">border</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"orange"</span>, <span class="st">"gold"</span>, <span class="st">"purple"</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">border.lwd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">outerborder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"orange"</span>, <span class="st">"gold"</span>, <span class="st">"purple"</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">outerborder.lwd</span> <span class="op">&lt;-</span> <span class="fl">0</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">outerborder.lwd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">innerborder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"orange4"</span>, <span class="st">"gold3"</span>, <span class="st">"purple4"</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">innerborder.lwd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">border.lwd</span> <span class="op">&lt;-</span> <span class="fl">1</span>;</span></span>
+<span class="r-in"><span><span class="va">jpz</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">border.lty</span> <span class="op">&lt;-</span> <span class="fl">2</span>;</span></span>
 <span class="r-in"><span><span class="co">#jpz &lt;- add_orientation_JamPolygon(jpz);</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jpz</span><span class="op">)</span>;</span></span>
-<span class="r-plt img"><img src="plot.JamPolygon-2.png" alt="" width="768" height="768"></span>
+<span class="r-plt img"><img src="plot.JamPolygon-3.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

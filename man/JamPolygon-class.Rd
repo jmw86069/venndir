@@ -5,7 +5,8 @@
 \alias{JamPolygon-class}
 \title{JamPolygon class}
 \description{
-JamPolygon class
+JamPolygon class contains one slot \code{"polygons"} which is a \code{data.frame}
+with one polygon per row. An individual polygon can
 }
 \examples{
 df <- data.frame(name=c("polygon1", "polygon2"),
@@ -24,6 +25,7 @@ jpdf <- new("JamPolygon", polygons=df);
 \seealso{
 Other JamPolygon: 
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -41,10 +43,12 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},

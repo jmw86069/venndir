@@ -370,9 +370,6 @@ textvenn(setlist, overlap_type="concordance", unicode=FALSE)
 #>                                                                       
 #>                             C    ^: 30                                
 #>                            71    v: 41
-```
-
-``` r
 
 # Revert options
 # options("jam.htmlOut"=FALSE, "jam.comment"=TRUE)
@@ -406,8 +403,6 @@ vn <- venndir(setlist_o,
 ```
 
 <img src="man/figures/README-nudge_1-1.png" width="100%" />
-
-    #> ##  (17:42:03) 18Jul2024:   warning_label exists
 
 The argument `circle_nudge` lets you nudge (move) a Venn circle given
 x,y coordinates. Provide a `list` named by the set you want to move,

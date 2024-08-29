@@ -53,10 +53,11 @@ check_JamPolygon <- function
 
 #' JamPolygon class
 #' 
-#' JamPolygon class
+#' JamPolygon class contains one slot `"polygons"` which is a `data.frame`
+#' with one polygon per row. An individual polygon can 
 #' 
 #' @family JamPolygon
-
+#'
 #' @examples
 #' df <- data.frame(name=c("polygon1", "polygon2"),
 #'    x=I(list(
@@ -82,6 +83,10 @@ setClass("JamPolygon",
    validity=check_JamPolygon
 );
 
+#' Subset JamPolygon object
+#' 
+#' @docType methods
+#' @rdname JamPolygon-methods
 #' @export
 setMethod("[",
    signature=c(x="JamPolygon",
@@ -119,16 +124,6 @@ if (!isGeneric("plot")) {
 #' Plot JamPolygon object
 #' 
 #' Plot JamPolygon object
-#' 
-#' Todo:
-#' * Consider re-factoring so that inner/outer borders are rendered
-#' in proper order, immediately after each polygon is drawn.
-#' This change means the polygons can no longer be rendered in
-#' vectorized fashion, since each polygon should have the opportunity
-#' to overlap existing polygons and their borders.
-#' * Implement method to render inner and outer borders where defined.
-#' Currently only the outer border is rendered.
-#' * Consider disabling the thin black border by default.
 #' 
 #' @returns `JamPolygon` object, invisibly.
 #' 
@@ -173,6 +168,8 @@ if (!isGeneric("plot")) {
 #' jpz <- add_orientation_JamPolygon(jpz);
 #' plot(jpz);
 #' 
+#' @docType methods
+#' @rdname JamPolygon-methods
 #' @export
 setMethod("plot",
    signature=c(x="JamPolygon", y="missing"),
@@ -257,6 +254,23 @@ setMethod("plot",
 #' jpx <- new("JamPolygon", polygons=dfx);
 #' plot(jpx);
 #' 
+#' # if you want to add to the plot, you must capture output
+#' # to use the viewport
+#' jpxout <- plot(jpx);
+#' vp <- attr(jpxout, "viewport");
+#' adjx <- attr(jpxout, "adjx");
+#' adjy <- attr(jpxout, "adjy");
+#' grid::grid.path(x=adjx(c(4, 5, 5, 4) + 0.5),
+#'    y=adjy(c(3, 3, 4, 4)),
+#'    vp=vp,
+#'    gp=grid::gpar(fill="purple", col="red1", lwd=2),
+#'    default.units="snpc")
+#' grid::grid.text(x=adjx(5), y=adjy(3.5),
+#'    label="new grob",
+#'    vp=vp,
+#'    gp=grid::gpar(col="yellow", fontsize=20),
+#'    default.units="snpc")
+#' 
 #' dfz <- data.frame(name=c("polygon1", "polygon2", "polygon3"),
 #'    x=I(list(
 #'       list(c(1, 4, 4, 1),
@@ -277,8 +291,13 @@ setMethod("plot",
 #'    fill=c("gold", "firebrick", "dodgerblue"));
 #' jpz <- new("JamPolygon", polygons=dfz);
 #' jpz@polygons[, c("label_x", "label_y")] <- as.data.frame(labelr_JamPolygon(jpz))
-#' jpz@polygons$border <- c("orange", "gold", "purple");
-#' jpz@polygons$border.lwd <- c(3, 4, 5);
+#' jpz@polygons$outerborder <- c("orange", "gold", "purple");
+#' jpz@polygons$outerborder.lwd <- 0;
+#' jpz@polygons$outerborder.lwd <- c(3, 4, 5);
+#' jpz@polygons$innerborder <- c("orange4", "gold3", "purple4");
+#' jpz@polygons$innerborder.lwd <- c(3, 4, 5);
+#' jpz@polygons$border.lwd <- 1;
+#' jpz@polygons$border.lty <- 2;
 #' #jpz <- add_orientation_JamPolygon(jpz);
 #' plot(jpz);
 #' 
@@ -329,12 +348,15 @@ setMethod("plot",
 #'    `grid::grid.draw()` for each graphical object.
 #'    When `do_draw=FALSE`, it also forces `do_newpage=FALSE`,
 #'    `do_viewport=FALSE`, and `do_pop_viewport=FALSE`.
+#' @param do_experimental `logical` indicating whether to use experimental
+#'    rendering with `gridGeometry` as potential replacement for `vwline`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param debug `logical` (default FALSE) indicating whether to enable
 #'    debug operations. When `debug=TRUE` it is also passed to `grid`
 #'    functions such as `vwline::grid.vwline()` to display internal
 #'    calculations in the graphical output.
 #' @param ... additional arguments are recognized to customize plot features.
+#' 
 #' 
 #' @export
 plot.JamPolygon <- function
@@ -355,6 +377,7 @@ plot.JamPolygon <- function
  do_viewport=TRUE,
  do_pop_viewport=TRUE,
  do_draw=TRUE,
+ do_experimental=TRUE,
  verbose=FALSE,
  debug=FALSE,
  ...)
@@ -374,8 +397,9 @@ plot.JamPolygon <- function
          flip_sign <- head(flip_sign, 1);
          flip_sign <- ifelse(flip_sign >= 0, 1, -1);
       }
-      if (flip_sign < 0) {
-         jamba::printDebug("Handling flip_sign:", flip_sign);
+      if (flip_sign < 0 && TRUE %in% verbose) {
+         jamba::printDebug("plot.JamPolygon(): ",
+            "Handling flip_sign:", flip_sign);
       }
    }
    # grid options
@@ -412,11 +436,15 @@ plot.JamPolygon <- function
       do_pop_viewport <- head(as.logical(do_pop_viewport), 1);
    }
    # render_vectorized: whether to draw polygons altogether, then borders later
+   render_vectorized <- FALSE;
    if (length(render_vectorized) == 0 || FALSE %in% render_vectorized) {
       render_vectorized <- FALSE;
    } else {
       render_vectorized <- head(as.logical(render_vectorized), 1);
-      jamba::printDebug("Overriding render_vectorized:", render_vectorized);
+      if (TRUE %in% verbose) {
+         jamba::printDebug("plot.JamPolygon(): ",
+            "Overriding render_vectorized:", render_vectorized);
+      }
    }
    # linejoin: the inner/outer border method
    if (length(mitrelimit) == 0) {
@@ -443,6 +471,9 @@ plot.JamPolygon <- function
    # - for now we assume all are defined via colnames(jp@polygons)
    opt_args <- c("fill",
       "label",
+      "outerborder",
+      "outerborder.lwd",
+      "outerborder.lty",
       "border",
       "border.lwd",
       "border.lty",
@@ -469,6 +500,9 @@ plot.JamPolygon <- function
    # fill in some default values where missing
    if (!"border.lwd" %in% colnames(x@polygons)) {
       x@polygons$border.lwd <- 1;
+   } else {
+      x@polygons$border.lwd <- jamba::rmNA(x@polygons$border.lwd,
+         naValue=0)
    }
    if (!"border.lty" %in% colnames(x@polygons)) {
       x@polygons$border.lty <- 1;
@@ -486,6 +520,22 @@ plot.JamPolygon <- function
    
    # assemble tall format for coordinates
    df <- x@polygons;
+
+   ## Reverse orientation of points where warranted
+   # (Experimental)
+   if (any(unlist(df$orientation) %in% c(1, -1))) {
+      for (i in seq_len(nrow(df))) {
+         idirs <- df$orientation[[i]];
+         for (ipart in seq_along(idirs)) {
+            idir <- idirs[[ipart]];
+            if (-1 %in% idir) {
+               # reverse the orientation for convenience later on
+               df$x[[i]][[ipart]] <- rev(df$x[[i]][[ipart]]);
+               df$y[[i]][[ipart]] <- rev(df$y[[i]][[ipart]]);
+            }
+         }
+      }
+   }
    # JamPolygon_to_grid_coords()
    row_lengths <- lapply(df$x, function(i){
       if (is.list(i)) {
@@ -516,7 +566,8 @@ plot.JamPolygon <- function
       yrange <- range(coords_df$y, na.rm=TRUE);
    }
    if (verbose) {
-      jamba::printDebug("xrange:", xrange, ", yrange:", yrange);
+      jamba::printDebug("plot.JamPolygon(): ",
+         "xrange:", xrange, ", yrange:", yrange);
    }
    ymid <- mean(yrange);
    yspan <- diff(yrange);
@@ -615,11 +666,186 @@ plot.JamPolygon <- function
       # and draw only the border on the appropriate side
       #
       # iterate each row
+      if (debug) {
+         jamba::printDebug("df:");print(df);# debug
+      }
       for (irow in seq_len(length(x))) {
          irowname <- rownames(x@polygons)[irow];
          # jamba::printDebug("irow:", irow, ", irowname:", irowname);# debug
          # render each polygon
-         if (FALSE %in% render_vectorized) {
+         if (TRUE %in% do_experimental) {
+            if (verbose) {
+               jamba::printDebug("Rendering polygon with gridGeometry: ", irow);
+            }
+            # first create the polygon path grob
+            use_coords_df <- subset(coords_df, pathId %in% irow);
+            if (nrow(use_coords_df) == 0 || all(is.na(use_coords_df$x))) {
+               next;
+            }
+            # jamba::printDebug("use_coords_df:");print(use_coords_df);# debug
+            
+            bc <- df[["border"]][[irow]];
+            bw <- jamba::rmNA(naValue=0,
+               df[["border.lwd"]][[irow]])
+            bt <- jamba::rmNA(naValue=0,
+               df[["border.lty"]][[irow]]);
+            # jamba::printDebug("bc:", bc, ", bw:", bw, ", bt:", bt);# debug
+            fc <- df$fill[[irow]];
+            has_border <- (length(bc) > 0 &&
+                  length(bw) > 0 &&
+                  !any(bc %in% c(NA, "")) &&
+                  all(!is.na(bw) & bw > 0));
+            # jamba::printDebug("df[irow,]:");print(df[irow, , drop=FALSE]);# debug
+            # jamba::printDebug("irow: ", irow, ", fc:", fc, ", bc:", bc, ", bw:", bw);jamba::printDebugI(fc);# debug
+            if (length(bt) == 0) {
+               bt <- 1;
+            }
+            if (length(bc) == 0 || any(bc %in% c(NA, "")) ||
+                  length(bw) == 0 || any(bw %in% c(NA) | bw <= 0)) {
+               bw <- 1;
+               bc <- NA;
+            }
+            shrunken <- NULL;
+            obc <- df[["outerborder"]][[irow]];
+            obw <- jamba::rmNA(naValue=0,
+               df[["outerborder.lwd"]][[irow]] / 2);
+            obt <- jamba::rmNA(naValue=0,
+               df[["outerborder.lwd"]][[irow]]);
+            has_outer <- (length(obc) > 0 &&
+                  length(obw) > 0 &&
+                  !any(obc %in% c(NA, "")) &&
+                  all(obw > 0));
+            ibc <- df[["innerborder"]][[irow]];
+            ibw <- jamba::rmNA(naValue=0,
+               df[["innerborder.lwd"]][[irow]] / 2);
+            ibt <- jamba::rmNA(naValue=0,
+               df[["innerborder.lwd"]][[irow]]);
+            # jamba::printDebug("bw:", bw, ", ibw:", ibw, ", obw:", obw);# debug
+            has_inner <- (length(ibc) > 0 &&
+                  length(ibw) > 0 &&
+                  !any(ibc %in% c(NA, "")) &&
+                  all(ibw > 0));
+            if (debug) {
+               jamba::printDebug("ibc:", ibc, ", ibw:", ibw, ", ibt:", ibt, ", has_inner:", has_inner);# debug
+            }
+            if (!has_border) {
+               if (has_inner) {
+                  bw <- 0.5;
+                  bc <- ibc;
+               } else if (has_outer) {
+                  bw <- 0.5;
+                  bc <- obc;
+               }
+            }
+            
+            if (has_inner) {
+               grobname <- paste0(irowname, ":", "pathGrob");
+               path_grob <- grid::pathGrob(
+                  rule="evenodd",
+                  x=adjx(use_coords_df$x),
+                  y=adjy(use_coords_df$y),
+                  pathId=use_coords_df$pathId,
+                  id=use_coords_df$id,
+                  name=grobname,
+                  vp=use_vp,
+                  gp=grid::gpar(
+                     fill=NA,
+                     lwd=bw,
+                     lty=bt,
+                     col=bc))
+                     # col=bc))
+            } else {
+               grobname <- paste0(irowname, ":", "pathGrob");
+               path_grob <- grid::pathGrob(
+                  rule="evenodd",
+                  x=adjx(use_coords_df$x),
+                  y=adjy(use_coords_df$y),
+                  pathId=use_coords_df$pathId,
+                  id=use_coords_df$id,
+                  name=grobname,
+                  vp=use_vp,
+                  gp=grid::gpar(
+                     fill=fc,
+                     lwd=bw,
+                     lty=bt,
+                     col=bc))
+                     # col=bc))
+            }
+            # check for inner border
+            # - if so, shrink polygon, use difference as inner border
+            if (has_inner) {
+               # jamba::printDebug("ibc:", ibc, ", ibw:", ibw, ", ibt:", ibt, fgText=ibc);# debug
+               shrunken_grob <- gridGeometry::polyoffsetGrob(
+                  A=path_grob,
+                  rule="evenodd",
+                  delta=grid::unit(-(ibw), "mm"),
+                  name=paste0(grobname, ":inner"),
+                  gp=grid::gpar(
+                     fill=fc,
+                     lwd=bw,
+                     lty=bt,
+                     col=NA));
+               # add the shrunken path_grob
+               if (TRUE %in% do_draw) {
+                  grid::grid.draw(shrunken_grob)
+               }
+               grob_list <- c(grob_list,
+                  setNames(list(shrunken_grob), paste0(grobname, ":inner:0")));
+               innerborder_grob <- gridGeometry::polyclipGrob(
+                  A=path_grob,
+                  B=shrunken_grob,
+                  op="minus",
+                  name=paste0(grobname, ":inner:1"),
+                  gp=grid::gpar(
+                     col=NA,
+                     fill=ibc))
+               # add the innerborder_grob
+               if (TRUE %in% do_draw) {
+                  grid::grid.draw(innerborder_grob)
+               }
+               grob_list <- c(grob_list,
+                  setNames(list(innerborder_grob), paste0(grobname, ":inner:1")));
+            }
+            if (length(obc) > 0 &&
+                  length(obw) > 0 &&
+                  !any(obc %in% c(NA, "")) &&
+                  all(obw > 0)) {
+               # jamba::printDebug("obc:", obc, ", obw:", obw, ", obt:", obt, fgText=obc);# debug
+               expanded_grob <- gridGeometry::polyoffsetGrob(
+                  A=path_grob,
+                  rule="evenodd",
+                  delta=grid::unit(obw, "mm"),
+                  name=paste0(grobname, ":outer:0"),
+                  gp=grid::gpar(
+                     fill="#FF0000",
+                     col=NA))
+               outerborder_grob <- gridGeometry::polyclipGrob(
+                  A=expanded_grob,
+                  B=path_grob,
+                  op="minus",
+                  name=paste0(grobname, ":outer:1"),
+                  gp=grid::gpar(
+                     col=NA,
+                     fill=obc))
+               # add the outerborder_grob
+               if (TRUE %in% do_draw) {
+                  grid::grid.draw(outerborder_grob)
+               }
+               grob_list <- c(grob_list,
+                  setNames(list(outerborder_grob), paste0(grobname, ":outer:1")));
+            }
+            # add the original path_grob
+            if (TRUE %in% do_draw) {
+               grid::grid.draw(path_grob)
+            }
+            grob_list <- c(grob_list,
+               setNames(list(path_grob), paste0(grobname)));
+            # check for outer border
+            # - if so, expand polygon, use difference as outer border
+            # check for border (drawn last?)
+            # - if so render only the edge with no color fill
+            # assemble gTree?
+         } else if (FALSE %in% render_vectorized) {
             if (verbose) {
                jamba::printDebug("Rendering polygon: ", irow);
             }
@@ -660,124 +886,126 @@ plot.JamPolygon <- function
          
          ########################################
          # render inner and outer borders
-         for (border_type in c("inner", "outer")) {
-            if ("outer" %in% border_type) {
-               use_border <- x@polygons$border[[irow]];
-               osign <- 1;
-            } else {
-               use_border <- x@polygons$innerborder[[irow]];
-               osign <- -1;
-            }
-            ## confirm use_border is a color
-            if (length(use_border) == 0 ||
-                  any(is.na(use_border)) ||
-                  !jamba::isColor(use_border)) {
-               # skip rows with no border color
-               # next;
-               use_border <- "#FFFFFF00";
-            }
-            if (verbose) {
-               jamba::printDebug("Rendering ", border_type, " border: ",
-                  use_border, fgText=list("darkorange", use_border));
-            }
-            use_x <- x@polygons$x[[irow]];
-            use_y <- x@polygons$y[[irow]];
-            if (!is.list(use_x)) {
-               use_x <- list(use_x);
-               use_y <- list(use_y);
-            }
-            # iterate each polygon part
-            for (ipart in seq_along(use_x)) {
-               part_x <- use_x[[ipart]];
-               part_y <- use_y[[ipart]];
-               part_x <- c(tail(part_x, 1), part_x, head(part_x, 0));
-               part_y <- c(tail(part_y, 1), part_y, head(part_y, 0));
-               npts <- length(part_x);
-               if (npts == 0) {
-                  next;
-               }
-               part_orientation <- x@polygons$orientation[[irow]][[ipart]];
-               if ("inner" %in% border_type) {
-                  lwd_pts <- jamba::rmNULL(x@polygons$innerborder.lwd[[irow]],
-                     nullValue=2);
-                  lty_pts <- jamba::rmNULL(x@polygons$innerborder.lty[[irow]],
-                     nullValue=1);
+         if (FALSE %in% do_experimental) {
+            for (border_type in c("inner", "outer")) {
+               if ("outer" %in% border_type) {
+                  use_border <- x@polygons$border[[irow]];
+                  osign <- 1;
                } else {
-                  lwd_pts <- jamba::rmNULL(x@polygons$border.lwd[[irow]],
-                     nullValue=2);
-                  lty_pts <- jamba::rmNULL(x@polygons$border.lty[[irow]],
-                     nullValue=1);
+                  use_border <- x@polygons$innerborder[[irow]];
+                  osign <- -1;
                }
-               # define line width at each point
-               if (any(lwd_pts <= 0)) {
-                  lwd_pts[lwd_pts <= 0] <- 0.01;
+               ## confirm use_border is a color
+               if (length(use_border) == 0 ||
+                     any(is.na(use_border)) ||
+                     !jamba::isColor(use_border)) {
+                  # skip rows with no border color
+                  # next;
+                  use_border <- "#FFFFFF00";
                }
-               use_w <- vwline::widthSpec(list(
-                  right=grid::unit(rep(
-                     lwd_pts * ((osign * part_orientation) > 0),
-                     # lwd_pts * (part_orientation != 0),
-                     npts), "pt"),
-                  left=grid::unit(rep(
-                     lwd_pts * ((osign * part_orientation) < 0),
-                     npts), "pt")));
-               grobname <- paste0(irowname, ":vwlineGrob:",
-                  border_type, ":", ipart); # rowname:grob:type:num
-               ## render the border
-               vwline_grob <- vwline::vwlineGrob(
-                  x=adjx(part_x),
-                  y=adjy(part_y),
-                  w=use_w,
-                  open=FALSE,
-                  stepWidth=TRUE,
-                  mitrelimit=mitrelimit,
-                  linejoin=linejoin,
-                  lineend="butt",
-                  debug=debug,
-                  name=grobname,
-                  # vp=use_vp,
-                  gp=grid::gpar(
-                     fill=use_border,
-                     col=NA,
-                     lwd=1))
-               ## update the viewport manually
-               vwline_grob$vp <- use_vp;
-               if (TRUE %in% do_draw) {
-                  grid::grid.draw(vwline_grob);
+               if (verbose) {
+                  jamba::printDebug("Rendering ", border_type, " border: ",
+                     use_border, fgText=list("darkorange", use_border));
                }
-               grob_list <- c(grob_list,
-                  setNames(list(vwline_grob), grobname));
-               
-               if (TRUE %in% render_thin_border) {
-                  # consider whether to draw a thin border as below
-                  # grobname <- paste0("border.", irow, ".", border_type, ".", ipart);# old style
-                  grobname <- paste0(irowname, ":pathGrob:",
-                     "border", ":", ipart); # rowname:grob:border:num
-                  path_grob2 <- grid::pathGrob(x=adjx(part_x),
+               use_x <- x@polygons$x[[irow]];
+               use_y <- x@polygons$y[[irow]];
+               if (!is.list(use_x)) {
+                  use_x <- list(use_x);
+                  use_y <- list(use_y);
+               }
+               # iterate each polygon part
+               for (ipart in seq_along(use_x)) {
+                  part_x <- use_x[[ipart]];
+                  part_y <- use_y[[ipart]];
+                  part_x <- c(tail(part_x, 1), part_x, head(part_x, 0));
+                  part_y <- c(tail(part_y, 1), part_y, head(part_y, 0));
+                  npts <- length(part_x);
+                  if (npts == 0) {
+                     next;
+                  }
+                  part_orientation <- x@polygons$orientation[[irow]][[ipart]];
+                  if ("inner" %in% border_type) {
+                     lwd_pts <- jamba::rmNULL(x@polygons$innerborder.lwd[[irow]],
+                        nullValue=2);
+                     lty_pts <- jamba::rmNULL(x@polygons$innerborder.lty[[irow]],
+                        nullValue=1);
+                  } else {
+                     lwd_pts <- jamba::rmNULL(x@polygons$border.lwd[[irow]],
+                        nullValue=2);
+                     lty_pts <- jamba::rmNULL(x@polygons$border.lty[[irow]],
+                        nullValue=1);
+                  }
+                  # define line width at each point
+                  if (any(lwd_pts <= 0)) {
+                     lwd_pts[lwd_pts <= 0] <- 0.01;
+                  }
+                  use_w <- vwline::widthSpec(list(
+                     right=grid::unit(rep(
+                        lwd_pts * ((osign * part_orientation) > 0),
+                        # lwd_pts * (part_orientation != 0),
+                        npts), "pt"),
+                     left=grid::unit(rep(
+                        lwd_pts * ((osign * part_orientation) < 0),
+                        npts), "pt")));
+                  grobname <- paste0(irowname, ":vwlineGrob:",
+                     border_type, ":", ipart); # rowname:grob:type:num
+                  ## render the border
+                  vwline_grob <- vwline::vwlineGrob(
+                     x=adjx(part_x),
                      y=adjy(part_y),
-                     rule="evenodd",
-                     pathId=rep(1, length(part_x)),
-                     id=rep(1, length(part_x)),
+                     w=use_w,
+                     open=FALSE,
+                     stepWidth=TRUE,
+                     mitrelimit=mitrelimit,
+                     linejoin=linejoin,
+                     lineend="butt",
+                     debug=debug,
                      name=grobname,
-                     vp=use_vp,
+                     # vp=use_vp,
                      gp=grid::gpar(
-                        fill=NA,
-                        col="#00000022",
-                        lty=lty_pts,
-                        lwd=0.25));
+                        fill=use_border,
+                        col=NA,
+                        lwd=1))
+                  ## update the viewport manually
+                  vwline_grob$vp <- use_vp;
                   if (TRUE %in% do_draw) {
-                     grid::grid.draw(path_grob2);
+                     grid::grid.draw(vwline_grob);
                   }
                   grob_list <- c(grob_list,
-                     setNames(list(path_grob2), grobname));
-               }
-               
-               if (FALSE) {
-                  # for debug only, print "1" at first point in polygon
-                  grid::grid.text(
-                     x=head(adjx(part_x), 1),
-                     y=head(adjy(part_y), 1),
-                     label="1",
-                     gp=grid::gpar(fontsize=8, color="black"))
+                     setNames(list(vwline_grob), grobname));
+                  
+                  if (TRUE %in% render_thin_border) {
+                     # consider whether to draw a thin border as below
+                     # grobname <- paste0("border.", irow, ".", border_type, ".", ipart);# old style
+                     grobname <- paste0(irowname, ":pathGrob:",
+                        "border", ":", ipart); # rowname:grob:border:num
+                     path_grob2 <- grid::pathGrob(x=adjx(part_x),
+                        y=adjy(part_y),
+                        rule="evenodd",
+                        pathId=rep(1, length(part_x)),
+                        id=rep(1, length(part_x)),
+                        name=grobname,
+                        vp=use_vp,
+                        gp=grid::gpar(
+                           fill=NA,
+                           col="#00000022",
+                           lty=lty_pts,
+                           lwd=0.25));
+                     if (TRUE %in% do_draw) {
+                        grid::grid.draw(path_grob2);
+                     }
+                     grob_list <- c(grob_list,
+                        setNames(list(path_grob2), grobname));
+                  }
+                  
+                  if (FALSE) {
+                     # for debug only, print "1" at first point in polygon
+                     grid::grid.text(
+                        x=head(adjx(part_x), 1),
+                        y=head(adjy(part_y), 1),
+                        label="1",
+                        gp=grid::gpar(fontsize=8, color="black"))
+                  }
                }
             }
          }
@@ -796,6 +1024,10 @@ plot.JamPolygon <- function
          }
       }
    }
+   # Debug print grob_list
+   # if (TRUE %in% do_experimental) {
+   #    jamba::printDebug("sdim(grob_list):");print(jamba::sdim(grob_list));# debug
+   # }
    
    # optionally print labels
    # Todo: Determine whether labels should be rendered "per polygon"
@@ -880,28 +1112,132 @@ plot.JamPolygon <- function
 # Todo:
 # - Enhance rbind2 to keep all columns and not only keep the shared columns.
 #   Useful and important to keep things like fill/border color.
-setMethod("rbind2",
-   signature=c(x="JamPolygon", y="JamPolygon"),
-   definition=function(x, y, ...) {
-      if (!all(colnames(x@polygons) == colnames(y@polygons))) {
-         use_colnames <- intersect(colnames(x@polygons),
-            colnames(y@polygons));
-         new_polygons <- rbind(x@polygons[, use_colnames, drop=FALSE],
-            y@polygons[, use_colnames, drop=FALSE]);
+
+#' Combine multiple JamPolygon objects
+#' 
+#' Combine multiple JamPolygon objects, given two JamPolygon or multiple
+#' objects in a list.
+#' 
+#' This function is intended to support input as `rbind2(list(JamPolygons))`
+#' or `do.call(rbind2.JamPolygon, list(JamPolygons))` with any
+#' combination of one or more `JamPolygon` objects.
+#' 
+#' @family JamPolygon
+#'
+#' @docType methods
+#' @rdname JamPolygon-methods
+#' 
+#' @param x,y `JamPolygon` object
+#' @param ... additional `JamPolygon` objects if present
+#' @export
+rbind2.JamPolygon <- function
+(x,
+ y,
+ ...)
+{
+   # convert everything to a list of dots
+   dots <- list(...);
+   if (!missing(y)) {
+      if (is.list(y)) {
+         dots <- c(y, dots);
       } else {
-         new_polygons <- rbind(x@polygons, y@polygons);
+         dots <- c(list(y), dots);
       }
-      dots <- list(...);
-      for (i in seq_along(dots)) {
-         if (!all(colnames(new_polygons) == colnames(dots[[i]]@polygons))) {
-            new_polygons <- rbind(new_polygons[, use_colnames, drop=FALSE],
-               dots[[i]]@polygons[, use_colnames, drop=FALSE]);
+      y <- NULL;
+   }
+   if (!missing(x)) {
+      if (is.list(x)) {
+         dots <- c(x, dots);
+      } else {
+         dots <- c(list(x), dots);
+      }
+      x <- NULL;
+   }
+   use_dots <- sapply(dots, function(i){
+      # ("JamPolygon" %in% class(i))
+      inherits(i, "JamPolygon")
+   })
+   if (!any(use_dots)) {
+      return(NULL)
+   }
+   use_dots <- which(use_dots)
+   # Option to keep columns already in all JamPolygon objects
+   if (FALSE) {
+      use_colnames <- Reduce("intersect",
+         lapply(dots[use_dots], function(i){
+            colnames(i@polygons)}))
+   } else {
+      # Option to keep every column across all JamPolygon objects
+      use_colnames <- Reduce("union",
+         lapply(dots[use_dots], function(i){
+            colnames(i@polygons)}))
+   }
+   # jamba::printDebug("use_colnames: ", use_colnames);# debug
+   
+   new_polygons <- dots[[head(use_dots, 1)]]@polygons;
+   new_names <- names(dots[use_dots]);
+   new_names[new_names %in% c("", NA)] <- "new";
+   new_names <- jamba::makeNames(new_names,
+      renameFirst=FALSE);
+
+   if (any(use_dots)) {
+      for (i in tail(use_dots, -1)) {
+         match1 <- match(use_colnames, colnames(new_polygons));
+         match2 <- match(use_colnames, colnames(dots[[i]]@polygons));
+         df1 <- as.data.frame(check.names=FALSE,
+            row.names=jamba::makeNames(new_polygons$name,
+               renameFirst=FALSE),
+            jamba::rmNULL(nullValue=NA,
+               as.list(new_polygons)[match1]));
+         colnames(df1) <- use_colnames;
+         df2list <- jamba::rmNULL(nullValue=NA,
+            as.list(dots[[i]]@polygons)[match2]);
+         names(df2list) <- use_colnames;
+         if ("name" %in% use_colnames) {
+            df2 <- as.data.frame(check.names=FALSE,
+               row.names=jamba::makeNames(df2list$name,
+                  renameFirst=FALSE),
+               df2list);
+            # jamba::printDebug("df2:");print(df2);# debug
          } else {
-            new_polygons <- rbind(new_polygons, dots[[i]]@polygons);
+            df2 <- as.data.frame(check.names=FALSE,
+               row.names=as.character(seq_along(df2list[[1]])),
+               df2list);
          }
+         # if ("name" %in% colnames(df2)) {
+         #    rownames(df2) <- df2[, "name"];
+         # }
+         colnames(df2) <- use_colnames;
+         new_polygons <- rbind(df1, df2);
       }
-      x@polygons <- new_polygons;
-      x;
+   }
+   x <- new("JamPolygon", polygons=new_polygons);
+   # ensure names are unique
+   names(x) <- jamba::makeNames(names(x),
+      renameFirst=FALSE)
+   rownames(x@polygons) <- names(x);
+   
+   # one step of validation to make sure certain columns are not empty
+   # if ("label" %in% colnames(x@polygons)) {
+   #    na_label <- is.na(x@polygons$label);
+   #    if (any(na_label)) {
+   #       x@polygons$label[na_label] <- x@polygons$label[na_label]
+   #    }
+   # }
+   
+   # jamba::printDebug("x:");print(x);# debug
+   return(x)
+}
+
+#' Combine multiple JamPolygon objects
+#'
+#' @docType methods
+#' @rdname JamPolygon-methods
+#' @export
+setMethod("rbind2",
+   signature=c(x="JamPolygon", y="ANY"),
+   definition=function(x, y, ...) {
+      rbind2.JamPolygon(x, y, ...)
    }
 )
 
@@ -918,6 +1254,8 @@ setMethod("names<-",
    signature=c(x="JamPolygon"),
    definition=function(x, value) {
       x@polygons$name <- value;
+      # keep rownames in sync with names
+      rownames(x@polygons) <- value;
       check_JamPolygon(x)
       x
    }
@@ -937,12 +1275,12 @@ setMethod("nrow",
 )
 
 # length()
-length.JamPolygon <- function
-(x)
-{
-   #
-   nrow(x@polygons)
-}
+# length.JamPolygon <- function
+# (x)
+# {
+#    #
+#    nrow(x@polygons)
+# }
 if (!isGeneric("length")) {
    # setGeneric("length", function(x) standardGeneric("length"))
    setGeneric("length")
@@ -1670,6 +2008,8 @@ update_JamPolygon <- function
 #' 
 #' @family JamPolygon
 #' 
+#' @param A output from `polyclip` functions.
+#' 
 #' @examples
 #' df <- data.frame(name=c("polygon1", "polygon2"),
 #'    x=I(list(
@@ -1794,7 +2134,7 @@ sample_JamPolygon <- function
  n=100,
  xyratio=1.1,
  spread=TRUE,
- n_ratio=5,
+ n_ratio=1,
  pattern=c("offset",
     "rectangle"),
  buffer=0,
@@ -1980,17 +2320,47 @@ sample_JamPolygon <- function
 #' 
 #' @family JamPolygon
 #' 
+#' @returns `JamPolygon` with one polygon, although the polygon could
+#'    contain multiple disconnected parts.
+#' 
 #' @param jp `JamPolygon` with one or more polygons. When multiple polygons
 #'    are provided, they are combined with `union_JamPolygon()` so that
 #'    one overall buffer can be provided.
 #' @param buffer `numeric` buffer, where negative values cause the polygon
 #'    to be reduced in size.
+#' @param steps `numeric` number of steps, default 200, used to
+#'    determine relative unit sizes when `relative=TRUE` (which is default).
+#' @param relative `logical` default `TRUE`, indicating whether to resize
+#'    polygons using relative dimensions. Relative units are defined by
+#'    the minimum negative buffer that results in non-zero area, where
+#'    relative unit -1 would result in zero area.
+#' @param verbose `logical` indicating whether to print verbose output.
+#' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' DEdf <- data.frame(check.names=FALSE,
+#'    name=c("D", "E"),
+#'    x=I(list(
+#'       c(-3, 3, 3, 0, -3),
+#'       c(-4, 2, 2, -4))),
+#'    y=I(list(
+#'    c(-3, -3, 1.5, 4, 1.5),
+#'    c(-2, -2, 4, 4))),
+#' fill=c("#FFD70055", "#B2222255"))
+#' jp <- new("JamPolygon", polygons=DEdf)
+#' plot(jp)
+#'
+#' jp2 <- nudge_JamPolygon(jp, nudge=list(D=c(10, 0)));
+#' jp_jp2 <- rbind2(jp2, buffer_JamPolygon(jp2));
+#' plot(jp_jp2,
+#'    border.lty=c(1, 1, 2),
+#'    fill=c(NA, NA, "gold"));
 #' 
 #' @export
 buffer_JamPolygon <- function
 (jp,
  buffer=-0.5,
- steps=50,
+ steps=200,
  relative=TRUE,
  verbose=FALSE,
  ...)
@@ -2046,7 +2416,6 @@ buffer_JamPolygon <- function
       #
       buffer_polygon_list <- polyclip::polyoffset(
          poly_list[[k]],
-         # union_polygon_list(polygon_list),
          buffer,
          jointype="round")
       if (length(jamba::rmNA(unlist(buffer_polygon_list))) == 0) {
@@ -2058,10 +2427,10 @@ buffer_JamPolygon <- function
    # relative size
    bbox_jp <- bbox_JamPolygon(jp);
    bbox_max <- max(apply(bbox_jp, 1, diff))
-   if (relative) {
+   if (TRUE %in% relative) {
       buffer_seq <- tail(seq(from=bbox_max,
          to=0,
-         length.out=100), -1)
+         length.out=steps), -1)
       # jamba::printDebug("buffer_seq:", round(digits=2, buffer_seq));
       
       # iterate buffer widths to determine complete removal
@@ -2074,22 +2443,6 @@ buffer_JamPolygon <- function
             next;
          }
          break;
-         # buffer_polygon_list2 <- polyclip::polyoffset(
-         #    poly_list[[1]],
-         #    # union_polygon_list(polygon_list),
-         #    # -max_buffer,
-         #    -0.05,
-         #    jointype="round")
-         # new_jp2 <- polyclip_to_JamPolygon(buffer_polygon_list2);
-         if (FALSE) {
-            plot(do.call(rbind2, list(jp, new_jp, new_jp2)),
-               border=c("grey", "gold", "blue"), border.lwd=c(1, 3, 3),
-               fill=c("firebrick", NA, "red1"))
-         }
-         if (length(buffer_polygon_list) > 0 &&
-               sum(polygon_areas(buffer_polygon_list, simplify=TRUE)) > 0) {
-            break;
-         }
       }
       buffer <- buffer * max_buffer;
       if (verbose) {

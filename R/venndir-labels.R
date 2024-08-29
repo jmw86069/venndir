@@ -104,6 +104,7 @@ draw_gridtext_groups <- function
       ## Experimental realign strategy
       if (TRUE %in% realign && length(groupdf) > 0) {
          # check if main count label exists
+         # jamba::printDebug("use_groupdf:");print(use_groupdf);# debug
          is_main_count <- (grepl("count", use_groupdf$type) &
                grepl("main", use_groupdf$counttype));
          is_signed_count <- (grepl("count", use_groupdf$type) &
@@ -134,6 +135,7 @@ draw_gridtext_groups <- function
          # all_g_labels_cns <- grid::childNames(g_labels);
          # jamba::printDebug("all_g_labels_cns:");print(data.frame(all_g_labels_cns));# debug
          g_labels_cns <- use_groupdf$childName;
+         # jamba::printDebug("g_labels_cns:");print(g_labels_cns);# debug
          use_vp <- NULL;
          gdfbasename <- head(gdf[korig, "gdf_group"], 1);
          ## signed counts

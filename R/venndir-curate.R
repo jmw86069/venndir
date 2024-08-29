@@ -97,29 +97,34 @@ curate_venn_labels <- function
          curate_list <- list(
             c("-1", "\u2193", "dodgerblue3"),
             c("1", "\u2191", "firebrick"),
-            c("concordant|agreement", "\u21F6", "dodgerblue3"),
-            #c("[ ]*mixed", "\u2193\u2191", "grey45"));
-            #c("[ ]*mixed", "\u21C6", "grey45"));
-            c("mixed", "\u2194", "grey45"));
+            c("concordant|agreement", "\u2714", "dodgerblue3"), # check mark
+            c("mixed", "\u2716", "grey45")); # X mark
+            # c("mixed", "\u2928", "grey45")); # up/down diagonal cross arrows - not supported widely
+            # c("concordant|agreement", "\u2016", "dodgerblue3"), # double bar ||
+            # c("mixed", "\u2717", "grey45")); # X to go with check mark
+            # c("[ ]*mixed", "\u21C6", "grey45")); # left-right equilibrium arrows
+            # c("mixed", "\u2194", "grey45")); # left-right single arrow (small)
+            # c("mixed", "X", "grey45")); # uppercase X
       } else if (1 %in% unicode) {
          curate_list <- list(
             c("-1", "\u2193", "dodgerblue3"),
             c("1", "\u2191", "firebrick"),
             c("0", "-", ""),
-            c("concordant|agreement", "=", "dodgerblue3"),
-            c("mixed", "X", "grey45"));
+            c("concordant|agreement", "\u2016", "dodgerblue3"), # double bar ||
+            c("mixed", "X", "grey45")); # uppercase X
+            # c("mixed", "\u58", "grey45")); # broken bar |
+            # c("mixed", "\u00A6", "grey45")); # broken bar |
+            # c("concordant|agreement", "\u2714", "dodgerblue3"), # check mark
+            # c("mixed", "\u2715", "grey45")); # X mark
+            # c("concordant|agreement", "=", "dodgerblue3"), # equal sign
+            # c("mixed", "X", "grey45"));
             #c("mixed", "\u21C6", "grey45"));
       } else {
-         curate_list <- list(
-            c("[ ]*-1", "v", "dodgerblue3"),
-            c("[ ]*1", "^", "firebrick"), # somehow ^ is not supported
-            c("[ ]*concordant|agreement", ">>>", "dodgerblue3"),
-            c("[ ]*mixed", ">|<", "grey45"));
          curate_list <- list(
             c("-1", "v", "dodgerblue3"),
             c("1", "^", "firebrick"),
             c("0", "-", ""),
-            c("concordant|agreement", ">>>", "dodgerblue3"),
+            c("concordant|agreement", "=", "dodgerblue3"),
             c("mixed", "X", "grey45"));
       }
       curate_df <- data.frame(check.names=FALSE,

@@ -20,7 +20,7 @@ venndir(
   font_cex = c(1, 1, 0.8),
   show_label = NA,
   display_counts = TRUE,
-  poly_alpha = 0.8,
+  poly_alpha = 0.6,
   alpha_by_counts = FALSE,
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   label_preset = "none",
@@ -41,6 +41,7 @@ venndir(
   verbose = FALSE,
   debug = 0,
   circle_nudge = NULL,
+  lwd = 1,
   rotate_degrees = 0,
   ...
 )
@@ -148,7 +149,7 @@ count zero label is displayed, otherwise no count label is shown.}
 The default \code{c(1, 1, 0.8)} defines the signed count label slightly
 smaller than other labels.}
 
-\item{poly_alpha}{\code{numeric} (default 0.8) value between 0 and 1, for
+\item{poly_alpha}{\code{numeric} (default 0.6) value between 0 and 1, for
 alpha transparency of the polygon fill color.
 This value is ignored when \code{alpha_by_counts=TRUE}.
 \itemize{

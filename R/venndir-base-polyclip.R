@@ -71,7 +71,7 @@
 #'    
 #'    The default `c(1, 1, 0.8)` defines the signed count label slightly
 #'    smaller than other labels.
-#' @param poly_alpha `numeric` (default 0.8) value between 0 and 1, for
+#' @param poly_alpha `numeric` (default 0.6) value between 0 and 1, for
 #'    alpha transparency of the polygon fill color.
 #'    This value is ignored when `alpha_by_counts=TRUE`.
 #'    * `poly_alpha=1` is completely opaque (no transparency)
@@ -241,7 +241,7 @@ venndir <- function
  # show_set=c("main", "all", "none"),
  show_label=NA,
  display_counts=TRUE,
- poly_alpha=0.8,
+ poly_alpha=0.6,
  alpha_by_counts=FALSE,
  label_style=c("basic",
     "fill",
@@ -269,6 +269,7 @@ venndir <- function
  verbose=FALSE,
  debug=0,
  circle_nudge=NULL,
+ lwd=1,
  rotate_degrees=0,
  ...)
 {
@@ -451,7 +452,6 @@ venndir <- function
          rotate_degrees=rotate_degrees,
          return_type="JamPolygon",
          ...);
-      rownames(venn_jp@polygons) <- paste0(names(venn_jp), "|set");
    }
       
    # Assign other attributes for consistency later on
@@ -461,17 +461,29 @@ venndir <- function
       function(xi) character(0)));
    venn_jp@polygons$venn_color <- set_colors[venn_jp@polygons$venn_name];
    border_dark_factor <- 1.1;
-   venn_jp@polygons$border <- jamba::makeColorDarker(
-      darkFactor=border_dark_factor,
-      set_colors[venn_jp@polygons$venn_name]);
-   venn_jp@polygons$border.lwd <- 4;
+   
+   venn_jp@polygons$outerborder <- jamba::alpha2col(
+      alpha=poly_alpha,
+      jamba::makeColorDarker(
+         darkFactor=border_dark_factor,
+         set_colors[venn_jp@polygons$venn_name]));
+   venn_jp@polygons$outerborder.lwd <- lwd;
+   
+   venn_jp@polygons$border <- jamba::alpha2col(
+      alpha=poly_alpha,
+      jamba::makeColorDarker(
+         darkFactor=border_dark_factor,
+         set_colors[venn_jp@polygons$venn_name]));
+   venn_jp@polygons$border.lwd <- lwd/2;
+   
+   venn_jp@polygons$innerborder <- NA;
+   venn_jp@polygons$innerborder.lwd <- 0;
+   
    venn_jp@polygons$fill <- NA;
    venn_jp@polygons$label <- venn_jp@polygons$venn_name;
    venn_jp@polygons$label_x <- NA;
    venn_jp@polygons$label_y <- NA;
    venn_jp@polygons$type <- "set";
-   venn_jp@polygons$innerborder <- NA;
-   venn_jp@polygons$innerborder.lwd <- 0;
    
 
    # convert to venn overlap polygons
@@ -489,6 +501,10 @@ venndir <- function
       ...);
    # rownames(venn_jpol@polygons) <- names(venn_jpol);
    venn_jp@polygons$type <- "set";
+   # update JamPolygon names to indicate full set
+   names(venn_jp) <- paste0(names(venn_jp), "|set");
+   rownames(venn_jp@polygons) <- names(venn_jp);
+
    venn_jpol@polygons$type <- "overlap";
    # jamba::printDebug("venndir(): ", "venn_jpol:");print(venn_jpol);# debug
    
@@ -615,9 +631,6 @@ venndir <- function
       venn_jps@polygons$hjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
          ixy["label", "adjy"]
       });
-      # jamba::printDebug("venn_jps[whichset, ]@polygons:");print(venn_jps[whichset, ]@polygons);# debug
-      # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
-      # stop("Stopped after outside labels.");# debug
    }
    
    # show_set: whether to display each overlap label
@@ -745,26 +758,34 @@ venndir <- function
       0);
 
    # define inner border
-   venn_jps@polygons$innerborder.lwd <- 2;
+   venn_jps@polygons$innerborder.lwd <- lwd;
    # venn_jps@polygons$innerborder.lty <- 1;
    border_dark_factor <- 1.1;
    border_s_factor <- 1.2;
    venn_jps@polygons$innerborder <- ifelse(vset,
-      jamba::makeColorDarker(
-         jamba::unalpha(venn_jps@polygons$venn_color),
-         darkFactor=border_dark_factor,
-         sFactor=border_s_factor),
+      jamba::alpha2col(alpha=1,
+         jamba::makeColorDarker(
+            jamba::unalpha(venn_jps@polygons$venn_color),
+            darkFactor=border_dark_factor,
+            sFactor=border_s_factor)),
       NA);
 
    # define outer border
-   venn_jps@polygons$border.lwd <- 2;
-   # venn_jps@polygons$border.lty <- 1;
-   venn_jps@polygons$border <- ifelse(vset,
+   venn_jps@polygons$border.lwd <- lwd/2;
+   # option to re-use outer border as border
+   # venn_jps@polygons$border <- ifelse(vset,
+   #    NA,
+   #    venn_jps@polygons$outerborder);
+   venn_jps@polygons$border <- NA;
+   # venn_jps@polygons$border.lty <- 3;
+   venn_jps@polygons$outerborder.lwd <- lwd;
+   venn_jps@polygons$outerborder <- ifelse(vset,
       NA,
-      jamba::makeColorDarker(
-         jamba::unalpha(venn_jps@polygons$venn_color),
-         darkFactor=border_dark_factor,
-         sFactor=border_s_factor))
+      jamba::alpha2col(alpha=1,
+         jamba::makeColorDarker(
+            jamba::unalpha(venn_jps@polygons$venn_color),
+            darkFactor=border_dark_factor,
+            sFactor=border_s_factor)))
    # define label font size
    venn_jps@polygons$fontsize <- 14 * head(font_cex, 1);
    

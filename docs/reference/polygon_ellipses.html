@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -113,7 +113,7 @@ conformed to between <code>0</code> and <code>360</code>, rotating clockwise.</p
     <h2>Value</h2>
     
 
-<p>object <code>list</code> with a number of circles encoded as polygons.</p>
+<p><code>JamPolygon</code> object</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -121,34 +121,44 @@ conformed to between <code>0</code> and <code>360</code>, rotating clockwise.</p
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>Other venndir polygons: 
-<code><a href="bbox_polygon_list.html">bbox_polygon_list</a>()</code>,
-<code><a href="eulerr_to_polygon_list.html">eulerr_to_polygon_list</a>()</code>,
-<code><a href="get_largest_polygon_list.html">get_largest_polygon_list</a>()</code>,
-<code><a href="get_venn_polygon_shapes.html">get_venn_polygon_shapes</a>()</code>,
-<code><a href="intersect_polygon_list.html">intersect_polygon_list</a>()</code>,
-<code><a href="labelr_polygon_list.html">labelr_polygon_list</a>()</code>,
-<code><a href="minus_polygon_list.html">minus_polygon_list</a>()</code>,
-<code><a href="nudge_polygon_coords.html">nudge_polygon_coords</a>()</code>,
-<code><a href="nudge_polygon_list.html">nudge_polygon_list</a>()</code>,
-<code><a href="plot_polygon_list.html">plot_polygon_list</a>()</code>,
-<code><a href="polygon_areas.html">polygon_areas</a>()</code>,
+    <div class="dont-index"><p>Other JamPolygon: 
+<code><a href="JamPolygon-class.html">JamPolygon-class</a></code>,
+<code><a href="Venndir-class.html">Venndir-class</a></code>,
+<code><a href="JamPolygon-methods.html">[,JamPolygon-method</a></code>,
+<code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon</a>()</code>,
+<code><a href="area_JamPolygon.html">area_JamPolygon</a>()</code>,
+<code><a href="bbox_JamPolygon.html">bbox_JamPolygon</a>()</code>,
+<code><a href="buffer_JamPolygon.html">buffer_JamPolygon</a>()</code>,
+<code><a href="check_JamPolygon.html">check_JamPolygon</a>()</code>,
+<code><a href="check_Venndir.html">check_Venndir</a>()</code>,
+<code><a href="eulerr_to_JamPolygon.html">eulerr_to_JamPolygon</a>()</code>,
+<code><a href="farthest_point_JamPolygon.html">farthest_point_JamPolygon</a>()</code>,
+<code><a href="find_venn_overlaps_JamPolygon.html">find_venn_overlaps_JamPolygon</a>()</code>,
+<code><a href="has_point_in_JamPolygon.html">has_point_in_JamPolygon</a>()</code>,
+<code><a href="intersect_JamPolygon.html">intersect_JamPolygon</a>()</code>,
+<code><a href="label_fill_JamPolygon.html">label_fill_JamPolygon</a>()</code>,
+<code><a href="label_outside_JamPolygon.html">label_outside_JamPolygon</a>()</code>,
+<code><a href="label_segment_JamPolygon.html">label_segment_JamPolygon</a>()</code>,
+<code><a href="labelr_JamPolygon.html">labelr_JamPolygon</a>()</code>,
+<code><a href="minus_JamPolygon.html">minus_JamPolygon</a>()</code>,
+<code><a href="nearest_point_JamPolygon.html">nearest_point_JamPolygon</a>()</code>,
+<code><a href="nudge_JamPolygon.html">nudge_JamPolygon</a>()</code>,
+<code><a href="plot.JamPolygon.html">plot.JamPolygon</a>()</code>,
+<code><a href="point_in_JamPolygon.html">point_in_JamPolygon</a>()</code>,
+<code><a href="polyclip_to_JamPolygon.html">polyclip_to_JamPolygon</a>()</code>,
 <code><a href="polygon_circles.html">polygon_circles</a>()</code>,
-<code><a href="polygon_list_labelr.html">polygon_list_labelr</a>()</code>,
-<code><a href="polygon_list_to_xy_list.html">polygon_list_to_xy_list</a>()</code>,
-<code><a href="rescale_polygon_list.html">rescale_polygon_list</a>()</code>,
-<code><a href="simple_ellipse.html">simple_ellipse</a>()</code>,
-<code><a href="union_polygon_list.html">union_polygon_list</a>()</code>,
-<code><a href="xy_list_to_polygon_list.html">xy_list_to_polygon_list</a>()</code></p></div>
+<code><a href="sample_JamPolygon.html">sample_JamPolygon</a>()</code>,
+<code><a href="split_JamPolygon.html">split_JamPolygon</a>()</code>,
+<code><a href="union_JamPolygon.html">union_JamPolygon</a>()</code>,
+<code><a href="update_JamPolygon.html">update_JamPolygon</a>()</code></p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">polygon_list</span> <span class="op">&lt;-</span> <span class="fu">polygon_ellipses</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ejp</span> <span class="op">&lt;-</span> <span class="fu">polygon_ellipses</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   xradius<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   yradius<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_polygon_list.html">plot_polygon_list</a></span><span class="op">(</span><span class="va">polygon_list</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#FF000077"</span>, <span class="st">"#FFDD0077"</span><span class="op">)</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, pch<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"2"</span><span class="op">)</span>, add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ejp</span>, fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#FF000077"</span>, <span class="st">"#FFDD0077"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="polygon_ellipses-1.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

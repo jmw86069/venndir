@@ -144,13 +144,18 @@ textvenn <- function
 
       # matrix for label colors
       header_colors <- c(vCol, vCol12);
+      names(header_colors) <- unique(sv$sets);
+      if (!"color" %in% colnames(sv)) {
+         sv$color <- header_colors[sv$sets]
+      }
       if (color_by_counts) {
-         count_colors <- colorjam::vals2colorLevels(sqrt(nCounts),
-            divergent=FALSE,
-            col="Reds",
-            trimRamp=c(8, 1),
-            lens=2,
-            baseline=0);
+         count_color_fn <- colorjam::col_linear_xf(
+            x=max(sqrt(nCounts)),
+            floor=max(c(0, min(sqrt(nCounts) - 1))),
+            lens=0,
+            ...);
+         count_colors <- count_color_fn(sqrt(nCounts));
+         # k <- sqrt(1:10*10);jamba::showColors(jamba::nameVector(colorjam::col_linear_xf(x=max(k), floor=min(k - 1), lens=0, colramp="Reds")(k), k^2))
       } else {
          if (inverse_counts) {
             count_colors <- header_colors;
@@ -178,12 +183,12 @@ textvenn <- function
       ## signed counts
       if (any(lengths(gCounts) > 1)) {
          if (color_by_counts) {
-            gcount_colors <- colorjam::vals2colorLevels(sqrt(unlist(gCounts)),
-               divergent=FALSE,
-               col="Reds",
-               trimRamp=c(8, 1),
-               lens=2,
-               baseline=0);
+            count_color_fn <- colorjam::col_linear_xf(
+               x=max(sqrt(unlist(gCounts))),
+               floor=max(c(0, min(sqrt(unlist(gCounts)) - 1))),
+               lens=0,
+               ...);
+            gcount_colors <- count_color_fn(sqrt(unlist(gCounts)))
          } else {
             if (inverse_counts) {
                gcount_colors <- rep(header_colors, lengths(gCounts));
@@ -266,13 +271,17 @@ textvenn <- function
 
       # matrix for label colors
       header_colors <- c(vCol, vCol12, vCol13, vCol23, vCol123);
+      names(header_colors) <- unique(sv$sets);
+      if (!"color" %in% colnames(sv)) {
+         sv$color <- header_colors[sv$sets]
+      }
       if (color_by_counts) {
-         count_colors <- colorjam::vals2colorLevels(sqrt(nCounts),
-            divergent=FALSE,
-            col="Reds",
-            trimRamp=c(8, 1),
-            lens=2,
-            baseline=0);
+         count_color_fn <- colorjam::col_linear_xf(
+            x=max(sqrt(nCounts)),
+            floor=max(c(0, min(sqrt(nCounts) - 1))),
+            lens=0,
+            ...);
+         count_colors <- count_color_fn(sqrt(nCounts));
       } else {
          if (inverse_counts) {
             count_colors <- header_colors;
@@ -296,12 +305,18 @@ textvenn <- function
       ## signed counts
       if (any(lengths(gCounts) > 1)) {
          if (color_by_counts) {
-            gcount_colors <- colorjam::vals2colorLevels(sqrt(unlist(gCounts)),
-               divergent=FALSE,
-               col="Reds",
-               trimRamp=c(8, 1),
-               lens=2,
-               baseline=0);
+            count_color_fn <- colorjam::col_linear_xf(
+               x=max(sqrt(unlist(gCounts))),
+               floor=max(c(0, min(sqrt(unlist(gCounts)) - 1))),
+               lens=0,
+               ...);
+            gcount_colors <- count_color_fn(sqrt(unlist(gCounts)))
+            # gcount_colors2 <- colorjam::vals2colorLevels(sqrt(unlist(gCounts)),
+            #    divergent=FALSE,
+            #    col="Reds",
+            #    trimRamp=c(8, 1),
+            #    lens=2,
+            #    baseline=0);
          } else {
             if (inverse_counts) {
                gcount_colors <- rep(header_colors, lengths(gCounts));

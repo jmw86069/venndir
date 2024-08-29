@@ -7,7 +7,7 @@
 buffer_JamPolygon(
   jp,
   buffer = -0.5,
-  steps = 50,
+  steps = 200,
   relative = TRUE,
   verbose = FALSE,
   ...
@@ -20,14 +20,51 @@ one overall buffer can be provided.}
 
 \item{buffer}{\code{numeric} buffer, where negative values cause the polygon
 to be reduced in size.}
+
+\item{steps}{\code{numeric} number of steps, default 200, used to
+determine relative unit sizes when \code{relative=TRUE} (which is default).}
+
+\item{relative}{\code{logical} default \code{TRUE}, indicating whether to resize
+polygons using relative dimensions. Relative units are defined by
+the minimum negative buffer that results in non-zero area, where
+relative unit -1 would result in zero area.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{...}{additional arguments are ignored.}
+}
+\value{
+\code{JamPolygon} with one polygon, although the polygon could
+contain multiple disconnected parts.
 }
 \description{
 Apply buffer outside or inside JamPolygon
+}
+\examples{
+DEdf <- data.frame(check.names=FALSE,
+   name=c("D", "E"),
+   x=I(list(
+      c(-3, 3, 3, 0, -3),
+      c(-4, 2, 2, -4))),
+   y=I(list(
+   c(-3, -3, 1.5, 4, 1.5),
+   c(-2, -2, 4, 4))),
+fill=c("#FFD70055", "#B2222255"))
+jp <- new("JamPolygon", polygons=DEdf)
+plot(jp)
+
+jp2 <- nudge_JamPolygon(jp, nudge=list(D=c(10, 0)));
+jp_jp2 <- rbind2(jp2, buffer_JamPolygon(jp2));
+plot(jp_jp2,
+   border.lty=c(1, 1, 2),
+   fill=c(NA, NA, "gold"));
+
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
@@ -44,10 +81,12 @@ Other JamPolygon:
 \code{\link{labelr_JamPolygon}()},
 \code{\link{minus_JamPolygon}()},
 \code{\link{nearest_point_JamPolygon}()},
-\code{\link{plot,JamPolygon,missing-method}},
+\code{\link{nudge_JamPolygon}()},
 \code{\link{plot.JamPolygon}()},
 \code{\link{point_in_JamPolygon}()},
 \code{\link{polyclip_to_JamPolygon}()},
+\code{\link{polygon_circles}()},
+\code{\link{polygon_ellipses}()},
 \code{\link{sample_JamPolygon}()},
 \code{\link{split_JamPolygon}()},
 \code{\link{union_JamPolygon}()},

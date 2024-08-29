@@ -6,11 +6,15 @@
 \usage{
 venndir_to_df(
   venndir_out,
-  return_type = c("kable", "data.frame"),
+  df_format = c("hits", "items", "wide"),
+  return_type = c("data.frame", "kable"),
   trim_blanks = TRUE,
   wrap_width = 80,
   colorize_headers = TRUE,
   set_colors = NULL,
+  item_type = "gene",
+  add_counts = TRUE,
+  verbose = FALSE,
   ...
 )
 }
@@ -50,20 +54,31 @@ for visual review.
 }
 }
 \examples{
-setlist <- venndir::make_venn_test(100, 3);
+setlist <- venndir::make_venn_test(100, 3, do_signed=TRUE);
 venndir_out <- venndir::venndir(setlist, overlap_type="each")
-kdf <- venndir_to_df(venndir_out)
+df <- venndir_to_df(venndir_out)
+head(df, 10)
+
+kdf <- venndir_to_df(venndir_out, return_type="kable")
 kdf
 
-kdf <- venndir_to_df(venndir_out, return_type="data.frame")
-kdf
+df2 <- venndir_to_df(venndir_out, df_format="items")
+head(df2, 10)
+
+kdf2 <- venndir_to_df(venndir_out, df_format="items", return_type="kable")
+kdf2
+
+df3 <- venndir_to_df(venndir_out, df_format="wide", return_type="data.frame")
+df3
+
+kdf3 <- venndir_to_df(venndir_out, df_format="wide", return_type="kable")
+kdf3
 
 }
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{expand_range}()},
-\code{\link{get_venn_shapes}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.37.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
       </span>
     </div>
 
@@ -136,6 +136,7 @@ since text labels are typically wider than they are tall.</p></li>
     <div class="dont-index"><p>Other JamPolygon: 
 <code><a href="JamPolygon-class.html">JamPolygon-class</a></code>,
 <code><a href="Venndir-class.html">Venndir-class</a></code>,
+<code><a href="JamPolygon-methods.html">[,JamPolygon-method</a></code>,
 <code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon</a>()</code>,
 <code><a href="area_JamPolygon.html">area_JamPolygon</a>()</code>,
 <code><a href="bbox_JamPolygon.html">bbox_JamPolygon</a>()</code>,
@@ -152,10 +153,12 @@ since text labels are typically wider than they are tall.</p></li>
 <code><a href="labelr_JamPolygon.html">labelr_JamPolygon</a>()</code>,
 <code><a href="minus_JamPolygon.html">minus_JamPolygon</a>()</code>,
 <code><a href="nearest_point_JamPolygon.html">nearest_point_JamPolygon</a>()</code>,
-<code><a href="plot-JamPolygon-missing-method.html">plot,JamPolygon,missing-method</a></code>,
+<code><a href="nudge_JamPolygon.html">nudge_JamPolygon</a>()</code>,
 <code><a href="plot.JamPolygon.html">plot.JamPolygon</a>()</code>,
 <code><a href="point_in_JamPolygon.html">point_in_JamPolygon</a>()</code>,
 <code><a href="polyclip_to_JamPolygon.html">polyclip_to_JamPolygon</a>()</code>,
+<code><a href="polygon_circles.html">polygon_circles</a>()</code>,
+<code><a href="polygon_ellipses.html">polygon_ellipses</a>()</code>,
 <code><a href="sample_JamPolygon.html">sample_JamPolygon</a>()</code>,
 <code><a href="split_JamPolygon.html">split_JamPolygon</a>()</code>,
 <code><a href="union_JamPolygon.html">union_JamPolygon</a>()</code>,
@@ -186,13 +189,17 @@ since text labels are typically wider than they are tall.</p></li>
 <span class="r-in"><span><span class="va">jp3</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"JamPolygon"</span>, polygons<span class="op">=</span><span class="va">df3</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jp3</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, labels<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lfj</span> <span class="op">&lt;-</span> <span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, labels<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="label_fill_JamPolygon-1.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="va">test_x</span> <span class="op">&lt;-</span> <span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">x</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>;</span></span>
-<span class="r-in"><span><span class="va">test_y</span> <span class="op">&lt;-</span> <span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">y</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>;</span></span>
-<span class="r-in"><span><span class="va">P</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.5</span>, <span class="fl">4.5</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.5</span>, <span class="fl">4.5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">test_x</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>   <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">test_x</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, y<span class="op">=</span><span class="va">test_y</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lfj</span><span class="op">$</span><span class="va">items_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span>, cex<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">lfj</span><span class="op">$</span><span class="va">items_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span>, labels<span class="op">=</span><span class="va">lfj</span><span class="op">$</span><span class="va">items_df</span><span class="op">$</span><span class="va">text</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="label_fill_JamPolygon-2.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#test_x &lt;- jp3[1,]@polygons$x[[1]];</span></span></span>
+<span class="r-in"><span><span class="co">#test_y &lt;- jp3[1,]@polygons$y[[1]];</span></span></span>
+<span class="r-in"><span><span class="co">#P &lt;- list(x=c(3.5, 4.5), y=c(3.5, 4.5))</span></span></span>
+<span class="r-in"><span><span class="co">#A &lt;- lapply(seq_along(test_x), function(i){</span></span></span>
+<span class="r-in"><span><span class="co">#   list(x=test_x[[i]], y=test_y[[i]])})</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
