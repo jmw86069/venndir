@@ -1898,8 +1898,10 @@ point_in_JamPolygon <- function
 #' @family JamPolygon
 #' 
 #' @returns `logical` vector with one result per point `x`, where
-#'    `TRUE` indicates the point overlaps at least one polygon, and
-#'    `FALSE` indicates the point does not overlap any polygon.
+#'    * `TRUE` indicates the point overlaps at least one polygon,
+#'    * `FALSE` indicates the point does not overlap any polygon.
+#'    * Note that a point contained in a polygon "hole" is expected
+#'    to return `FALSE` when `apply_holes=TRUE` (default).
 #' 
 #' @param x `list` with `"x"`,`"y"` with `numeric` values, representing
 #'    one or more points.
@@ -1929,11 +1931,18 @@ has_point_in_JamPolygon <- function
 
 #' Split JamPolygon multipart polygons
 #' 
+#' Split JamPolygon multipart polygons into separate polygons, one
+#' polygon per row in `jp@polygons`.
+#' 
 #' @family JamPolygon
-#'
+#' 
+#' @returns `JamPolygon` with one row per distinct polygon part in the
+#'    input `jp` object.
+#' 
 #' @param jp `JamPolygon`
 #' @param suffix `character` passed to `jamba::makeNames()` when creating
-#'    new unique `names()` for the resulting polygons.
+#'    new unique `names()` for the resulting polygons. The default `"_sub"`
+#'    will create sub-parts with `"_sub1"`, `"_sub2"`, `"_sub3"`, and so on.
 #' @param ... additional arguments are ignored.
 #' 
 #' @export
@@ -1967,6 +1976,7 @@ split_JamPolygon <- function
    new_jp <- jp;
    new_jp@polygons <- jp@polygons[rowseq, , drop=FALSE];
    names(new_jp) <- jamba::makeNames(names(new_jp), ...);
+   # rownames(new_jp@polygons) <- names(new_jp);
    new_jp@polygons$x <- I(new_x);
    new_jp@polygons$y <- I(new_y);
 
@@ -1977,6 +1987,19 @@ split_JamPolygon <- function
 }
 
 #' Update attributes for a JamPolygon object
+#' 
+#' Update attributes for a JamPolygon object, including default label
+#' position, and polygon orientations.
+#' 
+#' The default label position is defined with `"label_x","label_y"`
+#' if these columns do not already exist in `jp@polygons`.
+#' The coordinates are defined by `labelr_JamPolygon()` with
+#' argument `add_to_jp=TRUE`.
+#' 
+#' If the column `"orientation"` does not exist in `jp@polygons`
+#' it is added by calling `add_orientation_JamPolygon()`. It
+#' subsequently adds columns `"holes"`, `"polygon_clockwise"`, and
+#' `"polygon_parent"` when each is not already present.
 #' 
 #' @family JamPolygon
 #'
@@ -2157,10 +2180,20 @@ sample_JamPolygon <- function
    } else {
       use_jp <- jp;
    }
+   ## Todo: Fix error with use_jp has zero x,y coordinates
+   # - bbox_JamPolygon() creates c(-Inf,Inf) bbox values
+   # - jp has empty x,y coordinates
+   # - buffer_JamPolygon() may create use_jp with empty x,y coordinates
+   # jamba::printDebug("jp:");print(jp);# debug
+   # jamba::printDebug("use_jp:");print(use_jp);# debug
+   if (length(jamba::rmNA(unlist(jp@polygons$x))) == 0) {
+      return(list(x=numeric(0),
+         y=numeric(0)));
+   }
    
    # bounding box
    xyrange <- bbox_JamPolygon(use_jp);
-
+   
    # custom function to wrap some re-usable logic
    array_points <- function
    (xyrange,
@@ -2228,9 +2261,7 @@ sample_JamPolygon <- function
    
    # range of values for n to attempt
    n_seq <- unique(round(seq(from=n * 1, to=n * 50, by=ceiling(n / 50))));
-   # jamba::printDebug("sample_JamPolygon(): ",
-   #    "n_seq: ", n_seq);
-   
+
    # define n points inside the polygon
    n_ratio <- head(n_ratio, 1);
    if (length(n_ratio) == 0 || any(n_ratio) < 1) {
@@ -2240,6 +2271,8 @@ sample_JamPolygon <- function
       n_ratio <- 1;
    }
    for (try_n in n_seq) {
+      # jamba::printDebug("sample_JamPolygon(): ", "try_n:", try_n);# debug
+      # jamba::printDebug("use_jp:");print(use_jp);# debug
       A <- array_points(xyrange,
          n=try_n,
          pattern=pattern,
@@ -2360,7 +2393,7 @@ sample_JamPolygon <- function
 buffer_JamPolygon <- function
 (jp,
  buffer=-0.5,
- steps=200,
+ steps=20,
  relative=TRUE,
  verbose=FALSE,
  ...)

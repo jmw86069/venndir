@@ -22,8 +22,12 @@ outer boundary of the polygon.}
 }
 \value{
 \code{logical} vector with one result per point \code{x}, where
-\code{TRUE} indicates the point overlaps at least one polygon, and
-\code{FALSE} indicates the point does not overlap any polygon.
+\itemize{
+\item \code{TRUE} indicates the point overlaps at least one polygon,
+\item \code{FALSE} indicates the point does not overlap any polygon.
+\item Note that a point contained in a polygon "hole" is expected
+to return \code{FALSE} when \code{apply_holes=TRUE} (default).
+}
 }
 \description{
 Determine if a point is inside any JamPolygon
@@ -32,7 +36,7 @@ Determine if a point is inside any JamPolygon
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

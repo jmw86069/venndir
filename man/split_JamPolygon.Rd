@@ -10,18 +10,24 @@ split_JamPolygon(jp, suffix = "_sub", ...)
 \item{jp}{\code{JamPolygon}}
 
 \item{suffix}{\code{character} passed to \code{jamba::makeNames()} when creating
-new unique \code{names()} for the resulting polygons.}
+new unique \code{names()} for the resulting polygons. The default \code{"_sub"}
+will create sub-parts with \code{"_sub1"}, \code{"_sub2"}, \code{"_sub3"}, and so on.}
 
 \item{...}{additional arguments are ignored.}
 }
+\value{
+\code{JamPolygon} with one row per distinct polygon part in the
+input \code{jp} object.
+}
 \description{
-Split JamPolygon multipart polygons
+Split JamPolygon multipart polygons into separate polygons, one
+polygon per row in \code{jp@polygons}.
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

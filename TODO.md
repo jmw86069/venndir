@@ -2,6 +2,11 @@
 
 ## 28aug2024
 
+* Need some way to move outside labels to the top (or bottom),
+the default makes labels wide, which is difficult to use in figures.
+* Need some way to nudge count labels, to adjust centering polygons.
+
+* Consider using `cli` for messaging, and for unicode symbol support?
 * Hide single-set signed labels with concordance and agreement
 * Add generic convenience functions
 

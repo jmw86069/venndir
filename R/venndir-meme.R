@@ -112,7 +112,7 @@
 #' # by default any hidden overlaps do not trigger a warning to be displayed
 #' # Note: using shape="circle" triggers an error in polygon_label_fill()
 #' # that needs to be debugged
-#' # venn_meme(wtah, proportional=TRUE)
+#' # venn_meme(wtah, proportional=TRUE, shape="circle")
 #' 
 #' # for proportional diagrams it may be helpful to use shape="ellipse"
 #' venn_meme(wtah, proportional=TRUE, shape="ellipse")

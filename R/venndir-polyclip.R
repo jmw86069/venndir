@@ -96,8 +96,6 @@ eulerr_to_JamPolygon <- function
 #'    chooses color-blindness-friendly categorical colors, and
 #'    `blend_preset="ryb"` blends multiple colors using a red-yellow-blue
 #'    color wheel, consistent with paint-type color combinations.
-#' @param sp_nudge,rotate_degrees passed to `nudge_sp()` to allow manual
-#'    adjustment of `sp` objects.
 #' @param do_plot `logical` indicating whether to plot the output
 #'    `SpatialPolygonsDataFrame` object.
 #' @param verbose `logical` indicating whether to print verbose output.
@@ -129,8 +127,6 @@ find_venn_overlaps_JamPolygon <- function
  sep="&",
  preset="dichromat2",
  blend_preset="ryb",
- sp_nudge=NULL,
- rotate_degrees=0,
  do_plot=FALSE,
  verbose=FALSE,
  ...)
@@ -171,20 +167,6 @@ find_venn_overlaps_JamPolygon <- function
          "head(el1):");
       print(head(el1, 30));
    }
-   
-   ## Optionally nudge individual polygon coordinates
-   # if (length(sp_nudge) > 0 && any(unlist(sp_nudge) != 0)) {
-   #    sp <- nudge_sp(sp,
-   #       sp_nudge=sp_nudge,
-   #       ...);
-   # }
-   
-   ## Optionally rotate all polygon coordinates
-   # if (length(rotate_degrees) > 0 && any(rotate_degrees != 0)) {
-   #    sp <- rescale_sp(sp,
-   #       rotate_degrees=rotate_degrees,
-   #       ...);
-   # }
    
    if (length(venn_counts) > 0) {
       venn_counts_names <- strsplit(names(venn_counts),
@@ -844,6 +826,8 @@ polygon_ellipses <- function
 nudge_JamPolygon <- function
 (jp,
  nudge=NULL,
+ rotate_degrees=0,
+ center=NULL,
  verbose=FALSE,
  ...)
 {
@@ -851,63 +835,121 @@ nudge_JamPolygon <- function
    if (length(jp) == 0) {
       return(jp)
    }
-   if (length(nudge) == 0) {
+   if (length(rotate_degrees) == 0) {
+      rotate_degrees <- 0;
+   }
+   rotate_degrees <- head(rotate_degrees, 1) %% 360;
+   
+   if (length(nudge) == 0 && (0 %in% rotate_degrees)) {
       return(jp)
    }
-   if (length(names(nudge)) == 0) {
-      stop("There must be names(nudge).")
-   }
-   if (length(names(nudge)) == 0 && !any(names(nudge) %in% names(jp))) {
-      # check for numeric names
-      nudge_names <- as.integer(names(nudge));
-      use_nudge <- (!is.na(nudge_names) &
-            nudge_names == as.numeric(names(nudge)) &
-            nudge_names %in% seq_along(jp))
-      if (!all(use_nudge)) {
-         stop("names(nudge) must match names(jp) or seq_along(jp)")
+   
+   ## rotate polygons
+   if (rotate_degrees != 0) {
+      if (!length(center) == 2) {
+         use_bbox <- bbox_JamPolygon(jp);
+         center <- c(x=mean(use_bbox[1, 1:2]),
+            y=mean(use_bbox[2, 1:2]));
       }
-      nudge_names <- names(jp)[nudge_names]
-   } else {
-      nudge_names <- intersect(names(nudge), names(jp))
+      for (irow in seq_len(nrow(jp@polygons))) {
+         use_x <- jp@polygons$x[[irow]];
+         use_y <- jp@polygons$y[[irow]];
+         if (!is.list(use_x)) {
+            use_x <- list(use_x);
+            use_y <- list(use_y);
+         }
+         use_x_v <- unlist(use_x);
+         use_y_v <- unlist(use_y);
+         if (length(names(use_x)) > 0) {
+            use_split <- rep(jamba::makeNames(names(use_x)),
+               lengths(use_x));
+            use_split <- factor(use_split,
+               levels=jamba::makeNames(names(use_x)))
+         } else {
+            use_split <- rep(as.character(seq_along(use_x)),
+               lengths(use_x));
+            use_split <- factor(use_split,
+               levels=as.character(seq_along(use_x)))
+         }
+         new_xy <- rescale_coordinates(
+            x=cbind(x=use_x_v, y=use_y_v),
+            rotate_degrees=rotate_degrees,
+            scale=c(1, 1),
+            center=center)
+         new_x_v <- new_xy[, 1];
+         new_y_v <- new_xy[, 2];
+         new_x <- split(new_x_v, use_split);
+         new_y <- split(new_y_v, use_split);
+         if (length(names(use_x)) == 0) {
+            new_x <- unname(new_x);
+            new_y <- unname(new_y);
+         }
+         if (!is.list(use_x)) {
+            new_x <- unname(new_x[[1]]);
+            new_y <- unname(new_y[[1]]);
+         }
+         jp@polygons$x[[irow]] <- new_x;
+         jp@polygons$y[[irow]] <- new_y;
+      }
    }
    
-   # custom function to apply nudge to nested numeric list
-   apply_nudge <- function(i, offset) {
-      if (is.list(i)) {
-         lapply(i, function(j){
-            apply_nudge(j, offset)
-         })
-      } else {
-         i + offset
+   ## nudge polygons by name
+   if (length(nudge) > 0) {
+      if (length(names(nudge)) == 0) {
+         stop("There must be names(nudge).")
       }
-   }
-   for (nudge_name in nudge_names) {
-      n <- match(nudge_name, names(jp));
-      if (all(c("x", "y") %in% names(nudge[[nudge_name]]))) {
-         nudge_x <- nudge[[nudge_name]][["x"]];
-         nudge_y <- nudge[[nudge_name]][["y"]];
+      if (length(names(nudge)) == 0 && !any(names(nudge) %in% names(jp))) {
+         # check for numeric names
+         nudge_names <- as.integer(names(nudge));
+         use_nudge <- (!is.na(nudge_names) &
+               nudge_names == as.numeric(names(nudge)) &
+               nudge_names %in% seq_along(jp))
+         if (!all(use_nudge)) {
+            stop("names(nudge) must match names(jp) or seq_along(jp)")
+         }
+         nudge_names <- names(jp)[nudge_names]
       } else {
-         nudge_x <- nudge[[nudge_name]][[1]];
-         nudge_y <- nudge[[nudge_name]][[2]];
+         nudge_names <- intersect(names(nudge), names(jp))
       }
-      if (verbose) {
-         jamba::printDebug("nudge_JamPolygon(): ",
-            "applying nudge (", c(nudge_x, nudge_y), ") ",
-            "to '", nudge_name, "'");
+      
+      # custom function to apply nudge to nested numeric list
+      apply_nudge <- function(i, offset) {
+         if (is.list(i)) {
+            lapply(i, function(j){
+               apply_nudge(j, offset)
+            })
+         } else {
+            i + offset
+         }
       }
-      if (!all(nudge_x %in% c(NA, 0))) {
-         old_x <- jp@polygons$x[n];
-         new_x <- apply_nudge(jp[nudge_name, ]@polygons$x, offset=nudge_x)
-         jp@polygons$x[n] <- new_x;
-      } else {
-         new_x <- jp[nudge_name, ]@polygons$x;
-      }
-      if (!all(nudge_y %in% c(NA, 0))) {
-         old_y <- jp@polygons$y[n];
-         new_y <- apply_nudge(jp[nudge_name, ]@polygons$y, offset=nudge_y)
-         jp@polygons$y[n] <- new_y;
-      } else {
-         new_y <- jp[nudge_name, ]@polygons$y;
+      for (nudge_name in nudge_names) {
+         n <- match(nudge_name, names(jp));
+         if (all(c("x", "y") %in% names(nudge[[nudge_name]]))) {
+            nudge_x <- nudge[[nudge_name]][["x"]];
+            nudge_y <- nudge[[nudge_name]][["y"]];
+         } else {
+            nudge_x <- nudge[[nudge_name]][[1]];
+            nudge_y <- nudge[[nudge_name]][[2]];
+         }
+         if (verbose) {
+            jamba::printDebug("nudge_JamPolygon(): ",
+               "applying nudge (", c(nudge_x, nudge_y), ") ",
+               "to '", nudge_name, "'");
+         }
+         if (!all(nudge_x %in% c(NA, 0))) {
+            old_x <- jp@polygons$x[n];
+            new_x <- apply_nudge(jp[nudge_name, ]@polygons$x, offset=nudge_x)
+            jp@polygons$x[n] <- new_x;
+         } else {
+            new_x <- jp[nudge_name, ]@polygons$x;
+         }
+         if (!all(nudge_y %in% c(NA, 0))) {
+            old_y <- jp@polygons$y[n];
+            new_y <- apply_nudge(jp[nudge_name, ]@polygons$y, offset=nudge_y)
+            jp@polygons$y[n] <- new_y;
+         } else {
+            new_y <- jp[nudge_name, ]@polygons$y;
+         }
       }
    }
    return(jp);

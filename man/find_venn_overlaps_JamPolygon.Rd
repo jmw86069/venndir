@@ -12,8 +12,6 @@ find_venn_overlaps_JamPolygon(
   sep = "&",
   preset = "dichromat2",
   blend_preset = "ryb",
-  sp_nudge = NULL,
-  rotate_degrees = 0,
   do_plot = FALSE,
   verbose = FALSE,
   ...
@@ -39,9 +37,6 @@ colors, and for color blending. The default \code{preset="dichromat2"}
 chooses color-blindness-friendly categorical colors, and
 \code{blend_preset="ryb"} blends multiple colors using a red-yellow-blue
 color wheel, consistent with paint-type color combinations.}
-
-\item{sp_nudge, rotate_degrees}{passed to \code{nudge_sp()} to allow manual
-adjustment of \code{sp} objects.}
 
 \item{do_plot}{\code{logical} indicating whether to plot the output
 \code{SpatialPolygonsDataFrame} object.}
@@ -99,7 +94,7 @@ plot(xo);
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

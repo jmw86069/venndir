@@ -593,23 +593,20 @@ render_venndir <- function
             seed=123,
             verbose=TRUE,
             ...);
+         if (length(lpf) == 0) {
+            return(lpf)
+         }
          # add overlap label to items_df
          lpf$items_df$overlap_set <- head(items_df1$overlap_set, 1);
-         # jamba::printDebug("lpf$items_df:");print(lpf$items_df);
          # jamba::printDebug("lpf$items_df:");print(lpf$items_df);
          lpf;
       });
       # combine item label into one data.frame
-      itemlabels_df <- jamba::rbindList(lapply(itemlabels_list, function(i1){
+      itemlabels_df <- jamba::rbindList(lapply(
+         jamba::rmNULL(itemlabels_list), function(i1){
          i1$items_df;
       }));
       itemlabels_jp <- NULL;
-      # itemlabels_sp <- lapply(itemlabels_list, function(i1){
-      #    if (!grepl("Spatial", class(i1$sp_buffer))) {
-      #       return(NULL)
-      #    }
-      #    i1$sp_buffer
-      # });
    }
    
    gdf <- NULL;

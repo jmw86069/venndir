@@ -1,3 +1,22 @@
+# venndir 0.0.39.950
+
+* Small change to use `gridGeometry` 0.4.1 from Github until released to CRAN,
+this version fixes rare error caused by proportional diagram and innerborder,
+when the delta from two circles creates a small line with zero area.
+Will update again once it is available on CRAN.
+Thanks pmur002 for the rapid fix!
+
+   * Updated tests from 0.0.39.900 which skipped the innerborder to
+   circumvent the bug in the tests that uncovered the error.
+
+* `buffer_JamPolygon()`
+
+   * default argument `steps=20`, formerly `steps=200` which was (and is)
+   the predominant rate-limiting step.
+
+* `nudge_JamPolygon()` now recognizes `rotate_degrees` fixing the bug that
+previously did not allow rotating the Venn diagram polygons.
+
 # venndir 0.0.39.900
 
 ## changes to existing functions

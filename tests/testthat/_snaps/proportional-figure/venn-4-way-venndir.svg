@@ -114,10 +114,10 @@
 <text x='562.99' y='222.92' style='font-size: 14.00px; font-weight: bold; fill: #262626; font-family: sans;' textLength='36.58px' lengthAdjust='spacingAndGlyphs'>set_D</text>
 <text x='474.88' y='306.15' style='font-size: 14.00px; fill: #262626; font-family: sans;' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='487.25' y='305.47' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='14.95px' lengthAdjust='spacingAndGlyphs'>↑:1</text>
-<line x1='160.00' y1='228.79' x2='195.29' y2='264.98' style='stroke-width: 0.75; stroke: #EEC12E; stroke-opacity: 0.80;' />
-<line x1='248.60' y1='161.08' x2='280.18' y2='194.42' style='stroke-width: 0.75; stroke: #CC5500; stroke-opacity: 0.80;' />
-<line x1='471.40' y1='161.08' x2='439.81' y2='194.42' style='stroke-width: 0.75; stroke: #FF64B5; stroke-opacity: 0.80;' />
-<line x1='560.00' y1='228.81' x2='524.70' y2='264.99' style='stroke-width: 0.75; stroke: #7086E1; stroke-opacity: 0.80;' />
+<line x1='160.00' y1='228.79' x2='194.62' y2='264.29' style='stroke-width: 0.75; stroke: #EEC12E; stroke-opacity: 0.80;' />
+<line x1='248.60' y1='161.08' x2='279.99' y2='194.22' style='stroke-width: 0.75; stroke: #CC5500; stroke-opacity: 0.80;' />
+<line x1='471.40' y1='161.08' x2='440.01' y2='194.22' style='stroke-width: 0.75; stroke: #FF64B5; stroke-opacity: 0.80;' />
+<line x1='560.00' y1='228.81' x2='525.38' y2='264.30' style='stroke-width: 0.75; stroke: #7086E1; stroke-opacity: 0.80;' />
 </g>
 <defs>
   <clipPath id='cpNTM0LjE1fDU4MC42OHw0NDYuNjN8NDYzLjM5'>

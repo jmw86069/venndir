@@ -19,16 +19,8 @@ label_fill_JamPolygon(
   dither_cex = 0.04,
   dither_color = 0.07,
   dither_degrees = 0,
-  scale_width = -0.15,
   apply_n_scale = TRUE,
-  buffer_w = 0,
-  buffer_h = 0,
   label_method = c("hexagonal"),
-  layout_degrees = -20,
-  draw_buffer = FALSE,
-  buffer_fill = "#FFFFFF77",
-  buffer_border = "red",
-  draw_points = FALSE,
   draw_labels = TRUE,
   seed = 1,
   plot_style = c("base", "gg", "none"),
@@ -40,15 +32,121 @@ label_fill_JamPolygon(
 \item{jp}{\code{JamPolygon} where only the first row is processed.}
 
 \item{labels}{\code{character} vector of labels}
+
+\item{buffer}{\code{numeric} value (default \code{-0.15}) buffer to resize the
+polygon, where negative values shrink the polygon size relative
+to the size of the polygon. For example \code{-0.9} will reduce the polygon
+90\% of the way toward a completely empty polygon, where that range
+is defined by the width inside the polygon border.}
+
+\item{relative}{\code{logical} passed to \code{buffer_JamPolygon()} (default \code{TRUE})
+to define \code{buffer} with relative coordinates.}
+
+\item{color}{\code{character} string to define the color of resulting labels.}
+
+\item{border}{\code{character} string used to define an optional item border,
+which is only useful when \code{gridtext} is used to visualize labels.}
+
+\item{ref_jp}{\code{JamPolygon} (optional) used only when \code{apply_n_scale=TRUE},
+used to define the overall plot range before determining whether
+the internal area of \code{jp} should be reduced before arraying item
+label coordinates.
+The general idea is that polygons which are a smaller percentage
+of the total area should not be reduced as much by \code{apply_n_scale}
+because they have limited area, but larger polygons should receive
+closer to the full \code{apply_n_scale} adjustment.}
+
+\item{xyratio}{\code{numeric} value indicating the relative ratio of x (width)
+to y (height) when arraying coordinates inside the polygons.
+Values larger than \code{1} will place points wider from each other than
+they are tall, which can help with longer text labels.}
+
+\item{fontsize}{\code{numeric} font size in points, default \code{10}.}
+
+\item{cex}{\code{numeric} multiplied by \code{fontsize} as an alternative convenient
+way to adjust text label sizes.}
+
+\item{degrees}{\code{numeric} value used to rotate labels, default \code{0},
+in degrees between 0 and 359.}
+
+\item{apply_n_scale}{\code{logical} indicating whether to adjust the buffer
+based upon the number of items, where more items uses less buffer,
+and fewer items imposes a larger buffer.
+The intent is for a single label or small number of labels to
+appear near the center.}
+
+\item{label_method}{\code{character} string (default "hexagonal") to define
+the label layout. Currently only \code{"hexagonal"} is implemented.
+After testing some approaches in \code{sf::st_sample()} and
+\code{spatstat.random::rThomas()}, the other options were interesting
+but ultimately not more effective specifically for character labels.
+Both packages have heavy R dependencies and were avoided.}
+
+\item{draw_labels}{\code{logical} (default \code{TRUE}) indicating whether to
+draw labels, however it is only used when \code{plot_style="base"}.}
+
+\item{seed}{\code{numeric} value (default \code{1}) used to define the random seed
+with \code{set.seed(seed)} for reproducible output.
+When \code{seed} is \code{NULL} there is no call to \code{set.seed()}.}
+
+\item{plot_style}{\code{character} string (deprecated) to define the
+plot output, used only when \code{draw_labels=TRUE}.
+Currently, labels are only rendered for \code{plot_style="base"}.
+\itemize{
+\item \code{"base"}: Use R base plotting, using \code{gridBase} with \code{gridtext}.
+\item \code{"gg"}: Use \code{ggplot2} style plotting.
+\item \code{"none"}: No plot output.
+}}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{...}{additional arguments are passed to internal functions:
+\code{buffer_JamPolygon()}, and \code{sample_JamPolygon()}.}
+
+\item{`dither_cex, dither_color, dither_degrees`}{values used to provide
+some variability to the repeated pattern of text labels.
+\itemize{
+\item \code{dither_cex} provides a range to adjust \code{cex} and \code{fontsize} slightly
+for each label, making some slightly larger or smaller to help
+distinguish adjacent labels from one another.
+\item \code{dither_color} provides a range for adjusting the font color, which
+is applied with \code{darkFactor} in \code{jamba::makeColorDarker()}.
+\item \code{dither_degrees} provides a range for adjusting font \code{degrees},
+the default \code{0} means the values are not adjusted. The \code{text()} function
+does not permit multiple vectorized rotations, however \code{gridtext}
+does permit multiple angles. Best to use \code{dither_degrees} only
+when displaying labels with \code{gridtext}.
+}}
+}
+\value{
+\code{list} when there are valid coordinates, \code{NULL} otherwise.
+The \code{list} contains these elements:
+\itemize{
+\item \code{"items_df"}: a \code{data.frame} with columns
+\verb{x,y,text,rot,color,fontsize,border}
+\item \code{"g_labels"}: a grid \code{grob} graphical object only when
+\code{plot_style="base"}, otherwise \code{NULL}
+\item \code{"scale_width"}: a \code{numeric} value indicating the \code{buffer} used
+\item \code{"jp_buffer"}: a \code{JamPolygon} object after adjusting with \code{buffer}
+}
 }
 \description{
-Arrange text labels inside a polygon
+Arrange one or more text labels to fit inside a polygon.
 }
 \details{
 This function is intended to define points inside a polygon area
-which are evenly spaced, used to place text labels also inside
-the polygon. There are limited options to define a buffer region
-so that labels do not overlap the polygon boundary.
+so that text labels can be roughly evenly spaced, with relatively
+good default positioning to minimize overlapping labels.
+This function does not prevent overlapping labels, nor does it
+fully prevent labels overlapping the polygon border.
+
+There are options to help minimize overlapping labels, such as \code{xyratio}
+which defines the default width-to-height ratio of resulting points.
+For wider text labels, a higher value for \code{xyratio} may be helpful.
+To minimize adjacent (side-by-side) label overlaps, it can be helpful
+to use \code{degrees} to rotate labels slightly, for example \code{degrees=5}
+may be enough to prevent wide labels from overlapping the next label
+beside it.
 \subsection{Strategy}{
 \itemize{
 \item Determine bounding box with rectangular area that encompases the polygon.
@@ -58,21 +156,12 @@ to produce at least \code{n} total points.
 \item If there are fewer than \code{n} remaining points, repeat the process
 using a higher target value for \code{n}.
 }
-
-Challenges:
-\itemize{
-\item \code{polyclip::pointinpolygon()} does not appear to handle polygons with
-holes. If not, then we have to use logic like: "overlaps any solid polygon,
-does not overlap any polygon hole".
 }
 
-Options:
+\subsection{Todo}{
 \itemize{
-\item Consider applying a buffer with fixed width inside the original
-polygon, so that points have at least this minimum width to the
-polygon border.
-\item Bonus points for applying the buffer more to the width than height,
-since text labels are typically wider than they are tall.
+\item Modify options that plot the result so they work together with
+\code{plot.JamPolygon()}.
 }
 }
 }
@@ -100,21 +189,16 @@ jp3 <- new("JamPolygon", polygons=df3);
 plot(jp3);
 
 lfj <- label_fill_JamPolygon(jp3[1,], labels=1:20)
+lfj12 <- label_fill_JamPolygon(jp3, labels=1:20)
 plot(lfj$items_df[, c("x", "y")], cex=0)
 text(lfj$items_df[, c("x", "y")], labels=lfj$items_df$text)
-
-#test_x <- jp3[1,]@polygons$x[[1]];
-#test_y <- jp3[1,]@polygons$y[[1]];
-#P <- list(x=c(3.5, 4.5), y=c(3.5, 4.5))
-#A <- lapply(seq_along(test_x), function(i){
-#   list(x=test_x[[i]], y=test_y[[i]])})
 
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

@@ -10,13 +10,25 @@ update_JamPolygon(jp, ...)
 \item{...}{additional arguments are ignored.}
 }
 \description{
-Update attributes for a JamPolygon object
+Update attributes for a JamPolygon object, including default label
+position, and polygon orientations.
+}
+\details{
+The default label position is defined with \verb{"label_x","label_y"}
+if these columns do not already exist in \code{jp@polygons}.
+The coordinates are defined by \code{labelr_JamPolygon()} with
+argument \code{add_to_jp=TRUE}.
+
+If the column \code{"orientation"} does not exist in \code{jp@polygons}
+it is added by calling \code{add_orientation_JamPolygon()}. It
+subsequently adds columns \code{"holes"}, \code{"polygon_clockwise"}, and
+\code{"polygon_parent"} when each is not already present.
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

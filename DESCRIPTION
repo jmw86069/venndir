@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.39.900
+Version: 0.0.39.950
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -20,7 +20,7 @@ Imports: jamba(>= 0.0.101.900),
     gridBase,
     data.table,
     gridExtra,
-    gridGeometry,
+    gridGeometry(>= 0.4.1),
     methods
 Suggests:
     eulerr,
@@ -34,7 +34,8 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 Remotes: github::jmw86069/jamba,
-    github::jmw86069/colorjam
+    github::jmw86069/colorjam,
+    github::pmur002/gridgeometry
 URL: http://github.com/jmw86069/venndir
 BugReports: http://github.com/jmw86069/venndir/issues
 Roxygen: list(markdown = TRUE)

@@ -163,7 +163,7 @@ get_venn_polygon_shapes <- function
       # jamba::printDebug("get_venn_polygon_shapes(): ", "circle_nudge:");print(circle_nudge);# debug
       venn_jp <- nudge_JamPolygon(jp=venn_jp,
          nudge=circle_nudge,
-         rotate_degrees=NULL,
+         rotate_degrees=rotate_degrees,
          ...)
    }
    return(venn_jp);

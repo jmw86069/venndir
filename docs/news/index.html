@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
       </span>
     </div>
 
@@ -57,6 +57,18 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.39.950" id="venndir-0039950">venndir 0.0.39.950<a class="anchor" aria-label="anchor" href="#venndir-0039950"></a></h2>
+<ul><li>
+<p>Small change to use <code>gridGeometry</code> 0.4.1 from Github until released to CRAN, this version fixes rare error caused by proportional diagram and innerborder, when the delta from two circles creates a small line with zero area. Will update again once it is available on CRAN. Thanks pmur002 for the rapid fix!</p>
+<ul><li>Updated tests from 0.0.39.900 which skipped the innerborder to circumvent the bug in the tests that uncovered the error.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/buffer_JamPolygon.html">buffer_JamPolygon()</a></code></p>
+<ul><li>default argument <code>steps=20</code>, formerly <code>steps=200</code> which was (and is) the predominant rate-limiting step.</li>
+</ul></li>
+<li><p><code><a href="../reference/nudge_JamPolygon.html">nudge_JamPolygon()</a></code> now recognizes <code>rotate_degrees</code> fixing the bug that previously did not allow rotating the Venn diagram polygons.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.39.900" id="venndir-0039900">venndir 0.0.39.900<a class="anchor" aria-label="anchor" href="#venndir-0039900"></a></h2>
 <div class="section level3">

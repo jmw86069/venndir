@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
       </span>
     </div>
 
@@ -71,8 +71,6 @@
 <span>  sep <span class="op">=</span> <span class="st">"&amp;"</span>,</span>
 <span>  preset <span class="op">=</span> <span class="st">"dichromat2"</span>,</span>
 <span>  blend_preset <span class="op">=</span> <span class="st">"ryb"</span>,</span>
-<span>  sp_nudge <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  rotate_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -109,11 +107,6 @@ colors, and for color blending. The default <code>preset="dichromat2"</code>
 chooses color-blindness-friendly categorical colors, and
 <code>blend_preset="ryb"</code> blends multiple colors using a red-yellow-blue
 color wheel, consistent with paint-type color combinations.</p></dd>
-
-
-<dt>sp_nudge, rotate_degrees</dt>
-<dd><p>passed to <code>nudge_sp()</code> to allow manual
-adjustment of <code>sp</code> objects.</p></dd>
 
 
 <dt>do_plot</dt>
@@ -160,7 +153,7 @@ are returned as an attribute <code>"venn_missing"</code>.</p>
     <div class="dont-index"><p>Other JamPolygon: 
 <code><a href="JamPolygon-class.html">JamPolygon-class</a></code>,
 <code><a href="Venndir-class.html">Venndir-class</a></code>,
-<code><a href="JamPolygon-methods.html">[,JamPolygon-method</a></code>,
+<code><a href="JamPolygon-methods.html">[,JamPolygon,ANY,ANY,ANY-method</a></code>,
 <code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon</a>()</code>,
 <code><a href="area_JamPolygon.html">area_JamPolygon</a>()</code>,
 <code><a href="bbox_JamPolygon.html">bbox_JamPolygon</a>()</code>,
