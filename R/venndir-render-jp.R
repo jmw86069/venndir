@@ -57,6 +57,8 @@
 #'    `grid::grid.newpage()`. This option allows the figure to be rendered
 #'    inside an active display device, or active `grid::viewport`.
 #'    Note: When `do_draw=FALSE`, it also forces `do_newpage=FALSE`.
+#' @param verbose `logical` indicating whether to print verbose output.
+#' @param ... additional arguments are passed to internal functions.
 #' 
 #' @returns `Venndir` object with attributes that contain underlying
 #'    `grid` graphical objects (grobs):
@@ -114,6 +116,7 @@ render_venndir <- function
  do_newpage=TRUE,
  do_draw=TRUE,
  draw_buffer=FALSE,
+ verbose=FALSE,
  ...)
 {
    # validate input
@@ -477,7 +480,7 @@ render_venndir <- function
                y1=test_xy$y1,
                jp=jp_list,
                buffer=test_xy$segment_buffer,
-               verbose=FALSE,
+               verbose=verbose,
                ...);
             rownames(new_xy) <- names(sp_index);
             # jamba::printDebug("new_xy:");print(new_xy);# debug
@@ -591,7 +594,7 @@ render_venndir <- function
             degrees=items_df1$item_degrees[1],
             buffer=item_buffer,
             seed=123,
-            verbose=TRUE,
+            verbose=verbose,
             ...);
          if (length(lpf) == 0) {
             return(lpf)
@@ -955,6 +958,8 @@ render_venndir <- function
                vjust=igdf$vjust,
                hjust=igdf$hjust,
                halign=igdf$halign,
+               # valign=igdf$valign,
+               valign=0.5,
                rot=igdf$rot,
                padding=grid::unit(igdf$padding,
                   igdf$padding_unit),
@@ -974,9 +979,7 @@ render_venndir <- function
                   lty=igdf$box_lty,
                   lwd=igdf$box_lwd)
             );
-            # attempt to re-assign custom childNames to the grobs
-            # jamba::printDebug("childNames(g_labels):");print(childNames(g_labels));# debug
-            # jamba::printDebug("igdf:");print(igdf);# debug
+            # re-assign custom childNames to the grobs
             new_childNames <- paste0(
                igdf$overlap_set, ":",
                igdf$type, ":",
@@ -987,18 +990,15 @@ render_venndir <- function
                grid::getGrob(g_labels, iname);
             })
             names(templist) <- new_childNames;
+            # jamba::printDebug("names(templist):");print(names(templist));# debug
             templist
-            # tempgList <- do.call(grid::gList, templist);
-            # g_labels <- grid::setChildren(g_labels, children=tempgList)
-            # # g_labels$childrenOrder <- jamba::nameVector(new_childNames);
-            # jamba::printDebug("childNames(g_labels):");print(childNames(g_labels));# debug
-            # g_labels;
          });
          # grid::popViewport();
          # assemble g_labels_list into gTree
          g_labels_gTree <- grid::grobTree(
             vp=jp_viewport,
-            do.call(grid::gList, unlist(unname(g_labels_list), recursive=FALSE)),
+            do.call(grid::gList,
+               unlist(unname(g_labels_list), recursive=FALSE)),
             name="labels");
          # jamba::printDebug("names(grid::childNames(g_labels_gTree)):");print(names(grid::childNames(g_labels_gTree)));# debug
          g_labels_groupdf <- data.frame(check.names=FALSE,
@@ -1031,10 +1031,10 @@ render_venndir <- function
                   groupdf=g_labels_groupdf,
                   segment_df=unique(segment_df),
                   adjust_center=adjust_center,
-                  adjx=adjx,
-                  adjy=adjy,
+                  adjx_fn=adjx,
+                  adjy_fn=adjy,
                   do_draw=FALSE,
-                  verbose=FALSE)
+                  verbose=verbose)
                # dgg$g_labels;
                dgg
             }, error=function(e){

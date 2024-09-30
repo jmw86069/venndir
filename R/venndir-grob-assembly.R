@@ -604,6 +604,7 @@ grobs_yalign <- function
    
    ## define x reference coordinate for alignment
    if (verbose) {
+      jamba::printDebug("ref_grob: ", ref_grob);
       jamba::printDebug("yext_init:");print(yext_init);
    }
    if (length(use_y) > 0) {

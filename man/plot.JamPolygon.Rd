@@ -4,7 +4,7 @@
 \alias{plot.JamPolygon}
 \title{Plot JamPolygon object}
 \usage{
-\method{plot}{JamPolygon}(
+plot.JamPolygon(
   x,
   y,
   xlim = NULL,
@@ -236,7 +236,7 @@ plot(jpz);
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

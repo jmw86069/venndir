@@ -87,7 +87,8 @@ draw_gridtext_groups <- function
       # adjust_centered=FALSE turns off adjustment for adj=0.5
       #
       # adapted from gridtext::richtext_grob() internals
-      if (verbose) {
+      # if (all(c(1,2,3) %in% k)) { verbose <- TRUE }
+      if (verbose > 1) {
          jamba::printDebug("draw_gridtext_groups(): ",
             "grob_group_roundrect(),  k:", k);
          print(head(gdf[k,,drop=FALSE]));
@@ -98,7 +99,10 @@ draw_gridtext_groups <- function
          use_groupdf <- groupdf[k, , drop=FALSE];
          k_childnames <- use_groupdf$childName;
          k <- match(k_childnames, grid::childNames(g_labels));
-         # jamba::printDebug("use_groupdf:");print(use_groupdf);# debug
+         if (verbose > 1) {
+            jamba::printDebug("draw_gridtext_groups(): ",
+               "grob_group_roundrect(), use_groupdf:");print(use_groupdf);# debug
+         }
       }
       
       ## Experimental realign strategy
@@ -110,6 +114,11 @@ draw_gridtext_groups <- function
          is_signed_count <- (grepl("count", use_groupdf$type) &
                grepl("signed", use_groupdf$counttype));
          is_overlap_label <- (grepl("overlap", use_groupdf$type));
+         if (verbose > 1) {
+            jamba::printDebug("draw_gridtext_groups(): ",
+               "grob_group_roundrect(), params:");
+            print(data.frame(is_main_count, is_signed_count, is_overlap_label));# debug
+         }
          
          use_segment_df <- head(segment_df, 0);
          if ("label_group" %in% colnames(segment_df)) {
@@ -132,8 +141,6 @@ draw_gridtext_groups <- function
          # - assemble overlap and count labels top to bottom: grobs_stack()
          #    - center-align: grobs_xalign()
          
-         # all_g_labels_cns <- grid::childNames(g_labels);
-         # jamba::printDebug("all_g_labels_cns:");print(data.frame(all_g_labels_cns));# debug
          g_labels_cns <- use_groupdf$childName;
          # jamba::printDebug("g_labels_cns:");print(g_labels_cns);# debug
          use_vp <- NULL;
@@ -229,7 +236,7 @@ draw_gridtext_groups <- function
             use_y <- grid::unit(adjy_fn(head(gdf$y[korig], 1)), "snpc");
          }
          # jamba::printDebug("adjx:", adjx, ", adjy:", adjy);# debug
-         # jamba::printDebug("use_xalign:", use_xalign, ", use_yalign:", use_yalign);# debug
+         if (verbose) jamba::printDebug("use_xalign:", use_xalign, ", use_yalign:", use_yalign);# debug
          # jamba::printDebug("adjy_fn(use_segment_df$y):");print(adjy_fn(use_segment_df$y));
          # ge1 <- grobs_exts(gt_final);
          # jamba::printDebug("ge1:");print(ge1);
@@ -237,12 +244,23 @@ draw_gridtext_groups <- function
          gt_final2 <- grobs_xalign(xalign=use_xalign,
             use_x=use_x,
             grobs_yalign(yalign=use_yalign,
+               verbose=verbose,
                use_y=use_y,
                list(gt_final)))
          gt_final <- gt_final2;
-
+         if (verbose > 1) {
+            jamba::printDebug("str(gt_final):");
+            print(str(gt_final, max.level=3));# debug
+         }
+         
          ## Now create roundrectGrob to bind them
          scm_exts <- grobs_exts(gt_final)
+         if (verbose) {
+            # jamba::printDebug("scm_exts:");
+            # print(str(scm_exts, max.level=5));# debug
+            jamba::printDebug("length(scm_exts$xext):");
+            print(length(scm_exts$xext));# debug
+         }
          scm_exts_x <- (scm_exts$xext[[1]] + scm_exts$xext[[2]]) / 2;
          scm_exts_y <- (scm_exts$yext[[1]] + scm_exts$yext[[2]]) / 2;
          scm_exts_w <- (scm_exts$xext[[2]] - scm_exts$xext[[1]]);
@@ -477,7 +495,6 @@ draw_gridtext_groups <- function
    }
    gdf_split <- split(gdf$num, gdf_group);
    # jamba::printDebug("gdf:");print(gdf);# debug
-   # jamba::printDebug("gdf:");print(gdf);# debug
    # jamba::printDebug("head(gdf_split, 2):");print(head(gdf_split, 2));# debug
    # jamba::printDebug("unique(segment_df):");print(unique(segment_df));# debug
    
@@ -496,7 +513,7 @@ draw_gridtext_groups <- function
    }));
    rownames(adj_df) <- names(gdf_split);
    # jamba::printDebug("adj_df:");print(adj_df);# debug
-   
+   # jamba::printDebug("gdf_group:");print(gdf_group);# debug
    rr_grobs <- list();
    new_g_labels <- list();
    #rr_grobs <- lapply(split(gdf$num, gdf_group), function(k){
@@ -504,7 +521,8 @@ draw_gridtext_groups <- function
       k <- gdf_split[[ki]];
       # determine if any labels have a line segment
       kgroup <- gdf_group[k][1];
-      # jamba::printDebug("adj_df[kgroup, ]:");print(adj_df[kgroup, ]);
+      # jamba::printDebug("k:");print(k);# debug
+      # jamba::printDebug("adj_df[kgroup, ]:");print(adj_df[kgroup, ]);# debug
       # jamba::printDebug("prior to grob_group_roundrect() childNames(g_labels):");print(childNames(g_labels));# debug
       rr_grob_l <- grob_group_roundrect(
          g_labels=g_labels,

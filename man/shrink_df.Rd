@@ -26,6 +26,28 @@ configurable tool for the majority of scenarios.
 
 This function uses \code{data.table} for overall speed.
 }
+\examples{
+testdf <- data.frame(check.names=FALSE,
+   SYMBOL=rep(c("ACTB", "GAPDH", "PPIA"), c(2, 3, 1)),
+   `logFC B-A`=c(1.4, 1.4, 2.3, NA, 2.3, 5.1),
+   probe=paste0("probe", 1:6))
+shrink_df(testdf, by="SYMBOL", num_func=function(x){mean(x, na.rm=TRUE)})
+
+testdftall <- do.call(rbind, lapply(1:10000, function(i){
+   idf <- testdf;
+   idf$SYMBOL <- paste0(idf$SYMBOL, "_", i);
+   idf;
+}))
+head(testdftall, 12)
+shrunk_tall <- shrink_df(testdftall,
+   by="SYMBOL",
+   num_func=function(x){mean(x, na.rm=TRUE)})
+
+shrunk_tall2 <- jamses::shrinkDataFrame(testdftall,
+   groupBy="SYMBOL")
+head(shrunk_tall2, 12)
+
+}
 \seealso{
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},

@@ -1,3 +1,8 @@
+# venndir 0.0.40.900
+
+* Updated label positioning logic, silenced some unintended verbose output
+from `render_venndir()`.
+
 # venndir 0.0.39.950
 
 * Small change to use `gridGeometry` 0.4.1 from Github until released to CRAN,

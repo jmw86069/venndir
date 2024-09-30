@@ -828,12 +828,18 @@ venndir_label_style <- function
    
    # vjust does y-axis justification
    #   (0=above point, 1=below point, 0.5=centered)
-   venndir_output$label_df$vjust_outside <- ifelse(venndir_output$label_df$type %in% "main",
-      1 - llo_adjy,
-      venndir_output$label_df$vjust);
-   venndir_output$label_df$vjust_inside <- ifelse(venndir_output$label_df$type %in% "main",
-      1 - lli_adjy,
-      venndir_output$label_df$vjust);
+   if (FALSE) {
+      venndir_output$label_df$vjust_outside <- ifelse(venndir_output$label_df$type %in% "main",
+         1 - llo_adjy,
+         venndir_output$label_df$vjust);
+      venndir_output$label_df$vjust_inside <- ifelse(venndir_output$label_df$type %in% "main",
+         1 - lli_adjy,
+         venndir_output$label_df$vjust);
+   } else {
+      # test
+      venndir_output$label_df$vjust_outside <- venndir_output$label_df$vjust;
+      venndir_output$label_df$vjust_inside <- venndir_output$label_df$vjust;
+   }
    
    # toupdate
    toupdate <- venndir_output$label_df$type %in% label_types;

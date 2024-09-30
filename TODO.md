@@ -1,5 +1,23 @@
 # TODO for venndir
 
+## 13sep2024
+
+* Adjust aesthetics based upon feedback.
+
+   * The arrows could be larger relative to the signed counts.
+   * Consider removing the colon `":"` between arrows and signed counts.
+   * When adjusting arrow/signed count font sizes, the text is bottom-aligned,
+   should probably be middle (top-middle-bottom) aligned.
+   
+      * Using `vjust=0.5` caused signed labels not to be grouped properly.
+
+## 04sep2024
+
+* Fix bug when `names(setlist)` contains parentheses, causing the set
+name to appear inside the polygon. Removing the parentheses fixes
+the problem, but unclear why this happens? Probably errant `grep()`
+call somewhere.
+
 ## 28aug2024
 
 * Need some way to move outside labels to the top (or bottom),

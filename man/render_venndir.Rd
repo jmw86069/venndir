@@ -34,6 +34,7 @@ render_venndir(
   do_newpage = TRUE,
   do_draw = TRUE,
   draw_buffer = FALSE,
+  verbose = FALSE,
   ...
 )
 }
@@ -188,7 +189,9 @@ Note: When \code{do_draw=FALSE}, it also forces \code{do_newpage=FALSE}.}
 The \code{grid} graphical objects are returned in attributes:
 "gtree", "grob_list", "viewport", and can be drawn separately.}
 
-\item{...}{additional arguments are passed to \code{render_venndir()}.}
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{...}{additional arguments are passed to internal functions.}
 }
 \value{
 \code{Venndir} object with attributes that contain underlying
