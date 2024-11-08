@@ -1,5 +1,71 @@
 # TODO for venndir
 
+## 08nov2024
+
+* Based upon some excellent feedback:
+
+   * DONE. Move default labels above, not beside the Venn diagram.
+   * DONE. Add option for a plot title.
+   * DONE. Related, make it "easy" to adjust outer labels.
+   * DONE. Add option for signed counts below main counts in one column.
+   * Add option to display signed counts in the legend.
+   * Add option to display percentage in the legend.
+
+## 01nov2024
+
+* Item label enhancements
+
+   * Debug `item_cex` and `item_cex_factor` not being applied as expected.
+
+      * Consider assigning `item_cex` to `label_df` or `jps` for persistence.
+      * Consider specific logic when `proportional=TRUE` to assume that
+      all polygons are already proportional to the number of items.
+   
+   * Consider option to retain item factor order when provided,
+   to control the order they are placed.
+   * Consider some method to adjust the relative "height" of item labels,
+   for example multi-line labels should take proportionally more height?
+   * Allow custom `show_labels` so the set names can be displayed outside.
+   * Store `item_cex` and `item_buffer` somehow for re-use, otherwise
+   `plot(venndir_out)` does not retain these settings.
+   * Improve the default adjustment to `item_buffer` based upon number
+   of items, and relative size of the polygon. With fewer items (2 or 1),
+   it should more sharply use the center position.
+   
+   * Consider option to justify item label based upon its left-right
+   position in the polygon. Item labels on left edge would be placed so
+   the left edge of the label aligns with the left edge of the polygon.
+   It could help reduce labels overlapping the outside of a polygon.
+   It might make labels more crowded inside the polygon.
+   * Consider some option to reduce item label overlaps.
+   * Consider some approach to place count label box inside the polygon,
+   with item labels around it? Probably not feasible.
+   
+   * Useful test case, to reproduce a published figure.
+   Note that `as_factor()` does not affect item sorting, only the numeric
+   prefix seems to work.
+   ```
+   as_factor <- function(x){
+      factor(x, levels=unique(x))
+   }
+   venndir::venn_meme(x=list(
+      CLE=as_factor(c("1 CLE:",
+         "2 IFNa>IFNb",
+         "3 Anti-malarials effective\ntherapy for skin disease")),
+      DM=as_factor(c("1 DM:",
+         "2 IFNb>IFNa",
+         "\n3 Triggered by immune\nstimulating herbal\nsupplements",
+         "\n\n\n4 Anti-malarials effective\nin 25%, commonly causes\nmorbilliform rash",
+         "\n\n\n\n5 Cannabinoid receptor\nagonist proising\ntreatment")),
+      `CLE&DM`=as_factor(c(
+         "1 Photosensitivity",
+         "2 Triggered by viral and\nbacterial infections",
+         "3 Increased\ntype I IFN"))),
+      item_cex=c(1.5, 1.5, 1.2),
+      xyratio=10,
+      dither_cex=0)
+   ```
+
 ## 13sep2024
 
 * Adjust aesthetics based upon feedback.

@@ -86,6 +86,8 @@ and are not yet fully editable.
 Previously this data could be inferred from \code{label_df} which was
 tedious, and required column \code{"item"} which is optional.
 That said, \code{setlist} can be an empty \code{list()}.
+\item \strong{metadata}: \code{list} with optional metadata, intended for future
+expansion, such as plot title.
 }
 }
 \seealso{

@@ -26,9 +26,9 @@
 #'    label_df_rowname, name, childName, gdf_group.
 #'    Importantly, it must be in identical row order as `gdf`.
 #' @param segment_df `data.frame` with segment coordinates, optional.
-#' @param realign `logical` experimental feature indicating whether to
-#'    realign grouped labels, thus ignoring the hjust/vjust for each
-#'    label, instead arranging the labels using `groupdf`.
+#' @param realign `logical` experimental feature (now default) indicating
+#'    whether to realign grouped labels, thus ignoring the hjust/vjust
+#'    for each label, instead arranging the labels using `groupdf`.
 #'    In principle, overlap label (set name) should be top-center,
 #'    and counts should be centered below. When there are main counts
 #'    and signed counts, they should be in two columns, collectively
@@ -41,6 +41,11 @@
 #'    This option is `FALSE` specifically for two-column labels positioned
 #'    around a fixed centerpoint, where one column could be wider than the
 #'    other, and it would otherwise push the other column the other way.
+#' @param template `character` string (default "wide") with experimental
+#'    layout templates for count and signed labels.
+#'    * `"wide"` - original strategy with signed counts beside main counts.
+#'    * `"tall"` - new strategy with main counts and signed counts in
+#'    the same column.
 #' @param do_draw `logical` indicating whether to draw the finished
 #'    result in the context of the current open graphics device.
 #' @param verbose `logical` indicating whether to print verbose output.
@@ -54,6 +59,8 @@ draw_gridtext_groups <- function
  segment_df=NULL,
  realign=TRUE,
  adjust_center=FALSE,
+ template=c("wide",
+    "tall"),
  adjx_fn=c,
  adjy_fn=c,
  do_draw=TRUE,
@@ -68,6 +75,7 @@ draw_gridtext_groups <- function
       }
       return(gdf);
    }
+   template <- match.arg(template);
    
    # internal helper function
    grob_group_roundrect <- function
@@ -82,9 +90,11 @@ draw_gridtext_groups <- function
     adjx_fn=c,
     adjy_fn=c,
     adjust_center=FALSE,
+    template=c("wide", "tall"),
     verbose=FALSE)
    {
       # adjust_centered=FALSE turns off adjustment for adj=0.5
+      template <- match.arg(template);
       #
       # adapted from gridtext::richtext_grob() internals
       # if (all(c(1,2,3) %in% k)) { verbose <- TRUE }
@@ -155,7 +165,11 @@ draw_gridtext_groups <- function
                use_vp <- signed_grobs[[1]]$vp
             }
             # stack then left-align
-            gt_signed <- grobs_xalign(xalign="left",
+            use_xalign <- "center";
+            if ("wide" %in% template) {
+               use_xalign <- "left";
+            }
+            gt_signed <- grobs_xalign(xalign=use_xalign,
                grobs_stack(signed_grobs,
                   name=paste0(gdfbasename, ".signed")))
          }
@@ -171,7 +185,7 @@ draw_gridtext_groups <- function
             # stack then center-align,
             # or right-align if there are also signed counts
             use_xalign <- "center"
-            if (any(is_signed_count)) {
+            if (any(is_signed_count) && "wide" %in% template) {
                use_xalign <- "right"
             }
             gt_main <- grobs_xalign(xalign=use_xalign,
@@ -181,9 +195,18 @@ draw_gridtext_groups <- function
          ## combine count labels if needed
          gt_signed_count <- NULL;
          if (any(is_main_count) && any(is_signed_count)) {
-            gt_signed_count <- grobs_yalign(yalign="middle",
-               grobs_tile(list(gt_main, gt_signed),
-                  name=paste0(gdfbasename, ".main_signed")))
+            if ("wide" %in% template) {
+               # use_yalign <- "top";
+               use_yalign <- "middle";
+               gt_signed_count <- grobs_yalign(yalign=use_yalign,
+                  grobs_tile(list(gt_main, gt_signed),
+                     name=paste0(gdfbasename, ".main_signed")))
+            } else if ("tall" %in% template) {
+               use_xalign <- "center";
+               gt_signed_count <- grobs_xalign(xalign=use_xalign,
+                  grobs_stack(list(gt_main, gt_signed),
+                     name=paste0(gdfbasename, ".main_signed")))
+            }
          } else if (any(is_main_count)) {
             gt_signed_count <- gt_main;
          } else if (any(is_signed_count)) {
@@ -535,6 +558,7 @@ draw_gridtext_groups <- function
          adjx_fn=adjx_fn,
          adjy_fn=adjy_fn,
          adjust_center=adjust_center,
+         template=template,
          segment_df=segment_df,
          verbose=verbose);
       rr_grobs <- c(rr_grobs,

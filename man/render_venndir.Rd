@@ -8,6 +8,7 @@ render_venndir(
   venndir_output = NULL,
   expand_fraction = 0,
   font_cex = 1,
+  main = NULL,
   item_cex = NULL,
   item_cex_factor = 4,
   plot_warning = TRUE,
@@ -25,6 +26,7 @@ render_venndir(
   item_style = c("default", "text", "gridtext"),
   item_buffer = -0.15,
   group_labels = TRUE,
+  template = NULL,
   adjust_center = FALSE,
   draw_legend = TRUE,
   legend_x = "bottomright",
@@ -48,6 +50,12 @@ the Venn diagram. Values above zero cause the Venn diagram
 to be slighly smaller.}
 
 \item{font_cex}{\code{numeric} scalar to adjust font sizes.}
+
+\item{main}{\code{character} string used as a plot title, default NULL
+will render no title. When provided, it is rendered using
+\code{gridtext::richtext_grob()} which enables some Markdown-style
+formatting. The title is stored in \code{venndir@metadata$title}
+for persistence.}
 
 \item{item_cex}{\code{numeric} scalar applied to item labels in each overlap
 in order. When \code{length(item_cex) == 1} it is applied uniformly
@@ -166,6 +174,16 @@ Negative values are recommended, so they shrink the region.}
 label components together, therefore drawing fill and border
 around the group instead of each component. In most cases this
 setting should be TRUE.}
+
+\item{template}{\code{character} (default "wide") describing the default
+layout for counts and signed counts. The value is stored in
+\code{venndir@metadata$template} for persistence.
+\itemize{
+\item \code{"wide"} - main counts on the left, right-justified; signed counts
+on the right, left-justified.
+\item \code{"tall"} - main counts, center-justified; signed counts below main
+counts, center-justified.
+}}
 
 \item{adjust_center}{\code{logical} (default TRUE) used when labels are grouped,
 whether the group should be re-centered on the target point.

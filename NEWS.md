@@ -1,3 +1,52 @@
+# venndir 0.0.41.900
+
+## overall
+
+* Add plot titles!
+* Arrange signed counts in single column, under main counts.
+* Outside Venn labels default slightly toward the top, rather than the sides.
+* `nudge_venndir_label()` is convenient for moving inside or outside labels.
+
+## changes to existing functions
+
+* `Venndir` S4 object changes.
+
+   * New slot name `"metadata"` to store miscellaneous settings.
+   All efforts are made to accept older Venndir objects without
+   this slot available.
+
+* `venndir()`
+
+   * New argument `main` to draw a plot title. It uses `gridtext` to
+   enable custom Markdown font options.
+   When provided, `main` is also stored in `Venndir@metadata$main`
+   for persistence.
+   * New argument `template="wide"` is used to arrange count and signed
+   count labels together:
+   `"wide"` places them side-by-side, `"tall"` places them in one column.
+   When provided, `template` is also stored in `Venndir@metadata$template`
+   for persistence.
+   * New argument `center` passed to `label_outside_JamPolygon()`.
+   The default `center=c(0, -0.15)` tends to place labels at the top
+   rather than the left/right sides by default.
+   The default use case is improved.
+
+* `render_venndir()`
+
+   * Now properly converts set names with `"\n"` to use `"<br>"` as
+   originally intended, so it "just works".
+   * New arguments `main` and `template` as above, except that when
+   no argument is defined, it will use `Venndir@metadata$template`
+   or `Venndir@metadata$main` if defined.
+
+* `nudge_venndir_label()`
+
+   * New argument `offset_list` to define a list of offsets to one or more
+   sets, where set is defined by `names(offset_list)`.
+   * New arguments `align_x`,`align_y` to apply uniform alignment of labels
+   to the top/bottom/left/right of a set of labels. Useful to ensure
+   labels are the same y-position and not slightly different heights.
+
 # venndir 0.0.40.900
 
 * Updated label positioning logic, silenced some unintended verbose output

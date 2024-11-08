@@ -11,6 +11,7 @@ draw_gridtext_groups(
   segment_df = NULL,
   realign = TRUE,
   adjust_center = FALSE,
+  template = c("wide", "tall"),
   adjx_fn = c,
   adjy_fn = c,
   do_draw = TRUE,
@@ -39,9 +40,9 @@ Importantly, it must be in identical row order as \code{gdf}.}
 
 \item{segment_df}{\code{data.frame} with segment coordinates, optional.}
 
-\item{realign}{\code{logical} experimental feature indicating whether to
-realign grouped labels, thus ignoring the hjust/vjust for each
-label, instead arranging the labels using \code{groupdf}.
+\item{realign}{\code{logical} experimental feature (now default) indicating
+whether to realign grouped labels, thus ignoring the hjust/vjust
+for each label, instead arranging the labels using \code{groupdf}.
 In principle, overlap label (set name) should be top-center,
 and counts should be centered below. When there are main counts
 and signed counts, they should be in two columns, collectively
@@ -55,6 +56,14 @@ respect to the x-axis position.
 This option is \code{FALSE} specifically for two-column labels positioned
 around a fixed centerpoint, where one column could be wider than the
 other, and it would otherwise push the other column the other way.}
+
+\item{template}{\code{character} string (default "wide") with experimental
+layout templates for count and signed labels.
+\itemize{
+\item \code{"wide"} - original strategy with signed counts beside main counts.
+\item \code{"tall"} - new strategy with main counts and signed counts in
+the same column.
+}}
 
 \item{do_draw}{\code{logical} indicating whether to draw the finished
 result in the context of the current open graphics device.}

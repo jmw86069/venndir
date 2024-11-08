@@ -118,30 +118,37 @@ label_outside_JamPolygon <- function
    
    # get center
    set.seed(seed);
-   if (length(center) != 2) {
-      if ("bbox" %in% center_method || length(which_jp) == 1) {
-         center <- matrix(ncol=2,
-            rowMeans(jpbox)) + (rnorm(2) / 1000);
-      } else if ("label" %in% center_method) {
-         # use mean of label positions
-         if (all(c("label_x", "label_y") %in% colnames(jp))) {
-            center <- cbind(
-               x=mean(range(jp@polygons$label_x[which_jp], na.rm=TRUE)),
-               y=mean(range(jp@polygons$label_y[which_jp], na.rm=TRUE)))
-         } else {
-            label_xy <- labelr_JamPolygon(jp[which_jp, ]);
-            # average from range of labels
-            # center <- cbind(
-            #    x=mean(range(label_xy[,1], na.rm=TRUE)),
-            #    y=mean(range(label_xy[,2], na.rm=TRUE)))
-            # average from all actual labels
-            center <- cbind(
-               x=mean(label_xy[,1], na.rm=TRUE),
-               y=mean(label_xy[,2], na.rm=TRUE))
-         }
+   # calculate plot center
+   if ("bbox" %in% center_method || length(which_jp) == 1) {
+      new_center <- matrix(ncol=2,
+         rowMeans(jpbox)) + (rnorm(2) / 1000);
+   } else if ("label" %in% center_method) {
+      # use mean of label positions
+      if (all(c("label_x", "label_y") %in% colnames(jp))) {
+         new_center <- cbind(
+            x=mean(range(jp@polygons$label_x[which_jp], na.rm=TRUE)),
+            y=mean(range(jp@polygons$label_y[which_jp], na.rm=TRUE)))
+      } else {
+         label_xy <- labelr_JamPolygon(jp[which_jp, ]);
+         # average from range of labels
+         # center <- cbind(
+         #    x=mean(range(label_xy[,1], na.rm=TRUE)),
+         #    y=mean(range(label_xy[,2], na.rm=TRUE)))
+         # average from all actual labels
+         new_center <- cbind(
+            x=mean(label_xy[,1], na.rm=TRUE),
+            y=mean(label_xy[,2], na.rm=TRUE))
       }
+   }
+   if (length(center) == 2) {
+      # relative adjustment
+      if (TRUE %in% relative) {
+         center[1] <- diff(jpbox["x", ]) * center[1];
+         center[2] <- diff(jpbox["x", ]) * center[2];
+      }
+      center <- center + new_center;
    } else {
-      center <- matrix(ncol=2, head(center, 2));
+      center <- new_center
    }
    colnames(center) <- c("x", "y");
    # jamba::printDebug("center:");print(center);# debug

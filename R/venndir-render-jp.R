@@ -41,6 +41,13 @@
 #'    label components together, therefore drawing fill and border
 #'    around the group instead of each component. In most cases this
 #'    setting should be TRUE.
+#' @param template `character` (default "wide") describing the default
+#'    layout for counts and signed counts. The value is stored in
+#'    `venndir@metadata$template` for persistence.
+#'    * `"wide"` - main counts on the left, right-justified; signed counts
+#'    on the right, left-justified.
+#'    * `"tall"` - main counts, center-justified; signed counts below main
+#'    counts, center-justified.
 #' @param adjust_center `logical` (default TRUE) used when labels are grouped,
 #'    whether the group should be re-centered on the target point.
 #'    Try `adjust_center=FALSE` if wide label groups are adjusted
@@ -78,6 +85,7 @@ render_venndir <- function
 (venndir_output=NULL,
  expand_fraction=0,
  font_cex=1,
+ main=NULL,
  item_cex=NULL,
  item_cex_factor=4,
  plot_warning=TRUE,
@@ -107,6 +115,7 @@ render_venndir <- function
     "gridtext"),
  item_buffer=-0.15,
  group_labels=TRUE,
+ template=NULL,
  adjust_center=FALSE,
  draw_legend=TRUE,
  legend_x="bottomright",
@@ -123,10 +132,16 @@ render_venndir <- function
    if ("list" %in% class(venndir_output) && "vo" %in% names(venndir_output)) {
       venndir_output <- venndir_output$vo;
    }
+   metadata <- list();
    if ("Venndir" %in% class(venndir_output)) {
       venn_jp <- venndir_output@jps;
       label_df <- venndir_output@label_df;
       setlist <- venndir_output@setlist;
+      metadata <- tryCatch({
+         venndir_output@metadata
+      }, error=function(e){
+         list()
+      })
    } else {
       # legacy input
       if (length(venndir_output) > 0 && is.list(venndir_output)) {
@@ -145,11 +160,39 @@ render_venndir <- function
          venndir_output <- new("Venndir",
             jps=venn_jp,
             label_df=label_df,
-            setlist=list())
+            setlist=list(),
+            metadata=list())
       } else {
          stop("Input must be 'Venndir' or legacy list with 'jp' and 'label_df'")
       }
    }
+   
+   # validate other options
+   if (length(template) > 0) {
+      template <- match.arg(template,
+         choices=c("tall", "wide"))
+   } else {
+      template <- tryCatch({
+         metadata$template;
+      }, error=function(e){
+         NULL;
+      })
+      if (length(template) == 0) {
+         template <- "wide"
+      }
+   }
+   metadata$template <- template;
+   if (length(main) > 0) {
+      metadata$main <- main;
+      # venndir_output@metadata$main <- main;
+   } else {
+      main <- tryCatch({
+         venndir_output@metadata$main
+      }, error=function(e){
+         NULL;
+      })
+   }
+   
    # jamba::printDebug("render_venndir() label_df:");print(label_df);# debug
    show_items <- head(setdiff(label_df$show_items, c(NA, "none")), 1);
    if (length(show_items) == 0) {
@@ -629,6 +672,13 @@ render_venndir <- function
       venn_label <- ifelse(!label_df$venn_label %in% c(NA, ""),
          paste0("**", label_df$venn_label, "**"),
          "")
+      # 0.0.41.900 - also convert \n to <br>
+      if (any(grepl("[\n\r]", venn_label))) {
+         venn_label <- gsub("\n", "<br>",
+            gsub("^[\n]+|[\n]+$", "",
+            gsub("\n\n", "\n",
+            gsub("[\r\n]+|<br>", "\n", venn_label))))
+      }
       is_left <- (label_df$type %in% "main") * 1;
       # enhancement to apply fontsize from venn_spdf to main set labels
       label_df$overlap_fontsize <- label_df$fontsize;
@@ -847,6 +897,30 @@ render_venndir <- function
    jp_grobList$jps <- jp_gTree;
 
    ############################################
+   # Plot title
+   if (length(main) > 0 && any(nchar(main) > 0)) {
+      main <- gsub("\n", "<br>", main);
+      main <- jamba::cPaste(main, sep="<br>\n");
+      nlines <- length(strsplit(main, "<br>")[[1]])
+      #
+      main_grob <- gridtext::richtext_grob(
+         text=main,
+         x=0.5,
+         y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
+         default.units="snpc",
+         gp=grid::gpar(
+            # col=itemlabels_df$color,
+            fontsize=16 * font_cex[1]),
+         r=grid::unit(c(0, 0, 0, 0), "pt"),
+         padding=grid::unit(c(0, 0, 0, 0), "pt"),
+         margin=grid::unit(c(0, 0, 0, 0), "pt"),
+         vp=jp_viewport,
+         hjust=0.5,
+         vjust=1);
+      jp_grobList$main_title <- main_grob;
+   }
+   
+   ############################################
    # Item labels
    # draw using text()
    if (length(itemlabels_df) > 0) {
@@ -1034,6 +1108,7 @@ render_venndir <- function
                   adjx_fn=adjx,
                   adjy_fn=adjy,
                   do_draw=FALSE,
+                  template=template,
                   verbose=verbose)
                # dgg$g_labels;
                dgg
@@ -1117,7 +1192,8 @@ render_venndir <- function
    vo_new <- new("Venndir",
       jps=venn_jp,
       label_df=label_df,
-      setlist=setlist)
+      setlist=setlist,
+      metadata=metadata)
 
    # venndir legender
    if (TRUE %in% draw_legend) {

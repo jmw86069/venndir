@@ -13,6 +13,7 @@ venndir(
   legend_labels = NULL,
   proportional = FALSE,
   show_labels = "Ncs",
+  main = NULL,
   return_items = TRUE,
   show_items = c(NA, "none", "sign item", "sign", "item"),
   max_items = 3000,
@@ -24,6 +25,7 @@ venndir(
   alpha_by_counts = FALSE,
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   label_preset = "none",
+  template = c("wide", "tall"),
   unicode = TRUE,
   big.mark = ",",
   curate_df = NULL,
@@ -35,6 +37,7 @@ venndir(
   sign_count_delim = ": ",
   padding = c(3, 2),
   r = 2,
+  center = c(0, -0.15),
   segment_distance = 0.1,
   sep = "&",
   do_plot = TRUE,
@@ -116,6 +119,12 @@ defined by \code{show_items} are spread across the specific Venn overlap
 region.
 }}
 
+\item{main}{\code{character} string used as a plot title, default NULL
+will render no title. When provided, it is rendered using
+\code{gridtext::richtext_grob()} which enables some Markdown-style
+formatting. The title is stored in \code{venndir@metadata$title}
+for persistence.}
+
 \item{return_items}{\code{logical} (default TRUE) indicating whether to
 return items in the overlap data. When \code{FALSE} item labels also
 cannot be displayed in the figure.
@@ -176,6 +185,19 @@ There are pre-defined label styles.
 
 \item{label_preset}{\code{character} deprecated in favor of \code{show_labels}.
 This argument is passed to \code{venndir_label_style()}.}
+
+\item{template}{\code{character} (default "wide") describing the default
+layout for counts and signed counts. The value is stored in
+\code{venndir@metadata$template} for persistence.
+\itemize{
+\item \code{"wide"} - main counts on the left, right-justified; signed counts
+on the right, left-justified.
+This option is preferred for small numbers, and less-crowded diagrams.
+\item \code{"tall"} - main counts, center-justified; signed counts below main
+counts, center-justified.
+This option is recommended for large numbers (where there are 1000
+or more items in a single overlap region), or for crowded diagrams.
+}}
 
 \item{unicode}{\code{logical} (default TRUE) indicating whether to
 display Unicode arrows for signed overlaps. Passed to
@@ -241,6 +263,17 @@ for overlap count, and signed overlap count labels, in order.}
 \item{r}{\code{numeric} radius in units \code{"mm"} used for rounded
 rectangle corners for labels. Only visible when \code{label_preset}
 includes a background fill ("lite", "shaded", "fill"), or "box".}
+
+\item{center}{\code{numeric} coordinates relative to the plot bounding box,
+default \code{c(0, -0.15)} uses a center point in the middle (x=0)
+and slightly down (y=-0.15) from the plot center.
+It is used to place labels outside the diagram.
+In short, labels are placed by drawing a line from this center point,
+outward through the Venn overlap region to be labeled. The
+label is positioned outside the polygon region by \code{segment_distance}.
+The default \code{c(0, -0.15)} ensures that labels tend to be at the
+top of the plot, and not on the left/right side of the plot.
+This argument is passed along to \code{label_outside_JamPolygon()}.}
 
 \item{segment_distance}{\code{numeric} value indicating the distance
 between outside labels and the outer edge of the Venn diaram region.

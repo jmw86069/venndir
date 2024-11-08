@@ -21,7 +21,20 @@ check_Venndir <- function
    # all(c("jp", "jps", "label_df", "setlist") %in% slotNames(object))
    is_valid <- (c("jps", "label_df", "setlist") %in% slotNames(object))
    # jamba::printDebug("is_valid:", is_valid);
-   all(is_valid)
+   
+   # new practical validation
+   vnames <- object@jps@polygons$venn_name;
+   vsets <- unique(unlist(strsplit(vnames, "&")))
+   onames <- object@label_df$overlap_set;
+   osets <- unique(unlist(strsplit(onames, "&")))
+   # validate venn contents
+   is_valid_venn <- (
+      all(vsets %in% names(object@setlist)) &&
+      all(osets %in% names(object@setlist)) &&
+      all(length(vnames) == 0 ||
+         object@jps@polygons$venn_name %in% object@label_df$overlap_set)
+   )
+   all(is_valid) && all(is_valid_venn)
 }
 
 #' Venndir class
@@ -103,6 +116,8 @@ check_Venndir <- function
 #'    Previously this data could be inferred from `label_df` which was
 #'    tedious, and required column `"item"` which is optional.
 #'    That said, `setlist` can be an empty `list()`.
+#' * **metadata**: `list` with optional metadata, intended for future
+#'    expansion, such as plot title.
 #' 
 #' @family JamPolygon
 #' 
@@ -111,20 +126,22 @@ setClass("Venndir",
       # jp="JamPolygon",
       jps="JamPolygon",
       label_df="data.frame",
-      setlist="list"
+      setlist="list",
+      metadata="list"
    ),
    prototype=prototype(
       jps=NULL,
       label_df=data.frame(),
-      setlist=list()
+      setlist=list(),
+      metadata=list()
    ),
    validity=check_Venndir
 );
 
 
-#' Plot JamPolygon object
+#' Plot Venndir object
 #' 
-#' Plot JamPolygon object
+#' Plot Venndir object
 #' 
 #' @returns `Venndir` object, invisibly.
 #' 

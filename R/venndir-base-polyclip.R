@@ -47,6 +47,11 @@
 #'    * _i_tems: "i" only, by default hidden. When enabled, item labels
 #'    defined by `show_items` are spread across the specific Venn overlap
 #'    region.
+#' @param main `character` string used as a plot title, default NULL
+#'    will render no title. When provided, it is rendered using
+#'    `gridtext::richtext_grob()` which enables some Markdown-style
+#'    formatting. The title is stored in `venndir@metadata$title`
+#'    for persistence.
 #' @param return_items `logical` (default TRUE) indicating whether to
 #'    return items in the overlap data. When `FALSE` item labels also
 #'    cannot be displayed in the figure.
@@ -91,6 +96,16 @@
 #'    * `"box"` adds a dark border around the label region
 #' @param label_preset `character` deprecated in favor of `show_labels`.
 #'    This argument is passed to `venndir_label_style()`.
+#' @param template `character` (default "wide") describing the default
+#'    layout for counts and signed counts. The value is stored in
+#'    `venndir@metadata$template` for persistence.
+#'    * `"wide"` - main counts on the left, right-justified; signed counts
+#'    on the right, left-justified.
+#'    This option is preferred for small numbers, and less-crowded diagrams.
+#'    * `"tall"` - main counts, center-justified; signed counts below main
+#'    counts, center-justified.
+#'    This option is recommended for large numbers (where there are 1000
+#'    or more items in a single overlap region), or for crowded diagrams.
 #' @param unicode `logical` (default TRUE) indicating whether to 
 #'    display Unicode arrows for signed overlaps. Passed to
 #'    `curate_venn_labels()`.
@@ -141,6 +156,16 @@
 #' @param r `numeric` radius in units `"mm"` used for rounded
 #'    rectangle corners for labels. Only visible when `label_preset`
 #'    includes a background fill ("lite", "shaded", "fill"), or "box".
+#' @param center `numeric` coordinates relative to the plot bounding box,
+#'    default `c(0, -0.15)` uses a center point in the middle (x=0)
+#'    and slightly down (y=-0.15) from the plot center.
+#'    It is used to place labels outside the diagram.
+#'    In short, labels are placed by drawing a line from this center point,
+#'    outward through the Venn overlap region to be labeled. The
+#'    label is positioned outside the polygon region by `segment_distance`.
+#'    The default `c(0, -0.15)` ensures that labels tend to be at the
+#'    top of the plot, and not on the left/right side of the plot.
+#'    This argument is passed along to `label_outside_JamPolygon()`.
 #' @param segment_distance `numeric` value indicating the distance
 #'    between outside labels and the outer edge of the Venn diaram region.
 #'    Larger values place labels farther away, while also shrinking the
@@ -229,6 +254,7 @@ venndir <- function
  legend_labels=NULL,
  proportional=FALSE,
  show_labels="Ncs",
+ main=NULL,
  return_items=TRUE,
  show_items=c(NA,
     "none",
@@ -250,6 +276,8 @@ venndir <- function
     "lite",
     "lite_box"),
  label_preset="none",
+ template=c("wide",
+    "tall"),
  unicode=TRUE,
  big.mark=",",
  curate_df=NULL,
@@ -263,6 +291,7 @@ venndir <- function
  sign_count_delim=": ",
  padding=c(3, 2),
  r=2,
+ center=c(0, -0.15),
  segment_distance=0.1,
  sep="&",
  do_plot=TRUE,
@@ -282,6 +311,7 @@ venndir <- function
    
    overlap_type <- match.arg(overlap_type);
    item_style <- match.arg(item_style);
+   template <- match.arg(template);
    
    # show_set <- match.arg(show_set);
    show_set <- "main";
@@ -589,6 +619,7 @@ venndir <- function
          jp=venn_jps[use_whichset, ],
          which_jp=seq_along(use_whichset),
          distance=segment_distance,
+         center=center,
          # center_method="label",
          verbose=verbose,
          buffer=-0.9,
@@ -887,8 +918,9 @@ venndir <- function
    vo <- new("Venndir",
       jps=venn_jps,
       label_df=label_df,
-      setlist=setlist)
-   
+      setlist=setlist,
+      metadata=list(template=template))
+
    ## venndir_label_style()
    #
    # Todo: use real x_outside
@@ -964,7 +996,7 @@ venndir <- function
    #    jps=venn_jps,
    #    label_df=label_df,
    #    setlist=setlist)
-   
+
    # Optionally plot
    if (do_plot) {
       gg <- render_venndir(
