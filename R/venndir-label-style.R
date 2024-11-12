@@ -325,7 +325,7 @@ venndir_label_style <- function
       count=ifelse(use_count %in% "none", "",
          jamba::formatInt(venndir_output$label_df$venn_counts, ...)),
       percent=ifelse(use_percent %in% "none", "",
-         paste0(pct2, use_percent_values, "%", pct2)))
+         paste0(pct1, use_percent_values, "%", pct2)))
    # paste in order?
    use_text <- jamba::pasteByRow(use_text_df,
       sep=percent_delim);
