@@ -24,6 +24,7 @@ venndir_label_style(
   max_items = 3000,
   inside_percent_threshold = 0,
   label_types = c("main", "signed"),
+  extra_styles = list(percent = c("***", "***")),
   show_zero = TRUE,
   sep = "&",
   useGrey = 15,
@@ -99,6 +100,11 @@ polygon area.}
 \item{label_types}{\code{character} vector with one or more label types
 to be affected by this function. By default \code{"count"} and \code{"signed"}
 labels (all labels) are affected.}
+
+\item{extra_styles}{\code{list} of two-element vectors, named by the type of
+label, default \code{list(percent=c("***", "***"))} will use \code{"***"}
+before and after each percentage label.
+No other label types are supported.}
 
 \item{show_zero}{\code{logical} indicating whether to display zero \code{0}
 for empty overlaps for which the overlap polygon exists. Default FALSE

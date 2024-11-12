@@ -87,7 +87,7 @@ render_venndir <- function
  font_cex=1,
  main=NULL,
  item_cex=NULL,
- item_cex_factor=4,
+ item_cex_factor=1,
  plot_warning=TRUE,
  show_labels=NULL,
  show_items=c(NA,
@@ -269,11 +269,15 @@ render_venndir <- function
             so_counts <- venn_jp@polygons$venn_counts[poly_rows];
             names(so_counts) <- rownames(venn_jp@polygons)[poly_rows];
             # crude scaling by total number of items
-            so_cex <- jamba::noiseFloor(1/sqrt(so_counts) * item_cex_factor,#2.5,
-               ceiling=0.9,
-               minimum=0.2)
+            so_cex <- jamba::noiseFloor(
+               4 / sqrt(so_counts) * item_cex_factor,
+               # ceiling=0.9,
+               ceiling=2,
+               minimum=0.1)
             # update here in case area fails, it will use this crude item_cex
+            # jamba::printDebug("so_cex (# labels adjust): ", so_cex);# debug
             item_cex <- item_cex * so_cex;
+            # jamba::printDebug("item_cex (# labels adjusted): ", item_cex);# debug
             # area of each polygon
             so_areas <- area_JamPolygon(venn_jp[poly_rows, ]);
             names(so_areas) <- rownames(venn_jp@polygons)[poly_rows];
@@ -293,16 +297,21 @@ render_venndir <- function
             so_areas_cex_wt <- so_areas_wt + (1 - so_areas_wt) * so_areas_cex
             # adjust the crude scaling by the relative polygon area
             item_cex <- item_cex * so_areas_cex_wt;
+            # jamba::printDebug("so_areas_cex_wt (relative area adjust): ", so_areas_cex_wt);# debug
+            # jamba::printDebug("item_cex (relative area adjusted): ", item_cex);# debug
             # for debugging, the data.frame can be printed
             #print(data.frame(so_counts, so_cex, so_areas_cex, so_areas_wt, so_areas_cex_wt, item_cex));
             item_cex;
          }, error=function(e){
             item_cex;
          });
+      } else {
+         item_cex <- item_cex * item_cex_factor;
       }
       if (length(item_cex) == 0 || all(is.na(item_cex))) {
          item_cex <- 1;
       }
+      # jamba::printDebug("item_cex: ", item_cex);# debug2
       
       ## Fill any missing optional colnames with defaults
       label_df_defaults <- list(
@@ -618,8 +627,9 @@ render_venndir <- function
                labels <- paste(labels, items);
             }
          }
-         # jamba::printDebug("unique(items_df1$item_cex):", unique(items_df1$item_cex));
-         items_df1$item_cex <- item_cex[as.character(items_df1$overlap_set)];
+         # jamba::printDebug("unique(items_df1$item_cex):", unique(items_df1$item_cex));# debug
+         # jamba::printDebug("item_cex:");print(item_cex);# debug
+         # items_df1$item_cex <- item_cex[as.character(items_df1$overlap_set)];
          labels <- gsub("^[ ]+|[ ]+$", "", labels);
          bg <- jamba::alpha2col(vdf$color, vdf$alpha)
          color <- make_color_contrast(color1,
@@ -823,6 +833,9 @@ render_venndir <- function
             label_df$padding_unit[show_count_outside],
             label_df$padding_unit[show_count_inside])
       );
+      # fix halign for one-column or two-column alignment
+      gdf$halign <- 0.5;
+
       # Update label_col using overlap fill color
       # Todo: Use label_df$fill when not NA
       #
@@ -1024,6 +1037,7 @@ render_venndir <- function
             ## - seems to occur only with ": " and on certain output devices
             igdf$text <- gsub(": ", ":", igdf$text);
             # jamba::printDebug("igdf$text");print(igdf$text);# debug
+            # jamba::printDebug("igdf");print(igdf);# debug
             g_labels <- gridtext::richtext_grob(
                text=igdf$text,
                x=adjx(igdf$x),

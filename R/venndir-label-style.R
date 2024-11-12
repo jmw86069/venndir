@@ -72,6 +72,10 @@
 #' @param label_types `character` vector with one or more label types
 #'    to be affected by this function. By default `"count"` and `"signed"`
 #'    labels (all labels) are affected.
+#' @param extra_styles `list` of two-element vectors, named by the type of
+#'    label, default `list(percent=c("***", "***"))` will use `"***"`
+#'    before and after each percentage label.
+#'    No other label types are supported.
 #' @param show_zero `logical` indicating whether to display zero `0`
 #'    for empty overlaps for which the overlap polygon exists. Default FALSE
 #'    hides the display of zeros.
@@ -135,6 +139,7 @@ venndir_label_style <- function
  max_items=3000,
  inside_percent_threshold=0,
  label_types=c("main", "signed"),
+ extra_styles=list(percent=c("***", "***")),
  show_zero=TRUE,
  sep="&",
  useGrey=15,
@@ -301,13 +306,26 @@ venndir_label_style <- function
       subset(venndir_output$label_df,
          type %in% "main")$venn_counts, na.rm=TRUE)
    # jamba::printDebug("sum_counts:", sum_counts);# debug
+   
+   # optional workaround to display percent overlap
+   use_percent_values <- (venndir_output$label_df$venn_counts /
+         sum_counts * 100);
+   use_percent_values <- ifelse(use_percent_values < 1 & use_percent_values > 0,
+      # format(use_percent_values, digits=1),
+      sapply(use_percent_values, format, digits=1),
+      round(use_percent_values))
+   pct1 <- "***";
+   pct2 <- "***";
+   if ("percent" %in% names(extra_styles)) {
+      pcts <- rep(extra_styles[["percent"]], length.out=2);
+      pct1 <- pcts[1];
+      pct2 <- pcts[2];
+   }
    use_text_df <- data.frame(
       count=ifelse(use_count %in% "none", "",
          jamba::formatInt(venndir_output$label_df$venn_counts, ...)),
       percent=ifelse(use_percent %in% "none", "",
-         paste0(
-            round(venndir_output$label_df$venn_counts /
-                  sum_counts * 100), "%")))
+         paste0(pct2, use_percent_values, "%", pct2)))
    # paste in order?
    use_text <- jamba::pasteByRow(use_text_df,
       sep=percent_delim);

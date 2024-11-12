@@ -1,3 +1,21 @@
+# venndir 0.0.41.950
+
+## changes to existing functions
+
+* `render_venndir()`
+
+   * now applies `halign=0.5` for main count labels,
+   which helps display percentage labels centered under the main count.
+   * Percentage labels are rounded to integer values, except that values
+   between 0 and 1 will show one digit, excluding 0 and 1.
+   
+* `venndir_label_style()`
+
+   * new argument `extra_styles` intended to customize the text style
+   for different label types. Currently
+   `extra_styles=list(percent=c("***", "***"))` will
+   format percentage labels with bold,italic font.
+
 # venndir 0.0.41.900
 
 ## overall

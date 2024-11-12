@@ -182,10 +182,12 @@ label_fill_JamPolygon <- function
    color <- rep(color, length.out=n);
    border <- rep(border, length.out=n);
    cex <- rep(cex, length.out=n);
+   # jamba::printDebug("label_fill_JamPolygon(): ", "cex: ", cex);# debug
    if (length(dither_cex) > 0 & all(dither_cex != 0)) {
       #cex <- rnorm(n) * dither_cex * cex + dither_cex/3 + cex;
       cex <- runif(n, min=-dither_cex, max=dither_cex) * cex + dither_cex/3 + cex;
    }
+   # jamba::printDebug("label_fill_JamPolygon(): ", "cex: ", cex);# debug
    degrees <- rep(degrees, length.out=n);
    
    if (length(dither_degrees) > 0 & all(dither_degrees != 0)) {

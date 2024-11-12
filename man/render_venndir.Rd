@@ -10,7 +10,7 @@ render_venndir(
   font_cex = 1,
   main = NULL,
   item_cex = NULL,
-  item_cex_factor = 4,
+  item_cex_factor = 1,
   plot_warning = TRUE,
   show_labels = NULL,
   show_items = c(NA, "none", "sign item", "item", "sign"),
