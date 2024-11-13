@@ -1,3 +1,17 @@
+# venndir 0.0.42.900
+
+## changes to existing functions
+
+* `check_Venndir()` - validation function for `Venndir` objects.
+
+   * Fixed error when validating `Venndir`, applying logical criteria
+   to vector with size > 1.
+
+* `venn_meme()`
+
+   * Changed default `item_cex=1` consistent with improvements to item
+   label scaling by Venn overlap polygon size.
+
 # venndir 0.0.41.950
 
 ## changes to existing functions

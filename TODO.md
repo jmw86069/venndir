@@ -1,5 +1,23 @@
 # TODO for venndir
 
+## 12nov2024
+
+* `textvenn()`
+
+   * Consider optional text legend, counts per set, with total.
+   * Consider optional multi-line headers, with one line per set name.
+
+      * Goal: Prevent generating a very wide table.
+      * Requires changes to the `data.frame` structure, very doable.
+      * Consider supporting multi-line set names? Split them across rows using
+      similar logic.
+
+   * Consider option to display items beneath counts? Probably not practical,
+   but could be combined with `max_items=20`, then abbreviate the item
+   listing, something similar to: `"item1, item2, item3, ... (523 others)"`.
+   Or: `cli::ansi_collapse(letters, style="head", trunc=20, ellipsis="...")`,
+   but split across multiple lines.
+
 ## 08nov2024
 
 * Based upon some excellent feedback:

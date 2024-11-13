@@ -145,7 +145,7 @@
 #' #   `a&b&c`="Being<br>a sports<br>fan"
 #' venn_meme(em,
 #'    set_colors=c("gold", "dodgerblue3", "firebrick3"),
-#'    item_cex=rep(c(2.3, 1.4, 1.7), c(3, 3, 1)))
+#'    item_cex=rep(c(2.3, 1.8, 2), c(3, 3, 1)))
 #' 
 #' # Mister Venn
 #' mrvenn <- c(
@@ -178,7 +178,7 @@
 venn_meme <- function
 (x,
  proportional=FALSE,
- item_cex=1.4,
+ item_cex=1,
  item_degrees=0,
  item_buffer=-0.85,
  item_style=c("gridtext", "text"),
@@ -236,7 +236,7 @@ venn_meme <- function
       show_labels="i",
       # label_preset="meme",
       item_degrees=item_degrees,
-      item_cex=item_cex,
+      item_cex=item_cex * 1,
       item_buffer=item_buffer,
       item_style=item_style,
       plot_warning=plot_warning,

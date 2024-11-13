@@ -32,7 +32,7 @@ check_Venndir <- function
       all(vsets %in% names(object@setlist)) &&
       all(osets %in% names(object@setlist)) &&
       all(length(vnames) == 0 ||
-         object@jps@polygons$venn_name %in% object@label_df$overlap_set)
+         all(object@jps@polygons$venn_name %in% object@label_df$overlap_set))
    )
    all(is_valid) && all(is_valid_venn)
 }
