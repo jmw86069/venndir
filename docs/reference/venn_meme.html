@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -66,10 +66,11 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">venn_meme</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  proportional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  item_cex <span class="op">=</span> <span class="fl">1.4</span>,</span>
+<span>  item_cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  item_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  item_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.85</span>,</span>
 <span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gridtext"</span>, <span class="st">"text"</span><span class="op">)</span>,</span>
+<span>  keep_item_order <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plot_warning <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  draw_legend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -104,6 +105,13 @@ of each overlap polygon. In most cases this scaling is
 not helpful for Venn memes. To enable auto-scaling, use
 <code>item_cex=NULL</code>. See help text in <code><a href="venndir.html">venndir()</a></code> for more
 details.</p></dd>
+
+
+<dt>keep_item_order</dt>
+<dd><p><code>logical</code> default TRUE, to maintain labels
+in the order they are provided for each overlap.
+Use FALSE to have each label sorted using <code><a href="https://rdrr.io/pkg/jamba/man/mixedSort.html" class="external-link">jamba::mixedSort()</a></code>
+for true alphanumeric sort.</p></dd>
 
 
 <dt>plot_warning</dt>
@@ -248,7 +256,7 @@ an easy "clean" diagram.</p>
 <span class="r-in"><span><span class="co">#   `a&amp;b&amp;c`="Being&lt;br&gt;a sports&lt;br&gt;fan"</span></span></span>
 <span class="r-in"><span><span class="fu">venn_meme</span><span class="op">(</span><span class="va">em</span>,</span></span>
 <span class="r-in"><span>   set_colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gold"</span>, <span class="st">"dodgerblue3"</span>, <span class="st">"firebrick3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   item_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.3</span>, <span class="fl">1.4</span>, <span class="fl">1.7</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>   item_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.3</span>, <span class="fl">1.8</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="venn_meme-8.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Mister Venn</span></span></span>
@@ -278,6 +286,30 @@ an easy "clean" diagram.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">venn_meme</span><span class="op">(</span><span class="va">mrvenn</span>, proportional<span class="op">=</span><span class="cn">TRUE</span>, item_style<span class="op">=</span><span class="st">"text"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="venn_meme-9.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># example of ordered item labels</span></span></span>
+<span class="r-in"><span><span class="va">item_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>   CLE<span class="op">=</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"**CLE**:"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"IFN&amp;alpha; &gt; IFN&amp;beta;"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Anti-malarials effective\ntherapy for\nskin disease"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   DM<span class="op">=</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\n\n**DM**:"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"\n\nIFN&amp;beta; &gt; IFN&amp;alpha;"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"\nTriggered by\nimmune stimulating\nherbal supplements"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"\n\n\nAnti-malarials\neffective in 25%,\ncommonly causes\nmorbilliform rash"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"\n\n\n\n\nCannabinoid receptor\nagonist proising\ntreatment"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"  "</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   `CLE&amp;DM`<span class="op">=</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"Photosensitivity"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Triggered by viral and\nbacterial infections"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Increased\ntype I IFN"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="fu">::</span><span class="fu">venn_meme</span><span class="op">(</span>x<span class="op">=</span><span class="va">item_list</span>,</span></span>
+<span class="r-in"><span>   item_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.3</span>, <span class="fl">1.2</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   item_buffer<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.75</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   set_colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"darkorchid3"</span>, <span class="st">"gold"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span></span>
+<span class="r-in"><span>   xyratio<span class="op">=</span><span class="fl">5</span>,</span></span>
+<span class="r-in"><span>   dither_cex<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="venn_meme-10.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -86,7 +86,39 @@
 #'    present in the overlap. When `include_blanks=TRUE` is useful
 #'    in that it guarantees all possible combinations of overlaps
 #'    are represented consistently in the output.
+#' @param keep_item_order `logical` default FALSE, to determine whether
+#'    items will be stored and displayed in the order they are provided.
+#'    Note: `keep_item_order=TRUE` enables the following behaviors:
+#'    * Any `character` vector input will retain the order they appear.
+#'    * Any `factor` vector input will sort items using factor `levels`,
+#'    which maintains the factor level order.
+#'    * Any named vector will use the `character` vector of names, keeping
+#'    the order they appear in the vector.
+#' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to `list2imsigned()`.
+#' 
+#' @returns `data.frame` with columns intended to support `venndir()`,
+#' but which may be more widely useful:
+#' * `"sets"` - character vector with sets and overlap names.
+#' * one column indicating the `overlap_type` and corresponding values:
+#'
+#'    * `"overlap"` - This column is always included.
+#'    * `"concordance"` - includes `1` (concordant) and `-1` (discordant)
+#'    * `"agreement"` - includes `"agreement"` and `"disgreement"`
+#'    * `"each"` - includes sign values `-1` and `1`.
+#' 
+#' * `"overlap"` - integer vector with overlap values, where `0` and `1`
+#' indicate which sets contained these items. This column is always included,
+#' even when `overlap_type` is something else.
+#' * `"num_sets"` - integer number of sets represented in the overlap.
+#' * `"count"` - integer number of items in the overlap.
+#' * one colname for each set name represented in the `"sets"` column,
+#' intended to help filter by each set. Values will be `0` or `1`.
+#' * `overlap_label` - will represent only the non-0 elements from
+#' `"overlap"` for convenience.
+#' * `"items"` - when `return_items=TRUE` this column will contain
+#' a `list` (in `AsIs` format) of `character` vectors, with the items.
+#' 
 #' 
 #' @examples
 #' setlist <- make_venn_test(100, 2, do_signed=FALSE);
@@ -119,6 +151,12 @@
 #' # check to verify
 #' signed_overlaps(inputlist, return_items=TRUE)$items
 #' 
+#' # test specific factor level order
+#' inputlist <- list(
+#'    setA=factor(c("A", "B", "D"), levels=c("D", "B", "A")),
+#'    setB=factor(c("A", "C", "E", "F")))
+#' signed_overlaps(inputlist, return_items=TRUE)
+#' 
 #' @export
 signed_overlaps <- function
 (setlist,
@@ -132,6 +170,8 @@ signed_overlaps <- function
  sep="&",
  trim_label=TRUE,
  include_blanks=TRUE,
+ keep_item_order=FALSE,
+ verbose=FALSE,
  ...)
 {
    ##
@@ -141,29 +181,43 @@ signed_overlaps <- function
    ## 1sec
    # convert setlist to signed incidence matrix
    #svims <- list2im_value(setlist, ...);
+   
    if (inherits(setlist, "Matrix") || inherits(setlist, "matrix")) {
       svims <- setlist;
    } else {
       # handle list input
       setlist <- lapply(setlist, function(i){
          if (length(names(i)) == 0) {
-            if (is.numeric(i)) {
-               warning("signed_overlaps(): input list contains vector with un-named numeric values.");
+            ## No names, assume items are the elements
+            if (inherits(i, c("numeric", "integer"))) {
+               warning(paste("signed_overlaps():",
+                  "un-named numeric values coerced to character."));
             }
-            if (is.factor(i)) {
-               warning("signed_overlaps(): input list contains factor values which will be coerced to character.");
+            if (inherits(i, "factor")) {
+               warning(paste("signed_overlaps():",
+                  "factor values coerced to character."));
+               if (TRUE %in% keep_item_order) {
+                  i <- sort(i);
+               }
             }
             i <- jamba::nameVector(rep(1, length(i)),
                as.character(i),
                makeNamesFunc=c);
          } else {
+            ## Names exist, assume signed data
             if ("detect" %in% overlap_type) {
                # for "detect", convert numeric or integer input to sign(i)
-               if ( (is.numeric(i) || is.integer(i)) && !all(i %in% c(-1, 0, 1, NA)) ) {
+               if (inherits(i, c("numeric", "integer")) &&
+                     !all(i %in% c(-1, 0, 1, NA))) {
+                  # convert numeric values to the sign
                   i[] <- sign(i);
-               } else if (is.character(i) || is.factor(i)) {
+               } else if (inherits(i, c("character", "factor"))) {
+               # } else if (is.character(i) || is.factor(i)) {
                   if (!any(duplicated(i)) && length(i) > 3) {
-                     warning("signed_overlaps(): named character vector, non-duplicate items, length > 3, the vector values are used as items.");
+                     warning(paste("signed_overlaps():",
+                        "named character vector, non-duplicate items,",
+                        "length > 3.",
+                        "Values are used as items."));
                      i <- jamba::nameVector(rep(1, length(i)),
                         as.character(i),
                         makeNamesFunc=c);
@@ -174,6 +228,26 @@ signed_overlaps <- function
          i
       });
       svims <- list2im_value(setlist);
+      # optionally maintain item order
+      if (TRUE %in% keep_item_order) {
+         item_order_list <- lapply(setlist, names);
+         item_order <- unique(unlist(item_order_list));
+         matchims <- match(item_order, rownames(svims));
+         svims <- svims[matchims, , drop=FALSE];
+      }
+   }
+   
+   if (!TRUE %in% keep_item_order) {
+      item_order <- jamba::mixedSort(rownames(svims));
+      matchims <- match(item_order, rownames(svims));
+      svims <- svims[matchims, , drop=FALSE];
+   }
+   
+   # optional verbose output
+   if (TRUE %in% verbose) {
+      jamba::printDebug("signed_overlaps(): ",
+         "svims:");
+      print(svims);# debug
    }
    
    # handle overlap_type="detect"
@@ -191,26 +265,31 @@ signed_overlaps <- function
    ## 0.02sec
    # convert to overlap vector (signed)
    # 0 0 1, 1 1 0, 1 1 1, etc.
-   if (is.character(svims[1,1])) {
-      # if data is stored as character, change NA to ""
+   if (inherits(svims[1, 1], c("character", "factor"))) {
+      # if data is stored as character, recognize c("",NA) as empty
       svimsl <- (svims != "") * 1
+      # svimsl <- (!svims %in% c("", NA)) * 1; # new?
       svimsl[is.na(svims)] <- 0;
       svimss <- do.call(paste, lapply(seq_len(ncol(svims)), function(i){
-         jamba::rmNA(naValue="", svims[,i]);
+         jamba::rmNA(naValue="", svims[, i]);
       }))
    } else {
-      # if data is stored as numeric, change NA to "0"
+      # if data is stored as numeric, recognize c(0,NA) as empty
       svimsl <- (svims != 0) * 1
+      # svimsl <- (!svims %in% c(0, NA)) * 1; # new?
       svimsl[is.na(svims)] <- 0;
       svimss <- do.call(paste, lapply(seq_len(ncol(svims)), function(i){
-         jamba::rmNA(naValue="0", svims[,i]);
+         jamba::rmNA(naValue="0", svims[, i]);
       }))
    }
    
    ## 1.2sec
    # convert to overlap vector (un-signed)
    # 0 0 1, 1 1 0, 1 1 1, etc.
-   svimsv <- do.call(paste, lapply(seq_len(ncol(svimsl)), function(i){svimsl[,i]}))
+   svimsv <- do.call(paste,
+      lapply(seq_len(ncol(svimsl)), function(i){
+         svimsl[,i]
+      }))
    
    ## concordance
    ## 0.02sec
@@ -221,6 +300,22 @@ signed_overlaps <- function
       j <- setdiff(i, c("","0"))
       length(unique(j)) == 1;
    }), svimssu);
+   
+   # optional verbose output
+   if (TRUE %in% verbose) {
+      jamba::printDebug("signed_overlaps(): ",
+         "svimsl:");
+      print(svimsl);# debug
+      jamba::printDebug("signed_overlaps(): ",
+         "svimss:");
+      print(svimss);# debug
+      jamba::printDebug("signed_overlaps(): ",
+         "svimsv:");
+      print(svimsv);# debug
+      jamba::printDebug("signed_overlaps(): ",
+         "svimssu:");
+      print(svimssu);# debug
+   }
    
    # alternate approach, split using overlap_type upfront, avoid data.table
    svims_split_names <- sapply(jamba::nameVector(unique(svimsv)), function(i){

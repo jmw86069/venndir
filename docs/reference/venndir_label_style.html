@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -83,6 +83,7 @@
 <span>  max_items <span class="op">=</span> <span class="fl">3000</span>,</span>
 <span>  inside_percent_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  label_types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"main"</span>, <span class="st">"signed"</span><span class="op">)</span>,</span>
+<span>  extra_styles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>percent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"***"</span>, <span class="st">"***"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  show_zero <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">"&amp;"</span>,</span>
 <span>  useGrey <span class="op">=</span> <span class="fl">15</span>,</span>
@@ -178,6 +179,13 @@ polygon area.</p></dd>
 <dd><p><code>character</code> vector with one or more label types
 to be affected by this function. By default <code>"count"</code> and <code>"signed"</code>
 labels (all labels) are affected.</p></dd>
+
+
+<dt>extra_styles</dt>
+<dd><p><code>list</code> of two-element vectors, named by the type of
+label, default <code>list(percent=c("***", "***"))</code> will use <code>"***"</code>
+before and after each percentage label.
+No other label types are supported.</p></dd>
 
 
 <dt>show_zero</dt>

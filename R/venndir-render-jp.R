@@ -584,6 +584,15 @@ render_venndir <- function
    if (any(!label_df$show_items %in% c("none", NA))) {
       # jamba::printDebug("show_items");
       items_dfs <- subset(label_df, !label_df$show_items %in% c("none", NA));
+      uos <- unique(as.character(items_dfs$overlap_set));
+      if (length(names(item_buffer)) > 0 &&
+            all(uos %in% names(item_buffer))) {
+         item_buffer <- item_buffer[uos];
+      } else {
+         item_buffer <- rep(item_buffer,
+            length.out=length(uos));
+         names(item_buffer) <- uos;
+      }
       # jamba::printDebug("unique(items_dfs$overlap_set): ", unique(items_dfs$overlap_set));
       items_dfs <- split(items_dfs,
          factor(items_dfs$overlap_set,
@@ -593,10 +602,14 @@ render_venndir <- function
 
       #for (items_df1 in items_dfs) {
       itemlabels_list <- lapply(items_dfs, function(items_df1){
+         useos <- as.character(head(items_df1$overlap_set, 1))
+         use_item_buffer <- item_buffer[useos]
          items_list <- items_df1$items;
          items_list <- items_list[lengths(items_list) > 0];
          if (length(items_list) > 0) {
-            items <- unname(unlist(jamba::mixedSorts(items_list)));
+            # items <- unname(unlist(jamba::mixedSorts(items_list)));
+            # 0.0.43.900
+            items <- unname(unlist((items_list)));
          } else {
             return(NULL)
          }
@@ -615,7 +628,7 @@ render_venndir <- function
          # the same polygon
          #show_items_order <- strsplit(items_df1$show_items[1], "[- _.]")[[1]];
          use_show_items <- head(items_df1$item_style, 1);
-         # jamba::printDebug("use_show_items:");print(use_show_items);# debug
+         # jamba::printDebug(+"use_show_items:");print(use_show_items);# debug
          # show_items_order <- strsplit(show_items[1], "[- _.]")[[1]];
          show_items_order <- strsplit(use_show_items, "[- _.]")[[1]];
          for (dio in show_items_order) {
@@ -631,6 +644,7 @@ render_venndir <- function
          # jamba::printDebug("item_cex:");print(item_cex);# debug
          # items_df1$item_cex <- item_cex[as.character(items_df1$overlap_set)];
          labels <- gsub("^[ ]+|[ ]+$", "", labels);
+         # jamba::printDebug("labels:");print(labels);# debug
          bg <- jamba::alpha2col(vdf$color, vdf$alpha)
          color <- make_color_contrast(color1,
             y=bg,
@@ -645,7 +659,7 @@ render_venndir <- function
             plot_style="none",
             draw_labels=FALSE,
             degrees=items_df1$item_degrees[1],
-            buffer=item_buffer,
+            buffer=use_item_buffer,
             seed=123,
             verbose=verbose,
             ...);

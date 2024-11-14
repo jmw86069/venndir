@@ -18,6 +18,40 @@
    Or: `cli::ansi_collapse(letters, style="head", trunc=20, ellipsis="...")`,
    but split across multiple lines.
 
+* `venndir()`, `render_venndir()` - labeling placement options
+
+   * Fix the `grobs_tile()` spacing, remove overlap with percent labels.
+   * Find reproducible example of bad font kerning, post issue to `gridtext`.
+   * Consider adjustments to inner/outer labels. Examples:
+
+      * Option to show counts/percentage only when the overlap label is shown.
+      * Option to show overlap label for outside counts, e.g. `"setA&setB"`.
+      Probably need to split across multiple lines.
+
+   * Consider shorter default `segment_distance`.
+
+* `JamPolygon` plotting
+
+   * Need a method for adding components to venndir plot `grid` elements,
+   e.g. text labels, points, any `grid` object.
+   * Use case could be obtaining `grid` object, detecting the `gTree` elements
+   by name, then adjusting item label positions?
+
+
+* Add accessors to the `Venndir` object
+
+   * setlist
+   * overlap item list
+   * countlist - return overlap count list
+   * `as.data.frame()` - using the `setAs()` methodology. Convenient
+   conversion to `data.frame` format.
+
+* Summarize advice for fonts, plot resolution, anti-aliasing, etc.
+
+   * `ragg::agg_png()` provides a notable improvement over `png()`,
+   in RMarkdown put `dev="ragg_png"` in the kntir options, for example:
+   `knitr::opts_chunk$set(dev="ragg_png")`
+
 ## 08nov2024
 
 * Based upon some excellent feedback:

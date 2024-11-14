@@ -60,6 +60,10 @@
 #'    not helpful for Venn memes. To enable auto-scaling, use
 #'    `item_cex=NULL`. See help text in `venndir()` for more
 #'    details.
+#' @param keep_item_order `logical` default TRUE, to maintain labels
+#'    in the order they are provided for each overlap.
+#'    Use FALSE to have each label sorted using `jamba::mixedSort()`
+#'    for true alphanumeric sort.
 #' @param plot_warning `logical` passed to `render_venndir()` to determine
 #'    whether to plot any warnings caused by proportional Euler diagrams
 #'    which cannot display all overlapping regions. It should not be
@@ -174,6 +178,29 @@
 #' )
 #' venn_meme(mrvenn, proportional=TRUE, item_style="text")
 #' 
+#' # example of ordered item labels
+#' item_list <- list(
+#'    CLE=(c("**CLE**:",
+#'       "IFN&alpha; > IFN&beta;",
+#'       "Anti-malarials effective\ntherapy for\nskin disease")),
+#'    DM=(c("\n\n**DM**:",
+#'       "\n\nIFN&beta; > IFN&alpha;",
+#'       "\nTriggered by\nimmune stimulating\nherbal supplements",
+#'       "\n\n\nAnti-malarials\neffective in 25%,\ncommonly causes\nmorbilliform rash",
+#'       "\n\n\n\n\nCannabinoid receptor\nagonist proising\ntreatment",
+#'       "  ")),
+#'    `CLE&DM`=(c(
+#'       "Photosensitivity",
+#'       "Triggered by viral and\nbacterial infections",
+#'       "Increased\ntype I IFN")))
+#' vo <- venndir::venn_meme(x=item_list,
+#'    item_cex=c(1.3, 1.2, 1.3),
+#'    item_buffer=c(-0.5, -0.2, -0.75),
+#'    set_colors=c("darkorchid3", "gold"),
+#'    poly_alpha=0.3,
+#'    xyratio=5,
+#'    dither_cex=0)
+#' 
 #' @export
 venn_meme <- function
 (x,
@@ -182,6 +209,7 @@ venn_meme <- function
  item_degrees=0,
  item_buffer=-0.85,
  item_style=c("gridtext", "text"),
+ keep_item_order=TRUE,
  plot_warning=FALSE,
  draw_legend=FALSE,
  verbose=FALSE,
@@ -234,6 +262,7 @@ venn_meme <- function
       proportional=proportional,
       show_items="item",
       show_labels="i",
+      keep_item_order=keep_item_order,
       # label_preset="meme",
       item_degrees=item_degrees,
       item_cex=item_cex * 1,

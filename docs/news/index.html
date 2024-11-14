@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -57,6 +57,96 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.43.900" id="venndir-0043900">venndir 0.0.43.900<a class="anchor" aria-label="anchor" href="#venndir-0043900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-43-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-43-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code></p>
+<ul><li>Minor adjustment to how the item buffer is determined with decreasing number of items. Slightly more centralized with 3 or fewer items.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code> (and <code><a href="../reference/venndir.html">venndir()</a></code>)</p>
+<ul><li>Now accepts <code>item_buffer</code> as a vector, recycled to all overlap sets.</li>
+<li>No longer sorts item labels, instead they are expected to be sorted (or not) by <code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code>.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code></p>
+<ul><li>New argument <code>keep_item_order=FALSE</code> by default sorts all items using <code><a href="https://rdrr.io/pkg/jamba/man/mixedSort.html" class="external-link">jamba::mixedSort()</a></code> (proper alphanumeric sort). When <code>keep_item_order=TRUE</code> it will keep items in the same order they originally appeared, which allows a fixed item label order when displaying item labels.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venn_meme.html">venn_meme()</a></code></p>
+<ul><li>New argument <code>keep_item_order=TRUE</code> whose default will keep each overlap label in the order they are provided. Usually there is only one label per overlap, but if it is provided as a <code>list</code> with multiple entries, they will be rendered in the order they are provided. Motivated by efforts to “reproduce the Venn diagram from a paper.”</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.42.900" id="venndir-0042900">venndir 0.0.42.900<a class="anchor" aria-label="anchor" href="#venndir-0042900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-42-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-42-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/check_Venndir.html">check_Venndir()</a></code> - validation function for <code>Venndir</code> objects.</p>
+<ul><li>Fixed error when validating <code>Venndir</code>, applying logical criteria to vector with size &gt; 1.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venn_meme.html">venn_meme()</a></code></p>
+<ul><li>Changed default <code>item_cex=1</code> consistent with improvements to item label scaling by Venn overlap polygon size.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.41.950" id="venndir-0041950">venndir 0.0.41.950<a class="anchor" aria-label="anchor" href="#venndir-0041950"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-41-950">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-41-950"></a></h3>
+<ul><li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>now applies <code>halign=0.5</code> for main count labels, which helps display percentage labels centered under the main count.</li>
+<li>Percentage labels are rounded to integer values, except that values between 0 and 1 will show one digit, excluding 0 and 1.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code></p>
+<ul><li>new argument <code>extra_styles</code> intended to customize the text style for different label types. Currently <code>extra_styles=list(percent=c("***", "***"))</code> will format percentage labels with bold,italic font.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.41.900" id="venndir-0041900">venndir 0.0.41.900<a class="anchor" aria-label="anchor" href="#venndir-0041900"></a></h2>
+<div class="section level3">
+<h3 id="overall-0-0-41-900">overall<a class="anchor" aria-label="anchor" href="#overall-0-0-41-900"></a></h3>
+<ul><li>Add plot titles!</li>
+<li>Arrange signed counts in single column, under main counts.</li>
+<li>Outside Venn labels default slightly toward the top, rather than the sides.</li>
+<li>
+<code><a href="../reference/nudge_venndir_label.html">nudge_venndir_label()</a></code> is convenient for moving inside or outside labels.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-41-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-41-900"></a></h3>
+<ul><li>
+<p><code>Venndir</code> S4 object changes.</p>
+<ul><li>New slot name <code>"metadata"</code> to store miscellaneous settings. All efforts are made to accept older Venndir objects without this slot available.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>New argument <code>main</code> to draw a plot title. It uses <code>gridtext</code> to enable custom Markdown font options. When provided, <code>main</code> is also stored in <code>Venndir@metadata$main</code> for persistence.</li>
+<li>New argument <code>template="wide"</code> is used to arrange count and signed count labels together: <code>"wide"</code> places them side-by-side, <code>"tall"</code> places them in one column. When provided, <code>template</code> is also stored in <code>Venndir@metadata$template</code> for persistence.</li>
+<li>New argument <code>center</code> passed to <code><a href="../reference/label_outside_JamPolygon.html">label_outside_JamPolygon()</a></code>. The default <code>center=c(0, -0.15)</code> tends to place labels at the top rather than the left/right sides by default. The default use case is improved.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Now properly converts set names with <code>"\n"</code> to use <code>"&lt;br&gt;"</code> as originally intended, so it “just works”.</li>
+<li>New arguments <code>main</code> and <code>template</code> as above, except that when no argument is defined, it will use <code>Venndir@metadata$template</code> or <code>Venndir@metadata$main</code> if defined.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/nudge_venndir_label.html">nudge_venndir_label()</a></code></p>
+<ul><li>New argument <code>offset_list</code> to define a list of offsets to one or more sets, where set is defined by <code>names(offset_list)</code>.</li>
+<li>New arguments <code>align_x</code>,<code>align_y</code> to apply uniform alignment of labels to the top/bottom/left/right of a set of labels. Useful to ensure labels are the same y-position and not slightly different heights.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.40.900" id="venndir-0040900">venndir 0.0.40.900<a class="anchor" aria-label="anchor" href="#venndir-0040900"></a></h2>
+<ul><li>Updated label positioning logic, silenced some unintended verbose output from <code><a href="../reference/render_venndir.html">render_venndir()</a></code>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.39.950" id="venndir-0039950">venndir 0.0.39.950<a class="anchor" aria-label="anchor" href="#venndir-0039950"></a></h2>
 <ul><li>

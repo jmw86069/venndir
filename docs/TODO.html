@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -58,6 +58,117 @@
 
 <div id="todo-for-venndir" class="section level1">
 
+<div class="section level2">
+<h2 id="id_12nov2024">12nov2024<a class="anchor" aria-label="anchor" href="#id_12nov2024"></a></h2>
+<ul><li>
+<p><code><a href="reference/textvenn.html">textvenn()</a></code></p>
+<ul><li><p>Consider optional text legend, counts per set, with total.</p></li>
+<li>
+<p>Consider optional multi-line headers, with one line per set name.</p>
+<ul><li>Goal: Prevent generating a very wide table.</li>
+<li>Requires changes to the <code>data.frame</code> structure, very doable.</li>
+<li>Consider supporting multi-line set names? Split them across rows using similar logic.</li>
+</ul></li>
+<li><p>Consider option to display items beneath counts? Probably not practical, but could be combined with <code>max_items=20</code>, then abbreviate the item listing, something similar to: <code>"item1, item2, item3, ... (523 others)"</code>. Or: <code>cli::ansi_collapse(letters, style="head", trunc=20, ellipsis="...")</code>, but split across multiple lines.</p></li>
+</ul></li>
+<li>
+<p><code><a href="reference/venndir.html">venndir()</a></code>, <code><a href="reference/render_venndir.html">render_venndir()</a></code> - labeling placement options</p>
+<ul><li><p>Fix the <code><a href="reference/grobs_tile.html">grobs_tile()</a></code> spacing, remove overlap with percent labels.</p></li>
+<li><p>Find reproducible example of bad font kerning, post issue to <code>gridtext</code>.</p></li>
+<li>
+<p>Consider adjustments to inner/outer labels. Examples:</p>
+<ul><li>Option to show counts/percentage only when the overlap label is shown.</li>
+<li>Option to show overlap label for outside counts, e.g. <code>"setA&amp;setB"</code>. Probably need to split across multiple lines.</li>
+</ul></li>
+<li><p>Consider shorter default <code>segment_distance</code>.</p></li>
+</ul></li>
+<li>
+<p><code>JamPolygon</code> plotting</p>
+<ul><li>Need a method for adding components to venndir plot <code>grid</code> elements, e.g. text labels, points, any <code>grid</code> object.</li>
+<li>Use case could be obtaining <code>grid</code> object, detecting the <code>gTree</code> elements by name, then adjusting item label positions?</li>
+</ul></li>
+<li>
+<p>Add accessors to the <code>Venndir</code> object</p>
+<ul><li>setlist</li>
+<li>overlap item list</li>
+<li>countlist - return overlap count list</li>
+<li>
+<code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> - using the <code>setAs()</code> methodology. Convenient conversion to <code>data.frame</code> format.</li>
+</ul></li>
+<li>
+<p>Summarize advice for fonts, plot resolution, anti-aliasing, etc.</p>
+<ul><li>
+<code><a href="https://ragg.r-lib.org/reference/agg_png.html" class="external-link">ragg::agg_png()</a></code> provides a notable improvement over <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png()</a></code>, in RMarkdown put <code>dev="ragg_png"</code> in the kntir options, for example: <code>knitr::opts_chunk$set(dev="ragg_png")</code>
+</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_08nov2024">08nov2024<a class="anchor" aria-label="anchor" href="#id_08nov2024"></a></h2>
+<ul><li>
+<p>Based upon some excellent feedback:</p>
+<ul><li>DONE. Move default labels above, not beside the Venn diagram.</li>
+<li>DONE. Add option for a plot title.</li>
+<li>DONE. Related, make it “easy” to adjust outer labels.</li>
+<li>DONE. Add option for signed counts below main counts in one column.</li>
+<li>Add option to display signed counts in the legend.</li>
+<li>Add option to display percentage in the legend.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_01nov2024">01nov2024<a class="anchor" aria-label="anchor" href="#id_01nov2024"></a></h2>
+<ul><li>
+<p>Item label enhancements</p>
+<ul><li>
+<p>Debug <code>item_cex</code> and <code>item_cex_factor</code> not being applied as expected.</p>
+<ul><li>Consider assigning <code>item_cex</code> to <code>label_df</code> or <code>jps</code> for persistence.</li>
+<li>Consider specific logic when <code>proportional=TRUE</code> to assume that all polygons are already proportional to the number of items.</li>
+</ul></li>
+<li><p>Consider option to retain item factor order when provided, to control the order they are placed.</p></li>
+<li><p>Consider some method to adjust the relative “height” of item labels, for example multi-line labels should take proportionally more height?</p></li>
+<li><p>Allow custom <code>show_labels</code> so the set names can be displayed outside.</p></li>
+<li><p>Store <code>item_cex</code> and <code>item_buffer</code> somehow for re-use, otherwise <code>plot(venndir_out)</code> does not retain these settings.</p></li>
+<li><p>Improve the default adjustment to <code>item_buffer</code> based upon number of items, and relative size of the polygon. With fewer items (2 or 1), it should more sharply use the center position.</p></li>
+<li><p>Consider option to justify item label based upon its left-right position in the polygon. Item labels on left edge would be placed so the left edge of the label aligns with the left edge of the polygon. It could help reduce labels overlapping the outside of a polygon. It might make labels more crowded inside the polygon.</p></li>
+<li><p>Consider some option to reduce item label overlaps.</p></li>
+<li><p>Consider some approach to place count label box inside the polygon, with item labels around it? Probably not feasible.</p></li>
+<li><p>Useful test case, to reproduce a published figure. Note that <code>as_factor()</code> does not affect item sorting, only the numeric prefix seems to work.</p></li>
+</ul><pre><code><span><span class="va">as_factor</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
+<span>   <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">x</span>, levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">venndir</span><span class="fu">::</span><span class="fu"><a href="reference/venn_meme.html">venn_meme</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>   CLE<span class="op">=</span><span class="fu">as_factor</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1 CLE:"</span>,</span>
+<span>      <span class="st">"2 IFNa&gt;IFNb"</span>,</span>
+<span>      <span class="st">"3 Anti-malarials effective\ntherapy for skin disease"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>   DM<span class="op">=</span><span class="fu">as_factor</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1 DM:"</span>,</span>
+<span>      <span class="st">"2 IFNb&gt;IFNa"</span>,</span>
+<span>      <span class="st">"\n3 Triggered by immune\nstimulating herbal\nsupplements"</span>,</span>
+<span>      <span class="st">"\n\n\n4 Anti-malarials effective\nin 25%, commonly causes\nmorbilliform rash"</span>,</span>
+<span>      <span class="st">"\n\n\n\n5 Cannabinoid receptor\nagonist proising\ntreatment"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>   `CLE&amp;DM`<span class="op">=</span><span class="fu">as_factor</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"1 Photosensitivity"</span>,</span>
+<span>      <span class="st">"2 Triggered by viral and\nbacterial infections"</span>,</span>
+<span>      <span class="st">"3 Increased\ntype I IFN"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>   item_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">1.2</span><span class="op">)</span>,</span>
+<span>   xyratio<span class="op">=</span><span class="fl">10</span>,</span>
+<span>   dither_cex<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre>
+</li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_13sep2024">13sep2024<a class="anchor" aria-label="anchor" href="#id_13sep2024"></a></h2>
+<ul><li>
+<p>Adjust aesthetics based upon feedback.</p>
+<ul><li><p>The arrows could be larger relative to the signed counts.</p></li>
+<li><p>Consider removing the colon <code>":"</code> between arrows and signed counts.</p></li>
+<li>
+<p>When adjusting arrow/signed count font sizes, the text is bottom-aligned, should probably be middle (top-middle-bottom) aligned.</p>
+<ul><li>Using <code>vjust=0.5</code> caused signed labels not to be grouped properly.</li>
+</ul></li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_04sep2024">04sep2024<a class="anchor" aria-label="anchor" href="#id_04sep2024"></a></h2>
+<ul><li>Fix bug when <code>names(setlist)</code> contains parentheses, causing the set name to appear inside the polygon. Removing the parentheses fixes the problem, but unclear why this happens? Probably errant <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep()</a></code> call somewhere.</li>
+</ul></div>
 <div class="section level2">
 <h2 id="id_28aug2024">28aug2024<a class="anchor" aria-label="anchor" href="#id_28aug2024"></a></h2>
 <ul><li><p>Need some way to move outside labels to the top (or bottom), the default makes labels wide, which is difficult to use in figures.</p></li>
@@ -218,7 +329,7 @@
 <li>
 <p>Show how to extract items for each overlap.</p>
 <ul><li>Placeholder:</li>
-</ul><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+</ul><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">itemlist_by_overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">items</span>,</span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span>,</span>
 <span>      levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -265,7 +376,7 @@
 <li>
 <p>Investigate R crash - probably specific to Quartz on MacOS Sonoma 14.4, 14.5</p>
 <ul><li>Reproducible workflow in RStudio:</li>
-</ul><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+</ul><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jmw86069/venndir" class="external-link">venndir</a></span><span class="op">)</span></span>
 <span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, show_labels<span class="op">=</span><span class="st">"ncs"</span><span class="op">)</span></span>
 <span><span class="co"># open new device</span></span>
@@ -832,7 +943,7 @@
 <ul><li>calculation appears to use the overall percentage items.</li>
 <li>The default layout would place percentage velow the main counts:</li>
 </ul></li>
-</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
+</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
 </tr></thead><tbody><tr class="odd"><td align="right">overlap_count</td>
 <td rowspan="2" align="left">
 <p>^: up_counts</p>

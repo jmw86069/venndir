@@ -1,3 +1,35 @@
+# venndir 0.0.43.900
+
+## changes to existing functions
+
+* `label_fill_JamPolygon()`
+
+   * Minor adjustment to how the item buffer is determined with decreasing
+   number of items. Slightly more centralized with 3 or fewer items.
+
+* `render_venndir()` (and `venndir()`)
+
+   * Now accepts `item_buffer` as a vector, recycled to all overlap sets.
+   * No longer sorts item labels, instead they are expected to be
+   sorted (or not) by `signed_overlaps()`.
+
+* `signed_overlaps()`
+
+   * New argument `keep_item_order=FALSE` by default sorts all items
+   using `jamba::mixedSort()` (proper alphanumeric sort).
+   When `keep_item_order=TRUE` it will keep items in the same order
+   they originally appeared, which allows a fixed item label order
+   when displaying item labels.
+
+* `venn_meme()`
+
+   * New argument `keep_item_order=TRUE` whose default will keep each
+   overlap label in the order they are provided. Usually there is only
+   one label per overlap, but if it is provided as a `list` with multiple
+   entries, they will be rendered in the order they are provided.
+   Motivated by efforts to "reproduce the Venn diagram from a paper."
+
+
 # venndir 0.0.42.900
 
 ## changes to existing functions

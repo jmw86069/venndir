@@ -12,6 +12,8 @@ signed_overlaps(
   sep = "&",
   trim_label = TRUE,
   include_blanks = TRUE,
+  keep_item_order = FALSE,
+  verbose = FALSE,
   ...
 )
 }
@@ -55,7 +57,45 @@ present in the overlap. When \code{include_blanks=TRUE} is useful
 in that it guarantees all possible combinations of overlaps
 are represented consistently in the output.}
 
+\item{keep_item_order}{\code{logical} default FALSE, to determine whether
+items will be stored and displayed in the order they are provided.
+Note: \code{keep_item_order=TRUE} enables the following behaviors:
+\itemize{
+\item Any \code{character} vector input will retain the order they appear.
+\item Any \code{factor} vector input will sort items using factor \code{levels},
+which maintains the factor level order.
+\item Any named vector will use the \code{character} vector of names, keeping
+the order they appear in the vector.
+}}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
+
 \item{...}{additional arguments are passed to \code{list2imsigned()}.}
+}
+\value{
+\code{data.frame} with columns intended to support \code{venndir()},
+but which may be more widely useful:
+\itemize{
+\item \code{"sets"} - character vector with sets and overlap names.
+\item one column indicating the \code{overlap_type} and corresponding values:
+\itemize{
+\item \code{"overlap"} - This column is always included.
+\item \code{"concordance"} - includes \code{1} (concordant) and \code{-1} (discordant)
+\item \code{"agreement"} - includes \code{"agreement"} and \code{"disgreement"}
+\item \code{"each"} - includes sign values \code{-1} and \code{1}.
+}
+\item \code{"overlap"} - integer vector with overlap values, where \code{0} and \code{1}
+indicate which sets contained these items. This column is always included,
+even when \code{overlap_type} is something else.
+\item \code{"num_sets"} - integer number of sets represented in the overlap.
+\item \code{"count"} - integer number of items in the overlap.
+\item one colname for each set name represented in the \code{"sets"} column,
+intended to help filter by each set. Values will be \code{0} or \code{1}.
+\item \code{overlap_label} - will represent only the non-0 elements from
+\code{"overlap"} for convenience.
+\item \code{"items"} - when \code{return_items=TRUE} this column will contain
+a \code{list} (in \code{AsIs} format) of \code{character} vectors, with the items.
+}
 }
 \description{
 Calculate signed, directional overlaps across sets
@@ -145,6 +185,12 @@ signed_overlaps(inputlist, return_items=TRUE)
 
 # check to verify
 signed_overlaps(inputlist, return_items=TRUE)$items
+
+# test specific factor level order
+inputlist <- list(
+   setA=factor(c("A", "B", "D"), levels=c("D", "B", "A")),
+   setB=factor(c("A", "C", "E", "F")))
+signed_overlaps(inputlist, return_items=TRUE)
 
 }
 \seealso{

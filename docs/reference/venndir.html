@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -72,6 +72,7 @@
 <span>  legend_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  proportional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_labels <span class="op">=</span> <span class="st">"Ncs"</span>,</span>
+<span>  main <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  return_items <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">"none"</span>, <span class="st">"sign item"</span>, <span class="st">"sign"</span>, <span class="st">"item"</span><span class="op">)</span>,</span>
 <span>  max_items <span class="op">=</span> <span class="fl">3000</span>,</span>
@@ -83,6 +84,7 @@
 <span>  alpha_by_counts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  label_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basic"</span>, <span class="st">"fill"</span>, <span class="st">"shaded"</span>, <span class="st">"shaded_box"</span>, <span class="st">"lite"</span>, <span class="st">"lite_box"</span><span class="op">)</span>,</span>
 <span>  label_preset <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  template <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wide"</span>, <span class="st">"tall"</span><span class="op">)</span>,</span>
 <span>  unicode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  big.mark <span class="op">=</span> <span class="st">","</span>,</span>
 <span>  curate_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -94,6 +96,7 @@
 <span>  sign_count_delim <span class="op">=</span> <span class="st">": "</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  r <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="op">-</span><span class="fl">0.15</span><span class="op">)</span>,</span>
 <span>  segment_distance <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">"&amp;"</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -188,6 +191,14 @@ region.</p></li>
 </ul></dd>
 
 
+<dt>main</dt>
+<dd><p><code>character</code> string used as a plot title, default NULL
+will render no title. When provided, it is rendered using
+<code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> which enables some Markdown-style
+formatting. The title is stored in <code>venndir@metadata$title</code>
+for persistence.</p></dd>
+
+
 <dt>return_items</dt>
 <dd><p><code>logical</code> (default TRUE) indicating whether to
 return items in the overlap data. When <code>FALSE</code> item labels also
@@ -255,6 +266,19 @@ There are pre-defined label styles.</p><ul><li><p><code>"basic"</code> no backgr
 <dt>label_preset</dt>
 <dd><p><code>character</code> deprecated in favor of <code>show_labels</code>.
 This argument is passed to <code><a href="venndir_label_style.html">venndir_label_style()</a></code>.</p></dd>
+
+
+<dt>template</dt>
+<dd><p><code>character</code> (default "wide") describing the default
+layout for counts and signed counts. The value is stored in
+<code>venndir@metadata$template</code> for persistence.</p><ul><li><p><code>"wide"</code> - main counts on the left, right-justified; signed counts
+on the right, left-justified.
+This option is preferred for small numbers, and less-crowded diagrams.</p></li>
+<li><p><code>"tall"</code> - main counts, center-justified; signed counts below main
+counts, center-justified.
+This option is recommended for large numbers (where there are 1000
+or more items in a single overlap region), or for crowded diagrams.</p></li>
+</ul></dd>
 
 
 <dt>unicode</dt>
@@ -338,6 +362,19 @@ for overlap count, and signed overlap count labels, in order.</p></dd>
 <dd><p><code>numeric</code> radius in units <code>"mm"</code> used for rounded
 rectangle corners for labels. Only visible when <code>label_preset</code>
 includes a background fill ("lite", "shaded", "fill"), or "box".</p></dd>
+
+
+<dt>center</dt>
+<dd><p><code>numeric</code> coordinates relative to the plot bounding box,
+default <code>c(0, -0.15)</code> uses a center point in the middle (x=0)
+and slightly down (y=-0.15) from the plot center.
+It is used to place labels outside the diagram.
+In short, labels are placed by drawing a line from this center point,
+outward through the Venn overlap region to be labeled. The
+label is positioned outside the polygon region by <code>segment_distance</code>.
+The default <code>c(0, -0.15)</code> ensures that labels tend to be at the
+top of the plot, and not on the left/right side of the plot.
+This argument is passed along to <code><a href="label_outside_JamPolygon.html">label_outside_JamPolygon()</a></code>.</p></dd>
 
 
 <dt>segment_distance</dt>
@@ -429,6 +466,7 @@ for the graphical objects, specifically the use of coordinate
 <span class="r-out co"><span class="r-pr">#&gt;</span> jps        10      JamPolygon</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> label_df   21   51 data.frame</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> setlist     3            list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> metadata    1            list</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># custom set labels</span></span></span>
 <span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>

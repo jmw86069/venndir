@@ -163,6 +163,16 @@ label_fill_JamPolygon <- function
    ##
    label_method <- match.arg(label_method);
    plot_style <- match.arg(plot_style);
+   
+   if (length(buffer) == 0) {
+      buffer <- -0.15;
+   } else {
+      buffer <- head(buffer, 1)
+   }
+   if (buffer <= -1) {
+      buffer <- -0.99
+   }
+   
    if (length(seed) == 1) {
       set.seed(seed);
    }
@@ -208,20 +218,24 @@ label_fill_JamPolygon <- function
    }
    
    # adjust buffer based upon number of labels 
-   if (length(apply_n_scale) > 0 && TRUE %in% apply_n_scale) {
+   if (TRUE %in% apply_n_scale) {
       if (length(ref_jp) > 0) {
          jp_area <- sum(area_JamPolygon(jp));
          ref_jp_area <- sum(area_JamPolygon(union_JamPolygon(ref_jp)));
          jp_pct1 <- jp_area / ref_jp_area;
+         # at least 33% of the total area uses full buffer,
+         # any smaller than 33% gets larger buffer to shrink effective area.
          jp_pct <- jamba::noiseFloor(jp_pct1 * 3, ceiling=1);
       } else {
          jp_pct <- 1;
       }
       # n_scale <- 1 - (1 / (sqrt(n)*2)) * jp_pct;
-      n_scale <- 1 - (1 / (sqrt(n) * 1.5)) * jp_pct;# 0.0.30.900
-      # apply to buffer
       # scale_width <- (scale_width + 1) * (1 - (1 - n_scale) * 1.1) - 1;
-      new_buffer <- (buffer + 1) * (1 - (1 - n_scale) * 1.1) - 1;
+      # 0.0.42.900
+      n_scale <- 1 - (1 / (sqrt(n) * 1.5)) * jp_pct;# 0.0.42.900
+      new_buffer <- (buffer + 1) * (1 - (1 - n_scale) * 1.2) - 1;
+      # print(data.frame(buffer, new_buffer));# debug
+      # apply to buffer
       buffer <- new_buffer;
    }
    

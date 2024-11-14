@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -99,6 +99,60 @@ configurable tool for the majority of scenarios.</p>
 <code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">testdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>check.names<span class="op">=</span><span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>   SYMBOL<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACTB"</span>, <span class="st">"GAPDH"</span>, <span class="st">"PPIA"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   `logFC B-A`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.4</span>, <span class="fl">1.4</span>, <span class="fl">2.3</span>, <span class="cn">NA</span>, <span class="fl">2.3</span>, <span class="fl">5.1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   probe<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"probe"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">shrink_df</span><span class="op">(</span><span class="va">testdf</span>, by<span class="op">=</span><span class="st">"SYMBOL"</span>, num_func<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   SYMBOL logFC B-A                probe</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   ACTB       1.4        probe1,probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  GAPDH       2.3 probe3,probe4,probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   PPIA       5.1               probe6</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">testdftall</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10000</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>   <span class="va">idf</span> <span class="op">&lt;-</span> <span class="va">testdf</span>;</span></span>
+<span class="r-in"><span>   <span class="va">idf</span><span class="op">$</span><span class="va">SYMBOL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">idf</span><span class="op">$</span><span class="va">SYMBOL</span>, <span class="st">"_"</span>, <span class="va">i</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span>   <span class="va">idf</span>;</span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">testdftall</span>, <span class="fl">12</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     SYMBOL logFC B-A  probe</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   ACTB_1       1.4 probe1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   ACTB_1       1.4 probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  GAPDH_1       2.3 probe3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  GAPDH_1        NA probe4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  GAPDH_1       2.3 probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   PPIA_1       5.1 probe6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   ACTB_2       1.4 probe1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   ACTB_2       1.4 probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  GAPDH_2       2.3 probe3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 GAPDH_2        NA probe4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 GAPDH_2       2.3 probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  PPIA_2       5.1 probe6</span>
+<span class="r-in"><span><span class="va">shrunk_tall</span> <span class="op">&lt;-</span> <span class="fu">shrink_df</span><span class="op">(</span><span class="va">testdftall</span>,</span></span>
+<span class="r-in"><span>   by<span class="op">=</span><span class="st">"SYMBOL"</span>,</span></span>
+<span class="r-in"><span>   num_func<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">shrunk_tall2</span> <span class="op">&lt;-</span> <span class="fu">jamses</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamses/man/shrinkDataFrame.html" class="external-link">shrinkDataFrame</a></span><span class="op">(</span><span class="va">testdftall</span>,</span></span>
+<span class="r-in"><span>   groupBy<span class="op">=</span><span class="st">"SYMBOL"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">shrunk_tall2</span>, <span class="fl">12</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          SYMBOL logFC B-A                probe</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ACTB_1   ACTB_1       1.4        probe1,probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GAPDH_1 GAPDH_1       2.3 probe3,probe4,probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PPIA_1   PPIA_1       5.1               probe6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ACTB_2   ACTB_2       1.4        probe1,probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GAPDH_2 GAPDH_2       2.3 probe3,probe4,probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PPIA_2   PPIA_2       5.1               probe6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ACTB_3   ACTB_3       1.4        probe1,probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GAPDH_3 GAPDH_3       2.3 probe3,probe4,probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PPIA_3   PPIA_3       5.1               probe6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ACTB_4   ACTB_4       1.4        probe1,probe2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GAPDH_4 GAPDH_4       2.3 probe3,probe4,probe5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PPIA_4   PPIA_4       5.1               probe6</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

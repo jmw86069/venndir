@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.39.950</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
       </span>
     </div>
 
@@ -70,6 +70,7 @@
 <span>  segment_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  realign <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  adjust_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  template <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wide"</span>, <span class="st">"tall"</span><span class="op">)</span>,</span>
 <span>  adjx_fn <span class="op">=</span> <span class="va">c</span>,</span>
 <span>  adjy_fn <span class="op">=</span> <span class="va">c</span>,</span>
 <span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -109,9 +110,9 @@ Importantly, it must be in identical row order as <code>gdf</code>.</p></dd>
 
 
 <dt>realign</dt>
-<dd><p><code>logical</code> experimental feature indicating whether to
-realign grouped labels, thus ignoring the hjust/vjust for each
-label, instead arranging the labels using <code>groupdf</code>.
+<dd><p><code>logical</code> experimental feature (now default) indicating
+whether to realign grouped labels, thus ignoring the hjust/vjust
+for each label, instead arranging the labels using <code>groupdf</code>.
 In principle, overlap label (set name) should be top-center,
 and counts should be centered below. When there are main counts
 and signed counts, they should be in two columns, collectively
@@ -127,6 +128,14 @@ respect to the x-axis position.
 This option is <code>FALSE</code> specifically for two-column labels positioned
 around a fixed centerpoint, where one column could be wider than the
 other, and it would otherwise push the other column the other way.</p></dd>
+
+
+<dt>template</dt>
+<dd><p><code>character</code> string (default "wide") with experimental
+layout templates for count and signed labels.</p><ul><li><p><code>"wide"</code> - original strategy with signed counts beside main counts.</p></li>
+<li><p><code>"tall"</code> - new strategy with main counts and signed counts in
+the same column.</p></li>
+</ul></dd>
 
 
 <dt>do_draw</dt>
