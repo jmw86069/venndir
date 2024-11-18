@@ -101,6 +101,8 @@ jp3@polygons$label <- paste0(names(jp3),
    "\narea=", area_JamPolygon(jp3));
 plot(jp3)
 
+area_JamPolygon(jp3, return_list=TRUE)
+
 }
 \seealso{
 Other JamPolygon: 

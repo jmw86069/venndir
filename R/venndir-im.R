@@ -285,6 +285,12 @@ im_value2list <- function
 #' 
 #' @family venndir conversion
 #' 
+#' @param x `matrix` where non-empty values indicate presence of each
+#'    element (row) in each set (column).
+#' @param empty `list` of values recognized as empty. Each item is
+#'    co-erced to the class in columns of `x`.
+#' @param ... additional arguments are ignored.
+#' 
 #' @examples
 #' setlist <- make_venn_test(100, 3, do_signed=TRUE)
 #' ims <- list2im_value(setlist);
@@ -297,14 +303,17 @@ im_value2list <- function
 #' @export
 im2list <- function
 (x,
- empty=c(NA, "", 0, FALSE),
+ empty=list(NA, "", 0, FALSE),
  ...)
 {
    # the reciprocal of list2im()
    x_rows <- rownames(x);
    x_cols <- colnames(x);
    l <- lapply(jamba::nameVector(x_cols), function(i){
-      i_empty <- as(empty, class(x[,i]));
+      i_empty <- unlist(lapply(empty, function(k){
+         as(k, class(x[, i]))
+      }))
+      # i_empty <- as(empty, class(x[,i]));
       has_value <- (!x[,i] %in% i_empty);
       x_rows[has_value];
    });

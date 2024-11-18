@@ -203,6 +203,7 @@ venndir_legender <- function
  x_inset=grid::unit(2, "lines"),
  y_inset=grid::unit(2, "lines"),
  font_cex=1,
+ fontfamily="Arial",
  poly_alpha=0.8,
  table_theme=NULL,
  draw_legend=TRUE,
@@ -535,6 +536,7 @@ venndir_legender <- function
          }
          table_theme <- gridExtra::ttheme_default(
             base_size=12 * font_cex,
+            base_family=fontfamily,
             core=list(
                fg_params=list(
                   hjust=use_hjust,

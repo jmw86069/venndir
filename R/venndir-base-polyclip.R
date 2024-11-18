@@ -8,8 +8,10 @@
 #'    for the Venn diagram.
 #'    This option is useful when defining consistent `set_colors` for
 #'    all entries in `setlist`.
-#' @param set_colors `character` vector of R colors, or `NULL` (default) to
-#'    use default colors defined by `colorjam::rainbowJam()`.
+#' @param set_colors `character` vector of R colors, or default `NULL` to
+#'    use categorical colors defined by `colorjam::rainbowJam()`.
+#'    It will generate colors for every element in `setlist` even when
+#'    a subset is defined with `sets`.
 #' @param setlist_labels `character` vector with optional custom labels
 #'    to display in the Venn diagram. This option is intended when
 #'    the `names(setlist)` are not suitable for display, but should
@@ -20,6 +22,11 @@
 #'    still be maintained as the original names.
 #'    The legend labels are typically single-line entries and should
 #'    have relatively short text length.
+#' @param draw_legend `logical` passed to `render_venndir()`, and stored
+#'    in the `Venndir` metadata.
+#' @param legend_font_cex `numeric` scalar, default 1, used to adjust
+#'    the relative size of fonts with `venndir_legender()` when
+#'    `draw_legend=TRUE`. This value is stored in `metadata` for persistence.
 #' @param proportional `logical` (default FALSE) indicating whether
 #'    to draw proportional Venn circles, also known as a Euler diagram.
 #'    Proportional circles are not guaranteed to represent all possible
@@ -50,7 +57,7 @@
 #' @param main `character` string used as a plot title, default NULL
 #'    will render no title. When provided, it is rendered using
 #'    `gridtext::richtext_grob()` which enables some Markdown-style
-#'    formatting. The title is stored in `venndir@metadata$title`
+#'    formatting. The title is stored in `venndir@metadata$main`
 #'    for persistence.
 #' @param return_items `logical` (default TRUE) indicating whether to
 #'    return items in the overlap data. When `FALSE` item labels also
@@ -76,6 +83,20 @@
 #'    
 #'    The default `c(1, 1, 0.8)` defines the signed count label slightly
 #'    smaller than other labels.
+#' @param fontfamily `character` string to define the fontfamily.
+#'    The `fontfamily` must match a recognized font for the given output
+#'    device, and this font must be capable of producing UTF-8 / Unicode
+#'    characters, in order to print up arrow and down arrow.
+#'    When it does not work, either use `unicode=FALSE`, or check the
+#'    output from `Sys.getlocale()` to ensure the setting is capable
+#'    of using UTF-8 (for example "C" may not be sufficient).
+#'    Using the package `ragg` appears to be more consistently successful
+#'    for rasterized output than base R output, for example:
+#'    `ragg::agg_png()`, `ragg::agg_tiff()`, `ragg::agg_jpeg()`
+#'    produce substantially higher quality output, and with more successful
+#'    usage of system fonts, than `png()`, `tiff()`, and `jpeg()`.
+#'    Similarly, for PDF output, consider `cairo_pdf()` or
+#'    `Cairo::CairoPDF()` instead of using `pdf()`.
 #' @param poly_alpha `numeric` (default 0.6) value between 0 and 1, for
 #'    alpha transparency of the polygon fill color.
 #'    This value is ignored when `alpha_by_counts=TRUE`.
@@ -252,6 +273,8 @@ venndir <- function
  set_colors=NULL,
  setlist_labels=NULL,
  legend_labels=NULL,
+ draw_legend=TRUE,
+ legend_font_cex=1,
  proportional=FALSE,
  show_labels="Ncs",
  main=NULL,
@@ -264,6 +287,7 @@ venndir <- function
  max_items=3000,
  show_zero=FALSE,
  font_cex=c(1, 1, 0.8),
+ fontfamily="Arial",
  # show_set=c("main", "all", "none"),
  show_label=NA,
  display_counts=TRUE,
@@ -283,16 +307,19 @@ venndir <- function
  curate_df=NULL,
  venn_jp=NULL,
  inside_percent_threshold=0,
- item_cex=NULL,
+ item_cex=1,
  item_style=c("default",
     "text",
     "gridtext"),
  item_buffer=-0.15,
- sign_count_delim=": ",
+ item_degrees=0,
+ sign_count_delim=" ",
  padding=c(3, 2),
  r=2,
  center=c(0, -0.15),
  segment_distance=0.1,
+ segment_buffer=-0.1,
+ show_segments=TRUE,
  sep="&",
  do_plot=TRUE,
  verbose=FALSE,
@@ -338,6 +365,11 @@ venndir <- function
    }
    if (length(font_cex) != 3) {
       font_cex <- rep(font_cex, length.out=3)
+   }
+   
+   # accept incidence matrix input
+   if (inherits(setlist, "matrix")) {
+      setlist <- im_value2list(setlist);
    }
    
    # Validate names(setlist)
@@ -719,6 +751,9 @@ venndir <- function
       type="color",
       curate_df=curate_df,
       ...);
+   if (length(sign_count_delim) == 0) {
+      sign_count_delim <- "";
+   }
    gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
       ilabel <- paste0(
          gbase_labels[i],
@@ -914,12 +949,31 @@ venndir <- function
       label_df$items <- I(sv$items[sv_match]);
    }
 
+   ## Create metadata options
+   metadata <- list(
+      main=main,
+      overlap_type=overlap_type,
+      show_items=show_items,
+      template=template,
+      show_segments=show_segments,
+      draw_legend=draw_legend,
+      fontfamily=fontfamily,
+      legend_font_cex=legend_font_cex,
+      item_buffer=item_buffer,
+      item_cex=item_cex,
+      item_style=item_style,
+      item_degrees=item_degrees,
+      segment_buffer=segment_buffer)
+   
    # Create Venndir object
    vo <- new("Venndir",
       jps=venn_jps,
       label_df=label_df,
       setlist=setlist,
-      metadata=list(template=template))
+      metadata=metadata)
+
+   # add warning_list to vo
+   vo <- get_venndir_label_warning_list(vo);
 
    ## venndir_label_style()
    #
@@ -937,6 +991,7 @@ venndir <- function
             } else {
                show_items <- "sign item";
             }
+            metadata(vo)$show_items <- show_items;
             # jamba::printDebug("venndir(): ", "show_items:", show_items);# debug
          }
       }
@@ -946,7 +1001,7 @@ venndir <- function
       vo <- venndir_label_style(
          venndir_output=vo,
          show_labels=show_labels,
-         show_items=show_items,
+         show_items=metadata(vo)$show_items,
          label_preset=label_preset,
          label_style=label_style,
          show_zero=show_zero,
@@ -1010,9 +1065,9 @@ venndir <- function
          # label_preset=label_preset,
          # show_labels=show_labels,
          # label_style="custom",
-         item_cex=item_cex,
-         item_style=item_style,
-         item_buffer=item_buffer,
+         # item_cex=item_cex,
+         # item_style=item_style,
+         # item_buffer=item_buffer,
          max_items=max_items,
          inside_percent_threshold=inside_percent_threshold,
          ...);
@@ -1054,4 +1109,72 @@ venndir <- function
    return(invisible(retlist));
 }
 
+#' Internal function to define warning label for missing Venn overlaps
+#' 
+#' @returns when input is `data.frame`, returns `list` with:
+#'    * `"warning_df"` `data.frame`
+#'    * `"warning_text"` single line `character` string
+#'    * `"warning_label"`, multi-line `character` string
+#'    
+#'    Otherwise if input is `Venndir` it returns `Venndir` with metadata
+#'    that includes `"warning_list"`.
+#' 
+#' @noRd
+get_venndir_label_warning_list <- function
+(label_df,
+ ...)
+{
+   #
+   # warn about hidden non-zero labels
+   # - venn_counts are not zero; label_type is "main" AND EITHER:
+   #    - x,y are NA
+   #    OR
+   #    - overlap_set != ref_polygon;
+   vo <- NULL;
+   if (inherits(label_df, "Venndir")) {
+      vo <- label_df;
+      label_df <- vo@label_df;
+   }
+   
+   warn_rows <- (
+      (
+         (label_df$x %in% NA | label_df$y %in% NA) |
+         (!label_df$overlap_set == label_df$ref_polygon)
+      ) &
+         !label_df$venn_counts %in% c(NA, 0) &
+         label_df$type %in% "main");
+
+   #
+   warn_df <- data.frame(overlap_set="A", venn_counts=0)[0, , drop=FALSE];
+   warning_text <- NULL;
+   warning_label <- NULL;
+   if (any(warn_rows)) {
+      warn_df <- data.frame(check.names=FALSE,
+         overlap_set=label_df$overlap_set[warn_rows],
+         venn_counts=label_df$venn_counts[warn_rows])
+      warn_labels <- paste0("`",
+         warn_df$overlap_set,
+         "`=",
+         warn_df$venn_counts);
+      warning_base <- paste0(
+         ifelse(sum(warn_rows) > 1,
+            "These overlap counts",
+            "This overlap count"),
+         " cannot be displayed:");
+      warning_text <- paste(warning_base,
+         jamba::cPaste(warn_labels, sep=", "));
+      warning_label <- paste0(warning_base,
+         "\n",
+         jamba::cPaste(warn_labels,
+            sep="; "));
+   }
+   warning_list <- list(warning_df=warn_df,
+      warning_text=warning_text,
+      warning_label=warning_label)
+   if (length(vo) > 0) {
+      metadata(vo)$warning_list <- warning_list;
+      return(vo);
+   }
+   return(warning_list);
+}
 

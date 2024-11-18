@@ -4,15 +4,24 @@
 \alias{labelr_JamPolygon}
 \title{Define label positions for JamPolygon using polylabelr::poi()}
 \usage{
-labelr_JamPolygon(jp, precision = 1, add_to_jp = FALSE, ...)
+labelr_JamPolygon(
+  jp,
+  precision = 1,
+  add_to_jp = FALSE,
+  subset_multipart = TRUE,
+  ...
+)
 }
 \arguments{
 \item{jp}{\code{JamPolygon}}
 
-\item{precision}{\code{numeric} passed to \code{polylabelr::poi()}}
+\item{precision}{\code{numeric} passed to \code{polylabelr::poi()}, default 1.}
 
-\item{add_to_jp}{\code{logical} indicating whether to add \code{"label_x"},
-\code{"label_y"} into the \code{jp@polygons} \code{data.frame}.}
+\item{add_to_jp}{\code{logical} default FALSE, indicating whether to
+add \code{"label_x"},\code{"label_y"} into \code{jp@polygons} for persistence.}
+
+\item{subset_multipart}{\code{logical} default TRUE, whether to subset
+multipart polygons to label the largest area.}
 
 \item{...}{additional arguments are ignored.}
 }
@@ -37,6 +46,30 @@ This rule could serve to solve (1) as well.
 }
 }
 }
+}
+\examples{
+df3 <- data.frame(name=c("polygon1", "polygon2"),
+label=c("polygon A", "polygon B"),
+x=I(list(
+   list(c(1, 6, 6, 1),
+      c(2, 5, 5, 2),
+      c(3, 4, 4, 3)),
+   list(
+      c(12, 15, 15, 12) - 3,
+      c(13, 14, 14, 13) - 3)
+)),
+y=I(list(
+   list(c(1, 1, 6, 6),
+      c(2, 2, 5, 5),
+      c(3, 3, 4, 4)),
+   list(
+      c(2, 2, 5, 5),
+      c(3, 3, 4, 4))
+)),
+fill=jamba::alpha2col(c("gold", "firebrick"), alpha=0.7))
+jp3 <- new("JamPolygon", polygons=df3);
+plot(jp3);
+
 }
 \seealso{
 Other JamPolygon: 

@@ -21,6 +21,7 @@ venndir_legender(
   x_inset = grid::unit(2, "lines"),
   y_inset = grid::unit(2, "lines"),
   font_cex = 1,
+  fontfamily = "Arial",
   poly_alpha = 0.8,
   table_theme = NULL,
   draw_legend = TRUE,

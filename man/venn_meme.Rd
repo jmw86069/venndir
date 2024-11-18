@@ -12,6 +12,8 @@ venn_meme(
   item_buffer = -0.85,
   item_style = c("gridtext", "text"),
   keep_item_order = TRUE,
+  show_items = "item",
+  show_labels = "i",
   plot_warning = FALSE,
   draw_legend = FALSE,
   verbose = FALSE,

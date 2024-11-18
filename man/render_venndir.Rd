@@ -11,26 +11,26 @@ render_venndir(
   main = NULL,
   item_cex = NULL,
   item_cex_factor = 1,
-  plot_warning = TRUE,
+  plot_warning = FALSE,
   show_labels = NULL,
-  show_items = c(NA, "none", "sign item", "item", "sign"),
-  item_degrees = 0,
+  show_items = NULL,
+  item_degrees = NULL,
   max_items = 100,
   show_zero = TRUE,
-  show_segments = TRUE,
-  segment_buffer = -0.1,
+  show_segments = NULL,
+  segment_buffer = NULL,
   label_preset = c("none"),
   label_style = c("custom", "basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
-  fontfamily = "Arial",
+  fontfamily = NULL,
   inside_percent_threshold = 0,
-  item_style = c("default", "text", "gridtext"),
-  item_buffer = -0.15,
+  item_style = NULL,
+  item_buffer = NULL,
   group_labels = TRUE,
   template = NULL,
   adjust_center = FALSE,
-  draw_legend = TRUE,
+  draw_legend = NULL,
   legend_x = "bottomright",
-  legend_font_cex = 1,
+  legend_font_cex = NULL,
   show_label = NA,
   display_counts = TRUE,
   do_newpage = TRUE,
@@ -54,7 +54,7 @@ to be slighly smaller.}
 \item{main}{\code{character} string used as a plot title, default NULL
 will render no title. When provided, it is rendered using
 \code{gridtext::richtext_grob()} which enables some Markdown-style
-formatting. The title is stored in \code{venndir@metadata$title}
+formatting. The title is stored in \code{venndir@metadata$main}
 for persistence.}
 
 \item{item_cex}{\code{numeric} scalar applied to item labels in each overlap
@@ -143,7 +143,20 @@ There are pre-defined label styles.
 \item \code{"box"} adds a dark border around the label region
 }}
 
-\item{fontfamily}{\code{character} font family}
+\item{fontfamily}{\code{character} string to define the fontfamily.
+The \code{fontfamily} must match a recognized font for the given output
+device, and this font must be capable of producing UTF-8 / Unicode
+characters, in order to print up arrow and down arrow.
+When it does not work, either use \code{unicode=FALSE}, or check the
+output from \code{Sys.getlocale()} to ensure the setting is capable
+of using UTF-8 (for example "C" may not be sufficient).
+Using the package \code{ragg} appears to be more consistently successful
+for rasterized output than base R output, for example:
+\code{ragg::agg_png()}, \code{ragg::agg_tiff()}, \code{ragg::agg_jpeg()}
+produce substantially higher quality output, and with more successful
+usage of system fonts, than \code{png()}, \code{tiff()}, and \code{jpeg()}.
+Similarly, for PDF output, consider \code{cairo_pdf()} or
+\code{Cairo::CairoPDF()} instead of using \code{pdf()}.}
 
 \item{inside_percent_threshold}{\code{numeric} (default 0) indicating the
 percent area that a Venn overlap region must contain in order

@@ -259,7 +259,10 @@ draw_gridtext_groups <- function
             use_y <- grid::unit(adjy_fn(head(gdf$y[korig], 1)), "snpc");
          }
          # jamba::printDebug("adjx:", adjx, ", adjy:", adjy);# debug
-         if (verbose) jamba::printDebug("use_xalign:", use_xalign, ", use_yalign:", use_yalign);# debug
+         if (verbose) {
+            jamba::printDebug("use_xalign:", use_xalign,
+               ", use_yalign:", use_yalign);
+         }
          # jamba::printDebug("adjy_fn(use_segment_df$y):");print(adjy_fn(use_segment_df$y));
          # ge1 <- grobs_exts(gt_final);
          # jamba::printDebug("ge1:");print(ge1);

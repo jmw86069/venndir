@@ -5,7 +5,7 @@
 \title{Generate test sets for venndir}
 \usage{
 make_venn_test(
-  n_items = 1e+06,
+  n_items = 1000000,
   n_sets = 4,
   do_signed = FALSE,
   concordance = 0.5,

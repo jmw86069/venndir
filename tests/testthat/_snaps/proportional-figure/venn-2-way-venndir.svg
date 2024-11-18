@@ -38,15 +38,22 @@
 <polygon points='562.99,167.53 598.80,167.53 598.68,167.53 599.16,167.51 599.63,167.41 600.08,167.24 600.50,167.00 600.87,166.70 601.19,166.34 601.44,165.93 601.63,165.49 601.75,165.02 601.79,164.54 601.79,164.54 601.79,152.00 601.79,152.00 601.75,151.52 601.63,151.05 601.44,150.61 601.19,150.20 600.87,149.84 600.50,149.54 600.08,149.30 599.63,149.13 599.16,149.03 598.80,149.01 562.99,149.01 563.35,149.03 562.87,149.01 562.39,149.07 561.93,149.20 561.49,149.41 561.10,149.68 560.75,150.02 560.46,150.40 560.24,150.83 560.09,151.28 560.01,151.76 560.00,152.00 560.00,164.54 560.01,164.30 560.01,164.78 560.09,165.26 560.24,165.71 560.46,166.14 560.75,166.52 561.10,166.86 561.49,167.13 561.93,167.34 562.39,167.47 562.87,167.53 ' style='stroke-width: 1.50; stroke: none; fill: none;' />
 <text x='121.20' y='161.63' style='font-size: 14.00px; font-weight: bold; fill: #262626; font-family: sans;' textLength='35.81px' lengthAdjust='spacingAndGlyphs'>set_A</text>
 <text x='215.91' y='249.99' style='font-size: 14.00px; fill: #262626; font-family: sans;' textLength='15.57px' lengthAdjust='spacingAndGlyphs'>25</text>
-<text x='236.07' y='242.71' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='21.17px' lengthAdjust='spacingAndGlyphs'>↑:12</text>
-<text x='236.07' y='255.93' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='21.17px' lengthAdjust='spacingAndGlyphs'>↓:13</text>
+<text x='236.07' y='242.71' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>↑</text>
+<text x='244.78' y='242.71' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='12.46px' lengthAdjust='spacingAndGlyphs'>12</text>
+<text x='236.07' y='255.93' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>↓</text>
+<text x='244.78' y='255.93' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='12.46px' lengthAdjust='spacingAndGlyphs'>13</text>
 <text x='344.23' y='291.36' style='font-size: 14.00px; fill: #262626; font-family: sans;' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>7</text>
-<text x='356.60' y='277.47' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='20.55px' lengthAdjust='spacingAndGlyphs'>↑↑:4</text>
-<text x='356.60' y='290.69' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='20.55px' lengthAdjust='spacingAndGlyphs'>↓↓:2</text>
-<text x='356.60' y='303.91' style='font-size: 11.20px; fill: #5E5E5E; font-family: sans;' textLength='16.81px' lengthAdjust='spacingAndGlyphs'>X:1</text>
+<text x='356.60' y='277.47' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>↑↑</text>
+<text x='370.92' y='277.47' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='6.23px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='356.60' y='290.69' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>↓↓</text>
+<text x='370.92' y='290.69' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='6.23px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='356.60' y='303.91' style='font-size: 11.20px; fill: #5E5E5E; font-family: sans;' textLength='7.47px' lengthAdjust='spacingAndGlyphs'>X</text>
+<text x='367.19' y='303.91' style='font-size: 11.20px; fill: #5E5E5E; font-family: sans;' textLength='6.23px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='471.15' y='249.99' style='font-size: 14.00px; fill: #262626; font-family: sans;' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>9</text>
-<text x='483.52' y='242.71' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='14.95px' lengthAdjust='spacingAndGlyphs'>↑:5</text>
-<text x='483.52' y='255.93' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='14.95px' lengthAdjust='spacingAndGlyphs'>↓:4</text>
+<text x='483.52' y='242.71' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>↑</text>
+<text x='492.24' y='242.71' style='font-size: 11.20px; fill: #A73232; font-family: sans;' textLength='6.23px' lengthAdjust='spacingAndGlyphs'>5</text>
+<text x='483.52' y='255.93' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>↓</text>
+<text x='492.24' y='255.93' style='font-size: 11.20px; fill: #0060BF; font-family: sans;' textLength='6.23px' lengthAdjust='spacingAndGlyphs'>4</text>
 <text x='562.99' y='161.63' style='font-size: 14.00px; font-weight: bold; fill: #262626; font-family: sans;' textLength='35.81px' lengthAdjust='spacingAndGlyphs'>set_B</text>
 <line x1='160.00' y1='167.52' x2='197.09' y2='206.19' style='stroke-width: 0.75; stroke: #EEC12E; stroke-opacity: 0.80;' />
 <line x1='560.00' y1='167.53' x2='522.90' y2='206.20' style='stroke-width: 0.75; stroke: #7B62F1; stroke-opacity: 0.80;' />

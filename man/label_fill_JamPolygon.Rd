@@ -23,7 +23,7 @@ label_fill_JamPolygon(
   label_method = c("hexagonal"),
   draw_labels = TRUE,
   seed = 1,
-  plot_style = c("base", "gg", "none"),
+  plot_style = c("none", "JamPolygon"),
   verbose = FALSE,
   ...
 )
@@ -186,12 +186,18 @@ df3 <- data.frame(name=c("polygon1", "polygon2"),
       )),
    fill=c("gold", "firebrick"))
 jp3 <- new("JamPolygon", polygons=df3);
-plot(jp3);
 
-lfj <- label_fill_JamPolygon(jp3[1,], labels=1:20)
-lfj12 <- label_fill_JamPolygon(jp3, labels=1:20)
-plot(lfj$items_df[, c("x", "y")], cex=0)
-text(lfj$items_df[, c("x", "y")], labels=lfj$items_df$text)
+jp3p <- plot(jp3);
+
+lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 100),
+   ref_jp=jp3, plot_style="JamPolygon")
+lfj2 <- label_fill_JamPolygon(jp3[2,], labels=rep("X", 40),
+   buffer=-0.5,
+   ref_jp=jp3, plot_style="JamPolygon")
+
+jp3p <- plot(jp3);
+lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 1), apply_n_scale=FALSE,
+   ref_jp=jp3, plot_style="JamPolygon")
 
 }
 \seealso{

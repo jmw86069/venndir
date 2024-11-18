@@ -129,12 +129,18 @@
 #'       )),
 #'    fill=c("gold", "firebrick"))
 #' jp3 <- new("JamPolygon", polygons=df3);
-#' plot(jp3);
 #' 
-#' lfj <- label_fill_JamPolygon(jp3[1,], labels=1:20)
-#' lfj12 <- label_fill_JamPolygon(jp3, labels=1:20)
-#' plot(lfj$items_df[, c("x", "y")], cex=0)
-#' text(lfj$items_df[, c("x", "y")], labels=lfj$items_df$text)
+#' jp3p <- plot(jp3);
+#' 
+#' lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 100),
+#'    ref_jp=jp3, plot_style="JamPolygon")
+#' lfj2 <- label_fill_JamPolygon(jp3[2,], labels=rep("X", 40),
+#'    buffer=-0.5,
+#'    ref_jp=jp3, plot_style="JamPolygon")
+#' 
+#' jp3p <- plot(jp3);
+#' lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 1), apply_n_scale=FALSE,
+#'    ref_jp=jp3, plot_style="JamPolygon")
 #' 
 #' @export
 label_fill_JamPolygon <- function
@@ -156,7 +162,8 @@ label_fill_JamPolygon <- function
  label_method=c("hexagonal"),
  draw_labels=TRUE,
  seed=1,
- plot_style=c("base", "gg", "none"),
+ plot_style=c("none",
+    "JamPolygon"),
  verbose=FALSE,
  ...)
 {
@@ -229,11 +236,13 @@ label_fill_JamPolygon <- function
       } else {
          jp_pct <- 1;
       }
+      jp_pct <- 1;
       # n_scale <- 1 - (1 / (sqrt(n)*2)) * jp_pct;
       # scale_width <- (scale_width + 1) * (1 - (1 - n_scale) * 1.1) - 1;
       # 0.0.42.900
       n_scale <- 1 - (1 / (sqrt(n) * 1.5)) * jp_pct;# 0.0.42.900
       new_buffer <- (buffer + 1) * (1 - (1 - n_scale) * 1.2) - 1;
+      # jamba::printDebug("buffer:", buffer, ", n:", n, ", jp_pct:", jp_pct, ", new_buffer:", new_buffer);# debug
       # print(data.frame(buffer, new_buffer));# debug
       # apply to buffer
       buffer <- new_buffer;
@@ -279,18 +288,27 @@ label_fill_JamPolygon <- function
    
    # define text label grob
    g_labels <- NULL;
-   if ("base" %in% plot_style) {
+   if (any(c("JamPolygon") %in% plot_style)) {
+      if (length(ref_jp) > 0) {
+         jpp <- plot(ref_jp, do_draw=FALSE);
+      } else {
+         jpp <- plot(jp, do_draw=FALSE);
+      }
+      adjx <- attributes(jpp)$adjx;
+      adjy <- attributes(jpp)$adjy;
+      use_vp <- attributes(jpp)$viewport;
       g_labels <- gridtext::richtext_grob(
-         x=label_xy[,1],
-         y=label_xy[,2],
+         x=adjx(label_xy[,1]),
+         y=adjy(label_xy[,2]),
          text=labels,
          rot=-degrees,
-         default.units="native",
+         default.units="snpc",
          padding=grid::unit(2, "pt"),
          r=grid::unit(2, "pt"),
          vjust=0.5,
          hjust=0.5,
          halign=0.5,
+         vp=use_vp,
          gp=grid::gpar(
             col=color,
             fontsize=fontsize * cex
@@ -299,15 +317,8 @@ label_fill_JamPolygon <- function
             col=border
          )
       );
-      if (TRUE %in% draw_labels) {
-         ## Draw labels
-         # to draw using grid we have to use a custom viewport
-         if (length(dev.list()) > 0) {
-            vps <- gridBase::baseViewports();
-            grid::pushViewport(vps$inner, vps$figure, vps$plot);
-            grid::grid.draw(g_labels);
-            grid::popViewport(3);
-         }
+      if (TRUE %in% draw_labels && length(dev.list()) > 0) {
+         grid::grid.draw(g_labels);
       }
    }
    

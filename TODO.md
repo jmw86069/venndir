@@ -2,6 +2,37 @@
 
 ## 12nov2024
 
+* item labeling
+
+   * Consider storing item label coordinates in the `Venndir` object.
+   Then `render_venndir()` must be able to re-use item labels.
+   It would allow editing the coordinates for fine-tuning.
+   * Consider alternatives to `label_fill_JamPolygon()` to fill labels
+   inside a polygon. Ideally, it minimizes overlapping labels,
+   and maximizes placement of labels inside each polygon.
+
+      * Consider defining `adj` based upon label relative distance to
+      left-right edges of the polygon. Doing so would allow labels to
+      fit cleanly within the polygon.
+      * Evaluate `wordcloud` type approaches which can fill text words
+      into a polygon shape. Github `"Lchiffon/wordcloud2"` also on CRAN.
+      Note: `wordcloud2` produces HTML/javascript, it also requires
+      black-and-white mask for each shape, then places words inside
+      the shape using active javascript. It often needs web page refresh.
+
+   * Consider permitting item border and fill.
+
+* Font and character handling
+
+   * Consider `marquee` package for potentially more robust unicode character
+   and font handling.
+   
+      * It would involve converting existing markdown/HTML
+      to CommonMark format, which uses styles by name.
+      * Named styles could enable more flexible control over labeling overall.
+      E.g. `count` could be a `marquee::style()` with fontfamily, fontsize,
+      color, etc.
+
 * `textvenn()`
 
    * Consider optional text legend, counts per set, with total.
@@ -21,7 +52,11 @@
 * `venndir()`, `render_venndir()` - labeling placement options
 
    * Fix the `grobs_tile()` spacing, remove overlap with percent labels.
+   
+      * This issue might be solved with `ragg::agg_png()` font handling.
+   
    * Find reproducible example of bad font kerning, post issue to `gridtext`.
+   Consider `marquee` as alternative.
    * Consider adjustments to inner/outer labels. Examples:
 
       * Option to show counts/percentage only when the overlap label is shown.
@@ -36,21 +71,36 @@
    e.g. text labels, points, any `grid` object.
    * Use case could be obtaining `grid` object, detecting the `gTree` elements
    by name, then adjusting item label positions?
+   * Consider conversion to polypath-compatible coordinates, and `sf`.
 
+* DONE. `Venndir` polygon manipulations
+
+   * DONE. customize an overlap: fill color, innerborder/outerborder/border
 
 * Add accessors to the `Venndir` object
 
-   * setlist
-   * overlap item list
-   * countlist - return overlap count list
-   * `as.data.frame()` - using the `setAs()` methodology. Convenient
-   conversion to `data.frame` format.
+   * DONE. setlist
+   * DONE. `overlaplist()` - overlap item list
+   * DONE. `signed_counts()` - return overlap count list
+   * DONE. (`overlapdf()` and `venndir_to_df()`),
+   alternatively: `as.data.frame()` - using the `setAs()` methodology.
+   Convenient conversion to `data.frame` format.
 
 * Summarize advice for fonts, plot resolution, anti-aliasing, etc.
 
    * `ragg::agg_png()` provides a notable improvement over `png()`,
    in RMarkdown put `dev="ragg_png"` in the kntir options, for example:
    `knitr::opts_chunk$set(dev="ragg_png")`
+
+* Consider other S4 objects?
+
+   * `Setlist` - consistent representation for setlist
+   
+      * When `signed_overlaps()` is run, it first "detects" input type,
+      then converts data accordingly. It could be stored properly.
+      * list, signed list, incidence matrix, signed incidence matrix.
+      
+   * `SignedOverlaps` - Structured info
 
 ## 08nov2024
 

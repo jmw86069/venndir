@@ -1,5 +1,5 @@
 
-context("venndir utility")
+# context("venndir utility")
 # library(venndir)
 
 test_that("expand_range", {

@@ -11,6 +11,8 @@ venndir(
   set_colors = NULL,
   setlist_labels = NULL,
   legend_labels = NULL,
+  draw_legend = TRUE,
+  legend_font_cex = 1,
   proportional = FALSE,
   show_labels = "Ncs",
   main = NULL,
@@ -19,6 +21,7 @@ venndir(
   max_items = 3000,
   show_zero = FALSE,
   font_cex = c(1, 1, 0.8),
+  fontfamily = "Arial",
   show_label = NA,
   display_counts = TRUE,
   poly_alpha = 0.6,
@@ -31,14 +34,17 @@ venndir(
   curate_df = NULL,
   venn_jp = NULL,
   inside_percent_threshold = 0,
-  item_cex = NULL,
+  item_cex = 1,
   item_style = c("default", "text", "gridtext"),
   item_buffer = -0.15,
-  sign_count_delim = ": ",
+  item_degrees = 0,
+  sign_count_delim = " ",
   padding = c(3, 2),
   r = 2,
   center = c(0, -0.15),
   segment_distance = 0.1,
+  segment_buffer = -0.1,
+  show_segments = TRUE,
   sep = "&",
   do_plot = TRUE,
   verbose = FALSE,
@@ -73,8 +79,10 @@ for the Venn diagram.
 This option is useful when defining consistent \code{set_colors} for
 all entries in \code{setlist}.}
 
-\item{set_colors}{\code{character} vector of R colors, or \code{NULL} (default) to
-use default colors defined by \code{colorjam::rainbowJam()}.}
+\item{set_colors}{\code{character} vector of R colors, or default \code{NULL} to
+use categorical colors defined by \code{colorjam::rainbowJam()}.
+It will generate colors for every element in \code{setlist} even when
+a subset is defined with \code{sets}.}
 
 \item{setlist_labels}{\code{character} vector with optional custom labels
 to display in the Venn diagram. This option is intended when
@@ -87,6 +95,13 @@ the \code{names(setlist)} are not suitable for a legend, but should
 still be maintained as the original names.
 The legend labels are typically single-line entries and should
 have relatively short text length.}
+
+\item{draw_legend}{\code{logical} passed to \code{render_venndir()}, and stored
+in the \code{Venndir} metadata.}
+
+\item{legend_font_cex}{\code{numeric} scalar, default 1, used to adjust
+the relative size of fonts with \code{venndir_legender()} when
+\code{draw_legend=TRUE}. This value is stored in \code{metadata} for persistence.}
 
 \item{proportional}{\code{logical} (default FALSE) indicating whether
 to draw proportional Venn circles, also known as a Euler diagram.
@@ -122,7 +137,7 @@ region.
 \item{main}{\code{character} string used as a plot title, default NULL
 will render no title. When provided, it is rendered using
 \code{gridtext::richtext_grob()} which enables some Markdown-style
-formatting. The title is stored in \code{venndir@metadata$title}
+formatting. The title is stored in \code{venndir@metadata$main}
 for persistence.}
 
 \item{return_items}{\code{logical} (default TRUE) indicating whether to
@@ -157,6 +172,21 @@ count zero label is displayed, otherwise no count label is shown.}
 
 The default \code{c(1, 1, 0.8)} defines the signed count label slightly
 smaller than other labels.}
+
+\item{fontfamily}{\code{character} string to define the fontfamily.
+The \code{fontfamily} must match a recognized font for the given output
+device, and this font must be capable of producing UTF-8 / Unicode
+characters, in order to print up arrow and down arrow.
+When it does not work, either use \code{unicode=FALSE}, or check the
+output from \code{Sys.getlocale()} to ensure the setting is capable
+of using UTF-8 (for example "C" may not be sufficient).
+Using the package \code{ragg} appears to be more consistently successful
+for rasterized output than base R output, for example:
+\code{ragg::agg_png()}, \code{ragg::agg_tiff()}, \code{ragg::agg_jpeg()}
+produce substantially higher quality output, and with more successful
+usage of system fonts, than \code{png()}, \code{tiff()}, and \code{jpeg()}.
+Similarly, for PDF output, consider \code{cairo_pdf()} or
+\code{Cairo::CairoPDF()} instead of using \code{pdf()}.}
 
 \item{poly_alpha}{\code{numeric} (default 0.6) value between 0 and 1, for
 alpha transparency of the polygon fill color.

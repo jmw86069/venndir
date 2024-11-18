@@ -4,7 +4,16 @@
 \alias{im2list}
 \title{Incidence matrix to list}
 \usage{
-im2list(x, empty = c(NA, "", 0, FALSE), ...)
+im2list(x, empty = list(NA, "", 0, FALSE), ...)
+}
+\arguments{
+\item{x}{\code{matrix} where non-empty values indicate presence of each
+element (row) in each set (column).}
+
+\item{empty}{\code{list} of values recognized as empty. Each item is
+co-erced to the class in columns of \code{x}.}
+
+\item{...}{additional arguments are ignored.}
 }
 \description{
 Incidence matrix to list

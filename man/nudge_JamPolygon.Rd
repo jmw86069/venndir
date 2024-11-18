@@ -9,6 +9,7 @@ nudge_JamPolygon(
   nudge = NULL,
   rotate_degrees = 0,
   center = NULL,
+  scale = c(1, 1),
   verbose = FALSE,
   ...
 )
@@ -17,8 +18,31 @@ nudge_JamPolygon(
 \item{jp}{\code{JamPolygon} object}
 
 \item{nudge}{\code{list} whose names match \code{names(jp)}, containing \code{numeric}
-vector with names \code{"x"} and \code{"y"}. For example:
-\code{nudge=list(polyname1=c(x=1, y=0))}}
+vector with coordinates x and y. Alternatively, an atomic \code{numeric}
+vector with length=2, which will be applied to the x,y coordinates
+for all polygons in \code{jp}.
+An example of list input:
+\code{nudge=list(polyname1=c(1, 0))}}
+
+\item{rotate_degrees}{\code{numeric} optional rotation in degrees,
+named using \code{names(jp)}.
+When a single unnamed value is provided, it is applied to all polygons
+in \code{jp}.
+When a \code{numeric} vector is provided with \code{length(jp)}, it is applied
+in order to each polygon in \code{jp}.
+Note: 90 degrees will rotate clockwise
+(top the right, bottom to the left) by 1/4 turn.}
+
+\item{center}{\code{numeric} coordinates with optional center position.
+Default \code{NULL} will use the center of the bounding box of \code{jp}.
+All parts of the polygon, and all polygons, use the same \code{center}.}
+
+\item{scale}{\code{numeric} optional scalar to enlarge or shrink the polygon,
+named using \code{names(jp)}. Alternatively, if a single unnamed value
+is provided, it is applied to all polygons in \code{jp}.
+If a \code{numeric} vector is provided with \code{length(jp)}, it is applied
+in order to each polygon in \code{jp}.
+The scale is applied relative to the \code{center} as provided or calculated.}
 
 \item{...}{additional arguments are ignored}
 }
@@ -47,10 +71,24 @@ nudge <- list(D=c(7, 1), E=c(-1, -1));
 DEjp_nudged <- nudge_JamPolygon(DEjp, nudge=nudge)
 plot(DEjp_nudged)
 
-plot(rbind2(DEjp, DEjp_nudged),
-   fill=c("#FFD70055", "#B2222255", "gold", "firebrick"),
-   label=c("D_old", "E_old", "D_new", "E_new"),
-   border.lty=c(2, 2, 1, 1))
+# plot the difference
+plot_jpdiff <- function(a, b) {
+  fillb <- jamba::alpha2col(alpha=0.9, b@polygons$fill);
+  filla <- jamba::alpha2col(alpha=0.3, fillb)
+  plot(rbind2(a, b),
+    fill=c(filla, fillb),
+    label=c(paste(a@polygons$name, "old"),
+      paste(b@polygons$name, "new")),
+    border.lty=rep(c(2, 1), c(length(a), length(b))))
+}
+plot_jpdiff(DEjp, DEjp_nudged)
+
+# rotate, nudge, and scale
+DEjp_rotated <- nudge_JamPolygon(DEjp,
+   rotate_degrees=c(E=45),
+   scale=c(E=0.7),
+   nudge=list(E=c(5, 0), D=c(-1, -4)))
+plot_jpdiff(DEjp, DEjp_rotated)
 
 }
 \seealso{

@@ -22,6 +22,23 @@ overlap. This content is similar to the input to
 only contains the number of items per overlap,
 and not the items. In this case each overlap contains
 the vector of items also.
+
+Since version 0.0.44.900, this function also accepts nested
+list format, as returned by \code{overlaplist()} for a \code{Venndir}
+object, when the \code{overlap_type} is something other than
+\code{"overlap"}.
+
+Note that when converting data with \code{overlap_type} \code{"concordance"}
+and \code{"agreement"} it will be slightly lossy.
+\itemize{
+\item \code{overlap_type="concordance"} encodes mismatches as \code{"mixed"},
+instead of the original sign for each set.
+\item \code{overlap_type="agreement"} encodes as \code{"agreement"} and \code{"mixed"}
+instead of the original sign for each set.
+}
+
+Ideally, use \code{setlist()} to obtain to actual input setlist from
+the \code{Venndir} object.
 }
 \examples{
 # example from eulerr::euler()
@@ -51,6 +68,16 @@ venndir(setlist,
    item_degrees=0,
    item_buffer=-0.95,
    proportional=TRUE)
+
+# test interconversion: setlist to venndir to overlaplist to setlist
+setlist2 <- make_venn_test(100, 3, do_signed=TRUE);
+vo <- venndir(setlist2, do_plot=FALSE, overlap_type="each")
+ollist <- overlaplist(vo)
+setlist2b <- overlaplist2setlist(ollist)
+# all should be TRUE:
+sapply(names(setlist2b), function(i){
+   all(setlist2[[i]] == setlist2b[[i]][names(setlist2[[i]])])
+})
 
 }
 \seealso{

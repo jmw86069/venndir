@@ -418,14 +418,21 @@ grobs_tile <- function
 #' @family grobs
 #' @keywords internal
 #' 
-#' @param grobs
-#' @xalign `character` string indicating the type of alignment:
+#' @param grobs `gList` collection of graphical objects
+#' @param xalign `character` string indicating the type of alignment:
 #'    * `"left"` - objects are aligned at the left edge
 #'    * `"center"` - objects are aligned at the object center
 #'    * `"right"` - objects are aligned at the right edge
 #'    * `"tile"` - objects are aligned with the left edge
 #'    touching the right edge of the previous object (experimental)
 #'    * `"none"`
+#' @param ref_grob `integer` index of the grob in `grobs` to use as the
+#'    reference, around which other grobs will be oriented.
+#' @param use_x `unit` used as a reference x coordinate, used in
+#'    favor of other options such as `ref_grob` or the first grob in `grobs`.
+#' @param verbose `logical` indicating whether to print verbose output.
+#' @param debug `logical` indicating whether to print debug output.
+#' @param ... additional arguments are ignored.
 #' 
 grobs_xalign <- function
 (grobs,

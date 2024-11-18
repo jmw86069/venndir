@@ -1,3 +1,90 @@
+# venndir 0.0.44.900
+
+## new functions
+
+* `Venndir` has new methods:
+
+   * `show()` to summarize the contents
+   * `metadata()` and `metadata<-`
+   * `setlist()` - returns the original setlist
+   * `overlaplist()`
+   * `overlapdf()` - returns `data.frame` of overlap items
+   * `signed_counts()`
+   * `im()` - return incidence matrix format
+
+* `modify_venndir_overlap()`, `highlight_venndir_overlap()`
+
+   * Customize overlap set visual features, such as fill color, border,
+   fontsize, font color.
+   * The highlight function streamlines the options to draw a distinctive
+   border around one or more overlap sets.
+
+## changes to existing functions
+
+* General changes to remove warnings, for example `minus_JamPolygon()`
+was throwing warnings with empty polygon input or output.
+* Added tests for `area_JamPolygon()` and `labelr_JamPolygon()` for a
+couple weird cases with nested holes, nested-nested solid polygons.
+* `venndir()`, `render_venndir()`
+
+   * Now accepts incidence matrix input, sets as colnames, items as rows,
+   and `c(-1, 0, 1)` values.
+   * Added to metadata slot for persistence, though some might be added
+   directly to `label_df` for persistence for each overlap label:
+   `main`, `template`, `overlap_type`, `draw_legend`,
+   `item_buffer`, `item_cex`, `item_style`, `item_degrees`
+   `show_segments`, `segment_buffer`
+   * `render_venndir()` defaults are `NULL` so they will pull from the
+   "metadata" slot, otherwise it assigns the previous defaults.
+   It is now possible to make `Venndir` object, then render separately
+   and use the original `show_segments` and `segment_buffer` values.
+
+* `get_venn_polygon_shapes()`
+
+   * Very small nudge to default 4-way elliptical Venn shapes to prevent
+   rounding error overlaps at the ends of sets 2 and 3, overlapping the
+   side edge of sets 4 and 1, respectively. Same thing, nudging sets
+   1 and 4 to prevent rounding error overlaps at the bottom edge.
+   Previously there were miniscule "unique" shapes where the cornered edges
+   slightly criss-crossed, since the ellipses are drawn with N vertices,
+   and not infinite number of vertices.
+   Possible side effect is that item fill for sets 1 and 4 may now also
+   use the tiny section at the bottom for item labels.
+
+* `signed_overlaps()`
+
+   * Slightly changed how `keep_item_order=TRUE` is implemented, making
+   it markedly faster for larger lists.
+
+* `labelr_JamPolygon()`
+
+   * For multi-part polygons, it now uses the largest disconnected polygon
+   from the set, instead of using polygons in order. Apparently
+   `polylabelr::poi()` uses the first polygon provided, which is sometimes
+   comically small.
+   * The new method checks for multi-part polygons, then determines whether
+   there are multiple parent polygons. For polygons with holes,
+   the sub-part polygons (holes, or nested solid polygons within a hole)
+   need to be maintained with the appropriate parent. If there is only one
+   parent, use them all as-is, since `polylabelr::poi()` works properly
+   there. Otherwise, use the parent polygon with the largest net area.
+   * This update is an improvement for most Venn diagrams, but may not
+   be optimal for polygon purists, since the polygon with largest area
+   may not be the "most labelable" polygon. That said, `polylabelr::poi()`
+   ignores all but the first polygon anyway.
+
+* `label_fill_JamPolygon()`
+
+   * improved default condition for item buffer adjustment, it now only
+   uses the number of items to make the buffer more restrictive,
+   no longer uses the relative polygon area. (That adjustment was conflicting
+   with the item-shrinkage approach.)
+
+* `nudge_JamPolygon()`
+
+   * New argument `scale` so this function accomplishes all manipulations:
+   `nudge`, `rotate_degrees`, and `scale`.
+
 # venndir 0.0.43.900
 
 ## changes to existing functions

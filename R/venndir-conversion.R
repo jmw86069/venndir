@@ -76,6 +76,21 @@ counts2setlist <- function
 #' and not the items. In this case each overlap contains
 #' the vector of items also.
 #' 
+#' Since version 0.0.44.900, this function also accepts nested
+#' list format, as returned by `overlaplist()` for a `Venndir`
+#' object, when the `overlap_type` is something other than
+#' `"overlap"`.
+#' 
+#' Note that when converting data with `overlap_type` `"concordance"`
+#' and `"agreement"` it will be slightly lossy.
+#' * `overlap_type="concordance"` encodes mismatches as `"mixed"`,
+#' instead of the original sign for each set.
+#' * `overlap_type="agreement"` encodes as `"agreement"` and `"mixed"`
+#' instead of the original sign for each set.
+#' 
+#' Ideally, use `setlist()` to obtain to actual input setlist from
+#' the `Venndir` object.
+#' 
 #' @return `list` where the list names are the names of each set,
 #'    and values of each list element is a vector of items.
 #' 
@@ -110,13 +125,50 @@ counts2setlist <- function
 #'    item_buffer=-0.95,
 #'    proportional=TRUE)
 #' 
+#' # test interconversion: setlist to venndir to overlaplist to setlist
+#' setlist2 <- make_venn_test(100, 3, do_signed=TRUE);
+#' vo <- venndir(setlist2, do_plot=FALSE, overlap_type="each")
+#' ollist <- overlaplist(vo)
+#' setlist2b <- overlaplist2setlist(ollist)
+#' # all should be TRUE:
+#' sapply(names(setlist2b), function(i){
+#'    all(setlist2[[i]] == setlist2b[[i]][names(setlist2[[i]])])
+#' })
+#' 
 #' @export
 overlaplist2setlist <- function
 (x,
  sep="&",
  ...)
 {
-   combo_sets <- strsplit(names(x),
+   x_names <- names(x)
+   names(x_names) <- names(x);
+
+   ## check nested list
+   if (inherits(x[[1]], c("list", "AsIs"))) {
+      x_new <- jamba::rbindList(lapply(x_names, function(x_name){
+         x_sets <- unlist(strsplit(x_name, "&"))
+         x_signs <- jamba::nameVector(names(x[[x_name]]));
+         jamba::rbindList(lapply(x_signs, function(x_sign){
+            x_signvals1 <- strsplit(x_sign, " ")[[1]];
+            x_signvals <- rep(
+               x_signvals1[!x_signvals1 %in% "0"],
+               length.out=length(x_sets))
+            ivals <- x[[x_name]][[x_sign]];
+            jamba::rbindList(lapply(jamba::nameVector(seq_along(x_sets), x_sets), function(iset){
+               data.frame(set=x_sets[iset],
+                  name=ivals,
+                  value=rep(x_signvals[iset], length(ivals)))
+            }))
+         }))
+      }))
+      x_new_list <- lapply(split(x_new, x_new$set), function(idf){
+         jamba::nameVector(idf$value, idf$name)
+      })
+      return(x_new_list)
+   }
+   
+   combo_sets <- strsplit(x_names,
       fixed=TRUE,
       split=sep);
    combo_im <- list2im_opt(combo_sets,
@@ -182,6 +234,11 @@ overlaplist2setlist <- function
 #'    show_labels="cs",
 #'    proportional=TRUE,
 #'    label_style="fill_box")
+#' 
+#' # demonstrate interconversion
+#' setlist2 <- make_venn_test(100, 3, do_signed=TRUE)
+#' vo <- venndir(setlist2, do_plot=FALSE, overlap_type="each")
+#' venndir(signed_counts2setlist(signed_counts(vo)), overlap_type="each")
 #' 
 #' @export
 signed_counts2setlist <- function

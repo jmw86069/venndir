@@ -36,7 +36,6 @@
 #' @param segment_buffer `numeric` (default -0.1) indicating the depth
 #'    inside each Venn region a line segment will be drawn, relevant
 #'    only when `show_segments=TRUE`.
-#' @param fontfamily `character` font family
 #' @param group_labels `logical` (default TRUE) indicating whether to group
 #'    label components together, therefore drawing fill and border
 #'    around the group instead of each component. In most cases this
@@ -88,18 +87,14 @@ render_venndir <- function
  main=NULL,
  item_cex=NULL,
  item_cex_factor=1,
- plot_warning=TRUE,
+ plot_warning=FALSE,
  show_labels=NULL,
- show_items=c(NA,
-    "none",
-    "sign item",
-    "item",
-    "sign"),
- item_degrees=0,
+ show_items=NULL,
+ item_degrees=NULL,
  max_items=100,
  show_zero=TRUE,
- show_segments=TRUE,
- segment_buffer=-0.10,
+ show_segments=NULL,
+ segment_buffer=NULL,
  label_preset=c("none"),
  label_style=c("custom",
     "basic",
@@ -108,18 +103,16 @@ render_venndir <- function
     "shaded_box",
     "lite",
     "lite_box"),
- fontfamily="Arial",
+ fontfamily=NULL,
  inside_percent_threshold=0,
- item_style=c("default",
-    "text",
-    "gridtext"),
- item_buffer=-0.15,
+ item_style=NULL,
+ item_buffer=NULL,
  group_labels=TRUE,
  template=NULL,
  adjust_center=FALSE,
- draw_legend=TRUE,
+ draw_legend=NULL,
  legend_x="bottomright",
- legend_font_cex=1,
+ legend_font_cex=NULL,
  show_label=NA,
  display_counts=TRUE,
  do_newpage=TRUE,
@@ -167,7 +160,8 @@ render_venndir <- function
       }
    }
    
-   # validate other options
+   ## validate other options in metadata
+   # template
    if (length(template) > 0) {
       template <- match.arg(template,
          choices=c("tall", "wide"))
@@ -192,15 +186,82 @@ render_venndir <- function
          NULL;
       })
    }
+   # draw_legend
+   if (length(draw_legend) > 0) {
+      draw_legend <- head(as.logical(draw_legend), 1);
+   } else {
+      if ("draw_legend" %in% names(metadata)) {
+         if (length(metadata$draw_legend) == 0) {
+            draw_legend <- FALSE
+         } else {
+            draw_legend <- head(as.logical(metadata$draw_legend), 1);
+         }
+      } else {
+         draw_legend <- TRUE;
+      }
+   }
+   # legend_font_cex
+   if (length(legend_font_cex) > 0) {
+      metadata$legend_font_cex <- legend_font_cex;
+   } else {
+      legend_font_cex <- metadata$legend_font_cex;
+   }
+   # item_cex
+   if (length(item_cex) > 0) {
+      metadata$item_cex <- item_cex;
+   } else {
+      item_cex <- metadata$item_cex;
+   }
+   # item_style
+   if (length(item_style) > 0) {
+      metadata$item_style <- item_style;
+   } else {
+      item_style <- metadata$item_style;
+   }
+   # item_degrees
+   if (length(item_degrees) > 0) {
+      metadata$item_degrees <- item_degrees;
+   } else {
+      item_degrees <- metadata$item_degrees;
+   }
+   # item_buffer
+   if (length(item_buffer) == 0) {
+      if ("item_buffer" %in% names(metadata)) {
+         item_buffer <- metadata$item_buffer;
+      } else {
+         item_buffer <- -0.15;
+         metadata$item_buffer <- item_buffer;
+      }
+   } else {
+      metadata$item_buffer <- item_buffer;
+   }
    
-   # jamba::printDebug("render_venndir() label_df:");print(label_df);# debug
+   # fontfamily
+   if (length(fontfamily) == 0 || all(fontfamily %in% c(NA, ""))) {
+      if ("fontfamily" %in% names(metadata)) {
+         fontfamily <- metadata$fontfamily;
+      } else {
+         fontfamily <- "Arial";
+         metadata$fontfamily <- fontfamily;
+      }
+   } else {
+      metadata$fontfamily <- fontfamily;
+   }
+   # show_items
+   if (length(show_items) > 0) {
+      metadata$show_items <- show_items;
+   } else {
+      show_items <- metadata$show_items;
+   }
+   
    show_items <- head(setdiff(label_df$show_items, c(NA, "none")), 1);
    if (length(show_items) == 0) {
       show_items <- NA;
    }
    # jamba::printDebug("show_items: ", show_items);# debug
    # show_items <- head(show_items, 1);
-   item_style <- match.arg(item_style);
+   item_style <- match.arg(item_style,
+      choices=c("default", "text", "gridtext"));
 
    # validate other args
    if (length(expand_fraction) == 0) {
@@ -242,7 +303,17 @@ render_venndir <- function
       # }
    }
    
-   # Process labels   
+   # segment_buffer
+   if (length(segment_buffer) == 0) {
+      if ("segment_buffer" %in% names(metadata)) {
+         segment_buffer <- metadata$segment_buffer;
+      }
+      if (length(segment_buffer) == 0) {
+         segment_buffer <- -0.1;
+      }
+   }
+   # Process labels
+   warn_df <- data.frame(overlap_set="A", venn_counts=0)[0, , drop=FALSE];
    if (length(label_df) > 0) {
       ## Verify label_df contains required columns
       label_df_required <- c(
@@ -253,7 +324,10 @@ render_venndir <- function
          warning(paste0("label_df must contain colnames: ",
             jamba::cPaste(label_df_required)));
       }
-      
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Processing labels.");
+      }
       # auto-scale item_cex based upon number of items and polygon area
       if (length(item_cex) <= 1) {
          if (length(item_cex) == 1) {
@@ -264,6 +338,10 @@ render_venndir <- function
             item_cex <- 1;
          }
          # recipe to calculate item_cex
+         if (TRUE %in% verbose) {
+            jamba::printDebug("render_venndir): ",
+               "Defining item_cex.");
+         }
          item_cex <- tryCatch({
             poly_rows <- which(!is.na(venn_jp@polygons$venn_counts));
             so_counts <- venn_jp@polygons$venn_counts[poly_rows];
@@ -311,6 +389,7 @@ render_venndir <- function
       if (length(item_cex) == 0 || all(is.na(item_cex))) {
          item_cex <- 1;
       }
+      metadata$item_cex <- item_cex;
       # jamba::printDebug("item_cex: ", item_cex);# debug2
       
       ## Fill any missing optional colnames with defaults
@@ -339,6 +418,10 @@ render_venndir <- function
          r_unit="pt");
       label_df_add <- setdiff(names(label_df_defaults),
          colnames(label_df));
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Applying label_df defaults.");
+      }
       for (i in label_df_add) {
          label_df[[i]] <- rep(label_df_defaults[[i]],
             length.out=nrow(label_df));
@@ -406,47 +489,39 @@ render_venndir <- function
       # jamba::printDebug("label_df:");print(label_df);# debug
 
       # warn about hidden non-zero labels
-      warn_rows <- (
-         (label_df$x %in% NA |
-               label_df$y %in% NA) &
-            !label_df$venn_counts %in% c(NA, 0) &
-            label_df$type %in% "main");
-      #label_df_list <- split(label_df, label_df$overlap_set);
-      #warn_by_set <- lapply(label_df_list, function(idf){
-      #   (idf$show_label %in% TRUE | !idf$show_items %in% c(FALSE,NA))
-      #});
-      warning_label <- NULL;
-      if (any(warn_rows)) {
-         warn_labels <- paste0("'",
-            label_df$overlap_set[warn_rows],
-            "' (",
-            jamba::formatInt(label_df$venn_counts[warn_rows]),
-            ")");
-         warning_base <- paste0(
-            ifelse(sum(warn_rows) > 1, "These overlap counts", "This overlap count"),
-            " cannot be displayed: ");
-         warning_text <- paste0(warning_base,
-            jamba::cPaste(warn_labels, sep=", "));
-         warning(warning_text);
-         if (TRUE %in% plot_warning) {
-            warning_label <- paste0(warning_base,
-               "\n",
-               jamba::cPaste(warn_labels,
-                  sep="; "));
-         }
+      # - venn_counts are not zero; label_type is "main" AND EITHER:
+      #    - x,y are NA
+      #    OR
+      #    - overlap_set != ref_polygon;
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Detecting warnings.");
       }
-      
+      warning_list <- get_venndir_label_warning_list(label_df);
+      warning_text <- warning_list$warning_text;
+      warning_label <- warning_list$warning_label;
+      if (length(warning_text) > 0) {
+         #
+         # if (TRUE %in% plot_warning) {
+         #    warning(warning_text);
+         # }
+      }
+      metadata$warning_list <- warning_list;
+
       # prepare line segments for labels outside their respective polygons
       g_labels <- NULL;
       segment_df <- NULL;
       if (any(show_label %in% TRUE)) {
+         if (TRUE %in% verbose) {
+            jamba::printDebug("render_venndir): ",
+               "Showing labels.");
+         }
          # jamba::printDebug("show_label");
          # jamba::printDebug("table(label_df$overlap):");print(table(label_df$overlap));
          label_outside <- (label_df$overlap %in% "outside" | label_df$count %in% "outside");
          
          # Determine if any offset labels require line segment
          has_offset <- label_outside & (label_df$x_offset != 0 | label_df$y_offset != 0);
-         # jamba::printDebug("show offset data.frame summary:");print(data.frame(label_df.rownames=rownames(label_df), show_label=show_label, label_df.overlap=label_df$overlap, label_df.count=label_df$count, label_df.x=label_df$x, label_df.x_offset=label_df$x_offset, label_outside=label_outside, has_offset=has_offset));# debug
          #
          # Todo: Deal with has_offset, for now set to FALSE
          # jamba::printDebug("label_outside:");print(table(label_outside));
@@ -582,7 +657,10 @@ render_venndir <- function
    # print(jamba::middle(label_df, 5))
    # print(table(label_df$show_items))
    if (any(!label_df$show_items %in% c("none", NA))) {
-      # jamba::printDebug("show_items");
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Showing items.");
+      }
       items_dfs <- subset(label_df, !label_df$show_items %in% c("none", NA));
       uos <- unique(as.character(items_dfs$overlap_set));
       if (length(names(item_buffer)) > 0 &&
@@ -607,9 +685,12 @@ render_venndir <- function
          items_list <- items_df1$items;
          items_list <- items_list[lengths(items_list) > 0];
          if (length(items_list) > 0) {
+            ## 0.0.42.900 and previous
             # items <- unname(unlist(jamba::mixedSorts(items_list)));
-            # 0.0.43.900
-            items <- unname(unlist((items_list)));
+            ## 0.0.43.900
+            # items <- unname(unlist((items_list)));
+            ## 0.0.44.900 - expect items to be ordered factor or character
+            items <- unname(unlist(jamba::mixedSorts(items_list)));
          } else {
             return(NULL)
          }
@@ -628,7 +709,7 @@ render_venndir <- function
          # the same polygon
          #show_items_order <- strsplit(items_df1$show_items[1], "[- _.]")[[1]];
          use_show_items <- head(items_df1$item_style, 1);
-         # jamba::printDebug(+"use_show_items:");print(use_show_items);# debug
+         # jamba::printDebug("use_show_items:");print(use_show_items);# debug
          # show_items_order <- strsplit(show_items[1], "[- _.]")[[1]];
          show_items_order <- strsplit(use_show_items, "[- _.]")[[1]];
          for (dio in show_items_order) {
@@ -642,6 +723,8 @@ render_venndir <- function
          }
          # jamba::printDebug("unique(items_df1$item_cex):", unique(items_df1$item_cex));# debug
          # jamba::printDebug("item_cex:");print(item_cex);# debug
+         # jamba::printDebug("items_df1:");print(head(items_df1, 10));# debug
+         # jamba::printDebug("venn_jp[tail(vis, 1), ]:");print(venn_jp[tail(vis, 1), ]);# debug
          # items_df1$item_cex <- item_cex[as.character(items_df1$overlap_set)];
          labels <- gsub("^[ ]+|[ ]+$", "", labels);
          # jamba::printDebug("labels:");print(labels);# debug
@@ -671,6 +754,11 @@ render_venndir <- function
          # jamba::printDebug("lpf$items_df:");print(lpf$items_df);
          lpf;
       });
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Defined item label positions.");
+         print(jamba::sdim(itemlabels_list));# debug
+      }
       # combine item label into one data.frame
       itemlabels_df <- jamba::rbindList(lapply(
          jamba::rmNULL(itemlabels_list), function(i1){
@@ -890,6 +978,10 @@ render_venndir <- function
       }
       ## update all labels
       # jamba::printDebug("gdf:");print(gdf);# debug
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Defined gdf.");
+      }
    }
    
    #############################################
@@ -922,7 +1014,11 @@ render_venndir <- function
    jp_gTree <- attr(jp, "grob_tree");
    jp_grobList <- list()
    jp_grobList$jps <- jp_gTree;
-
+   if (TRUE %in% verbose) {
+      jamba::printDebug("render_venndir): ",
+         "Created jps grobs.");
+   }
+   
    ############################################
    # Plot title
    if (length(main) > 0 && any(nchar(main) > 0)) {
@@ -999,12 +1095,16 @@ render_venndir <- function
             gp=grid::gpar(
                col=itemlabels_df$color,
                fontsize=itemlabels_df$fontsize),
-            r=grid::unit(c(0, 0, 0, 0), "pt"),
+            r=grid::unit(0, "pt"),
             padding=grid::unit(c(0, 0, 0, 0), "pt"),
             margin=grid::unit(c(0, 0, 0, 0), "pt"),
             vp=jp_viewport,
             hjust=0.5,
             vjust=0.5);
+      }
+      if (TRUE %in% verbose) {
+         jamba::printDebug("render_venndir): ",
+            "Completed item label grobs.");
       }
       jp_grobList$item_labels <- text_grob;
       # grid::grid.draw(text_grob);
@@ -1049,9 +1149,10 @@ render_venndir <- function
          g_labels_list <- lapply(gdf_list, function(igdf){
             ## 0.0.39.900 - fix for inconsistent whitespace width
             ## - seems to occur only with ": " and on certain output devices
-            igdf$text <- gsub(": ", ":", igdf$text);
-            # jamba::printDebug("igdf$text");print(igdf$text);# debug
-            # jamba::printDebug("igdf");print(igdf);# debug
+            # igdf$text <- sub(": ", ":", igdf$text);
+            ## 0.0.44.900 - delimiter sign_count_delim is defined in venndir()
+            # sign_delim <- " ";
+            # igdf$text <- sub(": ", sign_delim, igdf$text);
             g_labels <- gridtext::richtext_grob(
                text=igdf$text,
                x=adjx(igdf$x),
@@ -1179,7 +1280,15 @@ render_venndir <- function
    }
    
    # segments
-   if (show_segments && length(segment_df) > 0) {
+   if (length(show_segments) == 0) {
+      if ("show_segments" %in% names(metadata)) {
+         show_segments <- metadata$show_segments;
+      }
+      if (length(show_segments) == 0) {
+         show_segments <- TRUE
+      }
+   }
+   if (TRUE %in% show_segments && length(segment_df) > 0) {
       # jamba::printDebug("segment_df:");print(segment_df);# debug
       segment_df1 <- subset(segment_df, point_order %in% 1);
       segment_df2 <- subset(segment_df, point_order %in% 2);
@@ -1223,6 +1332,22 @@ render_venndir <- function
       setlist=setlist,
       metadata=metadata)
 
+   # print warning when some overlap counts are hidden
+   # todo: consider displaying message on the plot
+   if (length(metadata(vo_new)$warning_list$warning_label) > 0) {
+      # jamba::printDebug("warning_label exists");
+      nhid <- nrow(metadata(vo_new)$warning_list$warning_df);
+      if (TRUE %in% plot_warning) {
+         if (nhid > 1) {
+            jamba::printDebug("Warning: ",
+               nhid, " overlap counts are hidden.");
+         } else {
+            jamba::printDebug("Warning: ",
+               "1 overlap count is hidden.");
+         }
+      }
+   }
+   
    # venndir legender
    if (TRUE %in% draw_legend) {
       ## Todo: Consider returning grobs from this function also
@@ -1230,6 +1355,7 @@ render_venndir <- function
          venndir_output=vo_new,
          x=legend_x,
          font_cex=legend_font_cex,
+         fontfamily=fontfamily,
          draw_legend=FALSE,
          vp=jp_viewport,
          ...)
@@ -1253,12 +1379,6 @@ render_venndir <- function
       grid::grid.draw(venndir_gtree);
    }
 
-   ## Todo: Consider displaying message on the plot.
-   ## Perhaps the number of hidden overlap labels?
-   # warning in case not all overlaps can be displayed
-   if (length(warning_label) > 0) {
-      jamba::printDebug("warning_label exists");
-   }
    # return Venndir object
    return(invisible(vo_new));
 }

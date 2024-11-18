@@ -135,7 +135,7 @@ venndir_label_style <- function
  items=c("none",
     "inside"),
  percent_delim="<br>",
- show_items=c("none"),
+ show_items=NULL,
  max_items=3000,
  inside_percent_threshold=0,
  label_types=c("main", "signed"),
@@ -154,6 +154,14 @@ venndir_label_style <- function
       } else {
          show_labels <- "";
       }
+   }
+   if (length(show_items) > 0) {
+      metadata(vo)$show_items <- show_items;
+   } else if (length(metadata(vo)$show_items) > 0) {
+      show_items <- metadata(vo)$show_items;
+   } else {
+      show_items <- "none";
+      metadata(vo)$show_items <- show_items;
    }
    use_nocpsi <- TRUE;
    if (use_nocpsi) {

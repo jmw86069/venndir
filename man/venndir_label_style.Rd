@@ -20,7 +20,7 @@ venndir_label_style(
   signed = c("inside", "outside", "ifneeded", "detect", "none"),
   items = c("none", "inside"),
   percent_delim = "<br>",
-  show_items = c("none"),
+  show_items = NULL,
   max_items = 3000,
   inside_percent_threshold = 0,
   label_types = c("main", "signed"),

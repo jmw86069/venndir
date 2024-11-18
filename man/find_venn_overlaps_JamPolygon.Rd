@@ -89,6 +89,19 @@ xo@polygons$outerborder <- jamba::makeColorDarker(darkFactor=1.2,
 xo@polygons$outerborder.lwd <- 4;
 plot(xo);
 
+testlist <- list(set_A=LETTERS, set_B=LETTERS[1:10], set_C=LETTERS[7:11])
+so <- subset(signed_overlaps(testlist), count > 0)
+test_counts <- setNames(so$count, so$sets)
+x <- eulerr::euler(test_counts)
+jp1 <- eulerr_to_JamPolygon(x)
+jp1@polygons$fill <- polygon_colors;
+plot(jp1)
+xo <- find_venn_overlaps_JamPolygon(jp=jp1, venn_counts=test_counts, verbose=TRUE)
+xo@polygons$outerborder <- jamba::makeColorDarker(darkFactor=1.2,
+   xo@polygons$venn_color)
+xo@polygons$outerborder.lwd <- 4;
+plot(xo);
+
 }
 \seealso{
 Other JamPolygon: 

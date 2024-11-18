@@ -21,6 +21,21 @@ venndir_to_df(
 \arguments{
 \item{venndir_out}{\code{list} output from \code{venndir()}}
 
+\item{df_format}{\code{character} string, default "hits" with output format:
+\itemize{
+\item \code{"hits"} - returns a hit matrix, with the first column containing
+item labels, subsequent columns indicate "hits" with 0 or +1 or -1.
+\item \code{"items"} - returns one column for each overlap, containing
+item labels in each corresponding column. This output does not
+include the sign.
+\item \code{"wide"} - returns one row for each overlap_set/sign combination,
+and a column \code{"items"} which is a \code{list} of \code{character} vectors
+with the item labels. Rows may be split for "word wrapping"
+when there are too many items. This output is intended for
+\code{kable()} formatting with grouped rows, for example with argument
+\code{return_type="kable"}.
+}}
+
 \item{return_type}{\code{character} string indicating how to format output:
 \itemize{
 \item \code{"kable"}: returns an object \code{"knitr_kable"} suitable for printing

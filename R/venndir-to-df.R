@@ -14,6 +14,18 @@
 #'    argument `return_type`.
 #' 
 #' @param venndir_out `list` output from `venndir()`
+#' @param df_format `character` string, default "hits" with output format:
+#'    * `"hits"` - returns a hit matrix, with the first column containing
+#'    item labels, subsequent columns indicate "hits" with 0 or +1 or -1.
+#'    * `"items"` - returns one column for each overlap, containing
+#'    item labels in each corresponding column. This output does not
+#'    include the sign.
+#'    * `"wide"` - returns one row for each overlap_set/sign combination,
+#'    and a column `"items"` which is a `list` of `character` vectors
+#'    with the item labels. Rows may be split for "word wrapping"
+#'    when there are too many items. This output is intended for
+#'    `kable()` formatting with grouped rows, for example with argument
+#'    `return_type="kable"`.
 #' @param return_type `character` string indicating how to format output:
 #'    * `"kable"`: returns an object `"knitr_kable"` suitable for printing
 #'    as HTML or LaTeX. This output is recommended for RMarkdown documents.

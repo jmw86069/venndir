@@ -14,6 +14,7 @@ signed_overlaps(
   include_blanks = TRUE,
   keep_item_order = FALSE,
   verbose = FALSE,
+  warn = FALSE,
   ...
 )
 }
@@ -69,6 +70,9 @@ the order they appear in the vector.
 }}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{warn}{\code{logical} default FALSE, whether to print warnings during
+import in the event that input data is coerced to another type.}
 
 \item{...}{additional arguments are passed to \code{list2imsigned()}.}
 }
@@ -157,6 +161,11 @@ converted to \code{sign()} before calling \code{signed_overlaps()}, for example:
 }
 \examples{
 setlist <- make_venn_test(100, 2, do_signed=FALSE);
+setlist <- make_venn_test(1e6, 3, do_signed=FALSE);
+
+# so is a data.frame
+so <- signed_overlaps(setlist, verbose=TRUE);
+so
 
 # detect overlap_type
 attr(signed_overlaps(setlist, "detect"), "overlap_type")

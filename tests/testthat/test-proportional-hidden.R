@@ -27,6 +27,13 @@ test_that("proportional_hidden", {
    testthat::expect_equal(
       vn@label_df[testnames, "count"],
       exp_count)
+   
+   warning_df <- metadata(vn)$warning_list$warning_df;
+   exp_warning_df <- data.frame(overlap_set="A&B",
+      venn_counts=1)
+   testthat::expect_equal(
+      warning_df,
+      exp_warning_df)
 
    testthat::expect_equal(
       vn@label_df[testnames, "venn_counts"],

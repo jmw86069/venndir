@@ -117,6 +117,19 @@ eulerr_to_JamPolygon <- function
 #' xo@polygons$outerborder.lwd <- 4;
 #' plot(xo);
 #' 
+#' testlist <- list(set_A=LETTERS, set_B=LETTERS[1:10], set_C=LETTERS[7:11])
+#' so <- subset(signed_overlaps(testlist), count > 0)
+#' test_counts <- setNames(so$count, so$sets)
+#' x <- eulerr::euler(test_counts)
+#' jp1 <- eulerr_to_JamPolygon(x)
+#' jp1@polygons$fill <- polygon_colors;
+#' plot(jp1)
+#' xo <- find_venn_overlaps_JamPolygon(jp=jp1, venn_counts=test_counts, verbose=TRUE)
+#' xo@polygons$outerborder <- jamba::makeColorDarker(darkFactor=1.2,
+#'    xo@polygons$venn_color)
+#' xo@polygons$outerborder.lwd <- 4;
+#' plot(xo);
+#' 
 #' @export
 # find_venn_polygon_list_overlaps <- function
 find_venn_overlaps_JamPolygon <- function
@@ -325,7 +338,34 @@ find_venn_overlaps_JamPolygon <- function
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
+#' df3 <- data.frame(name=c("polygon1", "polygon2"),
+#'    label=c("polygon1", "polygon2"),
+#'    x=I(list(
+#'       list(c(1, 6, 6, 1),
+#'          c(2, 5, 5, 2),
+#'          c(3, 4, 4, 3)),
+#'       list(
+#'          c(12, 15, 15, 12) - 7.5,
+#'          c(13, 14, 14, 13) - 7.5)
+#'    )),
+#'    y=I(list(
+#'       list(c(1, 1, 6, 6),
+#'          c(2, 2, 5, 5),
+#'          c(3, 3, 4, 4)),
+#'       list(
+#'          c(2, 2, 5, 5),
+#'          c(3, 3, 4, 4))
+#'    )),
+#'    fill=jamba::alpha2col(c("gold", "firebrick"), alpha=0.7))
+#' jp3 <- new("JamPolygon", polygons=df3);
+#' plot(jp3);
 #' 
+#' jp3i <- intersect_JamPolygon(jp3)
+#' jp3i@polygons$fill <- "red"
+#' jp3i@polygons$border <- "red3";
+#' jp3i@polygons$border.lwd <- 3;
+#' jp3c <- rbind2(jp3, jp3i)
+#' plot(jp3c)
 #' @export
 intersect_JamPolygon <- function
 (jp,
@@ -574,8 +614,24 @@ minus_JamPolygon <- function
       Ay <- list(Ay);
    }
    A <- lapply(seq_along(Ax), function(i){
-      list(x=Ax[[i]], y=Ay[[i]])
+      usex <- Ax[[i]];
+      usey <- Ay[[i]];
+      keepxy <- (!is.na(usex) & !is.na(usey))
+      list(x=usex[keepxy], y=usey[keepxy])
    })
+   
+   # handle empty input polygon
+   if (0 %in% length(unlist(A))) {
+      jp <- jp[1, ];
+      newx <- list(NULL);
+      newy <- list(NULL);
+      jp@polygons$x <- I(newx);
+      jp@polygons$y <- I(newy);
+      if (length(new_name) == 1) {
+         jp@polygons$name <- new_name;
+      }
+      return(jp)
+   }
    
    pseq <- seq(from=2, to=nrow(jp@polygons));
    for (i in pseq) {
@@ -596,20 +652,26 @@ minus_JamPolygon <- function
          B=B,
          closed=closed,
          op="minus")
-      if (0 %in% head(lengths(A), 1)) {
+      if (length(unlist(A)) == 0 || 0 %in% head(lengths(A), 1)) {
          break;
       }
    }
+   
    jp <- jp[1, ];
-   newx <- lapply(A, function(i){i$x});
-   newy <- lapply(A, function(i){i$y});
-   if (length(newx) == 0) {
+   if (length(unlist(A)) == 0 || 0 %in% head(lengths(A), 1)) {
       newx <- list(NULL);
       newy <- list(NULL);
-   } else if (length(newx) > 1) {
-      # handle multipart polygons
-      newx <- list(newx);
-      newy <- list(newy);
+   } else {
+      newx <- lapply(A, function(i){i$x});
+      newy <- lapply(A, function(i){i$y});
+      if (length(newx) == 0) {
+         newx <- list(NULL);
+         newy <- list(NULL);
+      } else if (length(newx) > 1) {
+         # handle multipart polygons
+         newx <- list(newx);
+         newy <- list(newy);
+      }
    }
    jp@polygons$x <- I(newx);
    jp@polygons$y <- I(newy);
@@ -797,8 +859,28 @@ polygon_ellipses <- function
 #' 
 #' @param jp `JamPolygon` object
 #' @param nudge `list` whose names match `names(jp)`, containing `numeric`
-#'    vector with names `"x"` and `"y"`. For example:
-#'    `nudge=list(polyname1=c(x=1, y=0))`
+#'    vector with coordinates x and y. Alternatively, an atomic `numeric`
+#'    vector with length=2, which will be applied to the x,y coordinates
+#'    for all polygons in `jp`.
+#'    An example of list input:
+#'    `nudge=list(polyname1=c(1, 0))`
+#' @param rotate_degrees `numeric` optional rotation in degrees,
+#'    named using `names(jp)`.
+#'    When a single unnamed value is provided, it is applied to all polygons
+#'    in `jp`.
+#'    When a `numeric` vector is provided with `length(jp)`, it is applied
+#'    in order to each polygon in `jp`.
+#'    Note: 90 degrees will rotate clockwise
+#'    (top the right, bottom to the left) by 1/4 turn.
+#' @param center `numeric` coordinates with optional center position.
+#'    Default `NULL` will use the center of the bounding box of `jp`.
+#'    All parts of the polygon, and all polygons, use the same `center`.
+#' @param scale `numeric` optional scalar to enlarge or shrink the polygon,
+#'    named using `names(jp)`. Alternatively, if a single unnamed value
+#'    is provided, it is applied to all polygons in `jp`.
+#'    If a `numeric` vector is provided with `length(jp)`, it is applied
+#'    in order to each polygon in `jp`.
+#'    The scale is applied relative to the `center` as provided or calculated.
 #' @param ... additional arguments are ignored
 #' 
 #' @examples
@@ -817,10 +899,24 @@ polygon_ellipses <- function
 #' DEjp_nudged <- nudge_JamPolygon(DEjp, nudge=nudge)
 #' plot(DEjp_nudged)
 #' 
-#' plot(rbind2(DEjp, DEjp_nudged),
-#'    fill=c("#FFD70055", "#B2222255", "gold", "firebrick"),
-#'    label=c("D_old", "E_old", "D_new", "E_new"),
-#'    border.lty=c(2, 2, 1, 1))
+#' # plot the difference
+#' plot_jpdiff <- function(a, b) {
+#'   fillb <- jamba::alpha2col(alpha=0.9, b@polygons$fill);
+#'   filla <- jamba::alpha2col(alpha=0.3, fillb)
+#'   plot(rbind2(a, b),
+#'     fill=c(filla, fillb),
+#'     label=c(paste(a@polygons$name, "old"),
+#'       paste(b@polygons$name, "new")),
+#'     border.lty=rep(c(2, 1), c(length(a), length(b))))
+#' }
+#' plot_jpdiff(DEjp, DEjp_nudged)
+#' 
+#' # rotate, nudge, and scale
+#' DEjp_rotated <- nudge_JamPolygon(DEjp,
+#'    rotate_degrees=c(E=45),
+#'    scale=c(E=0.7),
+#'    nudge=list(E=c(5, 0), D=c(-1, -4)))
+#' plot_jpdiff(DEjp, DEjp_rotated)
 #' 
 #' @export
 nudge_JamPolygon <- function
@@ -828,6 +924,7 @@ nudge_JamPolygon <- function
  nudge=NULL,
  rotate_degrees=0,
  center=NULL,
+ scale=c(1, 1),
  verbose=FALSE,
  ...)
 {
@@ -835,23 +932,97 @@ nudge_JamPolygon <- function
    if (length(jp) == 0) {
       return(jp)
    }
+   # validate rotate_degrees
    if (length(rotate_degrees) == 0) {
       rotate_degrees <- 0;
    }
-   rotate_degrees <- head(rotate_degrees, 1) %% 360;
+   rotate_degrees <- rotate_degrees %% 360;
+   if (length(names(rotate_degrees)) > 0) {
+      if (!all(names(rotate_degrees) %in% names(jp))) {
+         stop("names(rotate_degrees) does not match names(jp)")
+      }
+      use_rotate_degrees <- rep(0, length(jp));
+      names(use_rotate_degrees) <- names(jp);
+      use_rotate_degrees[names(rotate_degrees)] <- rotate_degrees;
+      rotate_degrees <- use_rotate_degrees;
+   } else {
+      if (length(unique(rotate_degrees)) == 1) {
+         rotate_degrees <- rep(rotate_degrees, length.out=length(jp))
+         names(rotate_degrees) <- names(jp);
+      } else if (length(rotate_degrees) == length(jp)) {
+         names(rotate_degrees) <- names(jp);
+      } else {
+         stop("length(rotate_degrees) must be length=1 or equal length(jp)")
+      }
+   }
+
+   # validate scale
+   if (length(scale) == 0) {
+      scale <- 1;
+   }
+   if (any(scale <= 0)) {
+      stop("scale must be greater than 0.")
+   }
+   if (length(names(scale)) > 0) {
+      if (!all(names(scale) %in% names(jp))) {
+         stop("names(scale) does not match names(jp)")
+      }
+      use_scale <- rep(1, length(jp));
+      names(use_scale) <- names(jp);
+      use_scale[names(scale)] <- scale;
+      scale <- use_scale;
+   } else {
+      if (length(unique(scale)) == 1) {
+         scale <- rep(scale, length.out=length(jp))
+         names(scale) <- names(jp);
+      } else if (length(scale) == length(jp)) {
+         names(scale) <- names(jp);
+      } else {
+         stop("length(scale) must be length=1 or equal length(jp)")
+      }
+   }
    
-   if (length(nudge) == 0 && (0 %in% rotate_degrees)) {
+   # exit early if no values need to be changed
+   if ((length(nudge) == 0 || all(unlist(nudge) %in% 0)) &&
+      all(rotate_degrees %in% 0) &&
+      all(scale %in% 1)) {
+      # return jp unchanged
       return(jp)
+   }
+   # validate nudge
+   if (length(jp) == 1) {
+      if (is.atomic(nudge) && length(nudge) == 2) {
+         nudge <- rep(list(nudge), length(jp));
+         names(nudge) <- names(jp);
+      }
+      if (is.list(nudge) && length(names(nudge)) == 0) {
+         if (length(nudge) == 1) {
+            nudge <- rep(nudge, length(jp));
+            names(nudge) <- names(jp);
+         } else if (length(nudge) == length(jp)) {
+            names(nudge) <- names(jp)
+         } else {
+            stop("length(nudge) must be length=1 or equal length(jp)")
+         }
+      }
+   }
+   
+   ## Define center if necessary
+   if (!length(center) == 2) {
+      use_bbox <- bbox_JamPolygon(jp);
+      center <- c(x=mean(use_bbox[1, 1:2]),
+         y=mean(use_bbox[2, 1:2]));
    }
    
    ## rotate polygons
-   if (rotate_degrees != 0) {
-      if (!length(center) == 2) {
-         use_bbox <- bbox_JamPolygon(jp);
-         center <- c(x=mean(use_bbox[1, 1:2]),
-            y=mean(use_bbox[2, 1:2]));
-      }
-      for (irow in seq_len(nrow(jp@polygons))) {
+   if (any(rotate_degrees != 0) || any(scale != 1)) {
+      for (irow in seq_len(length(jp))) {
+         jpname <- names(jp)[irow];
+         use_rotate <- rotate_degrees[jpname];
+         use_scale <- scale[jpname];
+         if (use_rotate %in% 0 && use_scale %in% 1) {
+            next;
+         }
          use_x <- jp@polygons$x[[irow]];
          use_y <- jp@polygons$y[[irow]];
          if (!is.list(use_x)) {
@@ -873,8 +1044,8 @@ nudge_JamPolygon <- function
          }
          new_xy <- rescale_coordinates(
             x=cbind(x=use_x_v, y=use_y_v),
-            rotate_degrees=rotate_degrees,
-            scale=c(1, 1),
+            rotate_degrees=use_rotate,
+            scale=c(1, 1) * use_scale,
             center=center)
          new_x_v <- new_xy[, 1];
          new_y_v <- new_xy[, 2];
@@ -979,19 +1150,42 @@ nudge_JamPolygon <- function
 #' @returns `matrix` with columns `"x"`, `"y"`, `"dist"`
 #' 
 #' @param jp `JamPolygon`
-#' @param precision `numeric` passed to `polylabelr::poi()`
-#' @param add_to_jp `logical` indicating whether to add `"label_x"`,
-#'    `"label_y"` into the `jp@polygons` `data.frame`.
+#' @param precision `numeric` passed to `polylabelr::poi()`, default 1.
+#' @param add_to_jp `logical` default FALSE, indicating whether to
+#'    add `"label_x"`,`"label_y"` into `jp@polygons` for persistence.
+#' @param subset_multipart `logical` default TRUE, whether to subset
+#'    multipart polygons to label the largest area.
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
-#' 
+#' df3 <- data.frame(name=c("polygon1", "polygon2"),
+#' label=c("polygon A", "polygon B"),
+#' x=I(list(
+#'    list(c(1, 6, 6, 1),
+#'       c(2, 5, 5, 2),
+#'       c(3, 4, 4, 3)),
+#'    list(
+#'       c(12, 15, 15, 12) - 3,
+#'       c(13, 14, 14, 13) - 3)
+#' )),
+#' y=I(list(
+#'    list(c(1, 1, 6, 6),
+#'       c(2, 2, 5, 5),
+#'       c(3, 3, 4, 4)),
+#'    list(
+#'       c(2, 2, 5, 5),
+#'       c(3, 3, 4, 4))
+#' )),
+#' fill=jamba::alpha2col(c("gold", "firebrick"), alpha=0.7))
+#' jp3 <- new("JamPolygon", polygons=df3);
+#' plot(jp3);
+#'
 #' @export
 labelr_JamPolygon <- function
 (jp,
  precision=1,
  add_to_jp=FALSE,
- # add_labels=FALSE,
+ subset_multipart=TRUE,
  ...)
 {
    # validate input
@@ -1000,12 +1194,37 @@ labelr_JamPolygon <- function
    # iterate each polygon
    row_seq <- seq_len(nrow(jp@polygons));
    label_xy_list <- lapply(row_seq, function(irow){
+      # extract coordinates
       ix <- jp@polygons$x[[irow]];
       iy <- jp@polygons$y[[irow]];
       if (!is.list(ix)) {
          ix <- list(ix);
          iy <- list(iy);
       }
+      # check multi-part polygons
+      iarea <- area_JamPolygon(jp[irow, ], return_list=TRUE)[[1]];
+      if (length(iarea) > 1) {
+         iori <- add_orientation_JamPolygon(jp[irow, ], include_parent=TRUE)
+         ioridf <- data.frame(
+            num=seq_along(iarea),
+            area=iarea,
+            orientation=unlist(iori@polygons$orientation),
+            polygon_parent=unlist(iori@polygons$polygon_parent))
+         # for multi-part polygons, use the parent polygon with largest
+         # net area, accounting for holes
+         if (TRUE %in% subset_multipart &&
+               length(unique(ioridf$polygon_parent)) > 1) {
+            iareas <- sapply(split(ioridf$area, ioridf$polygon_parent), sum)
+            ioridf$parent_area <- jamba::rmNA(naValue=0,
+               iareas[as.character(ioridf$polygon_parent)]);
+            # jamba::printDebug("ioridf:");print(ioridf);# debug
+            keeporidf <- subset(ioridf, parent_area %in% max(iareas))
+            keeppolys <- keeporidf$num;
+            ix <- ix[keeppolys]
+            iy <- iy[keeppolys]
+         }
+      }
+      
       plx <- head(unlist(lapply(seq_along(ix), function(j){
          c(ix[[j]], NA)
       })), -1)

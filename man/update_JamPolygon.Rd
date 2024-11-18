@@ -7,6 +7,8 @@
 update_JamPolygon(jp, ...)
 }
 \arguments{
+\item{jp}{\code{JamPolygon}}
+
 \item{...}{additional arguments are ignored.}
 }
 \description{

@@ -56,6 +56,11 @@ vo <- venndir(setlist,
    proportional=TRUE,
    label_style="fill_box")
 
+# demonstrate interconversion
+setlist2 <- make_venn_test(100, 3, do_signed=TRUE)
+vo <- venndir(setlist2, do_plot=FALSE, overlap_type="each")
+venndir(signed_counts2setlist(signed_counts(vo)), overlap_type="each")
+
 }
 \seealso{
 Other venndir conversion: 

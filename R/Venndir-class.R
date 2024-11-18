@@ -146,7 +146,7 @@ setClass("Venndir",
 #' @returns `Venndir` object, invisibly.
 #' 
 #' @docType methods
-#' @rdname `Venndir-methods`
+#' @rdname Venndir-methods
 #' 
 #' @export
 setMethod("plot",
@@ -161,6 +161,12 @@ setMethod("plot",
 # Todo:
 # * print(), summary() functions
 
+#' Return setlist length for Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
 setMethod("length",
    signature=c(x="Venndir"),
    definition=function(x) {
@@ -174,9 +180,9 @@ setGeneric("setlist", function(x) standardGeneric("setlist"))
 
 #' Extract setlist from a Venndir object
 #' 
-#' @param x `Venndir` object
 #' @docType methods
-#' @rdname `Venndir-method`
+#' @rdname Venndir-methods
+#' 
 #' @export
 setMethod("setlist",
    signature(x="Venndir"),
@@ -184,9 +190,249 @@ setMethod("setlist",
       x@setlist
    })
 
+#' Extract setlist names from a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
 setMethod("names",
    signature=c(x="Venndir"),
    definition=function(x) {
       names(x@setlist);
    }
 )
+
+## show a summary of a Venndir object
+#' Show summary of a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("show", "Venndir",
+   # signature=c(x="Venndir"),
+   function(object) {
+      # number of sets, polygons (set, overlap)
+      sets_num <- length(object@setlist);
+      sets_names <- names(object@setlist);
+      
+      # number of polygons
+      ct_polys <- table(object@jps@polygons$type)
+      ct_polys_set <- as.integer(ct_polys["set"])
+      ct_polys_ol <- as.integer(ct_polys["overlap"])
+      
+      # labels
+      ldf <- subset(object@jps@polygons, type %in% "set");
+      setdf <- ldf[, c("venn_name", "venn_label",
+         "legend_label", "venn_color"), drop=FALSE]
+      colnames(setdf)[1:4] <- c("set_name",
+         "setlist_labels", "legend_labels", "set_colors")
+      setdf$size <- lengths(object@setlist[setdf$set_name])
+      rownames(setdf) <- match(setdf$set_name, names(object@setlist))
+
+      # overlap_type
+      # overlap_type needs to be inferred?? Probably a mistake not to include.
+      ol_type <- NULL;
+      # ol_type <- intersect(c("each", "overlap", "concordance", "agreement"),
+      #    colnames(object@label_df))
+      
+      ## metadata
+      main <- NULL;
+      if ("metadata" %in% slotNames(object) && length(object@metadata) > 0) {
+         main <- object@metadata$main;
+         if ("overlap_type" %in% names(object@metadata)) {
+            ol_type <- object@metadata$overlap_type
+         }
+      }
+      
+      summary_v <- c(
+         paste0("class: Venndir"),
+         paste0("slots: ", paste(slotNames(object), collapse=", ")),
+         paste0("number of sets: ", sets_num),
+         paste0("number of polygons: ", #sum(ct_polys),
+            "", ct_polys_set, " sets, ", ct_polys_ol, " overlaps")
+         );
+      if (length(ol_type) > 0) {
+         summary_v <- c(summary_v,
+            paste0("overlap_type: '", ol_type, "'"))
+      }
+      if (length(main) > 0) {
+         summary_v <- c(summary_v,
+            paste0("Main title: '", main, "'"))
+      }
+      summary_v <- c(summary_v, "");
+      summary_text <- jamba::cPaste(summary_v, sep="\n")
+      cat(summary_text, sep="");
+      print(setdf);
+      # jamba::sdim(object)[, c("enrichIM", "geneIM", "memIM"), drop=FALSE]
+   }
+)
+
+if (!isGeneric("metadata")) {
+   setGeneric("metadata", function(x, ...) standardGeneric("metadata"))
+}
+#' Return metadata for a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("metadata",
+   signature=c(x="Venndir"),
+   function(x) {
+      if (is.null(x@metadata) || is.character(x@metadata)) {
+         list(metadata = x@metadata)
+      } else {
+         x@metadata
+      }
+   })
+
+if (!isGeneric("metadata<-")) {
+   setGeneric("metadata<-",
+      function(x, ..., value) standardGeneric("metadata<-"))
+}
+#' Replace metadata for a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setReplaceMethod("metadata", "Venndir",
+   function(x, value) {
+      if (!is.list(value))
+         stop("replacement 'metadata' value must be a list")
+      if (!length(value))
+         names(value) <- NULL # instead of character()
+      x@metadata <- value
+      x
+   })
+
+
+setGeneric("overlaplist", function(x) standardGeneric("overlaplist"))
+
+#' Extract overlap list from a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("overlaplist",
+   signature(x="Venndir"),
+   function(x) {
+      if (!"items" %in% colnames(x@label_df)) {
+         stop("'items' are not present in this Venndir object.")
+      }
+      overlaplist <- lapply(x@label_df$items, c);
+      names(overlaplist) <- x@label_df$overlap_sign;
+      keep_ol <- (lengths(overlaplist) > 0)
+      overlaplist <- overlaplist[keep_ol];
+      ol_split <- factor(x@label_df$overlap_set[keep_ol],
+         levels=unique(x@label_df$overlap_set[keep_ol]));
+      if (any("factor" %in% jamba::sclass(overlaplist))) {
+         overlaplist <- lapply(overlaplist, function(i){
+            if (inherits(i, "factor")) {
+               if (length(i) == 1) {
+                  as.character(i)
+               } else {
+                  factor(i)
+               }
+            } else {
+               i
+            }
+         })
+      }
+      overlaplist_list <- split(overlaplist, ol_split)
+      if (any(lengths(overlaplist_list) > 1)) {
+         overlaplist_list <- lapply(overlaplist_list, function(i){
+            names(i) <- sub("^.+[|]", "", names(i));
+            i
+         })
+         return(overlaplist_list)
+      }
+      names(overlaplist) <- gsub("[|].+", "", names(overlaplist));
+      overlaplist
+   })
+
+setGeneric("overlapdf", function(x) standardGeneric("overlapdf"))
+
+#' Extract overlaps as a data.frame from a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("overlapdf",
+   signature(x="Venndir"),
+   function(x) {
+      if (!"items" %in% colnames(x@label_df)) {
+         stop("'items' are not present in this Venndir object.")
+      }
+      ollist <- overlaplist(x)
+      if (inherits(ollist[[1]], "list")) {
+         odf <- data.frame(check.names=FALSE,
+            overlap=rep(names(ollist), lengths(ollist)),
+            sign=unlist(lapply(unname(ollist), names)),
+            items=I(unlist(ollist, recursive=FALSE)))
+         odf$sign <- jamba::cPaste(sep=" ",
+            lapply(strsplit(odf$sign, " "), function(i){
+               i[!i %in% "0"]
+            }))
+      } else {
+         odf <- data.frame(check.names=FALSE,
+            overlap=names(ollist),
+            items=I(ollist))
+      }
+      odf$overlap <- factor(odf$overlap,
+         levels=unique(odf$overlap));
+      odf$count <- lengths(odf$items);
+      odf
+   })
+
+# signed_counts
+setGeneric("signed_counts", function(x) standardGeneric("signed_counts"))
+
+#' Extract signed count list from a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("signed_counts",
+   signature(x="Venndir"),
+   function(x) {
+      scdf <- x@label_df[, c("overlap_sign", "venn_counts",
+         "text", "type", "overlap_set")];
+      scdf$sign <- sub("^.+[|]", "", scdf$overlap_sign);
+      scdf$sign <- jamba::cPaste(sep="_",
+         lapply(strsplit(scdf$sign, " "), function(i){
+            i[!i %in% "0"]
+         }))
+      scdf <- subset(scdf, venn_counts > 0);
+      sclist <- split(scdf,
+         scdf$overlap_set)
+      lapply(sclist, function(idf){
+         if ("signed" %in% idf$type) {
+            idf <- subset(idf, type %in% "signed")
+         }
+         setNames(idf$venn_counts, idf$sign)
+      })
+   })
+
+
+# im
+setGeneric("im", function(x) standardGeneric("im"))
+
+#' Extract incidence matrix (im) from a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("im",
+   signature(x="Venndir"),
+   function(x) {
+      sl <- setlist(x);
+      slim <- list2im_value(sl);
+      slim
+   })

@@ -1733,6 +1733,8 @@ bbox_JamPolygon <- function
 #'    "\narea=", area_JamPolygon(jp3));
 #' plot(jp3)
 #' 
+#' area_JamPolygon(jp3, return_list=TRUE)
+#' 
 #' @export
 area_JamPolygon <- function
 (jp,
@@ -2003,7 +2005,7 @@ split_JamPolygon <- function
 #' 
 #' @family JamPolygon
 #'
-#' @params jp `JamPolygon`
+#' @param jp `JamPolygon`
 #' @param ... additional arguments are ignored.
 #' 
 #' @export
@@ -2264,7 +2266,7 @@ sample_JamPolygon <- function
 
    # define n points inside the polygon
    n_ratio <- head(n_ratio, 1);
-   if (length(n_ratio) == 0 || any(n_ratio) < 1) {
+   if (length(n_ratio) == 0 || any(n_ratio < 1)) {
       n_ratio <- 1;
    }
    if (!TRUE %in% spread) {
@@ -2498,3 +2500,26 @@ buffer_JamPolygon <- function
       k=1);
    return(new_jp);
 }
+
+
+setReplaceMethod("[", "JamPolygon",
+   function(x, i, j, ..., value) {
+      if (missing(i))
+         stop("subscript i is missing")
+      if (!is.character(i) && !is.numeric(i))
+         stop("invalid subscript type")
+      if (length(i) < 1L)
+         stop("attempt to select less than one element")
+      if (!inherits(value, c("JamPolygon", "data.frame"))) {
+         stop("replacement must be a JamPolygon or data.frame")
+      }
+      if (!length(value)) {
+         names(value) <- NULL # instead of character()
+      }
+      if (inherits(value, "data.frame")) {
+         x@polygons[i, ] <- value
+      } else {
+         x@polygons[i, ] <- value@polygons
+      }
+      x
+   })

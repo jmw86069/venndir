@@ -21,6 +21,36 @@ otherwise the first existing value in \code{names(jp)} is kept.}
 \description{
 Intersect one or more JamPolygon objects
 }
+\examples{
+df3 <- data.frame(name=c("polygon1", "polygon2"),
+   label=c("polygon1", "polygon2"),
+   x=I(list(
+      list(c(1, 6, 6, 1),
+         c(2, 5, 5, 2),
+         c(3, 4, 4, 3)),
+      list(
+         c(12, 15, 15, 12) - 7.5,
+         c(13, 14, 14, 13) - 7.5)
+   )),
+   y=I(list(
+      list(c(1, 1, 6, 6),
+         c(2, 2, 5, 5),
+         c(3, 3, 4, 4)),
+      list(
+         c(2, 2, 5, 5),
+         c(3, 3, 4, 4))
+   )),
+   fill=jamba::alpha2col(c("gold", "firebrick"), alpha=0.7))
+jp3 <- new("JamPolygon", polygons=df3);
+plot(jp3);
+
+jp3i <- intersect_JamPolygon(jp3)
+jp3i@polygons$fill <- "red"
+jp3i@polygons$border <- "red3";
+jp3i@polygons$border.lwd <- 3;
+jp3c <- rbind2(jp3, jp3i)
+plot(jp3c)
+}
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
