@@ -158,22 +158,19 @@ the amount of detail.
 
 ### overlap_type=“concordance”
 
+``` r
+venndir(setlist_dir, font_cex=c(1.5, 1.5, 1))
+```
+
+<img src="man/figures/README-venndir_1-1.png" width="100%" />
+
 This option displays the number `up-up`, and the number `down-down`, and
 everything else is considered “discordant”. This approach is effective
 at conveying direction, without too many details.
 
 Notice the `"X"` to indicate discordance.
 
-``` r
-venndir(setlist_dir)
-```
-
-<img src="man/figures/README-venndir_1-1.png" width="100%" />
-
 ### overlap_type=“each”
-
-This option shows the count for each combination. It works best when you
-want to see all the details, however it can create a lot of labels!
 
 ``` r
 venndir(setlist_dir, overlap_type="each")
@@ -181,7 +178,16 @@ venndir(setlist_dir, overlap_type="each")
 
 <img src="man/figures/README-venndir_each-1.png" width="100%" />
 
+This option shows the count for each combination. It works best when you
+want to see all the details, however it can create a lot of labels!
+
 ### overlap_type=“agreement”
+
+``` r
+venndir(setlist_dir, overlap_type="agreement")
+```
+
+<img src="man/figures/README-venndir_agreement-1.png" width="100%" />
 
 This option shows the count that agrees in direction, and the count that
 disagrees in direction. It does not indicate whether the agreement is up
@@ -190,21 +196,16 @@ or down.
 This option is especially good at summarizing the number that agree and
 disagree, without including potentially confusing details.
 
-``` r
-venndir(setlist_dir, overlap_type="agreement")
-```
-
-<img src="man/figures/README-venndir_agreement-1.png" width="100%" />
-
 ### overlap_type=“overlap”
-
-This option only displays the overlap count, ignoring direction.
 
 ``` r
 venndir(setlist_dir, overlap_type="overlap")
 ```
 
 <img src="man/figures/README-venndir_overlap-1.png" width="100%" />
+
+This option only displays the overlap count, ignoring direction. Venn
+“Classic”.
 
 ## Proportional Venn Direction
 
@@ -301,6 +302,30 @@ vo4l <- venndir(setlist,
 ```
 
 <img src="man/figures/README-label_preset_1l-1.png" width="100%" />
+
+## Highlights
+
+Any overlap can be modified or highlighted, using either
+`modify_venndir_overlap()` or `highlight_venndir_overlap()`. Labels can
+be adjusted, moved, resized, etc.
+
+``` r
+vo4h <- highlight_venndir_overlap(vo4l,
+   outerborder="red", outerborder.lwd=3,
+   overlap_set="set_A&set_B")
+render_venndir(vo4h, main="Highlight for **set_A&set_B**")
+```
+
+<img src="man/figures/README-highlights-1.png" width="100%" />
+
+``` r
+
+vo4h <- highlight_venndir_overlap(vo4,
+   overlap_set=unique(grep("set_B", vo4l@jps@polygons$venn_name, value=TRUE)))
+render_venndir(vo4h, main="All overlaps **set_B** and not **set_D**")
+```
+
+<img src="man/figures/README-highlights-2.png" width="100%" />
 
 ## Text Venn for the R Console
 
@@ -446,10 +471,11 @@ Two changes are required:
     - `"sign"` - to show only the item label
 
 ``` r
-setlist <- make_venn_test(100, 3, do_signed=TRUE);
+setlist <- make_venn_test(100, 3, do_signed=TRUE, item_prefix="item");
 vo <- venndir(setlist,
-   poly_alpha=0.3, spread=TRUE,
-   show_labels="Ni", fontfamily="sans",
+   item_cex=0.8,
+   poly_alpha=0.3, sign_count_delim="",
+   show_labels="Ni", fontfamily="Arial",
    show_items="sign item");
 ```
 
@@ -483,7 +509,8 @@ setlist <- make_venn_test(1000, 3, do_signed=TRUE);
 venndir(setlist,
    show_labels="Ni",
    show_items="sign",
-   item_cex=2,
+   item_cex=1.5,
+   item_degrees=15,
    expand_fraction=0.1,
    show_segments=FALSE,
    max_items=10000);
@@ -498,7 +525,8 @@ venndir(setlist,
    show_labels="Ni",
    overlap_type="each",
    show_items="sign",
-   item_cex=2,
+   item_cex=3,
+   item_degrees=20,
    expand_fraction=0.1,
    max_items=10000,
    show_segments=FALSE,

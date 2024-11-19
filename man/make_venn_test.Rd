@@ -14,6 +14,7 @@ make_venn_test(
   items = NULL,
   sizes = NULL,
   seed = 123,
+  item_prefix = "item_",
   ...
 )
 }
@@ -51,6 +52,9 @@ are used as names for each set.}
 
 \item{seed}{\code{numeric} or \code{NULL} used with \code{set.seed()} for data
 reproducibility. When \code{seed=NULL} then \code{set.seed()} is not called.}
+
+\item{item_prefix}{\code{character} string used as prefix for item names,
+default \code{"item_"}.}
 
 \item{...}{additional arguments are ignored.}
 }

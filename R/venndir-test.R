@@ -57,6 +57,8 @@
 #'    are used as names for each set.
 #' @param seed `numeric` or `NULL` used with `set.seed()` for data
 #'    reproducibility. When `seed=NULL` then `set.seed()` is not called.
+#' @param item_prefix `character` string used as prefix for item names,
+#'    default `"item_"`.
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
@@ -111,6 +113,7 @@ make_venn_test <- function
  items=NULL,
  sizes=NULL,
  seed=123,
+ item_prefix="item_",
  ...)
 {
    # create set items
@@ -118,7 +121,7 @@ make_venn_test <- function
       set.seed(head(seed, 1))
    }
    if (length(items) == 0) {
-      items <- paste0("item_",
+      items <- paste0(item_prefix,
          jamba::padInteger(seq_len(n_items)));
    } else {
       n_items <- length(items);

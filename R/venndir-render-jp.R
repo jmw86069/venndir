@@ -13,17 +13,21 @@
 #'    the Venn diagram. Values above zero cause the Venn diagram
 #'    to be slighly smaller.
 #' @param font_cex `numeric` scalar to adjust font sizes.
-#' @param item_cex `numeric` scalar applied to item labels in each overlap
-#'    in order. When `length(item_cex) == 1` it is applied uniformly
-#'    across all overlaps, otherwise it is recycled to the total
-#'    number of overlaps.
-#'    When provided, it is used instead of any adjustments to item label
-#'    sizes based upon proportional area of each overlap.
-#' @param item_cex_factor `numeric` value used to adjust pre-calculated
-#'    item fontsizes. This value is used to adjust the item label sizes,
-#'    which may also be adjusted proportional to the area of each overlap,
-#'    in which case `item_cex_factor` is used to adjust those relative
-#'    label sizes.
+#' @param item_cex `numeric` default 1, used to define baseline font size
+#'    (single value), or exact font `cex` values (multiple values).
+#'    * When a single value is provided, each set of items is used to
+#'    define a font scaling, based upon the relative area of the
+#'    overlap polygon to the max item polygon area, and the number of
+#'    items in each polygon. These values are multiplied by `item_cex`
+#'    to produce the final adjustment.
+#'    These values are multiplied by `item_cex_factor`.
+#'    * When multiple values are provided, they are recycled to the
+#'    number of polygons that contain items, and applied in order.
+#'    There is no further adjustment by polygon area, nor number of labels.
+#'    These values are multiplied by `item_cex_factor`.
+#' @param item_cex_factor `numeric`, default 1, used to adjust the
+#'    `item_cex` values overall. It is intended to be a single value,
+#'    and is multiplied by `item_cex` as it is defined for each set of items.
 #' @param plot_warning `logical` indicating whether to include a warning
 #'    when one or more non-zero overlap counts cannot be displayed
 #'    in the figure.
@@ -186,6 +190,12 @@ render_venndir <- function
          NULL;
       })
    }
+   # sign_count_delim
+   if ("sign_count_delim" %in% names(metadata)) {
+      sign_count_delim <- metadata$sign_count_delim;
+   } else {
+      sign_count_delim <- " ";
+   }
    # draw_legend
    if (length(draw_legend) > 0) {
       draw_legend <- head(as.logical(draw_legend), 1);
@@ -223,6 +233,10 @@ render_venndir <- function
       metadata$item_degrees <- item_degrees;
    } else {
       item_degrees <- metadata$item_degrees;
+      if (length(item_degrees) == 0) {
+         item_degrees <- 0;
+         metadata$item_degrees <- item_degrees;
+      }
    }
    # item_buffer
    if (length(item_buffer) == 0) {
@@ -281,6 +295,7 @@ render_venndir <- function
          show_labels=show_labels,
          inside_percent_threshold=inside_percent_threshold,
          show_zero=show_zero,
+         max_items=max_items,
          ...);
       venn_jp <- venndir_output@jps;
       label_df <- venndir_output@label_df;
@@ -329,12 +344,11 @@ render_venndir <- function
             "Processing labels.");
       }
       # auto-scale item_cex based upon number of items and polygon area
-      if (length(item_cex) <= 1) {
-         if (length(item_cex) == 1) {
-            if (is.na(item_cex)) {
-               item_cex <- 1;
-            }
-         } else {
+      if (length(item_cex) == 0) {
+         item_cex <- 1;
+      }
+      if (length(item_cex) == 1) {
+         if (is.na(item_cex)) {
             item_cex <- 1;
          }
          # recipe to calculate item_cex
@@ -343,42 +357,65 @@ render_venndir <- function
                "Defining item_cex.");
          }
          item_cex <- tryCatch({
-            poly_rows <- which(!is.na(venn_jp@polygons$venn_counts));
-            so_counts <- venn_jp@polygons$venn_counts[poly_rows];
-            names(so_counts) <- rownames(venn_jp@polygons)[poly_rows];
-            # crude scaling by total number of items
-            so_cex <- jamba::noiseFloor(
-               4 / sqrt(so_counts) * item_cex_factor,
-               # ceiling=0.9,
-               ceiling=2,
-               minimum=0.1)
-            # update here in case area fails, it will use this crude item_cex
-            # jamba::printDebug("so_cex (# labels adjust): ", so_cex);# debug
-            item_cex <- item_cex * so_cex;
-            # jamba::printDebug("item_cex (# labels adjusted): ", item_cex);# debug
-            # area of each polygon
+            poly_rows <- which(!is.na(venn_jp@polygons$venn_counts) &
+                  venn_jp@polygons$venn_counts > 0);
+            # area adjustment is sqrt() of the fraction of max area
             so_areas <- area_JamPolygon(venn_jp[poly_rows, ]);
             names(so_areas) <- rownames(venn_jp@polygons)[poly_rows];
+            so_area_fracmax <- so_areas / max(so_areas, na.rm=TRUE)
+            
+            # so_area_adj <- sqrt(so_area_fracmax);
+            so_area_adj <- (so_area_fracmax)^(1/2.5);
+            
+            # count adjustment - 4 / cube root of count
+            # so it gets smaller with more labels, slightly slower then sqrt()
+            so_counts <- venn_jp@polygons$venn_counts[poly_rows];
+            names(so_counts) <- rownames(venn_jp@polygons)[poly_rows];
+            n_per_area_fracmax <- so_counts / so_area_fracmax;
+            # adjfn() is a wrapper for cube root transform
+            # adjfn <- function(x)sqrt(x)
+            adjfn <- function(x)x^(1/3)
+            so_cex <- (3 / adjfn(so_counts))
+            
+            # update here in case area fails, it will use this crude item_cex
+            new_item_cex <- item_cex * so_cex * so_area_adj * item_cex_factor;
+            # apply noise floor
+            floor_item_cex <- jamba::noiseFloor(new_item_cex,
+               ceiling=4,
+               floor=0.2)
+            if (verbose > 1) {
+               jamba::printDebug("item label size calculations:");
+               print(data.frame(so_areas, so_area_fracmax, so_area_adj,
+                  so_counts, n_per_area_fracmax, so_cex,
+                  item_cex, new_item_cex, floor_item_cex));# debug
+            }
+            # jamba::printDebug("so_area_adj:", so_area_adj, ", so_cex: ", so_cex);# debug
+            item_cex <- floor_item_cex;
+            #
+            # jamba::printDebug("item_cex (# labels adjusted): ", item_cex);# debug
+            # area of each polygon
             # total area of all polygons
             # (not used currently but might be preferred for proportional)
             # so_total_areas <- rgeos::gArea(
             #    rgeos::gSimplify(venn_spdf,
             #       tol=1));
-            
-            # take median of the larger area polygons
-            so_big <- median(so_areas[so_areas / max(so_areas) >= 0.5])
-            so_areas_cex <- sqrt(so_areas) / sqrt(so_big);
-            
-            # weight the effect by number of item labels
-            # so that 2 labels would not be scaled as much as 10
-            so_areas_wt <- (1 + 0.5) / (so_counts + 0.5)
-            so_areas_cex_wt <- so_areas_wt + (1 - so_areas_wt) * so_areas_cex
-            # adjust the crude scaling by the relative polygon area
-            item_cex <- item_cex * so_areas_cex_wt;
-            # jamba::printDebug("so_areas_cex_wt (relative area adjust): ", so_areas_cex_wt);# debug
-            # jamba::printDebug("item_cex (relative area adjusted): ", item_cex);# debug
-            # for debugging, the data.frame can be printed
-            #print(data.frame(so_counts, so_cex, so_areas_cex, so_areas_wt, so_areas_cex_wt, item_cex));
+
+            if (FALSE) {
+               # take median of the larger area polygons
+               so_big <- median(so_areas[so_areas / max(so_areas) >= 0.5])
+               so_areas_cex <- sqrt(so_areas) / sqrt(so_big);
+               
+               # weight the effect by number of item labels
+               # so that 2 labels would not be scaled as much as 10
+               so_areas_wt <- (1 + 0.5) / (so_counts + 0.5)
+               so_areas_cex_wt <- so_areas_wt + (1 - so_areas_wt) * so_areas_cex
+               # adjust the crude scaling by the relative polygon area
+               item_cex <- item_cex * so_areas_cex_wt;
+               # jamba::printDebug("so_areas_cex_wt (relative area adjust): ", so_areas_cex_wt);# debug
+               # jamba::printDebug("item_cex (relative area adjusted): ", item_cex);# debug
+               # for debugging, the data.frame can be printed
+               #print(data.frame(so_counts, so_cex, so_areas_cex, so_areas_wt, so_areas_cex_wt, item_cex));
+            }
             item_cex;
          }, error=function(e){
             item_cex;
@@ -423,8 +460,10 @@ render_venndir <- function
             "Applying label_df defaults.");
       }
       for (i in label_df_add) {
-         label_df[[i]] <- rep(label_df_defaults[[i]],
-            length.out=nrow(label_df));
+         # if (length(label_df_defaults[[i]]) > 0) {
+            label_df[[i]] <- rep(label_df_defaults[[i]],
+               length.out=nrow(label_df));
+         # }
       }
       
       # replace NA with 0
@@ -699,40 +738,51 @@ render_venndir <- function
          # vi <- tail(venn_jp@polygons$label %in% items_df1$overlap_set, 1);
          vi <- venn_jp@polygons$label %in% tail(items_df1$overlap_set, 1);
          vdf <- venn_jp@polygons[vi, , drop=FALSE];
+         if (nchar(sign_count_delim) > 0) {
+            use_sign_count_delim <- paste(collapse="",
+               paste0("[",
+                  gsub("[\\^]", "\\\\^",
+                     strsplit(sign_count_delim, "")[[1]]),
+                  "]"))
+            use_pattern <- paste0("(", use_sign_count_delim, "|[ :]*)[0-9,]+$")
+         } else {
+            use_pattern <- paste0("([ :]*)[0-9,]+$")
+         }
          prefixes <- rep(
-            gsub("[ :].+", "", items_df1$text),
+            # gsub("[ :]*[0-9,]+$", "", items_df1$text),
+            gsub(use_pattern, "", items_df1$text),
             lengths(items_df1$items));
          labels <- NULL;
          # note currently uses the same show_items format per polygon
          # not for each row in items_dfs, so it is not possible to
          # use different show_items format for up-up and down-down within
          # the same polygon
-         #show_items_order <- strsplit(items_df1$show_items[1], "[- _.]")[[1]];
          use_show_items <- head(items_df1$item_style, 1);
-         # jamba::printDebug("use_show_items:");print(use_show_items);# debug
-         # show_items_order <- strsplit(show_items[1], "[- _.]")[[1]];
          show_items_order <- strsplit(use_show_items, "[- _.]")[[1]];
          for (dio in show_items_order) {
             # jamba::printDebug("dio:", dio);# debug
             if (grepl("sign", dio)) {
-               labels <- paste(labels, prefixes);
+               if (length(labels) > 0) {
+                  labels <- paste0(labels, sign_count_delim, prefixes);
+               } else {
+                  labels <- prefixes;
+               }
                # jamba::printDebug("prefixes:", head(prefixes));# debug
             } else if (grepl("item", dio)) {
-               labels <- paste(labels, items);
+               if (length(labels) > 0) {
+                  labels <- paste0(labels, sign_count_delim, items);
+               } else {
+                  labels <- items;
+               }
             }
          }
-         # jamba::printDebug("unique(items_df1$item_cex):", unique(items_df1$item_cex));# debug
-         # jamba::printDebug("item_cex:");print(item_cex);# debug
-         # jamba::printDebug("items_df1:");print(head(items_df1, 10));# debug
-         # jamba::printDebug("venn_jp[tail(vis, 1), ]:");print(venn_jp[tail(vis, 1), ]);# debug
-         # items_df1$item_cex <- item_cex[as.character(items_df1$overlap_set)];
-         labels <- gsub("^[ ]+|[ ]+$", "", labels);
-         # jamba::printDebug("labels:");print(labels);# debug
+         # 0.0.45.900 - remove this line, should not be needed and may be
+         # useful to permit leading and trailing spaces
+         # labels <- gsub("^[ ]+|[ ]+$", "", labels);
          bg <- jamba::alpha2col(vdf$color, vdf$alpha)
          color <- make_color_contrast(color1,
             y=bg,
             ...);
-         
          lpf <- label_fill_JamPolygon(jp=venn_jp[tail(vis, 1), ],
             ref_jp=venn_jp,
             color=color,

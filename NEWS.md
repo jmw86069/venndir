@@ -1,3 +1,33 @@
+# venndir 0.0.45.900
+
+## changes to existing functions
+
+* `render_venndir()`
+
+   * Improved the `item_cex` calculations, accounting for relative
+   area of each shape, and number of items, also imposing a floor
+   to prevent microscopic font sizes.
+
+* `venndir()`
+
+   * default argument change: `font_cex=c(1, 1, 0.7)`, 0.7 is down from 0.8.
+   * All `font_cex` values are secretly multiplied by 1.2 as a slight
+   adjustment for the default condition.
+
+* `sample_JamPolygon()`
+
+   * New algorithm to place points inside a polygon, now using adaptive
+   step sizes. Substantially fewer steps, much more accurate, and
+   markedly faster. By being more accurate, it is guaranteed to use
+   the optimal pattern, which finds the closest match to the number
+   of points requested.
+   * For `spread=FALSE` it no longer takes the first `n` points, it
+   now takes the middle `n` points. Most cases the effect will be minimal.
+
+* `label_fill_JamPolygon()`
+
+   * Now has better working examples, which plot the labels for review.
+
 # venndir 0.0.44.900
 
 ## new functions

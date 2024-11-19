@@ -57,18 +57,24 @@ will render no title. When provided, it is rendered using
 formatting. The title is stored in \code{venndir@metadata$main}
 for persistence.}
 
-\item{item_cex}{\code{numeric} scalar applied to item labels in each overlap
-in order. When \code{length(item_cex) == 1} it is applied uniformly
-across all overlaps, otherwise it is recycled to the total
-number of overlaps.
-When provided, it is used instead of any adjustments to item label
-sizes based upon proportional area of each overlap.}
+\item{item_cex}{\code{numeric} default 1, used to define baseline font size
+(single value), or exact font \code{cex} values (multiple values).
+\itemize{
+\item When a single value is provided, each set of items is used to
+define a font scaling, based upon the relative area of the
+overlap polygon to the max item polygon area, and the number of
+items in each polygon. These values are multiplied by \code{item_cex}
+to produce the final adjustment.
+These values are multiplied by \code{item_cex_factor}.
+\item When multiple values are provided, they are recycled to the
+number of polygons that contain items, and applied in order.
+There is no further adjustment by polygon area, nor number of labels.
+These values are multiplied by \code{item_cex_factor}.
+}}
 
-\item{item_cex_factor}{\code{numeric} value used to adjust pre-calculated
-item fontsizes. This value is used to adjust the item label sizes,
-which may also be adjusted proportional to the area of each overlap,
-in which case \code{item_cex_factor} is used to adjust those relative
-label sizes.}
+\item{item_cex_factor}{\code{numeric}, default 1, used to adjust the
+\code{item_cex} values overall. It is intended to be a single value,
+and is multiplied by \code{item_cex} as it is defined for each set of items.}
 
 \item{plot_warning}{\code{logical} indicating whether to include a warning
 when one or more non-zero overlap counts cannot be displayed
@@ -147,6 +153,9 @@ There are pre-defined label styles.
 The \code{fontfamily} must match a recognized font for the given output
 device, and this font must be capable of producing UTF-8 / Unicode
 characters, in order to print up arrow and down arrow.
+You may review \code{systemfonts::system_fonts()} for a listing of fonts
+recognized by \code{ragg} devices, which seems to have the best
+overall font capabilities.
 When it does not work, either use \code{unicode=FALSE}, or check the
 output from \code{Sys.getlocale()} to ensure the setting is capable
 of using UTF-8 (for example "C" may not be sufficient).

@@ -15,6 +15,7 @@ sample_JamPolygon(
   width_buffer = 0.1,
   max_width_buffer = 10,
   byCols = c("-y", "x"),
+  algorithm = c("split", "seq"),
   do_plot = FALSE,
   verbose = FALSE,
   ...
@@ -28,16 +29,30 @@ sample_JamPolygon(
 \item{xyratio}{\code{numeric} adjustment for the x/y ratio, numbers larger than
 1 make the x-axis spacing larger than the y-axis spacing.}
 
-\item{spread}{\code{logical} (default \code{TRUE}) when more then \code{n} points can
-be fit inside the polygon, \code{spread=TRUE} spreads the points evenly
-across the available points, while \code{spread=FALSE} simply uses
-the first \code{n} points.}
+\item{spread}{\code{logical} (default \code{FALSE}) when more then \code{n} points are
+defined than the target number of points, \code{spread} indicates whether
+the subset of \code{n} points returned is defined using the first \code{n}
+points (spread=FALSE) or an even spread from start to end (spread=TRUE),
+\itemize{
+\item \code{spread=TRUE} can produce unusual distributions, with potential
+improvementwhen filling an irregular polygon.
+\item \code{spread=FALSE} produces more "regular" placement of labels, also
+without gaps.
+}}
 
-\item{n_ratio}{\code{numeric} ratio which must be \code{1} or higher, indicating
-how many total sampled points should be defined, before choosing
-the points to use. This option is used only when \code{spread=TRUE},
-which causes more points to be defined, from which it uses
-evenly distributed values.}
+\item{n_ratio}{\code{numeric} ratio which must be \code{1} or higher, default 1,
+how many total valid points should be defined before choosing
+a subset of points to use.
+\itemize{
+\item \code{n_ratio=1} - defines \code{n} points as closely as possible.
+\item \code{n_ratio=2} - defines twice the points, then takes a subset
+to use, based upon argument \code{spread}. It may be beneficial when
+trying to fill an irregularly shaped polygon to use a higher
+\code{n_ratio}, thereby forcing the discovery of many more possible
+points. That said, the subset of points may not be "ideally"
+distributed relative to other labels, and relative to the polygon
+shape.
+}}
 
 \item{pattern}{\code{character} string indicating how to array the points:
 \itemize{
@@ -54,6 +69,21 @@ polygon border. Points are sampled after this adjustment.}
 \item{byCols}{\code{character} passed to \code{jamba::mixedSortDF()} to determine
 how to sort the resulting coordinates. Default \code{byCols=c("-y", "x")}
 sorts top-to-bottom, then left-to-right.}
+
+\item{algorithm}{\code{character} string, default "split"
+\itemize{
+\item \code{"split"}: newer approach that starts with large step increases in \code{n},
+then subdivides between failure/success to find the optimal final \code{n}.
+During testing it was substantially faster and more accurate than
+the previous algorithm \code{"seq"}.
+\item \code{"seq"}: attempts a linear sequence of \code{n} values with gradual
+increases.
+The approach is slow, testing values iteratively without regard
+to the relative success, number of "points in polygon" compared to
+the number requested. It also used a fixed "step size" which sometimes
+produced more valid points than requested, and required using a subset
+of points, see argument \code{spread}.
+}}
 
 \item{do_plot}{\code{logical} indicating whether to create a plot to illustrate
 the process.}
@@ -98,9 +128,11 @@ df3 <- data.frame(name=c("polygon1", "polygon2"),
    fill=c("gold", "firebrick"))
 jp3 <- new("JamPolygon", polygons=df3);
 
-sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE)
-sample_JamPolygon(jp3[1,], n=80, do_plot=TRUE)
+sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="seq")
+sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="split")
 sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE)
+sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="split")
+sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="seq")
 
 sample_JamPolygon(jp3[1,], n=40, xyratio=1.5, do_plot=TRUE)
 

@@ -81,12 +81,20 @@
 #'    2. Overlap count label
 #'    3. Signed count label
 #'    
-#'    The default `c(1, 1, 0.8)` defines the signed count label slightly
+#'    The default `c(1, 1, 0.7)` defines the signed count label slightly
 #'    smaller than other labels.
+#'    * When one value is provided, it is multiplied by `c(1, 1, 0.7)` to
+#'    adjust font sizes altogether, keeping relative sizes.
+#'    * When two values are provided, they are multiplied by `c(1, 1, 0.7)`
+#'    using the second value twice.
+#'    * When three values are provided, they are used as-is without change.
 #' @param fontfamily `character` string to define the fontfamily.
 #'    The `fontfamily` must match a recognized font for the given output
 #'    device, and this font must be capable of producing UTF-8 / Unicode
 #'    characters, in order to print up arrow and down arrow.
+#'    You may review `systemfonts::system_fonts()` for a listing of fonts
+#'    recognized by `ragg` devices, which seems to have the best
+#'    overall font capabilities.
 #'    When it does not work, either use `unicode=FALSE`, or check the
 #'    output from `Sys.getlocale()` to ensure the setting is capable
 #'    of using UTF-8 (for example "C" may not be sufficient).
@@ -146,15 +154,18 @@
 #'    for the count label to be displayed inside the region,
 #'    otherwise the label is displayed outside the region.
 #'    Values are expected to range from 0 to 100.
-#' @param item_cex `numeric` value (default NULL) used to resize item labels.
-#'    * When `item_cex` is a single value or `NULL`, auto-scaling is
-#'    performed based upon the number of items in each overlap
-#'    polygon, and the relative polygon areas.
-#'    Any single `numeric` value for `item_cex` is multiplied by the
-#'    auto-scaled value for each overlap region.
-#'    * When two or more values are supplied as a vector, the
-#'    values are recycled and applied across all Venn overlap regions,
-#'    in the order they appear in `signed_overlaps()`.
+#' @param item_cex `numeric` default 1, used to define baseline font size
+#'    (single value), or exact font `cex` values (multiple values).
+#'    * When a single value is provided, each set of items is used to
+#'    define a font scaling, based upon the relative area of the
+#'    overlap polygon to the max item polygon area, and the number of
+#'    items in each polygon. These values are multiplied by `item_cex`
+#'    to produce the final adjustment.
+#'    These values are multiplied by `item_cex_factor`.
+#'    * When multiple values are provided, they are recycled to the
+#'    number of polygons that contain items, and applied in order.
+#'    There is no further adjustment by polygon area, nor number of labels.
+#'    These values are multiplied by `item_cex_factor`.
 #' @param item_style `character` string (default "text") indicating
 #'    the style to display item labels when they are enabled.
 #'    * `"default"` detects whether item labels contain `"<br>"` for newlines,
@@ -286,7 +297,7 @@ venndir <- function
     "item"),
  max_items=3000,
  show_zero=FALSE,
- font_cex=c(1, 1, 0.8),
+ font_cex=c(1, 1, 0.7),
  fontfamily="Arial",
  # show_set=c("main", "all", "none"),
  show_label=NA,
@@ -358,15 +369,20 @@ venndir <- function
    
    # validate font_cex input
    if (length(font_cex) == 0) {
-      font_cex <- c(1, 1, 0.8);
+      font_cex <- c(1, 1, 0.7);
+   }
+   if (length(font_cex) > 3) {
+      font_cex <- head(font_cex, 3);
+   }
+   if (length(font_cex) == 1) {
+      font_cex <- c(1, 1, 0.7) * font_cex[1];
    }
    if (length(font_cex) == 2) {
-      font_cex <- font_cex[c(1, 2, 2)];
+      font_cex <- c(1, 1, 0.7) * font_cex[c(1, 2, 2)];
    }
-   if (length(font_cex) != 3) {
-      font_cex <- rep(font_cex, length.out=3)
-   }
-   
+   # global adjustment to the default condition
+   font_cex <- font_cex * 1.2;
+
    # accept incidence matrix input
    if (inherits(setlist, "matrix")) {
       setlist <- im_value2list(setlist);
@@ -959,6 +975,7 @@ venndir <- function
       draw_legend=draw_legend,
       fontfamily=fontfamily,
       legend_font_cex=legend_font_cex,
+      sign_count_delim=sign_count_delim,
       item_buffer=item_buffer,
       item_cex=item_cex,
       item_style=item_style,

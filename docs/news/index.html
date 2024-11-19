@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.45.900</span>
       </span>
     </div>
 
@@ -57,6 +57,30 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.45.900" id="venndir-0045900">venndir 0.0.45.900<a class="anchor" aria-label="anchor" href="#venndir-0045900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-45-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-45-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Improved the <code>item_cex</code> calculations, accounting for relative area of each shape, and number of items, also imposing a floor to prevent microscopic font sizes.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>default argument change: <code>font_cex=c(1, 1, 0.7)</code>, 0.7 is down from 0.8.</li>
+<li>All <code>font_cex</code> values are secretly multiplied by 1.2 as a slight adjustment for the default condition.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code></p>
+<ul><li>New algorithm to place points inside a polygon, now using adaptive step sizes. Substantially fewer steps, much more accurate, and markedly faster. By being more accurate, it is guaranteed to use the optimal pattern, which finds the closest match to the number of points requested.</li>
+<li>For <code>spread=FALSE</code> it no longer takes the first <code>n</code> points, it now takes the middle <code>n</code> points. Most cases the effect will be minimal.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code></p>
+<ul><li>Now has better working examples, which plot the labels for review.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.44.900" id="venndir-0044900">venndir 0.0.44.900<a class="anchor" aria-label="anchor" href="#venndir-0044900"></a></h2>
 <div class="section level3">

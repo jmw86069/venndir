@@ -40,6 +40,19 @@ to the size of the polygon. For example \code{-0.9} will reduce the polygon
 90\% of the way toward a completely empty polygon, where that range
 is defined by the width inside the polygon border.}
 
+\item{width_buffer}{\code{numeric} passed to \code{sample_JamPolygon()} to apply
+a "width buffer", using values relative to the maximum \code{buffer}
+size. This mechanism is experimental, to try to improve label
+placement in unusually-shaped polygons.
+\itemize{
+\item \code{width_buffer=0} will add no additional buffer
+\item \code{width_buffer=0.5} will apply width buffer equal to half the
+buffer size required to create an empty polygon. The polygon is
+shifted left and right by half this amount each direction, then
+the intersection is used. This method has the intention of requiring
+a certain available width, for example for wide text labels.
+}}
+
 \item{relative}{\code{logical} passed to \code{buffer_JamPolygon()} (default \code{TRUE})
 to define \code{buffer} with relative coordinates.}
 
@@ -84,19 +97,23 @@ but ultimately not more effective specifically for character labels.
 Both packages have heavy R dependencies and were avoided.}
 
 \item{draw_labels}{\code{logical} (default \code{TRUE}) indicating whether to
-draw labels, however it is only used when \code{plot_style="base"}.}
+draw labels, however it is only used when \code{plot_style="JamPolygon"}.
+Note also, when drawing labels, it assumes the plot is already
+created using \code{ref_jp}, and it determines the coordinate
+adjustments relative to \code{ref_jp}.}
 
 \item{seed}{\code{numeric} value (default \code{1}) used to define the random seed
 with \code{set.seed(seed)} for reproducible output.
 When \code{seed} is \code{NULL} there is no call to \code{set.seed()}.}
 
-\item{plot_style}{\code{character} string (deprecated) to define the
-plot output, used only when \code{draw_labels=TRUE}.
-Currently, labels are only rendered for \code{plot_style="base"}.
+\item{plot_style}{\code{character} string, default "none".
 \itemize{
-\item \code{"base"}: Use R base plotting, using \code{gridBase} with \code{gridtext}.
-\item \code{"gg"}: Use \code{ggplot2} style plotting.
 \item \code{"none"}: No plot output.
+\item \code{"JamPolygon"}: assume \code{ref_jp} has already been plotted, and
+labels should be drawn in that coordinate context.
+For example call \code{plot(ref_jp)} then
+\code{label_fill_JamPolygon(jp, ref_jp, plot_output="JamPolygon")}.
+See examples.
 }}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}

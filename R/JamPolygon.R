@@ -2117,9 +2117,11 @@ polyclip_to_JamPolygon <- function
 #'    fill=c("gold", "firebrick"))
 #' jp3 <- new("JamPolygon", polygons=df3);
 #' 
-#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE)
-#' sample_JamPolygon(jp3[1,], n=80, do_plot=TRUE)
+#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="seq")
+#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="split")
 #' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE)
+#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="split")
+#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="seq")
 #' 
 #' sample_JamPolygon(jp3[1,], n=40, xyratio=1.5, do_plot=TRUE)
 #' 
@@ -2129,15 +2131,25 @@ polyclip_to_JamPolygon <- function
 #' @param n `integer` number of points required
 #' @param xyratio `numeric` adjustment for the x/y ratio, numbers larger than
 #'    1 make the x-axis spacing larger than the y-axis spacing.
-#' @param spread `logical` (default `TRUE`) when more then `n` points can
-#'    be fit inside the polygon, `spread=TRUE` spreads the points evenly
-#'    across the available points, while `spread=FALSE` simply uses
-#'    the first `n` points.
-#' @param n_ratio `numeric` ratio which must be `1` or higher, indicating
-#'    how many total sampled points should be defined, before choosing
-#'    the points to use. This option is used only when `spread=TRUE`,
-#'    which causes more points to be defined, from which it uses
-#'    evenly distributed values.
+#' @param spread `logical` (default `FALSE`) when more then `n` points are
+#'    defined than the target number of points, `spread` indicates whether
+#'    the subset of `n` points returned is defined using the first `n`
+#'    points (spread=FALSE) or an even spread from start to end (spread=TRUE),
+#'    * `spread=TRUE` can produce unusual distributions, with potential
+#'    improvementwhen filling an irregular polygon.
+#'    * `spread=FALSE` produces more "regular" placement of labels, also
+#'    without gaps.
+#' @param n_ratio `numeric` ratio which must be `1` or higher, default 1,
+#'    how many total valid points should be defined before choosing
+#'    a subset of points to use.
+#'    * `n_ratio=1` - defines `n` points as closely as possible.
+#'    * `n_ratio=2` - defines twice the points, then takes a subset
+#'    to use, based upon argument `spread`. It may be beneficial when
+#'    trying to fill an irregularly shaped polygon to use a higher
+#'    `n_ratio`, thereby forcing the discovery of many more possible
+#'    points. That said, the subset of points may not be "ideally"
+#'    distributed relative to other labels, and relative to the polygon
+#'    shape.
 #' @param pattern `character` string indicating how to array the points:
 #'    * `"offset"` (default) uses a rectangular grid where alternating
 #'    points on each row are offset slightly on the y-axis.
@@ -2149,6 +2161,18 @@ polyclip_to_JamPolygon <- function
 #' @param byCols `character` passed to `jamba::mixedSortDF()` to determine
 #'    how to sort the resulting coordinates. Default `byCols=c("-y", "x")`
 #'    sorts top-to-bottom, then left-to-right.
+#' @param algorithm `character` string, default "split"
+#'    * `"split"`: newer approach that starts with large step increases in `n`,
+#'    then subdivides between failure/success to find the optimal final `n`.
+#'    During testing it was substantially faster and more accurate than
+#'    the previous algorithm `"seq"`.
+#'    * `"seq"`: attempts a linear sequence of `n` values with gradual
+#'    increases.
+#'    The approach is slow, testing values iteratively without regard
+#'    to the relative success, number of "points in polygon" compared to
+#'    the number requested. It also used a fixed "step size" which sometimes
+#'    produced more valid points than requested, and required using a subset
+#'    of points, see argument `spread`.
 #' @param do_plot `logical` indicating whether to create a plot to illustrate
 #'    the process.
 #' @param verbose `logical` indicating whether to print verbose output.
@@ -2167,12 +2191,15 @@ sample_JamPolygon <- function
  width_buffer=0.1,
  max_width_buffer=10,
  byCols=c("-y", "x"),
+ algorithm=c("split",
+    "seq"),
  do_plot=FALSE,
  verbose=FALSE,
  ...)
 {
    # validate arguments
    pattern <- match.arg(pattern);
+   algorithm <- match.arg(algorithm);
    
    # optional buffer
    if (length(buffer) == 0) {
@@ -2181,14 +2208,22 @@ sample_JamPolygon <- function
    buffer <- head(buffer, 1);
    max_buffer <- NULL;
    if (buffer != 0) {
+      if (verbose) {
+         jamba::printDebug("sample_JamPolygon(): ",
+            "Applying buffer:", buffer);# debug
+      }
       use_jp <- buffer_JamPolygon(jp,
          relative=TRUE,
-         buffer=buffer);
+         buffer=buffer,
+         ...);
       max_buffer <- attr(use_jp, "max_buffer");
-      # jamba::printDebug("sample_JamPolygon(): ", "max_buffer:", max_buffer);# debug
       # experimental width_buffer
       # slides the polygon right and left
       if (length(width_buffer) == 1 && width_buffer > 0 && width_buffer < 1) {
+         if (verbose) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               "detected max_buffer:", max_buffer);# debug
+         }
          width_nudge <- jamba::noiseFloor(max_buffer * width_buffer,
             ceiling=max_width_buffer)
          use_jpr <- nudge_JamPolygon(use_jp,
@@ -2197,8 +2232,19 @@ sample_JamPolygon <- function
             nudge=c(-width_nudge, 0))
          use_jpi <- intersect_JamPolygon(rbind2(use_jpr, use_jpl));
          area_ratio <- (area_JamPolygon(use_jpi) / area_JamPolygon(use_jp));
-         # jamba::printDebug("width_nudge:", width_nudge, ", area_ratio: ", area_ratio);# debug
-         if (area_JamPolygon(use_jpi) / area_JamPolygon(use_jp) > 0.4) {
+         area_ratio_threshold <- 0.3;
+         if (verbose) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               "detected max_buffer:", max_buffer,
+               " * width_buffer:", width_buffer,
+               ", ceiling uses max_width_buffer:", max_width_buffer)
+            jamba::printDebug("sample_JamPolygon(): ",
+               "resulting width_nudge:", width_nudge,
+               ", area_ratio:", area_ratio,
+               " (threshold > ", area_ratio_threshold, ")");# debug
+         }
+         if (area_JamPolygon(use_jpi) / area_JamPolygon(use_jp) >
+               area_ratio_threshold) {
             use_jp <- use_jpi;
          }
       }
@@ -2220,6 +2266,8 @@ sample_JamPolygon <- function
    xyrange <- bbox_JamPolygon(use_jp);
    
    # custom function to wrap some re-usable logic
+   #
+   # array_points() defines a grid of points covering the bounding box
    array_points <- function
    (xyrange,
     n=100,
@@ -2240,7 +2288,10 @@ sample_JamPolygon <- function
          ystep <- ystep * 2;
       }
       if (verbose) {
-         jamba::printDebug("xstep:", xstep, ", ystep:", ystep);
+         jamba::printDebug("sample_JamPolygon(): ",
+            "array_points(): ",
+            "n:", n,
+            ", xstep:", xstep, ", ystep:", ystep);
       }
       # define x sequence
       xseq <- seq(from=xyrange[1, 1], to=xyrange[1, 2], by=xstep);
@@ -2279,50 +2330,210 @@ sample_JamPolygon <- function
       }
       
       if (verbose) {
-         jamba::printDebug("xrange:", range(xuse), ", yrange:", range(yuse));
+         jamba::printDebug("sample_JamPolygon(): ",
+            "array_points(): ",
+         "xrange:", range(xuse), ", yrange:", range(yuse));
       }
       list(x=xuse, y=yuse);
    }
    
    # range of values for n to attempt
-   n_seq <- unique(round(seq(from=n * 1, to=n * 50, by=ceiling(n / 50))));
-
-   # define n points inside the polygon
-   n_ratio <- head(n_ratio, 1);
-   if (length(n_ratio) == 0 || any(n_ratio < 1)) {
-      n_ratio <- 1;
-   }
-   if (!TRUE %in% spread) {
-      n_ratio <- 1;
-   }
-   for (try_n in n_seq) {
-      # jamba::printDebug("sample_JamPolygon(): ", "try_n:", try_n);# debug
-      # jamba::printDebug("use_jp:");print(use_jp);# debug
-      A <- array_points(xyrange,
-         n=try_n,
-         pattern=pattern,
-         verbose=verbose);
-      pip <- has_point_in_JamPolygon(x=A,
-         jp=use_jp);
-      if (verbose > 1) {
-         jamba::printDebug("try_n: ", try_n,
-            ", returned_n:", length(A$x),
-            ", usable n:", sum(pip));
+   target_n <- (n * n_ratio);
+   if ("seq" %in% algorithm) {
+      if (verbose) {
+         jamba::printDebug("sample_JamPolygon(): ",
+            "Algorithm ", "'seq'");
       }
-      # print(table(pip))
-      if (sum(pip) >= (n * n_ratio)) {
+      n_seq <- unique(round(seq(from=n * 1, to=n * 50, by=ceiling(n / 50))));
+      if (verbose) {
+         nseq_vals <- c(head(n_seq, 3), "...", tail(n_seq, 2))
+         jamba::printDebug("sample_JamPolygon(): ",
+            "n_seq:", nseq_vals, "(length ", length(n_seq), ")");
+      }
+      
+      # define n points inside the polygon
+      n_ratio <- head(n_ratio, 1);
+      if (length(n_ratio) == 0 || any(n_ratio < 1)) {
+         n_ratio <- 1;
+      }
+      if (!TRUE %in% spread) {
+         n_ratio <- 1;
+      }
+      for (try_n in n_seq) {
+         # jamba::printDebug("sample_JamPolygon(): ", "try_n:", try_n);# debug
+         # jamba::printDebug("use_jp:");print(use_jp);# debug
+         if (verbose) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               "Iteration ", match(try_n, n_seq));
+         }
+         A <- array_points(xyrange,
+            n=try_n,
+            pattern=pattern,
+            verbose=verbose > 2);
+         if (verbose) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               "array_points() complete.");
+         }
+         pip <- has_point_in_JamPolygon(x=A,
+            jp=use_jp);
+         if (verbose > 1) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               "has_point_in_JamPolygon() complete. ",
+               "required n:", n,
+               ", target_n:", target_n,
+               ", requested points:", try_n,
+               ", returned points:", length(A$x),
+               ", usable points:", sum(pip));
+         }
+         # print(table(pip))
+         if (sum(pip) >= (target_n)) {
+            if (TRUE %in% spread) {
+               pip_set <- which(pip);
+               pip_seq <- pip_set[seq(from=1, to=length(pip_set), length.out=n)]
+               pip[] <- FALSE;
+               pip[pip_seq] <- TRUE;
+            } else {
+               pip_seq <- head(which(pip), n);
+               pip[] <- FALSE;
+               pip[pip_seq] <- TRUE;
+            }
+            break;
+         }
+      }
+   } else if ("split" %in% algorithm) {
+      if (verbose) {
+         jamba::printDebug("sample_JamPolygon(): ",
+            "Algorithm ", "'split'");
+      }
+      # 
+      n_tolerance <- 2;
+      try_n <- target_n;
+      last_fail <- target_n - 1;
+      last_success <- NA;
+      last_piplist <- NULL;
+      iteration <- 0;
+      # iterate n values
+      while (TRUE) {
+         iteration <- iteration + 1;
+         if (iteration > 100) {
+            if (verbose) {
+               jamba::printDebug("sample_JamPolygon(): ",
+                  "Max Iteration ", iteration,
+                  ", breaking loop.");
+            }
+            if (is.na(last_success)) {
+               stop("No solution after 100 iterations.")
+            }
+            break;
+         }
+         if (verbose) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               "Iteration ", iteration,
+               # ", last_fail:", last_fail,
+               # ", last_success:", last_success,
+               ", try_n:", try_n)
+         }
+         A <- array_points(xyrange,
+            n=try_n,
+            pattern=pattern,
+            verbose=verbose > 2);
+         pip <- has_point_in_JamPolygon(x=A,
+            jp=use_jp);
+         n_pip <- sum(pip);
+         if (verbose > 1) {
+            jamba::printDebug("sample_JamPolygon(): ",
+               indent=5,
+               "has_point_in_JamPolygon() complete. ",
+               "required n:", n,
+               ", target_n:", target_n,
+               ", requested points:", try_n,
+               ", returned points:", length(A$x),
+               ", usable points:", n_pip);
+         }
+         # check for success
+         if (n_pip >= target_n) {
+            # success, check difference from last fail
+            if (abs(try_n - last_fail) > n_tolerance) {
+               # split the difference and try again
+               last_success <- try_n;
+               last_piplist <- list(A=A, pip=pip);
+               try_n <- floor(mean(c(last_success, last_fail)));
+               if (verbose) {
+                  jamba::printDebug("-> ",
+                     indent=5, fgText=c("darkorange1", "royalblue"),
+                     "Success, next try_n:", try_n);
+               }
+               next;
+            }
+            # success!
+            if (verbose) {
+               jamba::printDebug("-> ",
+                  indent=5, fgText=c("darkorange1", "green"),
+                  "Success, decision! try_n:", try_n);
+            }
+            last_piplist <- list(A=A, pip=pip);
+            break;
+         } else {
+            last_fail <- try_n;
+            if (is.na(last_success)) {
+               try_n <- try_n + (target_n / 2)
+            } else {
+               if (abs(try_n - last_success) > n_tolerance) {
+                  try_n <- floor(mean(c(last_success, last_fail)));
+               } else {
+                  # use last_success
+                  try_n <- last_success;
+                  if (verbose) {
+                     jamba::printDebug("-> ",
+                        indent=5, fgText=c("darkorange1", "green"),
+                        "Fail, decision!    try_n:", try_n);
+                  }
+                  break;
+               }
+            }
+            if (verbose) {
+               jamba::printDebug("-> ",
+                  indent=5, fgText=c("darkorange1", "red"),
+                  "Fail,    next try_n:", try_n);
+            }
+            next;
+         }
+         #
+      }
+      # end while()
+      A <- last_piplist$A;
+      pip <- last_piplist$pip;
+      # assume success
+      if (sum(pip) > n) {
+         pip_set <- which(pip);
          if (TRUE %in% spread) {
-            pip_set <- which(pip);
+            
+            # evenly spaced by order
             pip_seq <- pip_set[seq(from=1, to=length(pip_set), length.out=n)]
+
             pip[] <- FALSE;
             pip[pip_seq] <- TRUE;
          } else {
-            pip_seq <- head(which(pip), n);
+            # first n points
+            pip_seq <- head(pip_set, n);
+            
+            # points in the middle
+            hval <- (length(pip_set) - n) / 2;
+            hval1 <- floor(hval);
+            hval2 <- ceiling(hval);
+            pip_seq <- tail(head(pip_set, -hval2), -hval1)
+            if (hval1 > 0) {
+               pip_seq <- tail(head(pip_set, -hval2), -hval1)
+            } else {
+               pip_seq <- head(pip_set, -hval2)
+            }
+
             pip[] <- FALSE;
             pip[pip_seq] <- TRUE;
          }
-         break;
       }
+   } else {
+      stop(paste0("algorithm '", algorithm, "' is not yet implemented."))
    }
    
    ptcol <- ifelse(pip, "gold", "grey")

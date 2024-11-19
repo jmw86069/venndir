@@ -1,5 +1,55 @@
 # TODO for venndir
 
+## 19nov2024
+
+Residual todo items of note:
+
+* Item label
+
+   * DONE. `cex` fontsize adjustment seems not quite right.
+   See `README.Rmd` examples, they're not quite right yet.
+
+      * Providing `item_cex` as vector is different than single item.
+      * Single item label fontsize can be too large, and gets too small.
+      * It needs a better way to define and tune the fontsize adjustment.
+
+   * Revisit `item_buffer`, `width_buffer`, other ideas to position labels
+   inside polygons.
+   * Consider optional columns for item labels in `label_df`:
+   coords, label cex/fontsize, border, fill, fontcolor.
+   When `NA` use automated/defaults, otherwise they override.
+
+* Legend
+
+   * Optional signed counts and percentage to legend.
+   Might need special handling, e.g. calling `curate_venn_labels()`.
+   * Option for legend with `textvenn()`
+
+* Test PDF output with different font choices. Compare with `ragg_png`.
+
+   * Need automated tests for PDF and PNG output. Not sure how yet.
+
+* `textvenn()`
+
+   * enable multi-line headers in output
+   * include optional legend with counts
+
+* `README.Rmd`
+
+   * Add `venn_meme()`
+
+* Lower priority ideas
+
+   * DONE. `sample_JamPolygon()`
+   
+      * DONE. Consider more organic/efficient algorithm: instead of linear
+      testing across `n_seq`, do sparse testing, then fine-tune.
+      E.g. requested: 100;
+      try 100, 150, 200;
+      150 failed, 200 worked;
+      next try 175; if success try 162, if fail try 188;
+      try 188; if success try 194
+
 ## 12nov2024
 
 * item labeling

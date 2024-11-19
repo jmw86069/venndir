@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.45.900</span>
       </span>
     </div>
 
@@ -73,6 +73,7 @@
 <span>  items <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sizes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
+<span>  item_prefix <span class="op">=</span> <span class="st">"item_"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -129,6 +130,11 @@ are used as names for each set.</p></dd>
 <dt>seed</dt>
 <dd><p><code>numeric</code> or <code>NULL</code> used with <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> for data
 reproducibility. When <code>seed=NULL</code> then <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> is not called.</p></dd>
+
+
+<dt>item_prefix</dt>
+<dd><p><code>character</code> string used as prefix for item names,
+default <code>"item_"</code>.</p></dd>
 
 
 <dt>...</dt>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.45.900</span>
       </span>
     </div>
 
@@ -74,6 +74,7 @@
 <span>  width_buffer <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  max_width_buffer <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  byCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-y"</span>, <span class="st">"x"</span><span class="op">)</span>,</span>
+<span>  algorithm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"split"</span>, <span class="st">"seq"</span><span class="op">)</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -96,18 +97,28 @@
 
 
 <dt>spread</dt>
-<dd><p><code>logical</code> (default <code>TRUE</code>) when more then <code>n</code> points can
-be fit inside the polygon, <code>spread=TRUE</code> spreads the points evenly
-across the available points, while <code>spread=FALSE</code> simply uses
-the first <code>n</code> points.</p></dd>
+<dd><p><code>logical</code> (default <code>FALSE</code>) when more then <code>n</code> points are
+defined than the target number of points, <code>spread</code> indicates whether
+the subset of <code>n</code> points returned is defined using the first <code>n</code>
+points (spread=FALSE) or an even spread from start to end (spread=TRUE),</p><ul><li><p><code>spread=TRUE</code> can produce unusual distributions, with potential
+improvementwhen filling an irregular polygon.</p></li>
+<li><p><code>spread=FALSE</code> produces more "regular" placement of labels, also
+without gaps.</p></li>
+</ul></dd>
 
 
 <dt>n_ratio</dt>
-<dd><p><code>numeric</code> ratio which must be <code>1</code> or higher, indicating
-how many total sampled points should be defined, before choosing
-the points to use. This option is used only when <code>spread=TRUE</code>,
-which causes more points to be defined, from which it uses
-evenly distributed values.</p></dd>
+<dd><p><code>numeric</code> ratio which must be <code>1</code> or higher, default 1,
+how many total valid points should be defined before choosing
+a subset of points to use.</p><ul><li><p><code>n_ratio=1</code> - defines <code>n</code> points as closely as possible.</p></li>
+<li><p><code>n_ratio=2</code> - defines twice the points, then takes a subset
+to use, based upon argument <code>spread</code>. It may be beneficial when
+trying to fill an irregularly shaped polygon to use a higher
+<code>n_ratio</code>, thereby forcing the discovery of many more possible
+points. That said, the subset of points may not be "ideally"
+distributed relative to other labels, and relative to the polygon
+shape.</p></li>
+</ul></dd>
 
 
 <dt>pattern</dt>
@@ -128,6 +139,21 @@ polygon border. Points are sampled after this adjustment.</p></dd>
 <dd><p><code>character</code> passed to <code><a href="https://rdrr.io/pkg/jamba/man/mixedSortDF.html" class="external-link">jamba::mixedSortDF()</a></code> to determine
 how to sort the resulting coordinates. Default <code>byCols=c("-y", "x")</code>
 sorts top-to-bottom, then left-to-right.</p></dd>
+
+
+<dt>algorithm</dt>
+<dd><p><code>character</code> string, default "split"</p><ul><li><p><code>"split"</code>: newer approach that starts with large step increases in <code>n</code>,
+then subdivides between failure/success to find the optimal final <code>n</code>.
+During testing it was substantially faster and more accurate than
+the previous algorithm <code>"seq"</code>.</p></li>
+<li><p><code>"seq"</code>: attempts a linear sequence of <code>n</code> values with gradual
+increases.
+The approach is slow, testing values iteratively without regard
+to the relative success, number of "points in polygon" compared to
+the number requested. It also used a fixed "step size" which sometimes
+produced more valid points than requested, and required using a subset
+of points, see argument <code>spread</code>.</p></li>
+</ul></dd>
 
 
 <dt>do_plot</dt>
@@ -212,18 +238,22 @@ In future, consider hexagonal, diamond, or diagonal.</p></li>
 <span class="r-in"><span>   fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gold"</span>, <span class="st">"firebrick"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">jp3</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"JamPolygon"</span>, polygons<span class="op">=</span><span class="va">df3</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"seq"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-1.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">80</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"split"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-2.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-3.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"split"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="sample_JamPolygon-4.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"seq"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="sample_JamPolygon-5.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sample_JamPolygon-4.png" alt="" width="768" height="768"></span>
+<span class="r-plt img"><img src="sample_JamPolygon-6.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sample_JamPolygon-5.png" alt="" width="768" height="768"></span>
+<span class="r-plt img"><img src="sample_JamPolygon-7.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

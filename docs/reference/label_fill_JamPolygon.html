@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.45.900</span>
       </span>
     </div>
 
@@ -107,6 +107,19 @@ to the size of the polygon. For example <code>-0.9</code> will reduce the polygo
 is defined by the width inside the polygon border.</p></dd>
 
 
+<dt>width_buffer</dt>
+<dd><p><code>numeric</code> passed to <code><a href="sample_JamPolygon.html">sample_JamPolygon()</a></code> to apply
+a "width buffer", using values relative to the maximum <code>buffer</code>
+size. This mechanism is experimental, to try to improve label
+placement in unusually-shaped polygons.</p><ul><li><p><code>width_buffer=0</code> will add no additional buffer</p></li>
+<li><p><code>width_buffer=0.5</code> will apply width buffer equal to half the
+buffer size required to create an empty polygon. The polygon is
+shifted left and right by half this amount each direction, then
+the intersection is used. This method has the intention of requiring
+a certain available width, for example for wide text labels.</p></li>
+</ul></dd>
+
+
 <dt>relative</dt>
 <dd><p><code>logical</code> passed to <code><a href="buffer_JamPolygon.html">buffer_JamPolygon()</a></code> (default <code>TRUE</code>)
 to define <code>buffer</code> with relative coordinates.</p></dd>
@@ -172,7 +185,10 @@ Both packages have heavy R dependencies and were avoided.</p></dd>
 
 <dt>draw_labels</dt>
 <dd><p><code>logical</code> (default <code>TRUE</code>) indicating whether to
-draw labels, however it is only used when <code>plot_style="base"</code>.</p></dd>
+draw labels, however it is only used when <code>plot_style="JamPolygon"</code>.
+Note also, when drawing labels, it assumes the plot is already
+created using <code>ref_jp</code>, and it determines the coordinate
+adjustments relative to <code>ref_jp</code>.</p></dd>
 
 
 <dt>seed</dt>
@@ -182,11 +198,12 @@ When <code>seed</code> is <code>NULL</code> there is no call to <code><a href="h
 
 
 <dt>plot_style</dt>
-<dd><p><code>character</code> string (deprecated) to define the
-plot output, used only when <code>draw_labels=TRUE</code>.
-Currently, labels are only rendered for <code>plot_style="base"</code>.</p><ul><li><p><code>"base"</code>: Use R base plotting, using <code>gridBase</code> with <code>gridtext</code>.</p></li>
-<li><p><code>"gg"</code>: Use <code>ggplot2</code> style plotting.</p></li>
-<li><p><code>"none"</code>: No plot output.</p></li>
+<dd><p><code>character</code> string, default "none".</p><ul><li><p><code>"none"</code>: No plot output.</p></li>
+<li><p><code>"JamPolygon"</code>: assume <code>ref_jp</code> has already been plotted, and
+labels should be drawn in that coordinate context.
+For example call <code>plot(ref_jp)</code> then
+<code>label_fill_JamPolygon(jp, ref_jp, plot_output="JamPolygon")</code>.
+See examples.</p></li>
 </ul></dd>
 
 

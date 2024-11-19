@@ -48,6 +48,16 @@
 #'    to the size of the polygon. For example `-0.9` will reduce the polygon
 #'    90% of the way toward a completely empty polygon, where that range
 #'    is defined by the width inside the polygon border.
+#' @param width_buffer `numeric` passed to `sample_JamPolygon()` to apply
+#'    a "width buffer", using values relative to the maximum `buffer`
+#'    size. This mechanism is experimental, to try to improve label
+#'    placement in unusually-shaped polygons.
+#'    * `width_buffer=0` will add no additional buffer
+#'    * `width_buffer=0.5` will apply width buffer equal to half the
+#'    buffer size required to create an empty polygon. The polygon is
+#'    shifted left and right by half this amount each direction, then
+#'    the intersection is used. This method has the intention of requiring
+#'    a certain available width, for example for wide text labels.
 #' @param relative `logical` passed to `buffer_JamPolygon()` (default `TRUE`)
 #'    to define `buffer` with relative coordinates.
 #' @param color `character` string to define the color of resulting labels.
@@ -94,16 +104,20 @@
 #'    but ultimately not more effective specifically for character labels.
 #'    Both packages have heavy R dependencies and were avoided.
 #' @param draw_labels `logical` (default `TRUE`) indicating whether to
-#'    draw labels, however it is only used when `plot_style="base"`.
+#'    draw labels, however it is only used when `plot_style="JamPolygon"`.
+#'    Note also, when drawing labels, it assumes the plot is already
+#'    created using `ref_jp`, and it determines the coordinate
+#'    adjustments relative to `ref_jp`.
 #' @param seed `numeric` value (default `1`) used to define the random seed
 #'    with `set.seed(seed)` for reproducible output.
 #'    When `seed` is `NULL` there is no call to `set.seed()`.
-#' @param plot_style `character` string (deprecated) to define the
-#'    plot output, used only when `draw_labels=TRUE`.
-#'    Currently, labels are only rendered for `plot_style="base"`.
-#'    * `"base"`: Use R base plotting, using `gridBase` with `gridtext`.
-#'    * `"gg"`: Use `ggplot2` style plotting.
+#' @param plot_style `character` string, default "none".
 #'    * `"none"`: No plot output.
+#'    * `"JamPolygon"`: assume `ref_jp` has already been plotted, and
+#'    labels should be drawn in that coordinate context.
+#'    For example call `plot(ref_jp)` then
+#'    `label_fill_JamPolygon(jp, ref_jp, plot_output="JamPolygon")`.
+#'    See examples.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to internal functions:
 #'    `buffer_JamPolygon()`, and `sample_JamPolygon()`.
@@ -276,12 +290,17 @@ label_fill_JamPolygon <- function
       max_width_buffer <- abs(diff(bbox["x", ])) * (1 / 20);
    }
    
+   if (verbose) {
+      jamba::printDebug("label_fill_JamPolygon(): ",
+         "Calling sample_JamPolygon().")
+   }
    label_sampled <- sample_JamPolygon(jp=jp,
       n=n,
       xyratio=xyratio,
       buffer=buffer,
       width_buffer=width_buffer,
       max_width_buffer=max_width_buffer,
+      verbose=ifelse(verbose > 1, verbose - 1, FALSE),
       ...);
 
    label_xy <- do.call(cbind, label_sampled)
@@ -309,28 +328,63 @@ label_fill_JamPolygon <- function
       adjx <- attributes(jpp)$adjx;
       adjy <- attributes(jpp)$adjy;
       use_vp <- attributes(jpp)$viewport;
-      g_labels <- gridtext::richtext_grob(
-         x=adjx(label_xy[,1]),
-         y=adjy(label_xy[,2]),
-         text=labels,
-         rot=-degrees,
-         default.units="snpc",
-         padding=grid::unit(2, "pt"),
-         r=grid::unit(2, "pt"),
-         vjust=0.5,
-         hjust=0.5,
-         halign=0.5,
-         vp=use_vp,
-         gp=grid::gpar(
-            col=color,
-            fontsize=fontsize * cex
-         ),
-         box_gp=grid::gpar(
-            col=border
-         )
-      );
+      if (verbose) {
+         jamba::printDebug("label_fill_JamPolygon(): ",
+            "Preparing grid labels.")
+      }
+      if (FALSE) {
+         g_labels <- gridtext::richtext_grob(
+            x=adjx(label_xy[,1]),
+            y=adjy(label_xy[,2]),
+            text=labels,
+            rot=-degrees,
+            default.units="snpc",
+            padding=grid::unit(2, "pt"),
+            r=grid::unit(2, "pt"),
+            vjust=0.5,
+            hjust=0.5,
+            halign=0.5,
+            vp=use_vp,
+            gp=grid::gpar(
+               col=color,
+               fontsize=fontsize * cex
+            ),
+            box_gp=grid::gpar(
+               col=border
+            )
+         );
+      } else {
+         g_labels <- grid::grid.text(
+            x=adjx(label_xy[,1]),
+            y=adjy(label_xy[,2]),
+            label=labels,
+            rot=-degrees,
+            default.units="snpc",
+            # padding=grid::unit(2, "pt"),
+            # r=grid::unit(2, "pt"),
+            vjust=0.5,
+            hjust=0.5,
+            # halign=0.5,
+            vp=use_vp,
+            gp=grid::gpar(
+               col=color,
+               fontsize=fontsize * cex
+            )
+            # ,box_gp=grid::gpar(
+            #    col=border
+            # )
+         );
+      }
       if (TRUE %in% draw_labels && length(dev.list()) > 0) {
+         if (verbose) {
+            jamba::printDebug("label_fill_JamPolygon(): ",
+               "Drawing grid labels.")
+         }
          grid::grid.draw(g_labels);
+      }
+      if (verbose) {
+         jamba::printDebug("label_fill_JamPolygon(): ",
+            "Complete.")
       }
    }
    

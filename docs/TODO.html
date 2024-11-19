@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.45.900</span>
       </span>
     </div>
 
@@ -58,6 +58,48 @@
 
 <div id="todo-for-venndir" class="section level1">
 
+<div class="section level2">
+<h2 id="id_19nov2024">19nov2024<a class="anchor" aria-label="anchor" href="#id_19nov2024"></a></h2>
+<p>Residual todo items of note:</p>
+<ul><li>
+<p>Item label</p>
+<ul><li>
+<p>DONE. <code>cex</code> fontsize adjustment seems not quite right. See <code>README.Rmd</code> examples, they’re not quite right yet.</p>
+<ul><li>Providing <code>item_cex</code> as vector is different than single item.</li>
+<li>Single item label fontsize can be too large, and gets too small.</li>
+<li>It needs a better way to define and tune the fontsize adjustment.</li>
+</ul></li>
+<li><p>Revisit <code>item_buffer</code>, <code>width_buffer</code>, other ideas to position labels inside polygons.</p></li>
+<li><p>Consider optional columns for item labels in <code>label_df</code>: coords, label cex/fontsize, border, fill, fontcolor. When <code>NA</code> use automated/defaults, otherwise they override.</p></li>
+</ul></li>
+<li>
+<p>Legend</p>
+<ul><li>Optional signed counts and percentage to legend. Might need special handling, e.g. calling <code><a href="reference/curate_venn_labels.html">curate_venn_labels()</a></code>.</li>
+<li>Option for legend with <code><a href="reference/textvenn.html">textvenn()</a></code>
+</li>
+</ul></li>
+<li>
+<p>Test PDF output with different font choices. Compare with <code>ragg_png</code>.</p>
+<ul><li>Need automated tests for PDF and PNG output. Not sure how yet.</li>
+</ul></li>
+<li>
+<p><code><a href="reference/textvenn.html">textvenn()</a></code></p>
+<ul><li>enable multi-line headers in output</li>
+<li>include optional legend with counts</li>
+</ul></li>
+<li>
+<p><code>README.Rmd</code></p>
+<ul><li>Add <code><a href="reference/venn_meme.html">venn_meme()</a></code>
+</li>
+</ul></li>
+<li>
+<p>Lower priority ideas</p>
+<ul><li>
+<p>DONE. <code><a href="reference/sample_JamPolygon.html">sample_JamPolygon()</a></code></p>
+<ul><li>DONE. Consider more organic/efficient algorithm: instead of linear testing across <code>n_seq</code>, do sparse testing, then fine-tune. E.g. requested: 100; try 100, 150, 200; 150 failed, 200 worked; next try 175; if success try 162, if fail try 188; try 188; if success try 194</li>
+</ul></li>
+</ul></li>
+</ul></div>
 <div class="section level2">
 <h2 id="id_12nov2024">12nov2024<a class="anchor" aria-label="anchor" href="#id_12nov2024"></a></h2>
 <ul><li>

@@ -20,7 +20,7 @@ venndir(
   show_items = c(NA, "none", "sign item", "sign", "item"),
   max_items = 3000,
   show_zero = FALSE,
-  font_cex = c(1, 1, 0.8),
+  font_cex = c(1, 1, 0.7),
   fontfamily = "Arial",
   show_label = NA,
   display_counts = TRUE,
@@ -170,13 +170,23 @@ count zero label is displayed, otherwise no count label is shown.}
 \item Signed count label
 }
 
-The default \code{c(1, 1, 0.8)} defines the signed count label slightly
-smaller than other labels.}
+The default \code{c(1, 1, 0.7)} defines the signed count label slightly
+smaller than other labels.
+\itemize{
+\item When one value is provided, it is multiplied by \code{c(1, 1, 0.7)} to
+adjust font sizes altogether, keeping relative sizes.
+\item When two values are provided, they are multiplied by \code{c(1, 1, 0.7)}
+using the second value twice.
+\item When three values are provided, they are used as-is without change.
+}}
 
 \item{fontfamily}{\code{character} string to define the fontfamily.
 The \code{fontfamily} must match a recognized font for the given output
 device, and this font must be capable of producing UTF-8 / Unicode
 characters, in order to print up arrow and down arrow.
+You may review \code{systemfonts::system_fonts()} for a listing of fonts
+recognized by \code{ragg} devices, which seems to have the best
+overall font capabilities.
 When it does not work, either use \code{unicode=FALSE}, or check the
 output from \code{Sys.getlocale()} to ensure the setting is capable
 of using UTF-8 (for example "C" may not be sufficient).
@@ -253,16 +263,19 @@ for the count label to be displayed inside the region,
 otherwise the label is displayed outside the region.
 Values are expected to range from 0 to 100.}
 
-\item{item_cex}{\code{numeric} value (default NULL) used to resize item labels.
+\item{item_cex}{\code{numeric} default 1, used to define baseline font size
+(single value), or exact font \code{cex} values (multiple values).
 \itemize{
-\item When \code{item_cex} is a single value or \code{NULL}, auto-scaling is
-performed based upon the number of items in each overlap
-polygon, and the relative polygon areas.
-Any single \code{numeric} value for \code{item_cex} is multiplied by the
-auto-scaled value for each overlap region.
-\item When two or more values are supplied as a vector, the
-values are recycled and applied across all Venn overlap regions,
-in the order they appear in \code{signed_overlaps()}.
+\item When a single value is provided, each set of items is used to
+define a font scaling, based upon the relative area of the
+overlap polygon to the max item polygon area, and the number of
+items in each polygon. These values are multiplied by \code{item_cex}
+to produce the final adjustment.
+These values are multiplied by \code{item_cex_factor}.
+\item When multiple values are provided, they are recycled to the
+number of polygons that contain items, and applied in order.
+There is no further adjustment by polygon area, nor number of labels.
+These values are multiplied by \code{item_cex_factor}.
 }}
 
 \item{item_style}{\code{character} string (default "text") indicating

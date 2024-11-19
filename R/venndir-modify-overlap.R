@@ -202,6 +202,10 @@ modify_venndir_overlap <- function
       border=NA, border.lwd=1)
    # populate params values
    for (iparam in names(params_jps)) {
+      if (debug) {
+         jamba::printDebug("modify_venndir_overlap(): ",
+            "overlap param:", iparam);
+      }
       if (!iparam %in% names(params)) {
          # if not user-defined, use what exists
          if (iparam %in% colnames(venndir_output@jps@polygons)) {
@@ -311,7 +315,6 @@ modify_venndir_overlap <- function
 #' 
 #' # show set_C or set_D not set_B
 #' vo4h2 <- highlight_venndir_overlap(vo4, outerborder.lwd=0,
-#'    fill="gold",
 #'    overlap_set=unique(grep("set_B", value=TRUE, invert=TRUE,
 #'       grep("set_C|set_D", vo4@jps@polygons$venn_name, value=TRUE)))
 #'       )
@@ -377,13 +380,13 @@ modify_venndir_overlap <- function
 highlight_venndir_overlap <- function
 (venndir_output,
  overlap_set,
- innerborder="red",
+ innerborder="gold",
  innerborder.lwd=2,
  border="red3",
  border.lwd=1,
  outerborder=innerborder,
  outerborder.lwd=0,
- fill=NULL,
+ fill="yellow",
  params=list(
     fill=fill,
     innerborder=innerborder,
@@ -395,6 +398,7 @@ highlight_venndir_overlap <- function
  ...)
 {
    #
+   params <- params[lengths(params) > 0];
    venndir_output <- modify_venndir_overlap(
       venndir_output=venndir_output,
       overlap_set=overlap_set,
