@@ -85,10 +85,9 @@
 #'    `s&cs`="Data<br>Science",
 #'    `cs&b`="Computational<br>Biology",
 #'    `s&cs&b`="Bioinformatics")
-#' venn_meme(bix)
-#' 
 #' venn_meme(bix, proportional=TRUE)
 #' 
+#' # some customizations
 #' venn_meme(bix,
 #'    proportional=TRUE,
 #'    rotate_degrees=360/6,
@@ -101,7 +100,7 @@
 #'    ACTUAL=c("actual"),
 #'    HECK=c("heck", "What heck", "the heck", "What the heck"))
 #' wth <- lapply(wth[c(1,2,4)], function(i){gsub(" ", "<br>", i)})
-#' venn_meme(wth, item_cex=2)
+#' venn_meme(wth, item_cex=1.4, fontfamily="Impact")
 #' 
 #' # what the actual heck
 #' wtahv <- c("What", "the", "actual", "HECK");
@@ -111,15 +110,14 @@
 #'       jamba::pasteByRow(sep="<br>", im),
 #'       jamba::pasteByRow(sep="&", im))
 #' })))
-#' venn_meme(wtah)
+#' venn_meme(wtah, item_cex=0.7, fontfamily="Impact")
 #' 
-#' # by default any hidden overlaps do not trigger a warning to be displayed
-#' # Note: using shape="circle" triggers an error in polygon_label_fill()
-#' # that needs to be debugged
-#' # venn_meme(wtah, proportional=TRUE, shape="circle")
+#' # circular 4-way shapes
+#' venn_meme(wtah, proportional=TRUE, shape="circle",
+#'    item_cex=0.8, fontfamily="Impact")
 #' 
 #' # for proportional diagrams it may be helpful to use shape="ellipse"
-#' venn_meme(wtah, proportional=TRUE, shape="ellipse")
+#' venn_meme(wtah, proportional=TRUE, shape="ellipse", item_cex=0.8)
 #' 
 #' # superhero?
 #' avlist <- c(
@@ -131,7 +129,7 @@
 #' `ML&T`="Resists<br>taking a bath",
 #' `AV&ML&T`="Impossible<br>to reason with"
 #' )
-#' venn_meme(avlist,
+#' venn_meme(avlist, fontfamily="Trebuchet MS",
 #'    item_cex=rep(c(2, 1.6, 1.3, 1.7, 1.5),
 #'       c(3, 1, 1, 1, 1)))
 #' 
@@ -147,9 +145,9 @@
 #' )
 #' #   `a&c`="Scrolling<br>through your<br>Twitter feed",
 #' #   `a&b&c`="Being<br>a sports<br>fan"
-#' venn_meme(em,
+#' venn_meme(em, fontfamily="Georgia",
 #'    set_colors=c("gold", "dodgerblue3", "firebrick3"),
-#'    item_cex=rep(c(2.3, 1.8, 2), c(3, 3, 1)))
+#'    item_cex=rep(c(2.3, 1.8, 1.8), c(3, 3, 1)))
 #' 
 #' # Mister Venn
 #' mrvenn <- c(
@@ -176,29 +174,30 @@
 #' `r&sty&fh`="Mr<br>Monopoly",
 #' `sty&fh&str&t&f&fu&r`="Mr T"
 #' )
-#' venn_meme(mrvenn, proportional=TRUE, item_style="text")
+#' venn_meme(mrvenn, proportional=TRUE, fontfamily="Georgia")
 #' 
 #' # example of ordered item labels
 #' item_list <- list(
 #'    CLE=(c("**CLE**:",
 #'       "IFN&alpha; > IFN&beta;",
 #'       "Anti-malarials effective\ntherapy for\nskin disease")),
-#'    DM=(c("\n\n**DM**:",
-#'       "\n\nIFN&beta; > IFN&alpha;",
-#'       "\nTriggered by\nimmune stimulating\nherbal supplements",
-#'       "\n\n\nAnti-malarials\neffective in 25%,\ncommonly causes\nmorbilliform rash",
-#'       "\n\n\n\n\nCannabinoid receptor\nagonist proising\ntreatment",
-#'       "  ")),
+#'    DM=(c("**DM**:",
+#'       "IFN&beta; > IFN&alpha;",
+#'       "Triggered by\nimmune stimulating\nherbal supplements",
+#'       "\n\nAnti-malarials\neffective in 25%,\ncommonly causes\nmorbilliform rash",
+#'       "\n\nCannabinoid receptor\nagonist proising\ntreatment"
+#'       )),
 #'    `CLE&DM`=(c(
 #'       "Photosensitivity",
 #'       "Triggered by viral and\nbacterial infections",
 #'       "Increased\ntype I IFN")))
 #' vo <- venndir::venn_meme(x=item_list,
-#'    item_cex=c(1.3, 1.2, 1.3),
+#'    fontfamily="Times New Roman",
+#'    item_cex=c(1.3, 1.2, 1.3) ,
 #'    item_buffer=c(-0.5, -0.2, -0.75),
 #'    set_colors=c("darkorchid3", "gold"),
 #'    poly_alpha=0.3,
-#'    xyratio=5,
+#'    xyratio=5, spread=TRUE,
 #'    dither_cex=0)
 #' 
 #' @export

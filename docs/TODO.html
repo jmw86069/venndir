@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -61,6 +61,24 @@
 <div class="section level2">
 <h2 id="id_12nov2024">12nov2024<a class="anchor" aria-label="anchor" href="#id_12nov2024"></a></h2>
 <ul><li>
+<p>item labeling</p>
+<ul><li><p>Consider storing item label coordinates in the <code>Venndir</code> object. Then <code><a href="reference/render_venndir.html">render_venndir()</a></code> must be able to re-use item labels. It would allow editing the coordinates for fine-tuning.</p></li>
+<li>
+<p>Consider alternatives to <code><a href="reference/label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code> to fill labels inside a polygon. Ideally, it minimizes overlapping labels, and maximizes placement of labels inside each polygon.</p>
+<ul><li>Consider defining <code>adj</code> based upon label relative distance to left-right edges of the polygon. Doing so would allow labels to fit cleanly within the polygon.</li>
+<li>Evaluate <code>wordcloud</code> type approaches which can fill text words into a polygon shape. Github <code>"Lchiffon/wordcloud2"</code> also on CRAN. Note: <code>wordcloud2</code> produces HTML/javascript, it also requires black-and-white mask for each shape, then places words inside the shape using active javascript. It often needs web page refresh.</li>
+</ul></li>
+<li><p>Consider permitting item border and fill.</p></li>
+</ul></li>
+<li>
+<p>Font and character handling</p>
+<ul><li>
+<p>Consider <code>marquee</code> package for potentially more robust unicode character and font handling.</p>
+<ul><li>It would involve converting existing markdown/HTML to CommonMark format, which uses styles by name.</li>
+<li>Named styles could enable more flexible control over labeling overall. E.g. <code>count</code> could be a <code>marquee::style()</code> with fontfamily, fontsize, color, etc.</li>
+</ul></li>
+</ul></li>
+<li>
 <p><code><a href="reference/textvenn.html">textvenn()</a></code></p>
 <ul><li><p>Consider optional text legend, counts per set, with total.</p></li>
 <li>
@@ -73,8 +91,11 @@
 </ul></li>
 <li>
 <p><code><a href="reference/venndir.html">venndir()</a></code>, <code><a href="reference/render_venndir.html">render_venndir()</a></code> - labeling placement options</p>
-<ul><li><p>Fix the <code><a href="reference/grobs_tile.html">grobs_tile()</a></code> spacing, remove overlap with percent labels.</p></li>
-<li><p>Find reproducible example of bad font kerning, post issue to <code>gridtext</code>.</p></li>
+<ul><li>
+<p>Fix the <code><a href="reference/grobs_tile.html">grobs_tile()</a></code> spacing, remove overlap with percent labels.</p>
+<ul><li>This issue might be solved with <code><a href="https://ragg.r-lib.org/reference/agg_png.html" class="external-link">ragg::agg_png()</a></code> font handling.</li>
+</ul></li>
+<li><p>Find reproducible example of bad font kerning, post issue to <code>gridtext</code>. Consider <code>marquee</code> as alternative.</p></li>
 <li>
 <p>Consider adjustments to inner/outer labels. Examples:</p>
 <ul><li>Option to show counts/percentage only when the overlap label is shown.</li>
@@ -86,20 +107,33 @@
 <p><code>JamPolygon</code> plotting</p>
 <ul><li>Need a method for adding components to venndir plot <code>grid</code> elements, e.g. text labels, points, any <code>grid</code> object.</li>
 <li>Use case could be obtaining <code>grid</code> object, detecting the <code>gTree</code> elements by name, then adjusting item label positions?</li>
+<li>Consider conversion to polypath-compatible coordinates, and <code>sf</code>.</li>
+</ul></li>
+<li>
+<p>DONE. <code>Venndir</code> polygon manipulations</p>
+<ul><li>DONE. customize an overlap: fill color, innerborder/outerborder/border</li>
 </ul></li>
 <li>
 <p>Add accessors to the <code>Venndir</code> object</p>
-<ul><li>setlist</li>
-<li>overlap item list</li>
-<li>countlist - return overlap count list</li>
-<li>
-<code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> - using the <code>setAs()</code> methodology. Convenient conversion to <code>data.frame</code> format.</li>
+<ul><li>DONE. setlist</li>
+<li>DONE. <code>overlaplist()</code> - overlap item list</li>
+<li>DONE. <code>signed_counts()</code> - return overlap count list</li>
+<li>DONE. (<code>overlapdf()</code> and <code><a href="reference/venndir_to_df.html">venndir_to_df()</a></code>), alternatively: <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> - using the <code>setAs()</code> methodology. Convenient conversion to <code>data.frame</code> format.</li>
 </ul></li>
 <li>
 <p>Summarize advice for fonts, plot resolution, anti-aliasing, etc.</p>
 <ul><li>
 <code><a href="https://ragg.r-lib.org/reference/agg_png.html" class="external-link">ragg::agg_png()</a></code> provides a notable improvement over <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png()</a></code>, in RMarkdown put <code>dev="ragg_png"</code> in the kntir options, for example: <code>knitr::opts_chunk$set(dev="ragg_png")</code>
 </li>
+</ul></li>
+<li>
+<p>Consider other S4 objects?</p>
+<ul><li>
+<p><code>Setlist</code> - consistent representation for setlist</p>
+<ul><li>When <code><a href="reference/signed_overlaps.html">signed_overlaps()</a></code> is run, it first “detects” input type, then converts data accordingly. It could be stored properly.</li>
+<li>list, signed list, incidence matrix, signed incidence matrix.</li>
+</ul></li>
+<li><p><code>SignedOverlaps</code> - Structured info</p></li>
 </ul></li>
 </ul></div>
 <div class="section level2">

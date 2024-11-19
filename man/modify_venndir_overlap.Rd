@@ -120,14 +120,14 @@ vo2m <- modify_venndir_overlap(vo2,
       label.padding=c(5, 1, 1, 1), label.r=c(5, 1, 1, 1),
       label.color=c("darkorange4", "firebrick4", "dodgerblue4", "grey44"),
       label.fill=jamba::alpha2col("gold", alpha=0.8)
-   ), debug=TRUE);
-render_venndir(vo2m);
+   ));
+render_venndir(vo2m, main="Highlighted overlap");
 
 # nudge the label slightly higher
 vo2mb <- nudge_venndir_label(vo2m,set="set_A&set_B",
    x_offset=-0.01, y_offset=0.08,
    label_location="inside");
-render_venndir(vo2mb);
+render_venndir(vo2mb, main="Highlighted overlap");
 
 # nudge a few labels using offset_list
 vo2mc <- nudge_venndir_label(vo2m,
@@ -139,30 +139,17 @@ vo2mc <- nudge_venndir_label(vo2m,
    label_location="inside");
 vo2mc <- nudge_venndir_label(vo2mc,
    set=c("set_A", "set_B"), align_y="top")
-render_venndir(vo2mc);
+render_venndir(vo2mc, main="Highlighted overlap,\nnudged labels");
 
 # to control drawing order, place one polygon at the end of the line
 vo2md <- vo2mc;
 vo2md@jps <- vo2mc@jps[c(1:6, 8:10, 7),]
-render_venndir(vo2md);
-
-# modify multiple overlap_sets at once
-vo2multi <- modify_venndir_overlap(vo2md,
-   overlap_set=c("set_A", "set_A&set_B", "set_B"),
-   params=list(fill=c("gold", "darkorange", "firebrick3"),
-      alpha=0.8,
-      innerborder="red", innerborder.lwd=3,
-      outerborder="red", outerborder.lwd=3,
-      fontsize=list(c(18, 13, 13, 13)),
-      label.border="black",
-      label.fill=jamba::alpha2col("palegoldenrod", alpha=0.8)
-   ), reorder=TRUE);
-render_venndir(vo2multi);
+render_venndir(vo2md, main="Altered drawing order");
 
 # modify multiple overlap_sets at once
 vo2multi2 <- modify_venndir_overlap(vo2,
    overlap_set=c("set_A", "set_B", "set_C"),
-   params=list(fill=c("gold", "firebrick3", "slateblue"),
+   params=list(fill=c("gold", "gold", "gold"),
       alpha=0.8,
       innerborder="red",
       innerborder.lwd=3,
@@ -170,27 +157,22 @@ vo2multi2 <- modify_venndir_overlap(vo2,
       label.border="black",
       label.fill=jamba::alpha2col("palegoldenrod", alpha=0.8)
    ), reorder=TRUE);
-render_venndir(vo2multi2);
+render_venndir(vo2multi2, main="Multiple effects at once");
 
 # modify multiple overlap_sets at once
 vo2multi3 <- modify_venndir_overlap(vo2,
    overlap_set=c("set_A&set_B", "set_B&set_C", "set_A&set_C",
       "set_A&set_B&set_C"),
-   params=list(#fill=c("darkorange"),
+   params=list(fill=c("gold"),
       alpha=0.8,
       border="red4",
       innerborder="red",
-      innerborder.lwd=3
+      innerborder.lwd=3,
+      label.border="black",
+      label.fill=jamba::alpha2col("palegoldenrod", alpha=0.8)
    ), reorder=TRUE);
-render_venndir(vo2multi3);
+render_venndir(vo2multi3, main="Multi-overlaps highlighed");
 
-# highlight as a wrapper
-vo2_setb <- highlight_venndir_overlap(vo2, overlap_set="set_B");
-render_venndir(vo2_setb)
-
-vo2_setbs <- highlight_venndir_overlap(vo2,
-   overlap_set=c("set_B", "set_A&set_B", "set_B&set_C", "set_A&set_B&set_C"));
-render_venndir(vo2_setbs)
 testlist4 <- make_venn_test(n_sets=4, do_signed=FALSE)
 vo4 <- venndir(testlist4, main="Default test case")
 
@@ -264,4 +246,21 @@ vo4h2way <- highlight_venndir_overlap(vo4,
 render_venndir(vo4h2way, main="Two-way overlaps only")
 
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{expand_range}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{make_venn_test}()},
+\code{\link{match_list}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{plot,Venndir,ANY-method}},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{three_point_angle}()},
+\code{\link{venndir_legender}()},
+\code{\link{venndir_to_df}()}
+}
 \concept{jam JamPolygon}
+\concept{venndir utility}

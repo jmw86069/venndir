@@ -156,12 +156,12 @@ venndir_label_style <- function
       }
    }
    if (length(show_items) > 0) {
-      metadata(vo)$show_items <- show_items;
-   } else if (length(metadata(vo)$show_items) > 0) {
-      show_items <- metadata(vo)$show_items;
+      metadata(venndir_output)$show_items <- show_items;
+   } else if (length(metadata(venndir_output)$show_items) > 0) {
+      show_items <- metadata(venndir_output)$show_items;
    } else {
       show_items <- "none";
-      metadata(vo)$show_items <- show_items;
+      metadata(venndir_output)$show_items <- show_items;
    }
    use_nocpsi <- TRUE;
    if (use_nocpsi) {

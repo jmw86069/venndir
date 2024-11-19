@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -57,6 +57,68 @@
       <small>Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.44.900" id="venndir-0044900">venndir 0.0.44.900<a class="anchor" aria-label="anchor" href="#venndir-0044900"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-0-44-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-44-900"></a></h3>
+<ul><li>
+<p><code>Venndir</code> has new methods:</p>
+<ul><li>
+<code>show()</code> to summarize the contents</li>
+<li>
+<code>metadata()</code> and <code>metadata&lt;-</code>
+</li>
+<li>
+<code>setlist()</code> - returns the original setlist</li>
+<li><code>overlaplist()</code></li>
+<li>
+<code>overlapdf()</code> - returns <code>data.frame</code> of overlap items</li>
+<li><code>signed_counts()</code></li>
+<li>
+<code>im()</code> - return incidence matrix format</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/modify_venndir_overlap.html">modify_venndir_overlap()</a></code>, <code><a href="../reference/modify_venndir_overlap.html">highlight_venndir_overlap()</a></code></p>
+<ul><li>Customize overlap set visual features, such as fill color, border, fontsize, font color.</li>
+<li>The highlight function streamlines the options to draw a distinctive border around one or more overlap sets.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-44-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-44-900"></a></h3>
+<ul><li><p>General changes to remove warnings, for example <code><a href="../reference/minus_JamPolygon.html">minus_JamPolygon()</a></code> was throwing warnings with empty polygon input or output.</p></li>
+<li><p>Added tests for <code><a href="../reference/area_JamPolygon.html">area_JamPolygon()</a></code> and <code><a href="../reference/labelr_JamPolygon.html">labelr_JamPolygon()</a></code> for a couple weird cases with nested holes, nested-nested solid polygons.</p></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Now accepts incidence matrix input, sets as colnames, items as rows, and <code>c(-1, 0, 1)</code> values.</li>
+<li>Added to metadata slot for persistence, though some might be added directly to <code>label_df</code> for persistence for each overlap label: <code>main</code>, <code>template</code>, <code>overlap_type</code>, <code>draw_legend</code>, <code>item_buffer</code>, <code>item_cex</code>, <code>item_style</code>, <code>item_degrees</code> <code>show_segments</code>, <code>segment_buffer</code>
+</li>
+<li>
+<code><a href="../reference/render_venndir.html">render_venndir()</a></code> defaults are <code>NULL</code> so they will pull from the “metadata” slot, otherwise it assigns the previous defaults. It is now possible to make <code>Venndir</code> object, then render separately and use the original <code>show_segments</code> and <code>segment_buffer</code> values.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/get_venn_polygon_shapes.html">get_venn_polygon_shapes()</a></code></p>
+<ul><li>Very small nudge to default 4-way elliptical Venn shapes to prevent rounding error overlaps at the ends of sets 2 and 3, overlapping the side edge of sets 4 and 1, respectively. Same thing, nudging sets 1 and 4 to prevent rounding error overlaps at the bottom edge. Previously there were miniscule “unique” shapes where the cornered edges slightly criss-crossed, since the ellipses are drawn with N vertices, and not infinite number of vertices. Possible side effect is that item fill for sets 1 and 4 may now also use the tiny section at the bottom for item labels.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code></p>
+<ul><li>Slightly changed how <code>keep_item_order=TRUE</code> is implemented, making it markedly faster for larger lists.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/labelr_JamPolygon.html">labelr_JamPolygon()</a></code></p>
+<ul><li>For multi-part polygons, it now uses the largest disconnected polygon from the set, instead of using polygons in order. Apparently <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> uses the first polygon provided, which is sometimes comically small.</li>
+<li>The new method checks for multi-part polygons, then determines whether there are multiple parent polygons. For polygons with holes, the sub-part polygons (holes, or nested solid polygons within a hole) need to be maintained with the appropriate parent. If there is only one parent, use them all as-is, since <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> works properly there. Otherwise, use the parent polygon with the largest net area.</li>
+<li>This update is an improvement for most Venn diagrams, but may not be optimal for polygon purists, since the polygon with largest area may not be the “most labelable” polygon. That said, <code><a href="https://jolars.github.io/polylabelr//reference/poi.html" class="external-link">polylabelr::poi()</a></code> ignores all but the first polygon anyway.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code></p>
+<ul><li>improved default condition for item buffer adjustment, it now only uses the number of items to make the buffer more restrictive, no longer uses the relative polygon area. (That adjustment was conflicting with the item-shrinkage approach.)</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/nudge_JamPolygon.html">nudge_JamPolygon()</a></code></p>
+<ul><li>New argument <code>scale</code> so this function accomplishes all manipulations: <code>nudge</code>, <code>rotate_degrees</code>, and <code>scale</code>.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.43.900" id="venndir-0043900">venndir 0.0.43.900<a class="anchor" aria-label="anchor" href="#venndir-0043900"></a></h2>
 <div class="section level3">

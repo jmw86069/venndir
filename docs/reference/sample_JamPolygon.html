@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -66,11 +66,13 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sample_JamPolygon</span><span class="op">(</span></span>
 <span>  <span class="va">jp</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  xyratio <span class="op">=</span> <span class="fl">1.1</span>,</span>
-<span>  spread <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xyratio <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  spread <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  n_ratio <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"offset"</span>, <span class="st">"rectangle"</span><span class="op">)</span>,</span>
-<span>  buffer <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>,</span>
+<span>  width_buffer <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  max_width_buffer <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  byCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-y"</span>, <span class="st">"x"</span><span class="op">)</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -214,12 +216,14 @@ In future, consider hexagonal, diamond, or diagonal.</p></li>
 <span class="r-plt img"><img src="sample_JamPolygon-1.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">80</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-2.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-3.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-4.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="sample_JamPolygon-5.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

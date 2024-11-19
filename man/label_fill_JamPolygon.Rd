@@ -8,6 +8,7 @@ label_fill_JamPolygon(
   jp,
   labels,
   buffer = -0.15,
+  width_buffer = 0.1,
   relative = TRUE,
   color = "black",
   border = NA,

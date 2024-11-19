@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -73,6 +73,7 @@
 <span>  include_blanks <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  keep_item_order <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  warn <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -143,6 +144,11 @@ the order they appear in the vector.</p></li>
 
 <dt>verbose</dt>
 <dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
+
+
+<dt>warn</dt>
+<dd><p><code>logical</code> default FALSE, whether to print warnings during
+import in the event that input data is coerced to another type.</p></dd>
 
 
 <dt>...</dt>
@@ -232,6 +238,38 @@ converted to <code><a href="https://rdrr.io/r/base/sign.html" class="external-li
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">2</span>, do_signed<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">1e6</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># so is a data.frame</span></span></span>
+<span class="r-in"><span><span class="va">so</span> <span class="op">&lt;-</span> <span class="fu">signed_overlaps</span><span class="op">(</span><span class="va">setlist</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:52</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Processing input setlist.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:52</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Processing overlap_type='</span><span style="color: #FF8700;">detect</span><span style="color: #00AFFF;">'</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:52</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Creating other data types.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Creating overlap vector.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Creating concordance vector.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Creating split names.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Creating final vector.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Splitting by observed directions per overlap.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Creating labels for each split.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Processing include_blanks=</span><span style="color: #FF8700;">TRUE</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">20:01:53</span>) 18Nov2024:   <span style="color: #FF8700;">signed_overlaps(): </span><span style="color: #00AFFF;">Sorting rows by overlap count then set.</span> </span>
+<span class="r-in"><span><span class="va">so</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                      sets overlap num_sets  count set_A set_B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A|1 0 0                         set_A   1 0 0        1  29914     1     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_B|0 1 0                         set_B   0 1 0        1 378895     0     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_C|0 0 1                         set_C   0 0 1        1  74287     0     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_B|1 1 0             set_A&amp;set_B   1 1 0        2  27516     1     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_C|1 0 1             set_A&amp;set_C   1 0 1        2   5479     1     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_B&amp;set_C|0 1 1             set_B&amp;set_C   0 1 1        2  68631     0     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_B&amp;set_C|1 1 1 set_A&amp;set_B&amp;set_C   1 1 1        3   4995     1     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         set_C overlap_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A|1 0 0                 0             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_B|0 1 0                 0             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_C|0 0 1                 1             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_B|1 1 0           0           1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_C|1 0 1           1           1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_B&amp;set_C|0 1 1           1           1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_B&amp;set_C|1 1 1     1         1 1 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># detect overlap_type</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="fu">signed_overlaps</span><span class="op">(</span><span class="va">setlist</span>, <span class="st">"detect"</span><span class="op">)</span>, <span class="st">"overlap_type"</span><span class="op">)</span></span></span>

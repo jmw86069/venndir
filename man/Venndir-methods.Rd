@@ -43,3 +43,20 @@
 \description{
 Plot Venndir object
 }
+\seealso{
+Other venndir utility: 
+\code{\link{curate_venn_labels}()},
+\code{\link{expand_range}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{make_venn_test}()},
+\code{\link{match_list}()},
+\code{\link{modify_venndir_overlap}()},
+\code{\link{nudge_venndir_label}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{three_point_angle}()},
+\code{\link{venndir_legender}()},
+\code{\link{venndir_to_df}()}
+}
+\concept{venndir utility}

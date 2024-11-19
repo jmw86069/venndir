@@ -132,6 +132,8 @@ Other venndir utility:
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},
 \code{\link{match_list}()},
+\code{\link{modify_venndir_overlap}()},
+\code{\link{plot,Venndir,ANY-method}},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
 \code{\link{three_point_angle}()},

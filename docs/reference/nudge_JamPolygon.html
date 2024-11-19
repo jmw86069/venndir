@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -68,6 +68,7 @@
 <span>  nudge <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rotate_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -81,8 +82,37 @@
 
 <dt>nudge</dt>
 <dd><p><code>list</code> whose names match <code>names(jp)</code>, containing <code>numeric</code>
-vector with names <code>"x"</code> and <code>"y"</code>. For example:
-<code>nudge=list(polyname1=c(x=1, y=0))</code></p></dd>
+vector with coordinates x and y. Alternatively, an atomic <code>numeric</code>
+vector with length=2, which will be applied to the x,y coordinates
+for all polygons in <code>jp</code>.
+An example of list input:
+<code>nudge=list(polyname1=c(1, 0))</code></p></dd>
+
+
+<dt>rotate_degrees</dt>
+<dd><p><code>numeric</code> optional rotation in degrees,
+named using <code>names(jp)</code>.
+When a single unnamed value is provided, it is applied to all polygons
+in <code>jp</code>.
+When a <code>numeric</code> vector is provided with <code>length(jp)</code>, it is applied
+in order to each polygon in <code>jp</code>.
+Note: 90 degrees will rotate clockwise
+(top the right, bottom to the left) by 1/4 turn.</p></dd>
+
+
+<dt>center</dt>
+<dd><p><code>numeric</code> coordinates with optional center position.
+Default <code>NULL</code> will use the center of the bounding box of <code>jp</code>.
+All parts of the polygon, and all polygons, use the same <code>center</code>.</p></dd>
+
+
+<dt>scale</dt>
+<dd><p><code>numeric</code> optional scalar to enlarge or shrink the polygon,
+named using <code>names(jp)</code>. Alternatively, if a single unnamed value
+is provided, it is applied to all polygons in <code>jp</code>.
+If a <code>numeric</code> vector is provided with <code>length(jp)</code>, it is applied
+in order to each polygon in <code>jp</code>.
+The scale is applied relative to the <code>center</code> as provided or calculated.</p></dd>
 
 
 <dt>...</dt>
@@ -149,11 +179,26 @@ all parts are moved the identical amount.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">DEjp_nudged</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="nudge_JamPolygon-2.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">rbind2</span><span class="op">(</span><span class="va">DEjp</span>, <span class="va">DEjp_nudged</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#FFD70055"</span>, <span class="st">"#B2222255"</span>, <span class="st">"gold"</span>, <span class="st">"firebrick"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   label<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"D_old"</span>, <span class="st">"E_old"</span>, <span class="st">"D_new"</span>, <span class="st">"E_new"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   border.lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># plot the difference</span></span></span>
+<span class="r-in"><span><span class="va">plot_jpdiff</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">fillb</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/alpha2col.html" class="external-link">alpha2col</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.9</span>, <span class="va">b</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">fill</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span>  <span class="va">filla</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/alpha2col.html" class="external-link">alpha2col</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.3</span>, <span class="va">fillb</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">rbind2</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">filla</span>, <span class="va">fillb</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    label<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">a</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">name</span>, <span class="st">"old"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">b</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">name</span>, <span class="st">"new"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    border.lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu">plot_jpdiff</span><span class="op">(</span><span class="va">DEjp</span>, <span class="va">DEjp_nudged</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="nudge_JamPolygon-3.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># rotate, nudge, and scale</span></span></span>
+<span class="r-in"><span><span class="va">DEjp_rotated</span> <span class="op">&lt;-</span> <span class="fu">nudge_JamPolygon</span><span class="op">(</span><span class="va">DEjp</span>,</span></span>
+<span class="r-in"><span>   rotate_degrees<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>E<span class="op">=</span><span class="fl">45</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   scale<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>E<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   nudge<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>E<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span><span class="op">)</span>, D<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_jpdiff</span><span class="op">(</span><span class="va">DEjp</span>, <span class="va">DEjp_rotated</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="nudge_JamPolygon-4.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

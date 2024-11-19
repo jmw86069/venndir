@@ -2119,6 +2119,7 @@ polyclip_to_JamPolygon <- function
 #' 
 #' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE)
 #' sample_JamPolygon(jp3[1,], n=80, do_plot=TRUE)
+#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE)
 #' 
 #' sample_JamPolygon(jp3[1,], n=40, xyratio=1.5, do_plot=TRUE)
 #' 
@@ -2157,12 +2158,14 @@ polyclip_to_JamPolygon <- function
 sample_JamPolygon <- function
 (jp,
  n=100,
- xyratio=1.1,
- spread=TRUE,
+ xyratio=1.2,
+ spread=FALSE,
  n_ratio=1,
  pattern=c("offset",
     "rectangle"),
- buffer=0,
+ buffer=-0.2,
+ width_buffer=0.1,
+ max_width_buffer=10,
  byCols=c("-y", "x"),
  do_plot=FALSE,
  verbose=FALSE,
@@ -2176,9 +2179,29 @@ sample_JamPolygon <- function
       buffer <- 0;
    }
    buffer <- head(buffer, 1);
+   max_buffer <- NULL;
    if (buffer != 0) {
       use_jp <- buffer_JamPolygon(jp,
+         relative=TRUE,
          buffer=buffer);
+      max_buffer <- attr(use_jp, "max_buffer");
+      # jamba::printDebug("sample_JamPolygon(): ", "max_buffer:", max_buffer);# debug
+      # experimental width_buffer
+      # slides the polygon right and left
+      if (length(width_buffer) == 1 && width_buffer > 0 && width_buffer < 1) {
+         width_nudge <- jamba::noiseFloor(max_buffer * width_buffer,
+            ceiling=max_width_buffer)
+         use_jpr <- nudge_JamPolygon(use_jp,
+            nudge=c(width_nudge, 0))
+         use_jpl <- nudge_JamPolygon(use_jp,
+            nudge=c(-width_nudge, 0))
+         use_jpi <- intersect_JamPolygon(rbind2(use_jpr, use_jpl));
+         area_ratio <- (area_JamPolygon(use_jpi) / area_JamPolygon(use_jp));
+         # jamba::printDebug("width_nudge:", width_nudge, ", area_ratio: ", area_ratio);# debug
+         if (area_JamPolygon(use_jpi) / area_JamPolygon(use_jp) > 0.4) {
+            use_jp <- use_jpi;
+         }
+      }
    } else {
       use_jp <- jp;
    }
@@ -2462,6 +2485,7 @@ buffer_JamPolygon <- function
    # relative size
    bbox_jp <- bbox_JamPolygon(jp);
    bbox_max <- max(apply(bbox_jp, 1, diff))
+   max_buffer <- NULL;
    if (TRUE %in% relative) {
       buffer_seq <- tail(seq(from=bbox_max,
          to=0,
@@ -2498,6 +2522,7 @@ buffer_JamPolygon <- function
    new_jp <- apply_buffer_poly_list(poly_list,
       buffer=buffer,
       k=1);
+   attr(new_jp, "max_buffer") <- max_buffer;
    return(new_jp);
 }
 

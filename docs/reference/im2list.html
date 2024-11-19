@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -63,9 +63,25 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">im2list</span><span class="op">(</span><span class="va">x</span>, empty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">""</span>, <span class="fl">0</span>, <span class="cn">FALSE</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">im2list</span><span class="op">(</span><span class="va">x</span>, empty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">""</span>, <span class="fl">0</span>, <span class="cn">FALSE</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div id="arguments">
+    <h2>Arguments</h2>
+    <dl><dt>x</dt>
+<dd><p><code>matrix</code> where non-empty values indicate presence of each
+element (row) in each set (column).</p></dd>
+
+
+<dt>empty</dt>
+<dd><p><code>list</code> of values recognized as empty. Each item is
+co-erced to the class in columns of <code>x</code>.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>additional arguments are ignored.</p></dd>
+
+</dl></div>
     <div id="details">
     <h2>Details</h2>
     <p>This function is the reciprocal to <code>list2im()</code>. This function

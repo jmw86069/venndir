@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -75,6 +75,44 @@
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div id="arguments">
+    <h2>Arguments</h2>
+    <dl><dt>grobs</dt>
+<dd><p><code>gList</code> collection of graphical objects</p></dd>
+
+
+<dt>xalign</dt>
+<dd><p><code>character</code> string indicating the type of alignment:</p><ul><li><p><code>"left"</code> - objects are aligned at the left edge</p></li>
+<li><p><code>"center"</code> - objects are aligned at the object center</p></li>
+<li><p><code>"right"</code> - objects are aligned at the right edge</p></li>
+<li><p><code>"tile"</code> - objects are aligned with the left edge
+touching the right edge of the previous object (experimental)</p></li>
+<li><p><code>"none"</code></p></li>
+</ul></dd>
+
+
+<dt>ref_grob</dt>
+<dd><p><code>integer</code> index of the grob in <code>grobs</code> to use as the
+reference, around which other grobs will be oriented.</p></dd>
+
+
+<dt>use_x</dt>
+<dd><p><code>unit</code> used as a reference x coordinate, used in
+favor of other options such as <code>ref_grob</code> or the first grob in <code>grobs</code>.</p></dd>
+
+
+<dt>verbose</dt>
+<dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
+
+
+<dt>debug</dt>
+<dd><p><code>logical</code> indicating whether to print debug output.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>additional arguments are ignored.</p></dd>
+
+</dl></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other grobs: 

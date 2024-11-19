@@ -7,11 +7,13 @@
 sample_JamPolygon(
   jp,
   n = 100,
-  xyratio = 1.1,
-  spread = TRUE,
+  xyratio = 1.2,
+  spread = FALSE,
   n_ratio = 1,
   pattern = c("offset", "rectangle"),
-  buffer = 0,
+  buffer = -0.2,
+  width_buffer = 0.1,
+  max_width_buffer = 10,
   byCols = c("-y", "x"),
   do_plot = FALSE,
   verbose = FALSE,
@@ -98,6 +100,7 @@ jp3 <- new("JamPolygon", polygons=df3);
 
 sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE)
 sample_JamPolygon(jp3[1,], n=80, do_plot=TRUE)
+sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE)
 
 sample_JamPolygon(jp3[1,], n=40, xyratio=1.5, do_plot=TRUE)
 

@@ -147,6 +147,7 @@ setClass("Venndir",
 #' 
 #' @docType methods
 #' @rdname Venndir-methods
+#' @family venndir utility
 #' 
 #' @export
 setMethod("plot",

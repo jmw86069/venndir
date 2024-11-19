@@ -375,8 +375,6 @@ textvenn(setlist, overlap_type="concordance", unicode=FALSE)
 # options("jam.htmlOut"=FALSE, "jam.comment"=TRUE)
 ```
 
-Sorry, no proportional text Venn diagrams (yet)!
-
 ## Nudge Venn circles
 
 Another driving reason for this package is that sometimes proportional
@@ -449,9 +447,9 @@ Two changes are required:
 
 ``` r
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
-venndir(setlist,
-   poly_alpha=0.3,
-   show_labels="NCi",
+vo <- venndir(setlist,
+   poly_alpha=0.3, spread=TRUE,
+   show_labels="Ni", fontfamily="sans",
    show_items="sign item");
 ```
 

@@ -147,6 +147,7 @@ label_fill_JamPolygon <- function
 (jp,
  labels,
  buffer=-0.15,
+ width_buffer=0.1,
  relative=TRUE,
  color="black",
  border=NA,
@@ -250,7 +251,8 @@ label_fill_JamPolygon <- function
    
    # Todo: apply resizing to contract the polygon before arraying points
    #
-   if (length(buffer) > 0 && buffer != 0) {
+   # - skip this step since it happens inside sample_JamPolygon() already
+   if (FALSE && length(buffer) > 0 && buffer != 0) {
       jp <- buffer_JamPolygon(jp,
          buffer=buffer,
          relative=relative,
@@ -267,9 +269,19 @@ label_fill_JamPolygon <- function
    # number of labels for the procedure to return at least
    # that many label positions
 
+   # check bbox width if ref_jp is provided
+   max_width_buffer <- 10;
+   if (length(ref_jp) > 0 && inherits(ref_jp, "JamPolygon")) {
+      bbox <- bbox_JamPolygon(ref_jp);
+      max_width_buffer <- abs(diff(bbox["x", ])) * (1 / 20);
+   }
+   
    label_sampled <- sample_JamPolygon(jp=jp,
       n=n,
       xyratio=xyratio,
+      buffer=buffer,
+      width_buffer=width_buffer,
+      max_width_buffer=max_width_buffer,
       ...);
 
    label_xy <- do.call(cbind, label_sampled)

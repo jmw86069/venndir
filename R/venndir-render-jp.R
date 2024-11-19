@@ -700,7 +700,7 @@ render_venndir <- function
          vi <- venn_jp@polygons$label %in% tail(items_df1$overlap_set, 1);
          vdf <- venn_jp@polygons[vi, , drop=FALSE];
          prefixes <- rep(
-            gsub(":.+", "", items_df1$text),
+            gsub("[ :].+", "", items_df1$text),
             lengths(items_df1$items));
          labels <- NULL;
          # note currently uses the same show_items format per polygon
@@ -955,7 +955,12 @@ render_venndir <- function
       bg_fill <- jamba::rmNA(naValue="#00000000", gdf$bg_fill);
       max_bg_alpha <- (1 - box_alpha)
       bg_alpha <- jamba::col2alpha(bg_fill);
-      bg_alpha_adj <- jamba::noiseFloor(bg_alpha, ceiling=max_bg_alpha)
+      ksplit <- split(seq_along(bg_alpha), max_bg_alpha);
+      bg_alpha_adj <- rep(0, length(bg_alpha));
+      for (kset in ksplit) {
+         bg_alpha_adj[kset] <- jamba::noiseFloor(bg_alpha[kset],
+            ceiling=unique(max_bg_alpha[kset]))
+      }
       bg_fill_adj <- jamba::alpha2col(bg_fill, alpha=bg_alpha_adj);
       canvas_alpha <- max_bg_alpha - bg_alpha_adj;
       canvas_adj <- jamba::alpha2col(rep("white", length(canvas_alpha)), alpha=canvas_alpha)
@@ -1079,6 +1084,7 @@ render_venndir <- function
             default.units="snpc",
             gp=grid::gpar(
                col=itemlabels_df$color,
+               fontfamily=fontfamily,
                fontsize=itemlabels_df$fontsize),
             vp=jp_viewport,
             hjust=0.5,
@@ -1094,6 +1100,7 @@ render_venndir <- function
             default.units="snpc",
             gp=grid::gpar(
                col=itemlabels_df$color,
+               fontfamily=fontfamily,
                fontsize=itemlabels_df$fontsize),
             r=grid::unit(0, "pt"),
             padding=grid::unit(c(0, 0, 0, 0), "pt"),
@@ -1238,7 +1245,7 @@ render_venndir <- function
                   adjy_fn=adjy,
                   do_draw=FALSE,
                   template=template,
-                  verbose=verbose)
+                  verbose=(verbose > 1))
                # dgg$g_labels;
                dgg
             }, error=function(e){

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -67,6 +67,7 @@
 <span>  <span class="va">jp</span>,</span>
 <span>  <span class="va">labels</span>,</span>
 <span>  buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>,</span>
+<span>  width_buffer <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  relative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -82,7 +83,7 @@
 <span>  label_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hexagonal"</span><span class="op">)</span>,</span>
 <span>  draw_labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  plot_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"gg"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
+<span>  plot_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"JamPolygon"</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -313,13 +314,19 @@ using a higher target value for <code>n</code>.</p></li>
 <span class="r-in"><span>      <span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gold"</span>, <span class="st">"firebrick"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">jp3</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"JamPolygon"</span>, polygons<span class="op">=</span><span class="va">df3</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jp3</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">lfj</span> <span class="op">&lt;-</span> <span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, labels<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lfj12</span> <span class="op">&lt;-</span> <span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span>, labels<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">jp3p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jp3</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">lfj1</span> <span class="op">&lt;-</span> <span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"O"</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   ref_jp<span class="op">=</span><span class="va">jp3</span>, plot_style<span class="op">=</span><span class="st">"JamPolygon"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lfj2</span> <span class="op">&lt;-</span> <span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="fl">40</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.5</span>,</span></span>
+<span class="r-in"><span>   ref_jp<span class="op">=</span><span class="va">jp3</span>, plot_style<span class="op">=</span><span class="st">"JamPolygon"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="label_fill_JamPolygon-1.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lfj</span><span class="op">$</span><span class="va">items_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span>, cex<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">lfj</span><span class="op">$</span><span class="va">items_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span>, labels<span class="op">=</span><span class="va">lfj</span><span class="op">$</span><span class="va">items_df</span><span class="op">$</span><span class="va">text</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">jp3p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jp3</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">lfj1</span> <span class="op">&lt;-</span> <span class="fu">label_fill_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"O"</span>, <span class="fl">1</span><span class="op">)</span>, apply_n_scale<span class="op">=</span><span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>   ref_jp<span class="op">=</span><span class="va">jp3</span>, plot_style<span class="op">=</span><span class="st">"JamPolygon"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="label_fill_JamPolygon-2.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -368,7 +368,6 @@
 <span></span>
 <span><span class="co"># Revert options</span></span>
 <span><span class="co"># options("jam.htmlOut"=FALSE, "jam.comment"=TRUE)</span></span></code></pre></div>
-<p>Sorry, no proportional text Venn diagrams (yet)!</p>
 </div>
 <div class="section level2">
 <h2 id="nudge-venn-circles">Nudge Venn circles<a class="anchor" aria-label="anchor" href="#nudge-venn-circles"></a>
@@ -431,9 +430,9 @@
 </ol>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span>
-<span><span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
-<span>   poly_alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
-<span>   show_labels<span class="op">=</span><span class="st">"NCi"</span>,</span>
+<span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
+<span>   poly_alpha<span class="op">=</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>   show_labels<span class="op">=</span><span class="st">"Ni"</span>, fontfamily<span class="op">=</span><span class="st">"sans"</span>,</span>
 <span>   show_items<span class="op">=</span><span class="st">"sign item"</span><span class="op">)</span>;</span></code></pre></div>
 <p><img src="reference/figures/README-vennitems_1-1.png" width="100%"></p>
 <p>Interestingly, the density of labels gives some indication of the relative overlaps.</p>

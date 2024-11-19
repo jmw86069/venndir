@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -70,26 +70,26 @@
 <span>  main <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  item_cex <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  item_cex_factor <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  plot_warning <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plot_warning <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  show_items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">"none"</span>, <span class="st">"sign item"</span>, <span class="st">"item"</span>, <span class="st">"sign"</span><span class="op">)</span>,</span>
-<span>  item_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  show_items <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  item_degrees <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_items <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  show_zero <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  show_segments <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  segment_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.1</span>,</span>
+<span>  show_segments <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  segment_buffer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label_preset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  label_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"custom"</span>, <span class="st">"basic"</span>, <span class="st">"fill"</span>, <span class="st">"shaded"</span>, <span class="st">"shaded_box"</span>, <span class="st">"lite"</span>, <span class="st">"lite_box"</span><span class="op">)</span>,</span>
-<span>  fontfamily <span class="op">=</span> <span class="st">"Arial"</span>,</span>
+<span>  fontfamily <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  inside_percent_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"text"</span>, <span class="st">"gridtext"</span><span class="op">)</span>,</span>
-<span>  item_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>,</span>
+<span>  item_style <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  item_buffer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  template <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  adjust_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  draw_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  draw_legend <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend_x <span class="op">=</span> <span class="st">"bottomright"</span>,</span>
-<span>  legend_font_cex <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  legend_font_cex <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  display_counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_newpage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -122,7 +122,7 @@ to be slighly smaller.</p></dd>
 <dd><p><code>character</code> string used as a plot title, default NULL
 will render no title. When provided, it is rendered using
 <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> which enables some Markdown-style
-formatting. The title is stored in <code>venndir@metadata$title</code>
+formatting. The title is stored in <code>venndir@metadata$main</code>
 for persistence.</p></dd>
 
 
@@ -230,7 +230,20 @@ There are pre-defined label styles.</p><ul><li><p><code>"basic"</code> no backgr
 
 
 <dt>fontfamily</dt>
-<dd><p><code>character</code> font family</p></dd>
+<dd><p><code>character</code> string to define the fontfamily.
+The <code>fontfamily</code> must match a recognized font for the given output
+device, and this font must be capable of producing UTF-8 / Unicode
+characters, in order to print up arrow and down arrow.
+When it does not work, either use <code>unicode=FALSE</code>, or check the
+output from <code><a href="https://rdrr.io/r/base/locales.html" class="external-link">Sys.getlocale()</a></code> to ensure the setting is capable
+of using UTF-8 (for example "C" may not be sufficient).
+Using the package <code>ragg</code> appears to be more consistently successful
+for rasterized output than base R output, for example:
+<code><a href="https://ragg.r-lib.org/reference/agg_png.html" class="external-link">ragg::agg_png()</a></code>, <code><a href="https://ragg.r-lib.org/reference/agg_tiff.html" class="external-link">ragg::agg_tiff()</a></code>, <code><a href="https://ragg.r-lib.org/reference/agg_jpeg.html" class="external-link">ragg::agg_jpeg()</a></code>
+produce substantially higher quality output, and with more successful
+usage of system fonts, than <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png()</a></code>, <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff()</a></code>, and <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg()</a></code>.
+Similarly, for PDF output, consider <code><a href="https://rdrr.io/r/grDevices/cairo.html" class="external-link">cairo_pdf()</a></code> or
+<code><a href="https://rdrr.io/pkg/Cairo/man/Cairo.html" class="external-link">Cairo::CairoPDF()</a></code> instead of using <code><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf()</a></code>.</p></dd>
 
 
 <dt>inside_percent_threshold</dt>

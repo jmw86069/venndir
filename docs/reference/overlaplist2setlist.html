@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -83,6 +83,17 @@ overlap. This content is similar to the input to
 only contains the number of items per overlap,
 and not the items. In this case each overlap contains
 the vector of items also.</p>
+<p>Since version 0.0.44.900, this function also accepts nested
+list format, as returned by <code>overlaplist()</code> for a <code>Venndir</code>
+object, when the <code>overlap_type</code> is something other than
+<code>"overlap"</code>.</p>
+<p>Note that when converting data with <code>overlap_type</code> <code>"concordance"</code>
+and <code>"agreement"</code> it will be slightly lossy.</p><ul><li><p><code>overlap_type="concordance"</code> encodes mismatches as <code>"mixed"</code>,
+instead of the original sign for each set.</p></li>
+<li><p><code>overlap_type="agreement"</code> encodes as <code>"agreement"</code> and <code>"mixed"</code>
+instead of the original sign for each set.</p></li>
+</ul><p>Ideally, use <code>setlist()</code> to obtain to actual input setlist from
+the <code>Venndir</code> object.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -126,6 +137,18 @@ the vector of items also.</p>
 <span class="r-in"><span>   item_buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.95</span>,</span></span>
 <span class="r-in"><span>   proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="overlaplist2setlist-2.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># test interconversion: setlist to venndir to overlaplist to setlist</span></span></span>
+<span class="r-in"><span><span class="va">setlist2</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist2</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span>, overlap_type<span class="op">=</span><span class="st">"each"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ollist</span> <span class="op">&lt;-</span> <span class="fu">overlaplist</span><span class="op">(</span><span class="va">vo</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">setlist2b</span> <span class="op">&lt;-</span> <span class="fu">overlaplist2setlist</span><span class="op">(</span><span class="va">ollist</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># all should be TRUE:</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">setlist2b</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">setlist2</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="va">setlist2b</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">setlist2</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set_A set_B set_C </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  TRUE  TRUE  TRUE </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

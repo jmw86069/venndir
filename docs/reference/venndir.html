@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">venndir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.43.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.44.900</span>
       </span>
     </div>
 
@@ -70,6 +70,8 @@
 <span>  set_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  setlist_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  draw_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  legend_font_cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  proportional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_labels <span class="op">=</span> <span class="st">"Ncs"</span>,</span>
 <span>  main <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -78,6 +80,7 @@
 <span>  max_items <span class="op">=</span> <span class="fl">3000</span>,</span>
 <span>  show_zero <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  font_cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
+<span>  fontfamily <span class="op">=</span> <span class="st">"Arial"</span>,</span>
 <span>  show_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  display_counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  poly_alpha <span class="op">=</span> <span class="fl">0.6</span>,</span>
@@ -90,14 +93,17 @@
 <span>  curate_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  venn_jp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  inside_percent_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  item_cex <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  item_cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"text"</span>, <span class="st">"gridtext"</span><span class="op">)</span>,</span>
 <span>  item_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>,</span>
-<span>  sign_count_delim <span class="op">=</span> <span class="st">": "</span>,</span>
+<span>  item_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  sign_count_delim <span class="op">=</span> <span class="st">" "</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  r <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="op">-</span><span class="fl">0.15</span><span class="op">)</span>,</span>
 <span>  segment_distance <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  segment_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.1</span>,</span>
+<span>  show_segments <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">"&amp;"</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -139,8 +145,10 @@ all entries in <code>setlist</code>.</p></dd>
 
 
 <dt>set_colors</dt>
-<dd><p><code>character</code> vector of R colors, or <code>NULL</code> (default) to
-use default colors defined by <code><a href="https://rdrr.io/pkg/colorjam/man/rainbowJam.html" class="external-link">colorjam::rainbowJam()</a></code>.</p></dd>
+<dd><p><code>character</code> vector of R colors, or default <code>NULL</code> to
+use categorical colors defined by <code><a href="https://rdrr.io/pkg/colorjam/man/rainbowJam.html" class="external-link">colorjam::rainbowJam()</a></code>.
+It will generate colors for every element in <code>setlist</code> even when
+a subset is defined with <code>sets</code>.</p></dd>
 
 
 <dt>setlist_labels</dt>
@@ -157,6 +165,17 @@ the <code>names(setlist)</code> are not suitable for a legend, but should
 still be maintained as the original names.
 The legend labels are typically single-line entries and should
 have relatively short text length.</p></dd>
+
+
+<dt>draw_legend</dt>
+<dd><p><code>logical</code> passed to <code><a href="render_venndir.html">render_venndir()</a></code>, and stored
+in the <code>Venndir</code> metadata.</p></dd>
+
+
+<dt>legend_font_cex</dt>
+<dd><p><code>numeric</code> scalar, default 1, used to adjust
+the relative size of fonts with <code><a href="venndir_legender.html">venndir_legender()</a></code> when
+<code>draw_legend=TRUE</code>. This value is stored in <code>metadata</code> for persistence.</p></dd>
 
 
 <dt>proportional</dt>
@@ -195,7 +214,7 @@ region.</p></li>
 <dd><p><code>character</code> string used as a plot title, default NULL
 will render no title. When provided, it is rendered using
 <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> which enables some Markdown-style
-formatting. The title is stored in <code>venndir@metadata$title</code>
+formatting. The title is stored in <code>venndir@metadata$main</code>
 for persistence.</p></dd>
 
 
@@ -234,6 +253,23 @@ count zero label is displayed, otherwise no count label is shown.</p></dd>
 <li><p>Signed count label</p></li>
 </ol><p>The default <code>c(1, 1, 0.8)</code> defines the signed count label slightly
 smaller than other labels.</p></dd>
+
+
+<dt>fontfamily</dt>
+<dd><p><code>character</code> string to define the fontfamily.
+The <code>fontfamily</code> must match a recognized font for the given output
+device, and this font must be capable of producing UTF-8 / Unicode
+characters, in order to print up arrow and down arrow.
+When it does not work, either use <code>unicode=FALSE</code>, or check the
+output from <code><a href="https://rdrr.io/r/base/locales.html" class="external-link">Sys.getlocale()</a></code> to ensure the setting is capable
+of using UTF-8 (for example "C" may not be sufficient).
+Using the package <code>ragg</code> appears to be more consistently successful
+for rasterized output than base R output, for example:
+<code><a href="https://ragg.r-lib.org/reference/agg_png.html" class="external-link">ragg::agg_png()</a></code>, <code><a href="https://ragg.r-lib.org/reference/agg_tiff.html" class="external-link">ragg::agg_tiff()</a></code>, <code><a href="https://ragg.r-lib.org/reference/agg_jpeg.html" class="external-link">ragg::agg_jpeg()</a></code>
+produce substantially higher quality output, and with more successful
+usage of system fonts, than <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png()</a></code>, <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff()</a></code>, and <code><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg()</a></code>.
+Similarly, for PDF output, consider <code><a href="https://rdrr.io/r/grDevices/cairo.html" class="external-link">cairo_pdf()</a></code> or
+<code><a href="https://rdrr.io/pkg/Cairo/man/Cairo.html" class="external-link">Cairo::CairoPDF()</a></code> instead of using <code><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf()</a></code>.</p></dd>
 
 
 <dt>poly_alpha</dt>
@@ -466,7 +502,7 @@ for the graphical objects, specifically the use of coordinate
 <span class="r-out co"><span class="r-pr">#&gt;</span> jps        10      JamPolygon</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> label_df   21   51 data.frame</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> setlist     3            list</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> metadata    1            list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> metadata   14            list</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># custom set labels</span></span></span>
 <span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>
