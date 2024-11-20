@@ -1010,7 +1010,7 @@ plot.JamPolygon <- function
             }
          }
          # optional debug, return the polygon
-         if (debug) {
+         if (debug > 1) {
             return(list(
                x=(adjx(part_x)),
                y=(adjy(part_y)),

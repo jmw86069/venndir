@@ -7,6 +7,8 @@
    * Improved the `item_cex` calculations, accounting for relative
    area of each shape, and number of items, also imposing a floor
    to prevent microscopic font sizes.
+   * Fixed minor bug causing `item_cex` to be applied incorrectly
+   when there were missing/NA labels.
 
 * `venndir()`
 

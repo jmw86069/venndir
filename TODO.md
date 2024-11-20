@@ -4,20 +4,40 @@
 
 Residual todo items of note:
 
-* Item label
+* Item labels
 
+   * Debug: 4-way Venn may not be applying `item_cex` properly.
+   * Consider adding `item_fontfamily` to be distinct from other labels.
    * DONE. `cex` fontsize adjustment seems not quite right.
-   See `README.Rmd` examples, they're not quite right yet.
-
-      * Providing `item_cex` as vector is different than single item.
-      * Single item label fontsize can be too large, and gets too small.
-      * It needs a better way to define and tune the fontsize adjustment.
-
    * Revisit `item_buffer`, `width_buffer`, other ideas to position labels
    inside polygons.
    * Consider optional columns for item labels in `label_df`:
    coords, label cex/fontsize, border, fill, fontcolor.
    When `NA` use automated/defaults, otherwise they override.
+   * Consider radically different approach to `label_fill_JamPolygon()`
+   
+      * Brute force placement of labels.
+      * Create item label grobs, calculate absolute height/width bounding boxes
+      * Divide into N rows, start top-left, move left-to-right, place
+      labels inside the polygon, in order, prevent overlapping labels.
+      Repeat on each row.
+      * If not all labels fit, down-size labels and try again.
+      Use adaptive sizing as in `sample_JamPolygon()`.
+      * Final result: delete original item grobs, create new grobs with
+      final font scaling, using coordinates as determined.
+      * Consider allowing positive `buffer` to allow some spillover outside?
+
+* Improve label kerning irregularities. Possible show-stopper for signed labels
+and sign item labels. Arrows are rendered wider than internal font metrics.
+
+   * Linux system font kerning is inconsistent, unclear whether it is
+   specific to gridtext, or `grid::grid.text()` also.
+   * Most labels could be created parts, then assembled.
+   * `grid::grid.text()` could be used instead of `gridtext` for most labels.
+   Test `grid.text()` as drop-in replacement for `gridtext::richtext_grob()`.
+   Note it lacks `r`,`padding`.
+   * `marquee` could also be drop-in replacement. If it works best, all
+   `gridtext` should be replaced with `marquee`.
 
 * Legend
 

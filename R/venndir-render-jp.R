@@ -123,6 +123,7 @@ render_venndir <- function
  do_draw=TRUE,
  draw_buffer=FALSE,
  verbose=FALSE,
+ debug=FALSE,
  ...)
 {
    # validate input
@@ -358,7 +359,8 @@ render_venndir <- function
          }
          item_cex <- tryCatch({
             poly_rows <- which(!is.na(venn_jp@polygons$venn_counts) &
-                  venn_jp@polygons$venn_counts > 0);
+                  venn_jp@polygons$venn_counts >= 0);
+
             # area adjustment is sqrt() of the fraction of max area
             so_areas <- area_JamPolygon(venn_jp[poly_rows, ]);
             names(so_areas) <- rownames(venn_jp@polygons)[poly_rows];
@@ -376,14 +378,14 @@ render_venndir <- function
             # adjfn <- function(x)sqrt(x)
             adjfn <- function(x)x^(1/3)
             so_cex <- (3 / adjfn(so_counts))
-            
+
             # update here in case area fails, it will use this crude item_cex
             new_item_cex <- item_cex * so_cex * so_area_adj * item_cex_factor;
             # apply noise floor
             floor_item_cex <- jamba::noiseFloor(new_item_cex,
                ceiling=4,
                floor=0.2)
-            if (verbose > 1) {
+            if (verbose > 1 || TRUE %in% debug) {
                jamba::printDebug("item label size calculations:");
                print(data.frame(so_areas, so_area_fracmax, so_area_adj,
                   so_counts, n_per_area_fracmax, so_cex,
@@ -391,16 +393,9 @@ render_venndir <- function
             }
             # jamba::printDebug("so_area_adj:", so_area_adj, ", so_cex: ", so_cex);# debug
             item_cex <- floor_item_cex;
-            #
-            # jamba::printDebug("item_cex (# labels adjusted): ", item_cex);# debug
-            # area of each polygon
-            # total area of all polygons
-            # (not used currently but might be preferred for proportional)
-            # so_total_areas <- rgeos::gArea(
-            #    rgeos::gSimplify(venn_spdf,
-            #       tol=1));
 
             if (FALSE) {
+               ## Previous calculations
                # take median of the larger area polygons
                so_big <- median(so_areas[so_areas / max(so_areas) >= 0.5])
                so_areas_cex <- sqrt(so_areas) / sqrt(so_big);
@@ -418,6 +413,10 @@ render_venndir <- function
             }
             item_cex;
          }, error=function(e){
+            if (TRUE %in% verbose || TRUE %in% debug) {
+               jamba::printDebug("Error during item_cex calculations:");
+               print(e);
+            }
             item_cex;
          });
       } else {
