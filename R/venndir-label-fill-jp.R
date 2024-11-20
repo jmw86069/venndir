@@ -266,7 +266,8 @@ label_fill_JamPolygon <- function
    # Todo: apply resizing to contract the polygon before arraying points
    #
    # - skip this step since it happens inside sample_JamPolygon() already
-   if (FALSE && length(buffer) > 0 && buffer != 0) {
+   # if (length(buffer) > 0 && buffer != 0) {
+   if (FALSE) {
       jp <- buffer_JamPolygon(jp,
          buffer=buffer,
          relative=relative,
