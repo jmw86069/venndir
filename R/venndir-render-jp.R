@@ -13,7 +13,7 @@
 #'    the Venn diagram. Values above zero cause the Venn diagram
 #'    to be slighly smaller.
 #' @param font_cex `numeric` scalar to adjust font sizes.
-#' @param item_cex `numeric` default 1, used to define baseline font size
+#' @param item_cex `numeric` default NULL, used to define baseline font size
 #'    (single value), or exact font `cex` values (multiple values).
 #'    * When a single value is provided, each set of items is used to
 #'    define a font scaling, based upon the relative area of the
@@ -21,8 +21,17 @@
 #'    items in each polygon. These values are multiplied by `item_cex`
 #'    to produce the final adjustment.
 #'    These values are multiplied by `item_cex_factor`.
-#'    * When multiple values are provided, they are recycled to the
-#'    number of polygons that contain items, and applied in order.
+#'    * When multiple values are provided with names, the names are
+#'    matched with overlap names: `venndir_output@label_df$overlap_set`,
+#'    and applied accordingly. Any missing values retain the pre-existing
+#'    value by default.
+#'    * When multiple values are provided without names, the length is
+#'    matched to the number of polygons in `venndir_output@jps@polygons`
+#'    with non-zero and non-NA venn_counts; or the number of
+#'    unique polygons in `venndir_output@jps@polygons$venn_name`; or
+#'    the number of unique overlaps in `venndir_output@label_df$overlap_set`.
+#'    If a length match is found, those values are assigned to
+#'    `names(item_cex)`.
 #'    There is no further adjustment by polygon area, nor number of labels.
 #'    These values are multiplied by `item_cex_factor`.
 #' @param item_cex_factor `numeric`, default 1, used to adjust the
@@ -425,6 +434,22 @@ render_venndir <- function
       if (length(item_cex) == 0 || all(is.na(item_cex))) {
          item_cex <- 1;
       }
+      if (length(names(item_cex)) == 0) {
+         uvnames1 <- unique(subset(venn_jp@polygons, !is.na(venn_counts) &
+               venn_counts > 0)$venn_name);
+         uvnames <- unique(venn_jp@polygons$venn_name);
+         uonames <- unique(label_df$overlap_set);
+         if (length(item_cex) == length(uvnames1)) {
+            names(item_cex) <- uvnames1;
+         } else if (length(item_cex) == length(uvnames)) {
+            names(item_cex) <- uvnames;
+         } else if (length(item_cex) == length(uonames)) {
+            names(item_cex) <- uonames;
+         } else {
+            item_cex <- rep(item_cex, length.out=length(uonames));
+            names(item_cex) <- uonames;
+         }
+      }
       metadata$item_cex <- item_cex;
       # jamba::printDebug("item_cex: ", item_cex);# debug2
       
@@ -440,7 +465,7 @@ render_venndir <- function
          rot=0,
          color="black",
          fontsize=14,
-         item_cex=item_cex,
+         item_cex=head(item_cex, 1),
          border=NA,
          lty=1,
          lwd=1,
@@ -463,6 +488,14 @@ render_venndir <- function
             label_df[[i]] <- rep(label_df_defaults[[i]],
                length.out=nrow(label_df));
          # }
+      }
+      
+      # manually apply item_cex
+      if (length(names(item_cex)) > 0) {
+         match_i <- match(label_df$overlap_set, names(item_cex))
+         label_df$item_cex <- ifelse(!is.na(match_i),
+            item_cex[match_i],
+            label_df$item_cex)
       }
       
       # replace NA with 0

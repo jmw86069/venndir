@@ -37,6 +37,7 @@ render_venndir(
   do_draw = TRUE,
   draw_buffer = FALSE,
   verbose = FALSE,
+  debug = FALSE,
   ...
 )
 }
@@ -57,7 +58,7 @@ will render no title. When provided, it is rendered using
 formatting. The title is stored in \code{venndir@metadata$main}
 for persistence.}
 
-\item{item_cex}{\code{numeric} default 1, used to define baseline font size
+\item{item_cex}{\code{numeric} default NULL, used to define baseline font size
 (single value), or exact font \code{cex} values (multiple values).
 \itemize{
 \item When a single value is provided, each set of items is used to
@@ -66,8 +67,17 @@ overlap polygon to the max item polygon area, and the number of
 items in each polygon. These values are multiplied by \code{item_cex}
 to produce the final adjustment.
 These values are multiplied by \code{item_cex_factor}.
-\item When multiple values are provided, they are recycled to the
-number of polygons that contain items, and applied in order.
+\item When multiple values are provided with names, the names are
+matched with overlap names: \code{venndir_output@label_df$overlap_set},
+and applied accordingly. Any missing values retain the pre-existing
+value by default.
+\item When multiple values are provided without names, the length is
+matched to the number of polygons in \code{venndir_output@jps@polygons}
+with non-zero and non-NA venn_counts; or the number of
+unique polygons in \code{venndir_output@jps@polygons$venn_name}; or
+the number of unique overlaps in \code{venndir_output@label_df$overlap_set}.
+If a length match is found, those values are assigned to
+\code{names(item_cex)}.
 There is no further adjustment by polygon area, nor number of labels.
 These values are multiplied by \code{item_cex_factor}.
 }}
@@ -230,6 +240,8 @@ The \code{grid} graphical objects are returned in attributes:
 "gtree", "grob_list", "viewport", and can be drawn separately.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
+
+\item{debug}{\code{numeric} optional internal debug.}
 
 \item{...}{additional arguments are passed to internal functions.}
 }

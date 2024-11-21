@@ -17,13 +17,13 @@ modify_venndir_overlap(
 highlight_venndir_overlap(
   venndir_output,
   overlap_set,
-  innerborder = "red",
+  innerborder = "gold",
   innerborder.lwd = 2,
   border = "red3",
   border.lwd = 1,
   outerborder = innerborder,
   outerborder.lwd = 0,
-  fill = NULL,
+  fill = "yellow",
   params = list(fill = fill, innerborder = innerborder, innerborder.lwd =
     innerborder.lwd, border = border, outerborder = outerborder, outerborder.lwd =
     outerborder.lwd),
@@ -183,7 +183,6 @@ render_venndir(vo4h, main="All overlaps with **set_B**")
 
 # show set_C or set_D not set_B
 vo4h2 <- highlight_venndir_overlap(vo4, outerborder.lwd=0,
-   fill="gold",
    overlap_set=unique(grep("set_B", value=TRUE, invert=TRUE,
       grep("set_C|set_D", vo4@jps@polygons$venn_name, value=TRUE)))
       )

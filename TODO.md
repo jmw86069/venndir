@@ -4,6 +4,11 @@
 
 Residual todo items of note:
 
+* Legend
+
+   * Optional signed counts and percentage to legend.
+   Might need special handling, e.g. calling `curate_venn_labels()`.
+
 * Item labels
 
    * Debug: 4-way Venn may not be applying `item_cex` properly.
@@ -39,26 +44,28 @@ and sign item labels. Arrows are rendered wider than internal font metrics.
    * `marquee` could also be drop-in replacement. If it works best, all
    `gridtext` should be replaced with `marquee`.
 
-* Legend
-
-   * Optional signed counts and percentage to legend.
-   Might need special handling, e.g. calling `curate_venn_labels()`.
-   * Option for legend with `textvenn()`
-
 * Test PDF output with different font choices. Compare with `ragg_png`.
 
    * Need automated tests for PDF and PNG output. Not sure how yet.
 
 * `textvenn()`
 
-   * enable multi-line headers in output
-   * include optional legend with counts
+   * Enable multi-line headers in output
+   * Add optional legend with counts
 
 * `README.Rmd`
 
    * Add `venn_meme()`
 
 * Lower priority ideas
+
+   * Consider other directional metrics, similar to "percent" label
+   
+      * Jaccard overlap
+      * Kruskal concordance: (agree - disagree)/(n)
+      * Others: Cohen's Kappa; Holley and Guilford's G; Hubert's Gamma;
+      Yule's coefficient of association Q
+      * Ingenuity directional z-score (for a single set)
 
    * DONE. `sample_JamPolygon()`
    

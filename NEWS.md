@@ -4,6 +4,19 @@
 
 * `render_venndir()`
 
+   * Updated `item_cex` logic again, solidifying the association of
+   `item_cex` values to specific, named Venn overlaps, which are also
+   stored in `metadata` for persistence, and editing.
+   * Related, fixed a bug causing `item_cex` to be applied incorrectly
+   when there were empty items. Now it is applied by overlap name to keep
+   proper sync.
+
+# venndir 0.0.45.900
+
+## changes to existing functions
+
+* `render_venndir()`
+
    * Improved the `item_cex` calculations, accounting for relative
    area of each shape, and number of items, also imposing a floor
    to prevent microscopic font sizes.
