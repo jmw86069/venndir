@@ -1,3 +1,38 @@
+# venndir 0.0.46.900
+
+Legend labels can include signed counts and percentage values.
+
+## changes to existing functions
+
+* `venndir_legender()` can optionally include signed counts and percentage.
+
+   * Renamed argument `include_total=TRUE` to `legend_total=TRUE`, for
+   consistency with the next two arguments, and to help distinguish
+   these options specific to the legend.
+   * New argument `legend_signed=FALSE` defines whether to show signed counts.
+   When `NULL` or `TRUE` it will display signed counts only when present,
+   for example when `overlap_type` is not "overlap".
+   `legend_signed=FALSE` will always hide signed counts.
+   * New argument `legend_percentage=NULL` detects whether to display percent
+   total items, and is only used when `legend_total=TRUE`.
+   When `show_labels` includes percentage, it is `TRUE`, otherwise `FALSE`.
+
+* `venndir()`
+
+   * Changed default `segment_distance=0.05` previously `0.1`,
+   to shrink the distance of outside labels from the Venn polygons.
+   Outside labels are now always justified relative to the plot,
+   and so the labels can be placed closer, and the Venn diagram can be
+   drawn slightly larger.
+
+* `render_venndir()`
+
+   * Changed default `expand_fraction=NULL` from `expand_fraction=0`
+   so it detects whether to adjust the default condition when
+   `draw_legend=TRUE`, and `main` is supplied as a plot title.
+   It expands the default location, and shifts it slightly upward.
+   
+
 # venndir 0.0.45.900
 
 ## changes to existing functions

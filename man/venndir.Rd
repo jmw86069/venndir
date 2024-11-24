@@ -12,6 +12,7 @@ venndir(
   setlist_labels = NULL,
   legend_labels = NULL,
   draw_legend = TRUE,
+  legend_signed = NULL,
   legend_font_cex = 1,
   proportional = FALSE,
   show_labels = "Ncs",
@@ -42,7 +43,7 @@ venndir(
   padding = c(3, 2),
   r = 2,
   center = c(0, -0.15),
-  segment_distance = 0.1,
+  segment_distance = 0.05,
   segment_buffer = -0.1,
   show_segments = TRUE,
   sep = "&",
@@ -318,10 +319,13 @@ The default \code{c(0, -0.15)} ensures that labels tend to be at the
 top of the plot, and not on the left/right side of the plot.
 This argument is passed along to \code{label_outside_JamPolygon()}.}
 
-\item{segment_distance}{\code{numeric} value indicating the distance
-between outside labels and the outer edge of the Venn diaram region.
-Larger values place labels farther away, while also shrinking the
-relative size of the Venn diagram.}
+\item{segment_distance}{\code{numeric} value, default 0.05, the distance
+between outside labels and the outer edge of the Venn diaram region,
+relative to the size of the Venn polygons.
+The default \code{0.05} is approximately a 5\% buffer outside.
+Note that when labels are placed outside (using \code{show_labels})
+the outside label coordinates are used to define the plot
+range, which causes the Venn diagram itself to shrink accordingly.}
 
 \item{sep}{\code{character} used as a delimiter between set names,
 the default is \code{"&"}.}

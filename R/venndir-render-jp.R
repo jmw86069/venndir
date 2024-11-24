@@ -8,10 +8,15 @@
 #' @inheritParams venndir
 #' @param venndir_output `Venndir` output from `venndir()`, or
 #'    `list` with element `"vo"` as a `Venndir` object.
-#' @param expand_fraction `numeric` value indicating how much to
-#'    expand the figure range beyond the default calculated for
-#'    the Venn diagram. Values above zero cause the Venn diagram
-#'    to be slighly smaller.
+#' @param expand_fraction `numeric` value, default `NULL` to use automated
+#'    settings. It defines the figure margin fraction on each side in order:
+#'    bottom, left, top, right.
+#'    The default settings:
+#'    * When `draw_legend=FALSE` it uses `c(0, 0, 0, 0)`.
+#'    * When `draw_legend=TRUE` it uses `c(0.18, 0, 0, 0)`, in order
+#'    to help prevent the Venn diagram from overlapping the legend.
+#'    * When `expand_fraction` is defined, it is used without any
+#'    adjustment.
 #' @param font_cex `numeric` scalar to adjust font sizes.
 #' @param item_cex `numeric` default NULL, used to define baseline font size
 #'    (single value), or exact font `cex` values (multiple values).
@@ -64,8 +69,10 @@
 #'    whether the group should be re-centered on the target point.
 #'    Try `adjust_center=FALSE` if wide label groups are adjusted
 #'    so that the count label is too far left.
-#' @param draw_legend `logical` (default TRUE) indicating whether to draw
+#' @param draw_legend `logical` (default NULL) indicating whether to draw
 #'    a legend, calling `venndir_legender()`.
+#'    When `NULL` it uses `metadata(venndir_output)$draw_legend` when defined,
+#'    otherwise defaults to `TRUE`.
 #' @param legend_x `character` passed to `venndir_legender()` to customize
 #'    the position of the legend.
 #' @param legend_font_cex `numeric` scalar to adjust the legend font size.
@@ -95,7 +102,7 @@
 #' @export
 render_venndir <- function
 (venndir_output=NULL,
- expand_fraction=0,
+ expand_fraction=NULL,
  font_cex=1,
  main=NULL,
  item_cex=NULL,
@@ -212,7 +219,7 @@ render_venndir <- function
    } else {
       if ("draw_legend" %in% names(metadata)) {
          if (length(metadata$draw_legend) == 0) {
-            draw_legend <- FALSE
+            draw_legend <- TRUE
          } else {
             draw_legend <- head(as.logical(metadata$draw_legend), 1);
          }
@@ -289,7 +296,18 @@ render_venndir <- function
 
    # validate other args
    if (length(expand_fraction) == 0) {
-      expand_fraction <- 0;
+      if ("expand_fraction" %in% names(metadata(venndir_output))) {
+         expand_fraction <- metadata(venndir_output)$expand_fraction;
+      }
+      if (length(expand_fraction) == 0) {
+         expand_fraction <- c(-0.05, 0, -0.06, 0)
+         if (TRUE %in% draw_legend) {
+            expand_fraction <- expand_fraction + c(0.20, 0, 0, 0)
+         }
+         if (length(main) > 0 && nchar(main) > 0) {
+            expand_fraction <- expand_fraction + c(0, 0, 0.07, 0);
+         }
+      }
    }
 
    # Apply label_style
@@ -1440,12 +1458,20 @@ render_venndir <- function
    # venndir legender
    if (TRUE %in% draw_legend) {
       ## Todo: Consider returning grobs from this function also
+      ## 0.0.46.900 - try viewport using full device width
+      # legend_vp <- grid::viewport(
+      #    width=grid::unit(1, "npc"),
+      #    height=grid::unit(1, "npc"),
+      #    xscale=c(0, 1),
+      #    yscale=c(0, 1));
+      
       legend_grob <- venndir_legender(
          venndir_output=vo_new,
          x=legend_x,
          font_cex=legend_font_cex,
          fontfamily=fontfamily,
          draw_legend=FALSE,
+         # vp=legend_vp,
          vp=jp_viewport,
          ...)
       jp_grobList$legend <- legend_grob;

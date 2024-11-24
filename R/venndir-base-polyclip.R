@@ -198,10 +198,13 @@
 #'    The default `c(0, -0.15)` ensures that labels tend to be at the
 #'    top of the plot, and not on the left/right side of the plot.
 #'    This argument is passed along to `label_outside_JamPolygon()`.
-#' @param segment_distance `numeric` value indicating the distance
-#'    between outside labels and the outer edge of the Venn diaram region.
-#'    Larger values place labels farther away, while also shrinking the
-#'    relative size of the Venn diagram.
+#' @param segment_distance `numeric` value, default 0.05, the distance
+#'    between outside labels and the outer edge of the Venn diaram region,
+#'    relative to the size of the Venn polygons.
+#'    The default `0.05` is approximately a 5% buffer outside.
+#'    Note that when labels are placed outside (using `show_labels`)
+#'    the outside label coordinates are used to define the plot
+#'    range, which causes the Venn diagram itself to shrink accordingly.
 #' @param do_plot `logical (default TRUE) indicating whether to generate the
 #'    the figure.
 #'    * When `do_plot=TRUE` it calls `render_venndir()` to create `grid`
@@ -285,6 +288,7 @@ venndir <- function
  setlist_labels=NULL,
  legend_labels=NULL,
  draw_legend=TRUE,
+ legend_signed=NULL,
  legend_font_cex=1,
  proportional=FALSE,
  show_labels="Ncs",
@@ -328,7 +332,7 @@ venndir <- function
  padding=c(3, 2),
  r=2,
  center=c(0, -0.15),
- segment_distance=0.1,
+ segment_distance=0.05,
  segment_buffer=-0.1,
  show_segments=TRUE,
  sep="&",
@@ -972,8 +976,9 @@ venndir <- function
       show_items=show_items,
       template=template,
       show_segments=show_segments,
-      draw_legend=draw_legend,
       fontfamily=fontfamily,
+      draw_legend=draw_legend,
+      legend_signed=legend_signed,
       legend_font_cex=legend_font_cex,
       sign_count_delim=sign_count_delim,
       item_buffer=item_buffer,

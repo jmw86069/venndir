@@ -9,10 +9,16 @@ venndir_legender(
   x = "bottomleft",
   setlist = NULL,
   set_colors = NULL,
+  unicode = TRUE,
+  sign_count_delim = NULL,
   keep_newlines = FALSE,
-  include_total = TRUE,
+  legend_total = TRUE,
+  legend_percentage = NULL,
+  legend_signed = FALSE,
+  combine_signed = TRUE,
+  combine_size = TRUE,
   box.lwd = 0,
-  style = c("grid", "data.frame"),
+  legend_style = c("grid", "data.frame"),
   item_type = "",
   header_color = "#000000",
   header_bg = "#FFFFFF00",
@@ -35,31 +41,63 @@ venndir_legender(
 )
 }
 \arguments{
-\item{venndir_output}{\code{Venndir} object returned by \code{venndir()}, which is used
-to generate the legend counts. When supplied, the \code{set_colors} are
-also defined by this object.}
+\item{venndir_output}{\code{Venndir} object returned by \code{venndir()},
+which is used to generate the legend counts.
+When supplied, the \code{set_colors} are also defined by this object.}
 
 \item{x}{\code{character} string indicating the position of the legend,
-as passed to \code{graphics::legend()} when \code{style="base"}.}
+as passed to \code{graphics::legend()} when \code{legend_style="base"}.
+Not relevant when \code{legend_style="data.frame"}.}
 
-\item{setlist}{\code{list} DEPRECATED and no longer necessary when
-\code{venndir_output} is supplied as a \code{Venndir} object, which already
-contains the \code{setlist}.}
+\item{setlist}{\code{list} alternative when \code{venndir_output} is not supplied
+as a \code{Venndir} object. Used internally by \code{textvenn()}.}
 
 \item{set_colors}{\code{character} optional vector of R colors, whose names
 should match \code{names(setlist)}. When not supplied, colors are inferred
 from \code{venndir_output}, and when that is not supplied, colors are
 defined using \code{colorjam::rainbowJam()}.}
 
+\item{unicode}{\code{logical} default TRUE, whether to use unicode arrows
+for signed counts, used when \code{legend_signed=TRUE}.
+This argument is passed to \code{curate_venn_labels()}.}
+
 \item{keep_newlines}{\code{logical} indicating whether to keep newlines
 (line breaks) in the set labels used in the Venn legend.}
 
-\item{box.lwd}{\code{numeric} used to define the box line width,
-as passed to \code{graphics::legend()} when \code{style="base"}.}
+\item{legend_total}{\code{logical} default TRUE, whether to include the
+total unique items in the legend.
+When \code{FALSE} it also sets \code{legend_percentage=FALSE}.}
 
-\item{style}{\code{character} string indicating the style of legend:
+\item{legend_percentage}{\code{logical} default NULL, whether to include
+the percentage of total items represented in each set.
+This option is only used when \code{legend_total=TRUE}.
 \itemize{
-\item \code{"base"} uses \code{graphics::legend()}
+\item When set to \code{NULL} it will display percentage only when present
+as a text label, as when \code{show_labels} include \code{"p"} or \code{"P"}.
+}}
+
+\item{legend_signed}{\code{logical} default FALSE, whether to include
+signed counts in the legend.
+\itemize{
+\item When set to \code{NULL} it displays signed counts only when available,
+which requires: \code{overlap_type} is not "overlap", and
+\code{legend_df} column "type" has entries with "sign".
+}}
+
+\item{combine_signed}{\code{logical} default TRUE, whether to combine multiple
+signed counts into one column (TRUE), or keep separate columns
+(FALSE). Somewhat experimental.
+This option is only used when signed counts are included.}
+
+\item{combine_size}{\code{logical} default TRUE, whether to combine
+counts in the "Size" column with signed counts.
+When \code{TRUE}, this option also left-aligns the "Size" column.}
+
+\item{box.lwd}{\code{numeric} used to define the box line width,
+as passed to \code{graphics::legend()} when \code{legend_style="base"}.}
+
+\item{legend_style}{\code{character} string indicating the style of legend:
+\itemize{
 \item \code{"grid"} uses \code{gridExtra::grid.table()}
 \item \code{"data.frame"} only returns the venndir legend \code{data.frame}.
 }}
@@ -81,7 +119,7 @@ drawn with line width \code{lwd}.
 }}
 
 \item{lwd}{\code{numeric} value for line width used for the cell border
-in the legend table, when \code{style="grid"}.}
+in the legend table, when \code{legend_style="grid"}.}
 
 \item{x_inset, y_inset}{\code{grid::unit} object that defines the inset
 distance away from each plot edge, along the x-axis and y-axis,
@@ -94,7 +132,7 @@ than using \code{"npc"} in terms of fraction of overall plot width
 or height.}
 
 \item{font_cex}{\code{numeric} adjustment to default font sizes. The default
-font size with \code{style="grid"} uses a 12 point font, so to adjust
+font size with \code{legend_style="grid"} uses a 12 point font, so to adjust
 to a specific font size like 8 points, use: \code{font_cex=8/12}}
 
 \item{table_theme}{\code{list} of theme parameters as described in
@@ -111,10 +149,10 @@ within each cell
 }}
 
 \item{draw_legend}{\code{logical} indicating whether to draw the resulting
-legend. Because this function is in development, the \code{style="grid"}
+legend. Because this function is in development, the \code{legend_style="grid"}
 seems to be preferred, however it may be useful to return the
 \code{grob} object for manipulation before rendering inside the active
-plot. In that case, use arguments: \verb{style="grid", draw_legend=FALSE}.}
+plot. In that case, use arguments: \verb{legend_style="grid", draw_legend=FALSE}.}
 
 \item{alias}{\code{character} vector with optional set aliases, experimental
 feature to allow referring to entries in \code{setlist} by shorter aliases.
@@ -139,11 +177,13 @@ suffix, and previously used \code{":"} but was changed to \code{""}.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
-\item{...}{additional arguments are passed to subsequent functions.}
+\item{...}{additional arguments are passed to internal functions.
+Notably \code{curate_venn_labels()} may accept the \code{curate_df} argument,
+to allow custom labeling.}
 }
 \value{
 \code{data.frame} with legend information is returned invisibly,
-unless using \verb{style="grid", draw_legend=FALSE} in which case the
+unless using \verb{legend_style="grid", draw_legend=FALSE} in which case the
 legend \code{grob} object is returned which can then be manipulated
 before rendering.
 }
@@ -161,7 +201,7 @@ used to produce the \code{venndir()} output, and the \code{venndir()} output.
 In future, the \code{setlist} could be derived from the \code{venndir()} output
 object directly. That step likely needs a new function.
 
-When using arguments \code{style="grid"} and \code{draw_legend=FALSE} the
+When using arguments \code{legend_style="grid"} and \code{draw_legend=FALSE} the
 \code{grid} \code{grob} object is returned, so that it can be manipulated
 as needed before rendering. Note that in this case, the viewport
 will have already been defined and stored into \code{legend_grob$vp}

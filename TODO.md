@@ -6,12 +6,11 @@ Residual todo items of note:
 
 * Legend
 
-   * Optional signed counts and percentage to legend.
-   Might need special handling, e.g. calling `curate_venn_labels()`.
+   * DONE. Optional signed counts and percentage to legend.
 
 * Item labels
 
-   * Debug: 4-way Venn may not be applying `item_cex` properly.
+   * DONE. Debug: 4-way Venn may not be applying `item_cex` properly.
    * Consider adding `item_fontfamily` to be distinct from other labels.
    * DONE. `cex` fontsize adjustment seems not quite right.
    * Revisit `item_buffer`, `width_buffer`, other ideas to position labels
@@ -31,6 +30,12 @@ Residual todo items of note:
       * Final result: delete original item grobs, create new grobs with
       final font scaling, using coordinates as determined.
       * Consider allowing positive `buffer` to allow some spillover outside?
+
+* Test `marquee` as drop-in replacement for `gridtext`. Goals:
+
+   * Improve inconsistent font kerning
+   * Enable custom styling of labels.
+   * Test large number of item labels compared with grid and gridtext.
 
 * Improve label kerning irregularities. Possible show-stopper for signed labels
 and sign item labels. Arrows are rendered wider than internal font metrics.

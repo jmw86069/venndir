@@ -6,7 +6,7 @@
 \usage{
 render_venndir(
   venndir_output = NULL,
-  expand_fraction = 0,
+  expand_fraction = NULL,
   font_cex = 1,
   main = NULL,
   item_cex = NULL,
@@ -45,10 +45,17 @@ render_venndir(
 \item{venndir_output}{\code{Venndir} output from \code{venndir()}, or
 \code{list} with element \code{"vo"} as a \code{Venndir} object.}
 
-\item{expand_fraction}{\code{numeric} value indicating how much to
-expand the figure range beyond the default calculated for
-the Venn diagram. Values above zero cause the Venn diagram
-to be slighly smaller.}
+\item{expand_fraction}{\code{numeric} value, default \code{NULL} to use automated
+settings. It defines the figure margin fraction on each side in order:
+bottom, left, top, right.
+The default settings:
+\itemize{
+\item When \code{draw_legend=FALSE} it uses \code{c(0, 0, 0, 0)}.
+\item When \code{draw_legend=TRUE} it uses \code{c(0.18, 0, 0, 0)}, in order
+to help prevent the Venn diagram from overlapping the legend.
+\item When \code{expand_fraction} is defined, it is used without any
+adjustment.
+}}
 
 \item{font_cex}{\code{numeric} scalar to adjust font sizes.}
 
@@ -222,8 +229,10 @@ whether the group should be re-centered on the target point.
 Try \code{adjust_center=FALSE} if wide label groups are adjusted
 so that the count label is too far left.}
 
-\item{draw_legend}{\code{logical} (default TRUE) indicating whether to draw
-a legend, calling \code{venndir_legender()}.}
+\item{draw_legend}{\code{logical} (default NULL) indicating whether to draw
+a legend, calling \code{venndir_legender()}.
+When \code{NULL} it uses \code{metadata(venndir_output)$draw_legend} when defined,
+otherwise defaults to \code{TRUE}.}
 
 \item{legend_x}{\code{character} passed to \code{venndir_legender()} to customize
 the position of the legend.}
