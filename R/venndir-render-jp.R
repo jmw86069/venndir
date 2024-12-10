@@ -3,6 +3,78 @@
 #' 
 #' Render venndir output
 #' 
+#' 
+#' ## About fonts and unicode symbols
+#' 
+#' R handles unicode symbols for each graphics device somewhat independently.
+#' Creating a PNG uses a different set of fonts than creating a PDF.
+#' Not all fonts used for PNG are compatible with PDF, and vice versa.
+#' (It is not solely an R problem.)
+#' 
+#' For the most part, users should not have to care about these details...
+#' 
+#' How this affects venndir:
+#' 
+#' Not every font registered in R supports extended unicode characters
+#' `upArrow` and `downArrow`, which causes it to draw blank boxes like `[]`.
+#' The quick options:
+#' 
+#' * Try a different `fontfamily` that may support the characters of interest.
+#' * Try a different grob type, see `text_grob_type="marquee"` below.
+#' * Install `extrafont`, which may be useful for installing consistent
+#' fonts to be used with PNG and PDF output formats.
+#' 
+#' 
+#' ## Additional options
+#' 
+#' Several options are passed through `...` (ellipses) to internal
+#' functions, documented below:
+#' 
+#' * `L_threshold` is passed to `make_color_contrast()` and controls
+#' the _L_uminance at which text is either dark or light.
+#' * `text_grob_type` is passed to `assemble_venndir_labels()` and controls
+#' the text `grid` graphical object (grob) type used.
+#' Note that `"marquee"` requires the `marquee` package, which implicitly
+#' requires R-4.3 or newer, though somehow that is not a formal dependency.
+#' R-4.3 adds glyph rendering, which is required by `marquee`.
+#' 
+#'    * `text_grob_type="textGrob"` (default) uses `grid::textGrob()`
+#'    which only handles text, and no markdown. It is also fastest.
+#'    * `text_grob_type="richtext_grob"` uses `gridtext::richtext_grob()`,
+#'    and requires the `gridtext` package.
+#'    It handles a subset of markdown (bold, italics, but not bullets),
+#'    and a subset of HTML markup such as inline CSS styles.
+#'    It sometimes produces visual glitches, where whitespace between
+#'    words can be inconsistent, otherwise it would have been the default.
+#'    * `text_grob_type="marquee"` uses `marquee::marquee_grob()`, which
+#'    requires the `marquee` package. It may rarely cause a full R crash
+#'    on MacOS, apparently due to font handling subsystems, otherwise it
+#'    would have been the default. Its rendering of Unicode is outstanding,
+#'    since it uses `systemfonts` to substitute any missing glyphs per font,
+#'    for example the upArrow/downArrow symbols.
+#'    It handles full markdown, including bullets, but not tables, nor HTML.
+#'    It does not support table format, through version 0.1.0, however.
+#' 
+#' * `fontfamilies` is passed to `assemble_venndir_label()`, as a `list`
+#' with three named elements: `"overlap"`, `"count"`, `"signed"`.
+#' 
+#'    * The fontfamily can be customized for each element, which may be
+#'    useful for a custom font for the overlap label, and a different font
+#'    (e.g. one that contains upArrow/downArrow unicode characters) for
+#'    the count and signed count labels.
+#'    * The custom font is also accepted by `venndir_legender()` for
+#'    consistency.
+#' 
+#' * `outerborder`,`outerborder.lwd`,`innerborder`,`innerborder.lwd`,
+#' `border`,`border.lwd` - these arguments are passed to `plot.JamPolygon()`
+#' and override internal values when defined. They can be used to produce
+#' interesting visual variations of the Venn diagram. For example:
+#' 
+#'    * `outerborder.lwd=0, innerborder.lwd=0, border="white", border.lwd=3`
+#'    will use a white border.
+#'    * `outerborder.lwd=0, innerborder.lwd=4, border="white", border.lwd=1`
+#'    will use a wide internal border, and thin white line between overlaps.
+#' 
 #' @family venndir core
 #' 
 #' @inheritParams venndir
@@ -272,7 +344,8 @@ render_venndir <- function
       if ("fontfamily" %in% names(metadata)) {
          fontfamily <- metadata$fontfamily;
       } else {
-         fontfamily <- "Arial";
+         # default "sans" to avoid font not being present for all devices
+         fontfamily <- "sans";
          metadata$fontfamily <- fontfamily;
       }
    } else {
@@ -477,9 +550,6 @@ render_venndir <- function
          show_label=NA,
          show_items=NA,
          item_degrees=item_degrees,
-         vjust=0.5,
-         hjust=0.5,
-         halign=0.5,
          rot=0,
          color="black",
          fontsize=14,
@@ -807,6 +877,9 @@ render_venndir <- function
          # not for each row in items_dfs, so it is not possible to
          # use different show_items format for up-up and down-down within
          # the same polygon
+         
+         # Todo: change "item_style" colname to "item_label"?
+         # because item_style is used for something else
          use_show_items <- head(items_df1$item_style, 1);
          show_items_order <- strsplit(use_show_items, "[- _.]")[[1]];
          for (dio in show_items_order) {
@@ -861,9 +934,12 @@ render_venndir <- function
       }
       # combine item label into one data.frame
       itemlabels_df <- jamba::rbindList(lapply(
-         jamba::rmNULL(itemlabels_list), function(i1){
-         i1$items_df;
-      }));
+         names(jamba::rmNULL(itemlabels_list)), function(i1name){
+            itemlabels_list[[i1name]]$items_df;
+         }));
+      # jamba::printDebug("ssdim(itemlabels_list):");print(jamba::ssdim(itemlabels_list));# debug
+      # jamba::printDebug("dim(itemlabels_df):");print(dim(itemlabels_df));# debug
+      # jamba::printDebug("middle(itemlabels_df):");print(jamba::middle(itemlabels_df));# debug
       itemlabels_jp <- NULL;
    }
    
@@ -885,11 +961,16 @@ render_venndir <- function
          paste0("**", label_df$venn_label, "**"),
          "")
       # 0.0.41.900 - also convert \n to <br>
-      if (any(grepl("[\n\r]", venn_label))) {
+      if (any(grepl("[\n\r]|<br>", venn_label))) {
+         # venn_label <- gsub("\n", "<br>",
+         #    gsub("^[\n]+|[\n]+$", "",
+         #    gsub("\n\n", "\n",
+         #    gsub("[\r\n]+|<br>", "\n", venn_label))))
+         # 0.0.47.900
          venn_label <- gsub("\n", "<br>",
-            gsub("^[\n]+|[\n]+$", "",
-            gsub("\n\n", "\n",
-            gsub("[\r\n]+|<br>", "\n", venn_label))))
+            gsub("^[\n]+|[\n]+$", "", # remove leading/trailing newline
+               gsub("[\n]+", "\n",    # limit to one newline at a time
+                  gsub("[\r\n]+|<br>", "\n", venn_label))))
       }
       is_left <- (label_df$type %in% "main") * 1;
       # enhancement to apply fontsize from venn_spdf to main set labels
@@ -900,18 +981,6 @@ render_venndir <- function
          label_df$overlap_fontsize[setmatchupdate] <- venn_jp@polygons$fontsize[setmatch[setmatchupdate]];
       }
       # gdf is the expanded data.frame of label coordinates
-      if (!"vjust_outside" %in% colnames(label_df)) {
-         label_df$vjust_outside <- label_df$vjust;
-      }
-      if (!"hjust_outside" %in% colnames(label_df)) {
-         label_df$hjust_outside <- label_df$hjust;
-      }
-      if (!"vjust_inside" %in% colnames(label_df)) {
-         label_df$vjust_inside <- label_df$vjust;
-      }
-      if (!"hjust_inside" %in% colnames(label_df)) {
-         label_df$hjust_inside <- label_df$hjust;
-      }
       gdf <- data.frame(
          check.names=FALSE,
          stringsAsFactors=FALSE,
@@ -964,21 +1033,6 @@ render_venndir <- function
             label_df$y[show_overlap_inside],
             label_df$y[show_count_outside] + label_df$y_offset[show_count_outside],
             label_df$y[show_count_inside]),
-         vjust=c(
-            1 - label_df$vjust_outside[show_overlap_outside],
-            1 - label_df$vjust_inside[show_overlap_inside],
-            label_df$vjust_outside[show_count_outside],
-            label_df$vjust_inside[show_count_inside]),
-         hjust=c(
-            label_df$hjust_outside[show_overlap_outside],
-            label_df$hjust_inside[show_overlap_inside],
-            label_df$hjust_outside[show_count_outside],
-            label_df$hjust_inside[show_count_inside]),
-         halign=c(
-            label_df$halign[show_overlap_outside],
-            label_df$halign[show_overlap_inside],
-            (label_df$halign[show_count_outside] > 0) * 1,
-            (label_df$halign[show_count_inside] > 0) * 1),
          rot=c(
             label_df$rot[show_overlap_outside],
             label_df$rot[show_overlap_inside],
@@ -1036,7 +1090,7 @@ render_venndir <- function
             label_df$padding_unit[show_count_inside])
       );
       # fix halign for one-column or two-column alignment
-      gdf$halign <- 0.5;
+      # gdf$halign <- 0.5;
 
       # Update label_col using overlap fill color
       # Todo: Use label_df$fill when not NA
@@ -1131,20 +1185,41 @@ render_venndir <- function
       main <- jamba::cPaste(main, sep="<br>\n");
       nlines <- length(strsplit(main, "<br>")[[1]])
       #
-      main_grob <- gridtext::richtext_grob(
-         text=main,
-         x=0.5,
-         y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
-         default.units="snpc",
-         gp=grid::gpar(
-            # col=itemlabels_df$color,
-            fontsize=16 * font_cex[1]),
-         r=grid::unit(c(0, 0, 0, 0), "pt"),
-         padding=grid::unit(c(0, 0, 0, 0), "pt"),
-         margin=grid::unit(c(0, 0, 0, 0), "pt"),
-         vp=jp_viewport,
-         hjust=0.5,
-         vjust=1);
+      if ("marquee" %in% debug &&
+            jamba::check_pkg_installed("marquee") &&
+            getRversion() >= "4.3.0") {
+         main_grob <- marquee::marquee_grob(
+            text=main,
+            ignore_html=TRUE,
+            name="venndir_main",
+            x=0.5,
+            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
+            default.units="snpc",
+            style=marquee::classic_style(
+               base_size=16 * font_cex[1],
+               body_font=fontfamily,
+               # weight="bold",
+               align="center"
+            ),
+            vp=jp_viewport,
+            hjust="center",
+            vjust="top");
+      } else {
+         main_grob <- gridtext::richtext_grob(
+            text=main,
+            x=0.5,
+            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
+            default.units="snpc",
+            gp=grid::gpar(
+               # col=itemlabels_df$color,
+               fontsize=16 * font_cex[1]),
+            r=grid::unit(c(0, 0, 0, 0), "pt"),
+            padding=grid::unit(c(0, 0, 0, 0), "pt"),
+            margin=grid::unit(c(0, 0, 0, 0), "pt"),
+            vp=jp_viewport,
+            hjust=0.5,
+            vjust=1);
+      }
       jp_grobList$main_title <- main_grob;
    }
    
@@ -1173,7 +1248,45 @@ render_venndir <- function
             item_style <- "gridtext";
          }
       }
-      if ("text" %in% item_style) {
+      if ("marquee" %in% debug) {
+         # experimental
+         # substitute style for each label
+         # new_item_text <- paste0("{",
+         #    itemlabels_df$color, " ",
+         #    itemlabels_df$text, "}")
+         print("items marquee_grob");# debug
+         # define styles
+         min_fontsize <- min(itemlabels_df$fontsize);
+         item_style <- marquee::classic_style(
+            base_size=min_fontsize,
+            body_font=fontfamily,
+            align="center")
+         rel_fontsize <- round(itemlabels_df$fontsize / min_fontsize, digits=2);
+         rel_fontsizeu <- jamba::nameVector(unique(rel_fontsize));
+         for (irel in unique(rel_fontsize)) {
+            item_style <- marquee::modify_style(
+               style_set=item_style, 
+               paste0("rel.", irel), 
+               size=marquee::relative(irel))
+         }
+         new_item_text <- paste0(
+            "{", paste0(".rel.", rel_fontsize), " ",
+            "{", itemlabels_df$color, " ",
+            itemlabels_df$text, "}", "}")
+         print(head(new_item_text));# debug
+         text_grob <- marquee::marquee_grob(
+            text=new_item_text,
+            ignore_html=TRUE,
+            name="venndir_main",
+            x=adjx(itemlabels_df$x),
+            y=adjy(itemlabels_df$y),
+            default.units="snpc",
+            angle=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
+            style=item_style,
+            vp=jp_viewport,
+            hjust="center-ink",
+            vjust="center-ink");
+      } else if ("text" %in% item_style) {
          # jamba::printDebug("itemlabels_df:");print(itemlabels_df);# debug
          text_grob <- grid::textGrob(
             x=adjx(itemlabels_df$x),
@@ -1249,140 +1362,119 @@ render_venndir <- function
          # 0.0.36.900 - use a list
          gdf$roworder <- seq_len(nrow(gdf));
          # jamba::printDebug("head(gdf, 10):");print(head(gdf, 10));# debug
+         
+         # split gdf rows by groups of labels
+         new_childNames <- paste0(
+            gdf$overlap_set, ":",
+            gdf$type, ":",
+            gsub("(count|overlap)_", "\\1:", gdf$location), ":",
+            gdf$roworder, ":",
+            gdf$label_df_rowname);
+         new_childNames <- paste0(
+            gdf$overlap_set, ":",
+            gsub("^.*(count|overlap)_", "", gdf$location), ":")
          gdf_list <- split(gdf,
-            jamba::pasteByRow(gdf[, c("padding", "r"), drop=FALSE]));
-         ## Push viewport in case that helps grob size estimates
-         # grid::pushViewport(jp_viewport);
-         g_labels_list <- lapply(gdf_list, function(igdf){
-            ## 0.0.39.900 - fix for inconsistent whitespace width
-            ## - seems to occur only with ": " and on certain output devices
-            # igdf$text <- sub(": ", ":", igdf$text);
-            ## 0.0.44.900 - delimiter sign_count_delim is defined in venndir()
-            # sign_delim <- " ";
-            # igdf$text <- sub(": ", sign_delim, igdf$text);
-            g_labels <- gridtext::richtext_grob(
-               text=igdf$text,
-               x=adjx(igdf$x),
-               y=adjy(igdf$y),
-               default.units="snpc",
-               vjust=igdf$vjust,
-               hjust=igdf$hjust,
-               halign=igdf$halign,
-               # valign=igdf$valign,
-               valign=0.5,
-               rot=igdf$rot,
-               padding=grid::unit(igdf$padding,
-                  igdf$padding_unit),
-               r=grid::unit(igdf$r,
-                  igdf$r_unit),
-               vp=jp_viewport,
-               gp=grid::gpar(
-                  fontfamily=fontfamily,
-                  col=igdf$label_col,
-                  fontsize=igdf$fontsize
-               ),
-               box_gp=grid::gpar(
-                  col=if(group_labels){NA}else{igdf$border_col},
-                  fill=if(group_labels){NA}else{igdf$box_fill},
-                  # col=igdf$border_col,
-                  # fill=igdf$box_fill,
-                  lty=igdf$box_lty,
-                  lwd=igdf$box_lwd)
-            );
-            # re-assign custom childNames to the grobs
-            new_childNames <- paste0(
-               igdf$overlap_set, ":",
-               igdf$type, ":",
-               gsub("(count|overlap)_", "\\1:", igdf$location), ":",
-               igdf$roworder, ":",
-               igdf$label_df_rowname);
-            templist <- lapply(grid::childNames(g_labels), function(iname){
-               grid::getGrob(g_labels, iname);
-            })
-            names(templist) <- new_childNames;
-            # jamba::printDebug("names(templist):");print(names(templist));# debug
-            templist
-         });
-         # grid::popViewport();
-         # assemble g_labels_list into gTree
+            factor(new_childNames, levels=unique(new_childNames)));
+         # default args
+         default_fontcolors <- eval(formals(assemble_venndir_label)$fontcolors)
+         default_fontsizes <- eval(formals(assemble_venndir_label)$fontsizes)
+         default_fontfamilies <- eval(formals(assemble_venndir_label)$fontfamilies)
+         # iterate label groups
+         g_labels_list <- lapply(jamba::nameVectorN(gdf_list), function(igdfname){
+            igdf <- gdf_list[[igdfname]];
+            # optionally change to Markdown format
+            # igdf$text <- gsub("<br>\n|<br>", "\n\n", igdf$text);
+            # 0.0.47.900
+            igdf$text <- gsub("<br>\n|<br>", "\n", igdf$text);
+            # optionally change to textGrob format
+            igdf$text <- gsub("<br>\n|<br>", "\n", igdf$text);
+            # remove markdown bold
+            igdf$text <- gsub("[*]+([^*]+)[*]+", "\\1", igdf$text);
+            
+            # get each label component
+            use_fontcolors <- default_fontcolors;
+            use_fontsizes <- default_fontsizes;
+            use_fontfamilies <- default_fontfamilies;
+            signed_df <- subset(igdf, type %in% "signed" & grepl("count", location));
+            signed_labels <- signed_df$text;
+            if (nrow(signed_df) > 0) {
+               use_fontcolors$signed <- signed_df$label_col;
+               use_fontsizes$signed <- signed_df$fontsize
+            }
+            count_df <- subset(igdf, type %in% "main" & grepl("count", location));
+            count_labels <- count_df$text;
+            if (nrow(count_df) > 0) {
+               use_fontcolors$count <- count_df$label_col;
+               count_labels <- unname(unlist(strsplit(count_labels, "\n")));
+               use_count_fontsize <- rep(count_df$fontsize,
+                  length.out=length(count_labels)) * c(1,
+                     rep(0.7, length.out=length(count_labels) - 1));
+               use_fontsizes$count <- use_count_fontsize;
+            }
+            overlap_df <- subset(igdf, type %in% "main" & grepl("overlap", location));
+            overlap_labels <- overlap_df$text;
+            if (nrow(overlap_df) > 0) {
+               use_fontcolors$overlap <- overlap_df$label_col;
+               use_fontsizes$overlap <- overlap_df$fontsize;
+               overlap_labels <- unname(unlist(strsplit(overlap_labels, "\n")));
+            }
+            
+            # do some checking for segment angle, then define just properly
+            use_just <- c("center", "center")
+            if (any(grepl(":outside:", igdfname))) {
+               # determine segment angle, use ref_polygon for fully
+               # internal sets that draw segment to internal overlap polygon
+               igdfname_ref <- head(igdf$ref_polygon, 1);
+               isegment_df <- unique(subset(segment_df,
+                  group %in% gsub(":.+", "", igdfname_ref)));
+               if (nrow(isegment_df) == 2) {
+                  line_degree <- jamba::rad2deg(
+                     atan2(y=diff(isegment_df$y[1+c(1,0)]),
+                        x=diff(isegment_df$x[1+c(1,0)])))
+                  use_adj <- degrees_to_adj(line_degree);
+                  use_just <- as.character(use_adj);
+                  use_just[1] <- ifelse(use_adj[1] == 0.5, "center",
+                     ifelse(use_adj[1] == 1, "right", "left"))
+                  use_just[2] <- ifelse(use_adj[2] == 0.5, "center",
+                     ifelse(use_adj[2] == 1, "top", "bottom"))
+               }
+               
+            }
+            
+            # assemble_venndir_label
+            g_label <- assemble_venndir_label(
+               x=grid::unit(adjx(head(igdf$x, 1)), "snpc"),
+               y=grid::unit(adjy(head(igdf$y, 1)), "snpc"),
+               overlap_labels=overlap_labels,
+               count_labels=count_labels,
+               signed_labels=signed_labels,
+               # debug="overlap",
+               just=use_just,
+               fontfamily=fontfamily,
+               fontcolors=use_fontcolors,
+               fontsizes=use_fontsizes,
+               frame_fill=head(igdf$box_fill, 1),
+               frame_border=head(igdf$border_col, 1),
+               template=template,
+               ...
+            )
+            if ("frameGrob" %in% debug) {
+               jamba::printDebug("signed_labels: ", signed_labels);# debug
+               jamba::printDebug("count_labels: ", count_labels);# debug
+               jamba::printDebug("overlap_labels: ", overlap_labels);# debug
+               stop("Stopping for debug.");# debug
+            }
+            g_label
+         })
+         # assemble into gTree label object
          g_labels_gTree <- grid::grobTree(
             vp=jp_viewport,
             do.call(grid::gList,
-               unlist(unname(g_labels_list), recursive=FALSE)),
+               g_labels_list),
             name="labels");
-         # jamba::printDebug("names(grid::childNames(g_labels_gTree)):");print(names(grid::childNames(g_labels_gTree)));# debug
-         g_labels_groupdf <- data.frame(check.names=FALSE,
-            jamba::rbindList(strsplit(names(grid::childNames(g_labels_gTree)), ":"),
-               newColnames=c("overlap_set",
-                  "counttype",
-                  "type",
-                  "location",
-                  "roworder",
-                  "label_df_rowname",
-                  paste0("extra", seq_len(100)))))
-         # jamba::printDebug("render_venndir(): ", "g_labels_groupdf:");print(g_labels_groupdf);# debug
-         g_labels_groupdf$roworder <- as.numeric(g_labels_groupdf$roworder);
-         g_labels_groupdf$name <- names(grid::childNames(g_labels_gTree));
-         g_labels_groupdf$childName <- grid::childNames(g_labels_gTree);
-         g_labels_groupdf <- jamba::mixedSortDF(g_labels_groupdf,
-            byCols=c(1, 4, -3, 2, 5, 6));
-         # jp_grobList$g_labels_list <- g_labels_list;
-         # jp_grobList$g_labels_groupdf <- g_labels_groupdf;
-         # jp_grobList$g_labels_gTree <- g_labels_gTree;
-         # jamba::printDebug("g_labels_groupdf:");print(g_labels_groupdf);# debug
-         ## Strategy: group labels
-         if (TRUE %in% group_labels) {
-            # jamba::printDebug("unique(segment_df):");print(unique(segment_df));# debug
-            # grid::pushViewport(attr(jp, "viewport"));
-            grouped_labels_list <- tryCatch({
-               dgg <- draw_gridtext_groups(
-                  g_labels=g_labels_gTree,
-                  gdf=gdf[g_labels_groupdf$roworder, , drop=FALSE],
-                  groupdf=g_labels_groupdf,
-                  segment_df=unique(segment_df),
-                  adjust_center=adjust_center,
-                  adjx_fn=adjx,
-                  adjy_fn=adjy,
-                  do_draw=FALSE,
-                  template=template,
-                  verbose=(verbose > 1))
-               # dgg$g_labels;
-               dgg
-            }, error=function(e){
-               print(e);
-               g_labels;
-            });
-            # grid::popViewport();
-            # jp_grobList$grouped_labels_list <- grouped_labels_list;
-            # roundedRect around grouped labels
-            g_labels_grobs <- grouped_labels_list$grobs;
-            # adjusted positions for grouped labels
-            g_labels <- grouped_labels_list$g_labels;
-            
-            ## do not draw here
-            # grid::pushViewport(attr(jp, "viewport"));
-            ## draw roundedrect outlines
-            # lapply(g_labels_grobs, grid::grid.draw);
-            ## draw re-positioned grouped labels
-            # grid::grid.draw(g_labels);
-            # grid::popViewport();
-            
-            ## Todo: Consider combining label_borders and labels
-            jp_grobList$label_borders <- grid::grobTree(
-               do.call(grid::gList, g_labels_grobs),
-               vp=jp_viewport,
-               name="label_borders");
-            jp_grobList$labels <- grid::grobTree(
-               g_labels,
-               vp=jp_viewport,
-               name="labels");
-         } else {
-            ## do not draw here
-            # grid::pushViewport(attr(jp, "viewport"))
-            # grid::grid.draw(g_labels_gTree);
-            # grid::popViewport();
-            # jp_grobList$labels <- g_labels_gTree;
-         }
+         # return grobs
+         jp_grobList$label_borders <- NULL;
+         jp_grobList$labels <- g_labels_gTree;
       }
    }
    

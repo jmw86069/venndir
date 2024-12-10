@@ -14,6 +14,8 @@ print_color_df(
   pad_type = 1,
   comment = FALSE,
   timeStamp = FALSE,
+  htmlOut = getOption("jam.htmlOut", FALSE),
+  debug = FALSE,
   ...
 )
 }

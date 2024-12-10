@@ -22,7 +22,7 @@ venndir(
   max_items = 3000,
   show_zero = FALSE,
   font_cex = c(1, 1, 0.7),
-  fontfamily = "Arial",
+  fontfamily = "sans",
   show_label = NA,
   display_counts = TRUE,
   poly_alpha = 0.6,
@@ -182,6 +182,8 @@ using the second value twice.
 }}
 
 \item{fontfamily}{\code{character} string to define the fontfamily.
+Default is "sans" because it should get mapped to a supported font
+for each graphics device.
 The \code{fontfamily} must match a recognized font for the given output
 device, and this font must be capable of producing UTF-8 / Unicode
 characters, in order to print up arrow and down arrow.

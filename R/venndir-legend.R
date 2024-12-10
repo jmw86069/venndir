@@ -65,6 +65,15 @@
 #' @param combine_size `logical` default TRUE, whether to combine
 #'    counts in the "Size" column with signed counts.
 #'    When `TRUE`, this option also left-aligns the "Size" column.
+#' @param legend_color_style `character` string to customize how colors are
+#'    used, `c("fill", "border")` are default:
+#'    * `"fill"`: will use the Venn fill color
+#'    * `"border"`: will use the Venn border color
+#'    * `"nofill"`: will remove the Venn fill color
+#'    * `"noborder"`: will remove the Venn border color
+#'    * `"greyfill"`: will use `"F4F4f4"` grey fill color, matching the Total.
+#'    * `"greyborder"`: will use `"#999999"` border color, matching the Total.
+#'    * `"blackborder"`: will use `"#000000"` border color, matching the Total.
 #' @param box.lwd `numeric` used to define the box line width,
 #'    as passed to `graphics::legend()` when `legend_style="base"`.
 #' @param legend_style `character` string indicating the style of legend:
@@ -96,6 +105,18 @@
 #' @param font_cex `numeric` adjustment to default font sizes. The default
 #'    font size with `legend_style="grid"` uses a 12 point font, so to adjust
 #'    to a specific font size like 8 points, use: `font_cex=8/12`
+#' @param fontfamily `character` used as the default font for all labels,
+#'    and is used in `fontfamilies` by default. However `fontfamilies`
+#'    takes priority when defined.
+#' @param fontfamilies `list` with named elements: `"overlap"`, `"count"`,
+#'    `"signed"`, to allow a custom font for each element of the legend.
+#'    This argument is also used by `assemble_venndir_label()`.
+#'    * The "overlap" font is used for set names, and column headers.
+#'    Column headers are currently always bold.
+#'    * Note that "overlap" is used for `"Size"` and `"Percent"` columns, and
+#'    when `combine_size=TRUE` the signed counts are in the same cell
+#'    and therefore use the same font.
+#'    * When `combine_size=FALSE` the signed counts use "signed".
 #' @param table_theme `list` of theme parameters as described in
 #'    `gridExtra::tableGrob()`, and `gridExtra::ttheme_default()`.
 #'    When supplied, the `font_cex` argument is ignored. 
@@ -219,9 +240,11 @@ venndir_legender <- function
  keep_newlines=FALSE,
  legend_total=TRUE,
  legend_percentage=NULL,
- legend_signed=FALSE,
+ legend_signed=NULL,
  combine_signed=TRUE,
  combine_size=TRUE,
+ legend_color_style=c("fill",
+    "border"),
  box.lwd=0, 
  legend_style=c("grid",
     "data.frame"),
@@ -234,6 +257,9 @@ venndir_legender <- function
  y_inset=grid::unit(2, "lines"),
  font_cex=1,
  fontfamily="Arial",
+ fontfamilies=list(signed=fontfamily,
+    count=fontfamily,
+    overlap=fontfamily),
  poly_alpha=0.8,
  table_theme=NULL,
  draw_legend=TRUE,
@@ -380,7 +406,6 @@ venndir_legender <- function
       names(vodf_lwd) <- names(vodf_color);
    } else if (length(venndir_output) > 0) {
       vodf_all <- venndir_output@jps@polygons;
-      # jamba::printDebug("vodf_all:");print(vodf_all);# debug
       use_label <- head(intersect(c("label", "name"),
          colnames(vodf_all)), 1);
       
@@ -419,7 +444,11 @@ venndir_legender <- function
          vo_match <- match(vodf[[use_label]], vodf[[use_label]]);
          vodf_border <- ifelse(is.na(vo_match),
             header_border,
-            vodf$border[vo_match])
+            ifelse(!is.na(vodf$outerborder[vo_match]),
+               vodf$outerborder[vo_match],
+               ifelse(!is.na(vodf$innerborder[vo_match]),
+                  vodf$innerborder[vo_match],
+                  vodf$border[vo_match])));
          # vodf_ol$border[vo_match])
          names(vodf_border) <- vodf[[use_label]];
       }
@@ -458,16 +487,12 @@ venndir_legender <- function
 
    # fix names by converting newline from HTML <br> to \n
    # Note: This step must occur after subsetting by names(setlist)
-   # jamba::printDebug("setlist:");print(setlist);# debug
-   # jamba::printDebug("vodf_color:");print(vodf_color);# debug
    setlist <- fix_setlist_names(setlist,
       use_newline="\n",
       keep_newlines=keep_newlines)
    vodf_color <- fix_setlist_names(vodf_color,
       use_newline="\n",
       keep_newlines=keep_newlines)
-   # jamba::printDebug("setlist:");print(setlist);# debug
-   # jamba::printDebug("vodf_color:");print(vodf_color);# debug
    vodf_border <- fix_setlist_names(vodf_border,
       use_newline="\n",
       keep_newlines=keep_newlines)
@@ -493,6 +518,8 @@ venndir_legender <- function
       size=lengths(setlist))
 
    # optional signed counts
+   gcdf1 <- NULL;
+   gcdf2 <- NULL;
    if (TRUE %in% legend_signed) {
       sv <- jamba::rbindList(lapply(seq_along(setlist), function(isetlist){
          idf <- signed_overlaps(setlist[isetlist],
@@ -547,7 +574,7 @@ venndir_legender <- function
       # replace with "(# up, # dn)" format
       gcolnames1 <- c(
          # " (Sign)",
-         " Sign",
+         "Sign",
          sapply(seq_len(ncol(gcdf2)), function(k1){
             paste(rep(" ", k1), collapse="")}));
       gcolnames <- tail(gcolnames1, -1)
@@ -555,13 +582,12 @@ venndir_legender <- function
       colnames(gcdf1) <- colnames(gcdf2);
       if (TRUE %in% combine_signed) {
          gcdf2 <- data.frame(check.names=FALSE,
-            ` Sign`=paste0(" (", jamba::pasteByRow(gcdf2, sep=", "), ")"))
+            `Sign`=paste0("(", jamba::pasteByRow(gcdf2, sep=", "), ")  "))
          # colnames(gcdf2) <- gcolnames[1]
       } else if (TRUE %in% combine_size) {
          colnames(gcdf2) <- jamba::makeNames(rep("Sign", ncol(gcdf2)));
       }
       rownames(gcdf2) <- rownames(gcdf1);
-      # print(gcdf2);
    }
    
    # optional labels
@@ -614,12 +640,32 @@ venndir_legender <- function
       gridlegend_df <- rbind(gridlegend_df, gridlegend_df2);
       #
       legend_df2 <- data.frame(legend="Total",
-         color="grey95",
-         border="grey95",
-         lwd=2);
+         # color="grey95",
+         # border="grey95",
+         color="#F4F4F4",
+         border="#999999",
+         lwd=1);
       legend_df <- rbind(legend_df, legend_df2);
    }
 
+   if ("nofill" %in% legend_color_style) {
+      legend_df$color[] <- "#FFFFFF00";
+   }
+   if ("greyfill" %in% legend_color_style) {
+      legend_df$color[] <- "#F4F4F4";
+   }
+   if ("noborder" %in% legend_color_style) {
+      legend_df$border[] <- "#FFFFFF00";
+      # legend_df$border[] <- legend_df$color[];
+   }
+   if ("greyborder" %in% legend_color_style) {
+      legend_df$border[] <- "#999999";
+   }
+   if ("blackborder" %in% legend_color_style) {
+      legend_df$border[] <- "#000000";
+   }
+   legend_df$lwd <- 1;
+   
    # optionally add percentage
    if (TRUE %in% legend_percentage && TRUE %in% legend_total) {
       pct_total <- round(
@@ -646,14 +692,7 @@ venndir_legender <- function
       addc_df <- gcdf1[match(gridlegend_df$set, rownames(gcdf2)), , drop=FALSE];
       addc_df[is.na(addc_df)] <- ""
       gridlegend_df[, colnames(add_df)] <- add_df
-      # gridlegend_df
-      # legend_df
    }
-   
-   # # return data.frame
-   # if ("data.frame" %in% legend_style) {
-   #    return(list(gridlegend_df=gridlegend_df, legend_df=legend_df))
-   # }
    
    # render legend
    if (any(c("grid", "data.frame") %in% legend_style)) {
@@ -707,32 +746,26 @@ venndir_legender <- function
       #   be placed at the border of the extended padded range, the very edge.
       colnames(gridlegend_df_use) <- jamba::ucfirst(
          colnames(gridlegend_df_use));
-      for (icol in head(colnames(gridlegend_df_use), -1)) {
+      # for (icol in head(colnames(gridlegend_df_use), -1)) {
+      # add leading whitespace to all columns
+      for (icol in colnames(gridlegend_df_use)) {
          gridlegend_df_use[[icol]] <- paste0("  ", gridlegend_df_use[[icol]]);
          inum <- match(icol, colnames(gridlegend_df_use))
          colnames(gridlegend_df_use)[inum] <- paste0("  ",
             colnames(gridlegend_df_use)[inum]);
       }
-      for (icol in tail(colnames(gridlegend_df_use), 1)) {
-         gridlegend_df_use[[icol]] <- paste0(gridlegend_df_use[[icol]], "  ");
+      # for (icol in tail(colnames(gridlegend_df_use), 1)) {
+      # add trailing whitespace to all columns
+      for (icol in colnames(gridlegend_df_use)) {
+         gridlegend_df_use[[icol]] <- paste0(gridlegend_df_use[[icol]], " ");
          inum <- match(icol, colnames(gridlegend_df_use))
          colnames(gridlegend_df_use)[inum] <- paste0(
             colnames(gridlegend_df_use)[inum],
-            "  ");
+            " ");
       }
       if (length(table_theme) == 0) {
-         # jamba::printDebug("gridlegend_df_use:");print(gridlegend_df_use);# debug
-         # align_list <- lapply(jamba::nameVectorN(gridlegend_df_use), function(icol){
-         #    list(fg_params=list(hjust=0))
-         # })
-         # use_hjust1 <- ifelse(
-         #    grepl("Set|Label|Sign", colnames(gridlegend_df_use)),
-         #    0, 1)
          use_hjust1 <- ifelse(
-            grepl("Size$|Percent", colnames(gridlegend_df_use)),
-            1, 0)
-         # use_hjust1 <- rep(c(0, 1),
-         #    c(ncol(gridlegend_df_use) - 1, 1))
+            grepl("Size$|Percent", colnames(gridlegend_df_use)), 1, 0)
          use_hjust <- rep(use_hjust1,
             each=nrow(gridlegend_df_use))
          if (length(legend_padding) == 0) {
@@ -748,7 +781,7 @@ venndir_legender <- function
          }
          table_theme <- gridExtra::ttheme_default(
             base_size=12 * font_cex,
-            base_family=fontfamily,
+            base_family=fontfamilies$overlap,
             core=list(
                fg_params=list(
                   hjust=use_hjust,
@@ -769,7 +802,7 @@ venndir_legender <- function
          theme=table_theme,
          vp=vp,
          d=gridlegend_df_use)
-      
+
       # optionally color each row
       if (length(vodf_color) > 0) {
          # custom function to find matching cell
@@ -821,14 +854,24 @@ venndir_legender <- function
             }
          }
          # iterate each row
+         # Todo: Consider resizing columns with alternate fonts
          for (irow in seq_len(nrow(legend_df))) {
             for (icol in seq_len(ncol(gridlegend_df_use))) {
+               icolname <- colnames(gridlegend_df_use)[icol];
                ind <- find_cell(legend_grob, irow + 1, icol, "core-fg")
                for (ind0 in unique(ind)) {
+                  use_fontfamily <- fontfamilies$overlap;
+                  if (any(grepl("Size|Percent", icolname))) {
+                     use_fontfamily <- fontfamilies$count;
+                  } else if (any(grepl("Sign|^[ ]*$", icolname))) {
+                     use_fontfamily <- fontfamilies$signed;
+                  }
+                  # Todo: Consider substituting marquee() to handle arrows?
                   legend_grob$grobs[ind0][[1]][["gp"]] <- update_gpar_values(
                      gp=legend_grob$grobs[ind0][[1]][["gp"]],
                      gp_list=list(
                         # fontface="bold",
+                        fontfamily=use_fontfamily,
                         col=jamba::setTextContrastColor(legend_df$color[irow])))
                   # legend_grob$grobs[ind0][[1]][["gp"]] <- grid::gpar(
                   #    # fontface="bold",

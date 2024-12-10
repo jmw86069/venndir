@@ -270,9 +270,9 @@ setMethod("show", "Venndir",
    }
 )
 
-if (!isGeneric("metadata")) {
+# if (!isGeneric("metadata")) {
    setGeneric("metadata", function(x, ...) standardGeneric("metadata"))
-}
+# }
 #' Return metadata for a Venndir object
 #' 
 #' @docType methods
@@ -289,10 +289,10 @@ setMethod("metadata",
       }
    })
 
-if (!isGeneric("metadata<-")) {
+# if (!isGeneric("metadata<-")) {
    setGeneric("metadata<-",
       function(x, ..., value) standardGeneric("metadata<-"))
-}
+# }
 #' Replace metadata for a Venndir object
 #' 
 #' @docType methods

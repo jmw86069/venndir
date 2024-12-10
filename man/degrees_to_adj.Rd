@@ -39,12 +39,23 @@ for text plotting, which arranges text relative
 to the angle in degrees.
 }
 \examples{
-degrees <- seq(from=1, to=360, by=33);
-adjdf <- degrees_to_adj(degrees);
+degrees <- seq(from=1, to=360, by=15);
 x <- cos(jamba::deg2rad(degrees));
 y <- sin(jamba::deg2rad(degrees));
+adjdf <- degrees_to_adj(degrees);
+adjdf1 <- degrees_to_adj(degrees, bias_side=1, bias_height=1);
 plot(x, y,
    pch=20, asp=1,
+   xlim=c(-1.3, 1.3),
+   ylim=c(-1.3, 1.3));
+jamba::drawLabels(txt=seq_along(degrees),
+   x=x, y=y, labelCex=0.8,
+   adjX=adjdf1[,1], adjY=adjdf1[,2])
+jamba::drawLabels(txt=seq_along(degrees),
+   x=x, y=y, labelCex=0.8, boxColor="gold",
+   adjX=adjdf[,1], adjY=adjdf[,2])
+plot(x, y,
+   pch=20, asp=1, cex=0.4, col="red",
    xlim=c(-1.3, 1.3),
    ylim=c(-1.3, 1.3));
 for (i in seq_along(degrees)) {

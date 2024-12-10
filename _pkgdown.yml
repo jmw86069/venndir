@@ -3,8 +3,9 @@ figures:
   fig.height: 8
   fig.width: 8
 template:
-  params:
-    bootswatch: cosmo
+  bootstrap: 5
+  bootswatch: cosmo
+url: https://jmw86069.github.io/venndir
 reference:
 - title: venndir Core Functions
   desc: Core functions for venndir

@@ -80,17 +80,17 @@
 #'    way to adjust text label sizes.
 #' @param degrees `numeric` value used to rotate labels, default `0`,
 #'    in degrees between 0 and 359.
-#' @param `dither_cex,dither_color,dither_degrees` values used to provide
+#' @param `jitter_cex,jitter_color,jitter_degrees` values used to provide
 #'    some variability to the repeated pattern of text labels.
-#'    * `dither_cex` provides a range to adjust `cex` and `fontsize` slightly
+#'    * `jitter_cex` provides a range to adjust `cex` and `fontsize` slightly
 #'    for each label, making some slightly larger or smaller to help
 #'    distinguish adjacent labels from one another.
-#'    * `dither_color` provides a range for adjusting the font color, which
+#'    * `jitter_color` provides a range for adjusting the font color, which
 #'    is applied with `darkFactor` in `jamba::makeColorDarker()`.
-#'    * `dither_degrees` provides a range for adjusting font `degrees`,
+#'    * `jitter_degrees` provides a range for adjusting font `degrees`,
 #'    the default `0` means the values are not adjusted. The `text()` function
 #'    does not permit multiple vectorized rotations, however `gridtext`
-#'    does permit multiple angles. Best to use `dither_degrees` only
+#'    does permit multiple angles. Best to use `jitter_degrees` only
 #'    when displaying labels with `gridtext`.
 #' @param apply_n_scale `logical` indicating whether to adjust the buffer
 #'    based upon the number of items, where more items uses less buffer,
@@ -170,9 +170,9 @@ label_fill_JamPolygon <- function
  fontsize=10,
  cex=1,
  degrees=0,
- dither_cex=0.04,
- dither_color=0.07,
- dither_degrees=0,
+ jitter_cex=0.04,
+ jitter_color=0.07,
+ jitter_degrees=0,
  apply_n_scale=TRUE,
  label_method=c("hexagonal"),
  draw_labels=TRUE,
@@ -215,23 +215,23 @@ label_fill_JamPolygon <- function
    border <- rep(border, length.out=n);
    cex <- rep(cex, length.out=n);
    # jamba::printDebug("label_fill_JamPolygon(): ", "cex: ", cex);# debug
-   if (length(dither_cex) > 0 & all(dither_cex != 0)) {
-      #cex <- rnorm(n) * dither_cex * cex + dither_cex/3 + cex;
-      cex <- runif(n, min=-dither_cex, max=dither_cex) * cex + dither_cex/3 + cex;
+   if (length(jitter_cex) > 0 & all(jitter_cex != 0)) {
+      #cex <- rnorm(n) * jitter_cex * cex + jitter_cex/3 + cex;
+      cex <- runif(n, min=-jitter_cex, max=jitter_cex) * cex + jitter_cex/3 + cex;
    }
    # jamba::printDebug("label_fill_JamPolygon(): ", "cex: ", cex);# debug
    degrees <- rep(degrees, length.out=n);
    
-   if (length(dither_degrees) > 0 & all(dither_degrees != 0)) {
-      #cex <- rnorm(n) * dither_cex * cex + dither_cex/3 + cex;
+   if (length(jitter_degrees) > 0 & all(jitter_degrees != 0)) {
+      #cex <- rnorm(n) * jitter_cex * cex + jitter_cex/3 + cex;
       degrees <- runif(n,
-         min=-abs(dither_degrees),
-         max=abs(dither_degrees)) + degrees;
+         min=-abs(jitter_degrees),
+         max=abs(jitter_degrees)) + degrees;
    }
    
-   # optionally dither colors for slight visual distinction
-   if (length(dither_color) == 1 & dither_color > 0) {
-      df <- runif(n, min=-dither_color, max=dither_color);
+   # optionally jitter colors for slight visual distinction
+   if (length(jitter_color) == 1 & jitter_color > 0) {
+      df <- runif(n, min=-jitter_color, max=jitter_color);
       sf <- (abs(df)*2 + 1) * sign(df);
       df <- (abs(df) + 1) * sign(df) 
       color <- jamba::makeColorDarker(color,
@@ -365,7 +365,6 @@ label_fill_JamPolygon <- function
             # r=grid::unit(2, "pt"),
             vjust=0.5,
             hjust=0.5,
-            # halign=0.5,
             vp=use_vp,
             gp=grid::gpar(
                col=color,

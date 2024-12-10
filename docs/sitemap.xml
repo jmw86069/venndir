@@ -1,384 +1,82 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/TODO.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/venndir_gene_expression.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/label_positioning_logic.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/polyclip_notes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/JamPolygon-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/JamPolygon-methods.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Venndir-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Venndir-methods.html</loc>
-  </url>
-  <url>
-    <loc>/reference/add_orientation_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/area_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bbox_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bbox_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/buffer_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_Venndir.html</loc>
-  </url>
-  <url>
-    <loc>/reference/counts2setlist.html</loc>
-  </url>
-  <url>
-    <loc>/reference/curate_venn_labels.html</loc>
-  </url>
-  <url>
-    <loc>/reference/degrees_to_adj.html</loc>
-  </url>
-  <url>
-    <loc>/reference/diff_degrees.html</loc>
-  </url>
-  <url>
-    <loc>/reference/display_angles.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_gridtext_groups.html</loc>
-  </url>
-  <url>
-    <loc>/reference/eulerr2polys.html</loc>
-  </url>
-  <url>
-    <loc>/reference/eulerr_to_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/eulerr_to_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/expand_range.html</loc>
-  </url>
-  <url>
-    <loc>/reference/farthest_point_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/find_venn_overlaps_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/find_vennpoly_overlaps.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_largest_polygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_largest_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_sp_buffer.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_venn_polygon_shapes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_venn_shapes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gridtext_make_outer_box.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gridtext_richtext_grob.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grobs_exts.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grobs_stack.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grobs_tile.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grobs_xalign.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grobs_yalign.html</loc>
-  </url>
-  <url>
-    <loc>/reference/has_point_in_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/im2list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/im_value2list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/intersect_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/intersect_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/intersect_polygons.html</loc>
-  </url>
-  <url>
-    <loc>/reference/label_fill_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/label_outside_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/label_segment_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/labelr_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/labelr_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/list2im_opt.html</loc>
-  </url>
-  <url>
-    <loc>/reference/list2im_signed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/list2im_value.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_color_contrast.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_venn_combn_df.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_venn_test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/match_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mean_degree_arc.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mean_degrees.html</loc>
-  </url>
-  <url>
-    <loc>/reference/minus_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/minus_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/modify_venndir_overlap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nearest_point_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nudge_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nudge_polygon_coords.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nudge_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nudge_sp.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nudge_venndir_label.html</loc>
-  </url>
-  <url>
-    <loc>/reference/overlaplist2setlist.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot-JamPolygon-missing-method.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/point_in_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polyclip_to_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_areas.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_circles.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_ellipses.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_label_fill.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_label_outside.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_label_segment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_list_labelr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polygon_list_to_xy_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/print_color_df.html</loc>
-  </url>
-  <url>
-    <loc>/reference/render_venndir.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reposition_venn_gridtext_labels.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rescale_coordinates.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rescale_p.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rescale_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rescale_ps.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rescale_sp.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sample_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/shrink_df.html</loc>
-  </url>
-  <url>
-    <loc>/reference/signed_counts2setlist.html</loc>
-  </url>
-  <url>
-    <loc>/reference/signed_overlaps.html</loc>
-  </url>
-  <url>
-    <loc>/reference/simple_ellipse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sp_circles.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sp_ellipses.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sp_percent_area.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sp_polylabelr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/split_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/spread_degrees.html</loc>
-  </url>
-  <url>
-    <loc>/reference/textvenn.html</loc>
-  </url>
-  <url>
-    <loc>/reference/three_point_angle.html</loc>
-  </url>
-  <url>
-    <loc>/reference/to_basic.GeomRichText.html</loc>
-  </url>
-  <url>
-    <loc>/reference/to_basic.GeomTextBox.html</loc>
-  </url>
-  <url>
-    <loc>/reference/union_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/union_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/union_polygons.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update_JamPolygon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/venn_meme.html</loc>
-  </url>
-  <url>
-    <loc>/reference/venndir.html</loc>
-  </url>
-  <url>
-    <loc>/reference/venndir_label_style.html</loc>
-  </url>
-  <url>
-    <loc>/reference/venndir_legend.html</loc>
-  </url>
-  <url>
-    <loc>/reference/venndir_legender.html</loc>
-  </url>
-  <url>
-    <loc>/reference/venndir_to_df.html</loc>
-  </url>
-  <url>
-    <loc>/reference/xy_list_to_polygon_list.html</loc>
-  </url>
-  <url>
-    <loc>/venndir_todo.html</loc>
-  </url>
-  <url>
-    <loc>/venndir_workflow.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://jmw86069.github.io/venndir/404.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/LICENSE-text.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/LICENSE.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/TODO.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/articles/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/articles/venndir_gene_expression.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/authors.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/news/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/JamPolygon-class.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/JamPolygon-methods.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/Venndir-class.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/Venndir-methods.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/add_orientation_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/area_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/assemble_venndir_label.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/bbox_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/buffer_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/check_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/check_Venndir.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/counts2setlist.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/curate_venn_labels.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/degrees_to_adj.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/diff_degrees.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/display_angles.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/eulerr_to_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/expand_range.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/farthest_point_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/find_venn_overlaps_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/get_venn_polygon_shapes.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/has_point_in_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/im2list.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/im_value2list.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/intersect_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/label_fill_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/label_outside_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/label_segment_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/labelr_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/list2im_opt.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/list2im_value.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/make_color_contrast.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/make_venn_combn_df.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/make_venn_test.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/match_list.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/mean_degree_arc.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/mean_degrees.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/minus_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/modify_venndir_overlap.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/nearest_point_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/nudge_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/nudge_venndir_label.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/overlaplist2setlist.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/plot.JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/point_in_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/polyclip_to_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/polygon_circles.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/polygon_ellipses.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/print_color_df.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/render_venndir.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/rescale_coordinates.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/sample_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/shrink_df.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/signed_counts2setlist.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/signed_overlaps.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/simple_ellipse.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/split_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/spread_degrees.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/textvenn.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/three_point_angle.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/to_basic.GeomRichText.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/to_basic.GeomTextBox.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/union_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/update_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/venn_meme.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/venndir.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/venndir_label_style.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/venndir_legender.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/venndir_to_df.html</loc></url>
 </urlset>
+

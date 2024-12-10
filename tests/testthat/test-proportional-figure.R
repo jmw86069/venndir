@@ -76,3 +76,12 @@ test_that("proportional_nested_figure", {
       vdiffr::expect_doppelganger("Proportional, nested render_venndir()", run_vo5p)
    }
 })
+
+test_that("venn_figure_3way_tall", {
+   set.seed(123)
+   run_venndir5 <- function() 
+      venndir(make_venn_test(10000, 3, do_signed=TRUE), template="tall")
+   if (jamba::check_pkg_installed("vdiffr")) {
+      vdiffr::expect_doppelganger("Venn 3-way, venndir() template='tall'", run_venndir5)
+   }
+})

@@ -1,3 +1,51 @@
+# venndir 0.0.47.900
+
+* Added to Imports: `eulerr`, `gtable` (lightweight, also used by ggplot2)
+* Added to Suggests: `gridtext`, `marquee`
+* Count labels use `grid::textGrob()` by default, since `gridtext` (kerning)
+and `marquee` (R crash on MacOS) have "limitations".
+* Major refactoring of label grouping: uses `gtable` instead of `gTree`.
+Faster and more accurate height/width. Fixed labels being slightly cropped.
+* Simplified the Venndir data model, columns no longer used for labels.
+
+## new functions
+
+* `assemble_venndir_labels()` - new workhorse function creates grobs,
+assembles them into `gtable` format.
+
+   * Reverts `text_grob_type="marquee"` to `text_grob_type="textGrob"`
+   on MacOS using R-4.4.1 or older.
+   * Applies fontfamily,fontface,fontsize,fontcolor to each type of label,
+   and multiple labels, each in order.
+
+## changes to existing functions
+
+* `render_venndir()`
+
+   * Changed default `fontfamily="sans"` to avoid "Arial" which may not
+   be present for all graphics devices.
+   * Help docs include useful `...` arguments passed to internal functions.
+   * Now calls `assemble_venndir_labels()`, not `draw_gridtext_groups()`.
+   * Argument `group_labels` is dropped, all labels are grouped.
+
+* `venn_meme()`
+
+   * Changed default `item_style="text"` to avoid kerning issues with gridtext.
+* `venndir_legender()`
+
+   * New default shows up/down counts when shown in Venn diagram.
+   * New default shows table borders.
+   * New argument `legend_color_style` controls color fill and border.
+   * The "Size" column is now left-aligned, previously right-aligned.
+   * Added light grey shading to "Total" row.
+   * Added leading/trailing whitespace to all columns.
+
+## deprecated functions (internal)
+
+* `grobs_exts()`, `grobs_stack()`, `grobs_tile()`, `grobs_xalign()`,
+`grobs_yalign()`, `draw_gridtext_groups()`
+* removed: `reposition_venn_gridtext_labels()`
+
 # venndir 0.0.46.900
 
 Legend labels can include signed counts and percentage values.

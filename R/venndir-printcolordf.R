@@ -60,6 +60,8 @@ print_color_df <- function
  pad_type=1,
  comment=FALSE,
  timeStamp=FALSE,
+ htmlOut=getOption("jam.htmlOut", FALSE),
+ debug=FALSE,
  ...)
 {
    if (length(dfjustify) == 0) {
@@ -120,6 +122,11 @@ print_color_df <- function
    }
    padchars <- paste(collapse="",
       rep(" ", length.out=padding));
+   if (any(c("html", "data.frames") %in% debug)) {
+      return(list(
+         df=df,
+         dfcolor=dfcolor));
+   }
    for (iline in seq_len(nrow(df))) {
       line_invert <- dfinvert[iline,];
       line_fg <- ifelse(line_invert,
@@ -128,14 +135,34 @@ print_color_df <- function
       line_bg <- ifelse(line_invert,
          dfcolor[iline,],
          NA);
-      jamba::printDebug(
-         timeStamp=FALSE,
-         comment=FALSE,
-         paste0(padchars, df[iline,], padchars),
-         fgText=as.list(line_fg),
-         bgText=as.list(line_bg),
-         sep="",
-         splitComments=TRUE);
+      if (TRUE %in% htmlOut) {
+         catlines <- capture.output(jamba::printDebug(
+            timeStamp=FALSE,
+            comment=FALSE,
+            gsub(" ", "&nbsp;", paste0(padchars, df[iline,], padchars)),
+            fgText=as.list(line_fg),
+            bgText=as.list(line_bg),
+            sep="",
+            splitComments=TRUE,
+            htmlOut=TRUE,
+            ...))
+         catlines <- paste0(
+            "<span style=\"font-family: monospace\">",
+            gsub("<br/>$", "", catlines),
+            "</span><br/>\n");
+         cat(catlines, sep="");
+      } else {
+         catlines <- jamba::printDebug(
+            timeStamp=FALSE,
+            comment=FALSE,
+            paste0(padchars, df[iline,], padchars),
+            fgText=as.list(line_fg),
+            bgText=as.list(line_bg),
+            sep="",
+            splitComments=TRUE,
+            htmlOut=FALSE,
+            ...)
+      }
    }
 }
 

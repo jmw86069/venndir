@@ -17,9 +17,9 @@ label_fill_JamPolygon(
   fontsize = 10,
   cex = 1,
   degrees = 0,
-  dither_cex = 0.04,
-  dither_color = 0.07,
-  dither_degrees = 0,
+  jitter_cex = 0.04,
+  jitter_color = 0.07,
+  jitter_degrees = 0,
   apply_n_scale = TRUE,
   label_method = c("hexagonal"),
   draw_labels = TRUE,
@@ -121,18 +121,18 @@ See examples.
 \item{...}{additional arguments are passed to internal functions:
 \code{buffer_JamPolygon()}, and \code{sample_JamPolygon()}.}
 
-\item{`dither_cex, dither_color, dither_degrees`}{values used to provide
+\item{`jitter_cex, jitter_color, jitter_degrees`}{values used to provide
 some variability to the repeated pattern of text labels.
 \itemize{
-\item \code{dither_cex} provides a range to adjust \code{cex} and \code{fontsize} slightly
+\item \code{jitter_cex} provides a range to adjust \code{cex} and \code{fontsize} slightly
 for each label, making some slightly larger or smaller to help
 distinguish adjacent labels from one another.
-\item \code{dither_color} provides a range for adjusting the font color, which
+\item \code{jitter_color} provides a range for adjusting the font color, which
 is applied with \code{darkFactor} in \code{jamba::makeColorDarker()}.
-\item \code{dither_degrees} provides a range for adjusting font \code{degrees},
+\item \code{jitter_degrees} provides a range for adjusting font \code{degrees},
 the default \code{0} means the values are not adjusted. The \code{text()} function
 does not permit multiple vectorized rotations, however \code{gridtext}
-does permit multiple angles. Best to use \code{dither_degrees} only
+does permit multiple angles. Best to use \code{jitter_degrees} only
 when displaying labels with \code{gridtext}.
 }}
 }

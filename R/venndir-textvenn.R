@@ -41,9 +41,23 @@
 #'    `colorjam::blend_colors()` to define the color wheel used
 #'    during color blending operations.
 #' @param curate_df `data.frame` or `NULL` passed to `curate_venn_labels()`.
+#' @param lightMode `logical` default `jamba::checkLightMode()` checks
+#'    whether the console has a light background, and therefore needs
+#'    to have darker text. This check is incomplete, it assumes
+#'    RStudio has a light background, and everything else is dark.
+#'    To override consistently, set the option below, or add to `.Rprofile`:
+#'    * `options("jam.lightMode"=TRUE)` will force lightMode=TRUE, for
+#'    light background and darker text.
+#'    * `options("jam.lightMode"=FALSE)` will force lightMode=FALSE, for
+#'    dark background and lighter text.
+#'    
 #' @param verbose `logical` indicating whether to print verbose output.
 #' 
 #' @examples
+#' # for this purpose, set lightMode=TRUE to ensure darker text
+#' options(jam.lightMode=TRUE)
+#' 
+#' # generate test data
 #' setlist <- make_venn_test(n_items=100, do_signed=TRUE)
 #' 
 #' # two-way Venn by default shows concordance
@@ -80,6 +94,8 @@ textvenn <- function
  sep="&",
  blend_preset="ryb",
  curate_df=NULL,
+ lightMode=jamba::checkLightMode(),
+ debug=NULL,
  verbose=FALSE,
  ...)
 {
@@ -107,6 +123,33 @@ textvenn <- function
    #sv <- signed_overlaps(list(A=letters[1:10], B=LETTERS[1:20]), "overlap");
    #sv
    
+   # custom function for debug output
+   handle_textvenn_debug <- function(outdf=NULL, debug="data.frames") {
+      df <- data.frame(outdf$df)
+      dfcolor <- data.frame(outdf$dfcolor);
+      use_color_sub <- jamba::rmNULL(
+         lapply(jamba::nameVectorN(dfcolor), function(i){
+            k <- !is.na(dfcolor[,i]);
+            jamba::nameVector(subset(
+               data.frame(a=dfcolor[k, i], b=df[k, i]),
+               !duplicated(b)))
+         }))
+      use_align <- ifelse(sapply(colnames(df), function(i){
+         any(grepl(":", df[, i]))
+      }), "l", "r")
+      if ("html" %in% debug) {
+         kbl <- jamba::kable_coloring(df,
+            align=use_align,
+            col.names=rep("", ncol(df)),
+            extra_css="white-space: nowrap; border-top: none;",
+            colorSub=use_color_sub,
+            border_left=FALSE) %>%
+            kableExtra::kable_styling(bootstrap_options=c("condensed"),
+               full_width=FALSE)
+         return(kbl)
+      }
+      return(outdf)
+   }
    # numeric counts
    nCounts <- sapply(unique(sv$sets), function(i){
       sum(subset(sv, sets %in% i)$count)
@@ -237,11 +280,16 @@ textvenn <- function
       }
       
       # print this colorized text table
-      print_color_df(df=venn_m,
+      outdf <- print_color_df(df=venn_m,
          dfcolor=venn_c,
          dfinvert=venn_i,
          padding=padding,
+         lightMode=lightMode,
+         debug=debug,
          ...);
+      if (any(c("html", "data.frames") %in% debug)) {
+         return(handle_textvenn_debug(outdf, debug))
+      }
       return(invisible(sv));
 
    } else if (n == 3) {
@@ -373,11 +421,16 @@ textvenn <- function
       }
       
       ## print color data.frame
-      print_color_df(venn_m,
+      outdf <- print_color_df(venn_m,
          venn_c,
          venn_i,
          padding=padding,
+         lightMode=lightMode,
+         debug=debug,
          ...);
+      if (any(c("html", "data.frames") %in% debug)) {
+         return(handle_textvenn_debug(outdf, debug))
+      }
       return(invisible(sv));
    }
    invisible(sv);

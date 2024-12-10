@@ -14,9 +14,10 @@ venndir_legender(
   keep_newlines = FALSE,
   legend_total = TRUE,
   legend_percentage = NULL,
-  legend_signed = FALSE,
+  legend_signed = NULL,
   combine_signed = TRUE,
   combine_size = TRUE,
+  legend_color_style = c("fill", "border"),
   box.lwd = 0,
   legend_style = c("grid", "data.frame"),
   item_type = "",
@@ -28,6 +29,7 @@ venndir_legender(
   y_inset = grid::unit(2, "lines"),
   font_cex = 1,
   fontfamily = "Arial",
+  fontfamilies = list(signed = fontfamily, count = fontfamily, overlap = fontfamily),
   poly_alpha = 0.8,
   table_theme = NULL,
   draw_legend = TRUE,
@@ -93,6 +95,18 @@ This option is only used when signed counts are included.}
 counts in the "Size" column with signed counts.
 When \code{TRUE}, this option also left-aligns the "Size" column.}
 
+\item{legend_color_style}{\code{character} string to customize how colors are
+used, \code{c("fill", "border")} are default:
+\itemize{
+\item \code{"fill"}: will use the Venn fill color
+\item \code{"border"}: will use the Venn border color
+\item \code{"nofill"}: will remove the Venn fill color
+\item \code{"noborder"}: will remove the Venn border color
+\item \code{"greyfill"}: will use \code{"F4F4f4"} grey fill color, matching the Total.
+\item \code{"greyborder"}: will use \code{"#999999"} border color, matching the Total.
+\item \code{"blackborder"}: will use \code{"#000000"} border color, matching the Total.
+}}
+
 \item{box.lwd}{\code{numeric} used to define the box line width,
 as passed to \code{graphics::legend()} when \code{legend_style="base"}.}
 
@@ -134,6 +148,22 @@ or height.}
 \item{font_cex}{\code{numeric} adjustment to default font sizes. The default
 font size with \code{legend_style="grid"} uses a 12 point font, so to adjust
 to a specific font size like 8 points, use: \code{font_cex=8/12}}
+
+\item{fontfamily}{\code{character} used as the default font for all labels,
+and is used in \code{fontfamilies} by default. However \code{fontfamilies}
+takes priority when defined.}
+
+\item{fontfamilies}{\code{list} with named elements: \code{"overlap"}, \code{"count"},
+\code{"signed"}, to allow a custom font for each element of the legend.
+This argument is also used by \code{assemble_venndir_label()}.
+\itemize{
+\item The "overlap" font is used for set names, and column headers.
+Column headers are currently always bold.
+\item Note that "overlap" is used for \code{"Size"} and \code{"Percent"} columns, and
+when \code{combine_size=TRUE} the signed counts are in the same cell
+and therefore use the same font.
+\item When \code{combine_size=FALSE} the signed counts use "signed".
+}}
 
 \item{table_theme}{\code{list} of theme parameters as described in
 \code{gridExtra::tableGrob()}, and \code{gridExtra::ttheme_default()}.

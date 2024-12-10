@@ -202,7 +202,9 @@ label_outside_JamPolygon <- function
    angles[not_na] <- spread_degrees(angles1[not_na],
       min_degrees=min_degrees);
    names(angles) <- names(jp)[which_jp];
-
+   # jamba::printDebug("angles:");# debug
+   # print(data.frame(angles_in=round(angles1), angles_out=round(angles)));# debug
+   
    if (verbose > 1) {   
       jamba::printDebug("label_outside_JamPolygon(): ",
          "angles:");

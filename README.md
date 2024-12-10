@@ -34,6 +34,7 @@ disease from the effects of a cure?
 options("warn"=-1)
 
 library(venndir)
+
 vo <- venndir(make_venn_test(100, 2, do_signed=TRUE),
    proportional=TRUE,
    overlap_type="each", font_cex=1.2)
@@ -134,9 +135,8 @@ setlist_dir
 #>        1        1        1        1       -1        1       -1
 ```
 
-For biological data, direction is important and relevant. Whether a gene
-is regulated up or down might be the difference between disease and
-treatment.
+For biological data, **direction is important and relevant**. Up- or
+down-regulation might be the difference between disease or treatment.
 
 > Note `make_venn_tests()` can simulate concordance, and the default is
 > `concordance=0.5`. Concordance is a measure of how frequently two
@@ -145,16 +145,14 @@ treatment.
 > disagree in direction, and `concordance=1` means every element agrees
 > in direction.
 
-There are a few ways to summarize directional overlaps, which vary by
-the amount of detail.
+There are different ways to summarize directional overlaps:
 
-- `overlap_type="overlap"` - This method ignores direction.
-- `overlap_type="agreement"` - This method displays agreement and
-  disagreement, with no details about up/down direction.
-- `overlap_type="concordance"` - **(default)** This method displays
-  concordant directions, up-up, down-down; all discordant combinations
-  are grouped together as “discordant”.
-- `overlap_type="each"` - This method displays each directional overlap.
+- `overlap_type="concordance"` - **(default for signed input)**:
+  Concordant up 191, down 193, and discordant X.
+- `overlap_type="overlap"` - **(default for basic input)**: Overlap
+  counts only.
+- `overlap_type="agreement"` - Agreement and disagreement.
+- `overlap_type="each"` - Counts for each combination of directions.
 
 ### overlap_type=“concordance”
 
@@ -164,11 +162,8 @@ venndir(setlist_dir, font_cex=c(1.5, 1.5, 1))
 
 <img src="man/figures/README-venndir_1-1.png" width="100%" />
 
-This option displays the number `up-up`, and the number `down-down`, and
-everything else is considered “discordant”. This approach is effective
-at conveying direction, without too many details.
-
-Notice the `"X"` to indicate discordance.
+This approach is effective at conveying direction, without too many
+details.
 
 ### overlap_type=“each”
 
@@ -178,8 +173,7 @@ venndir(setlist_dir, overlap_type="each")
 
 <img src="man/figures/README-venndir_each-1.png" width="100%" />
 
-This option shows the count for each combination. It works best when you
-want to see all the details, however it can create a lot of labels!
+This option shows the count for each combination.
 
 ### overlap_type=“agreement”
 
@@ -189,12 +183,7 @@ venndir(setlist_dir, overlap_type="agreement")
 
 <img src="man/figures/README-venndir_agreement-1.png" width="100%" />
 
-This option shows the count that agrees in direction, and the count that
-disagrees in direction. It does not indicate whether the agreement is up
-or down.
-
-This option is especially good at summarizing the number that agree and
-disagree, without including potentially confusing details.
+This option is preferred for overall agreement, without all the details.
 
 ### overlap_type=“overlap”
 
@@ -204,14 +193,12 @@ venndir(setlist_dir, overlap_type="overlap")
 
 <img src="man/figures/README-venndir_overlap-1.png" width="100%" />
 
-This option only displays the overlap count, ignoring direction. Venn
-“Classic”.
+Venn “Classic”.
 
 ## Proportional Venn Direction
 
-As mentioned previously, you can display proportional Venn diagram, (a
-Euler diagram), which uses the excellent `eulerr` R package. Add
-argument `proportional=TRUE`.
+Add argument `proportional=TRUE` to display a proportional Venn diagram
+(Euler diagram), which uses the excellent `eulerr` R package.
 
 ``` r
 vo <- venndir(setlist_dir,
@@ -221,15 +208,16 @@ vo <- venndir(setlist_dir,
 
 <img src="man/figures/README-venndir_each_p-1.png" width="100%" />
 
-Labeling is often a challenge with proportional Venn diagrams. For very
-small regions, you can push the label outside with
-`inside_percent_threshold=5`. This option will move labels outside when
-the region is less than 5% of the total area.
+Labeling is a challenge with proportional Venn diagrams, venndir has
+several options to help optimize, and customize label placement.
+(Bookdown docs forthcoming.)
+
+For very small overlap regions, `inside_percent_threshold=5` will move
+labels outside when the area is less than 5% of the total.
 
 ``` r
-venndir(setlist,
+venndir(setlist_dir,
    proportional=TRUE,
-   overlap_type="overlap",
    label_style="lite box",
    inside_percent_threshold=5,
    font_cex=c(1.3, 1))
@@ -238,6 +226,9 @@ venndir(setlist,
 <img src="man/figures/README-venndir_overlap_p-1.png" width="100%" />
 
 ## Customizing the Venn diagram
+
+Labels can be customized with shading, border, and placed inside or
+outside the Venn area.
 
 ### Label styles
 
@@ -305,7 +296,7 @@ vo4l <- venndir(setlist,
 
 ## Highlights
 
-Any overlap can be modified or highlighted, using either
+Specific overlaps can be modified or highlighted, using either
 `modify_venndir_overlap()` or `highlight_venndir_overlap()`. Labels can
 be adjusted, moved, resized, etc.
 
@@ -320,7 +311,7 @@ render_venndir(vo4h, main="Highlight for **set_A&set_B**")
 
 ``` r
 
-vo4h <- highlight_venndir_overlap(vo4,
+vo4h <- highlight_venndir_overlap(vo4l,
    overlap_set=unique(grep("set_B", vo4l@jps@polygons$venn_name, value=TRUE)))
 render_venndir(vo4h, main="All overlaps **set_B** and not **set_D**")
 ```
@@ -329,9 +320,8 @@ render_venndir(vo4h, main="All overlaps **set_B** and not **set_D**")
 
 ## Text Venn for the R Console
 
-There is a text Venn diagram, surprisingly useful for quickly checking
-overlaps and direction. Note that the R console, and R help examples
-display colored text, just not in Rmarkdown.
+Text Venn diagrams are surprisingly convenient for remote server work!
+(Output is colorized, not colorized in RMarkdown.)
 
 The first example is the basic Venn overlap, without direction.
 
@@ -341,73 +331,67 @@ The first example is the basic Venn overlap, without direction.
 
 setlist <- make_venn_test(1000, 3, do_signed=TRUE)
 names(setlist) <- gsub("set_", "", names(setlist));
-textvenn(setlist, overlap_type="overlap")
-#>                    A&B                         
-#>                    27                          
-#>    A                                    B      
-#>    31                                  390     
-#>                                                
-#>                   A&B&C                        
-#>                     7                          
-#>           A&C                  B&C             
-#>            6                   76              
-#>                                                
-#>                                                
-#>                     C                          
-#>                    71
+textvenn(setlist, overlap_type="overlap", htmlOut=TRUE)
 ```
+
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#000000FF;background-color:#CE926CFF">  A&B  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#A9A9C7FF">  27   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#000000FF;background-color:#EEC12EFF"> A  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#FFFFFFFF;background-color:#D54848FF">  B  </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#A8A8C8FF"> 31 </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#3F007DFF"> 390 </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#000000FF;background-color:#BF92A2FF"> A&B&C </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#AAA9BCFF">   7   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#000000FF;background-color:#79C0A0FF"> A&C </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#FFFFFFFF;background-color:#D162B8FF"> B&C </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#AAA9BBFF">  6  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#9996C7FF"> 76  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">       </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#000000FF;background-color:#9F8DFFFF">   C   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#9C99C8FF">  71   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">   </span></span><br/>
 
 But of course direction is helpful, so here it is with the default
 `overlap_type="concordance"` (below)
 
 ``` r
-textvenn(setlist, overlap_type="concordance")
-#>                            A&B   ↑↑: 9                                
-#>                            27    ↓↓: 12                               
-#>    A   ↑: 19                      X: 6                    B   ↑: 185  
-#>    31  ↓: 12                                             390  ↓: 205  
-#>                                                                       
-#>                           A&B&C  ↑↑↑: 2                               
-#>                             7     X: 5                                
-#>               A&C  ↑↑: 2                    B&C  ↑↑: 39               
-#>                6   ↓↓: 3                    76   ↓↓: 21               
-#>                    X: 1                          X: 16                
-#>                                                                       
-#>                             C    ↑: 30                                
-#>                            71    ↓: 41
+textvenn(setlist, overlap_type="concordance", htmlOut=TRUE)
 ```
 
-Not all consoles can display Unicode arrows, so you can use ASCII output
-only with `unicode=FALSE`:
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#CE926CFF">  A&B  </span><span style="color:#B22222FF"> ↑↑: 9  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#A9A9C7FF">  27   </span><span style="color:#1874CDFF"> ↓↓: 12 </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#000000FF;background-color:#EEC12EFF"> A  </span><span style="color:#B22222FF"> ↑: 19 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#7F706DFF">  X: 6  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#FFFFFFFF;background-color:#D54848FF">  B  </span><span style="color:#B22222FF"> ↑: 185 </span></span><br/>
+<span style="font-family: monospace"><span style="color:#A8A8C8FF"> 31 </span><span style="color:#1874CDFF"> ↓: 12 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#3F007DFF"> 390 </span><span style="color:#1874CDFF"> ↓: 205 </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#BF92A2FF"> A&B&C </span><span style="color:#B22222FF"> ↑↑↑: 2 </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#AAA9BCFF">   7   </span><span style="color:#7F706DFF">  X: 5  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#79C0A0FF"> A&C </span><span style="color:#B22222FF"> ↑↑: 2 </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#FFFFFFFF;background-color:#D162B8FF"> B&C </span><span style="color:#B22222FF"> ↑↑: 39 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#AAA9BBFF">  6  </span><span style="color:#1874CDFF"> ↓↓: 3 </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#9996C7FF"> 76  </span><span style="color:#1874CDFF"> ↓↓: 21 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#7F706DFF"> X: 1  </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#7F706DFF"> X: 16  </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#9F8DFFFF">   C   </span><span style="color:#B22222FF"> ↑: 30  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#9C99C8FF">  71   </span><span style="color:#1874CDFF"> ↓: 41  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+
+Use `unicode=FALSE` if the console font does not support unicode arrows.
 
 ``` r
-textvenn(setlist, overlap_type="concordance", unicode=FALSE)
-#>                            A&B   ^^: 9                                
-#>                            27    vv: 12                               
-#>    A   ^: 19                      X: 6                    B   ^: 185  
-#>    31  v: 12                                             390  v: 205  
-#>                                                                       
-#>                           A&B&C  ^^^: 2                               
-#>                             7     X: 5                                
-#>               A&C  ^^: 2                    B&C  ^^: 39               
-#>                6   vv: 3                    76   vv: 21               
-#>                    X: 1                          X: 16                
-#>                                                                       
-#>                             C    ^: 30                                
-#>                            71    v: 41
-
-# Revert options
-# options("jam.htmlOut"=FALSE, "jam.comment"=TRUE)
+textvenn(setlist, overlap_type="concordance", unicode=FALSE, htmlOut=TRUE)
 ```
+
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#CE926CFF">  A&B  </span><span style="color:#B22222FF"> ^^: 9  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#A9A9C7FF">  27   </span><span style="color:#1874CDFF"> vv: 12 </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#000000FF;background-color:#EEC12EFF"> A  </span><span style="color:#B22222FF"> ^: 19 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#7F706DFF">  X: 6  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#FFFFFFFF;background-color:#D54848FF">  B  </span><span style="color:#B22222FF"> ^: 185 </span></span><br/>
+<span style="font-family: monospace"><span style="color:#A8A8C8FF"> 31 </span><span style="color:#1874CDFF"> v: 12 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#3F007DFF"> 390 </span><span style="color:#1874CDFF"> v: 205 </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#BF92A2FF"> A&B&C </span><span style="color:#B22222FF"> ^^^: 2 </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#AAA9BCFF">   7   </span><span style="color:#7F706DFF">  X: 5  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#79C0A0FF"> A&C </span><span style="color:#B22222FF"> ^^: 2 </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#FFFFFFFF;background-color:#D162B8FF"> B&C </span><span style="color:#B22222FF"> ^^: 39 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#AAA9BBFF">  6  </span><span style="color:#1874CDFF"> vv: 3 </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#9996C7FF"> 76  </span><span style="color:#1874CDFF"> vv: 21 </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#7F706DFF"> X: 1  </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#7F706DFF"> X: 16  </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#837471FF">       </span><span style="color:#837471FF">        </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#000000FF;background-color:#9F8DFFFF">   C   </span><span style="color:#B22222FF"> ^: 30  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
+<span style="font-family: monospace"><span style="color:#837471FF">    </span><span style="color:#837471FF">       </span><span style="color:#837471FF">     </span><span style="color:#837471FF">       </span><span style="color:#9C99C8FF">  71   </span><span style="color:#1874CDFF"> v: 41  </span><span style="color:#837471FF">   </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span><span style="color:#837471FF">     </span><span style="color:#837471FF">        </span></span><br/>
 
 ## Nudge Venn circles
 
-Another driving reason for this package is that sometimes proportional
-Venn (Euler) diagrams fail to produce circles that show all the
-overlaps. While sometimes it is mathematically impossible, other times
-are just… puzzling.
-
-See below, the overlap `set_A&set_B` has 1 count, but is not displayed.
+The overlap `set_A&set_B` has 1 count, but is not displayed.
 
 ``` r
 overlaps <- c(set_A=187, set_B=146, set_C=499,
@@ -421,80 +405,61 @@ setlist_o <- counts2setlist(overlaps)
 vn <- venndir(setlist_o,
    expand_fraction=0.15,
    proportional=TRUE,
+   outerborder="white", outerborder.lwd=2, innerborder=NA,
    font_cex=1.4,
-   set_colors=c("firebrick2", "dodgerblue", "#9999AA"))
+   set_colors=c("firebrick2", "dodgerblue", "#BBBBBB"))
 ```
 
 <img src="man/figures/README-nudge_1-1.png" width="100%" />
 
-The argument `circle_nudge` lets you nudge (move) a Venn circle given
-x,y coordinates. Provide a `list` named by the set you want to move,
-with a `numeric` vector for the `x,y` coordinates direction.
+Use argument `circle_nudge` to move a Venn circle using x,y coordinates.
 
 ``` r
 vo_nudge <- venndir(setlist_o,
-   expand_fraction=0.15,
-   # label_style="lite box",
    font_cex=1.4,
-   proportional=TRUE,
+   proportional=TRUE, inside_percent_threshold=2,
+   outerborder="white", outerborder.lwd=2, innerborder=NA,
    circle_nudge=list(set_A=c(1, 0), set_B=c(-1, 0)),
-   set_colors=c("firebrick2", "dodgerblue", "#9999AA"))
+   set_colors=c("firebrick2", "dodgerblue", "#BBBBBB"))
 ```
 
 <img src="man/figures/README-nudge_2-1.png" width="100%" />
 
 ## Item labels
 
-An optional but useful feature is to include item labels inside the Venn
-diagram. It helps answer the question, “What are those shared items?”
-(In my experience, that’s a very early question.)
+Adding item labels can be convenient for the most common next question:
+***“What are those?”***
 
-This step can also include the directional sign, which helps indicate
-which items are shared, and whether they have the same direction. In
-cases with too many labels to display, it is sometimes still useful to
-display the sign, as a visual cue for the proportion of shared or
-discordant signs.
+Add “i” to the `show_labels` argument, for example change
+`show_labels="Nc"` to `show_labels="Ni"`.
 
-Two changes are required:
-
-1.  Argument `show_labels` must include `"i"` to indicate items should
-    be included in the labels. Preferred options:
-
-    - `"Ni"` which shows \_N_ame outside, and \_i_tems inside.
-    - `"NCi"` which shows \_N_ame and \_C_ounts outside, and \_i_tems
-      inside.
-
-2.  Argument `show_items` should be one of
-
-    - `"item"` - to show only the item label
-    - `"sign item"` - to show the sign beside each item label
-    - `"sign"` - to show only the item label
+Optionally adjust `show_items="sign item"` to include the sign, the
+item, or both (default).
 
 ``` r
-setlist <- make_venn_test(100, 3, do_signed=TRUE, item_prefix="item");
+setlist <- make_venn_test(33, 3, do_signed=TRUE, item_prefix="item");
 vo <- venndir(setlist,
    item_cex=0.8,
-   poly_alpha=0.3, sign_count_delim="",
-   show_labels="Ni", fontfamily="Arial",
+   show_segments=FALSE,
+   poly_alpha=0.4,
+   sign_count_delim="",
+   outerborder="white", outerborder.lwd=1, innerborder=NA,
+   show_labels="Ni",
+   # fontfamily="Arial",
    show_items="sign item");
 ```
 
 <img src="man/figures/README-vennitems_1-1.png" width="100%" />
 
-Interestingly, the density of labels gives some indication of the
-relative overlaps.
-
-The same plot using proportional circles makes the label density
-effectively uniform. Note the option `show_items="sign"` displays only
-the directional arrow, and `item_cex=2` makes the arrows twice as large
-as normal.
+Note that `show_items="sign"` displays only the directional arrow, used
+in the proportional Euler diagram.
 
 ``` r
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir(setlist,
    poly_alpha=0.3,
    show_labels="Ni",
-   item_cex=2,
+   item_cex=1.5,
    show_items="sign",
    proportional=TRUE);
 ```
@@ -505,32 +470,40 @@ The sign is an interesting visual summary when there are too many labels
 to display otherwise.
 
 ``` r
-setlist <- make_venn_test(1000, 3, do_signed=TRUE);
+setlist <- make_venn_test(850, 3, do_signed=TRUE);
 venndir(setlist,
+   poly_alpha=0.3,
+   # rotate_degrees=60,
+   outerborder="white", outerborder.lwd=1, innerborder=NA,
    show_labels="Ni",
    show_items="sign",
    item_cex=1.5,
    item_degrees=15,
-   expand_fraction=0.1,
+   item_buffer=-0.05,
    show_segments=FALSE,
+   combine_size=FALSE,
    max_items=10000);
 ```
 
 <img src="man/figures/README-vennitems_2-1.png" width="100%" />
 
-Again, proportional Venn circles effectively makes the density uniform.
+## Venn Memes
+
+More examples will be in the bookdown docs, and some fun ones are in
+`venn_meme()`. Here is a simple example:
 
 ``` r
-venndir(setlist,
-   show_labels="Ni",
-   overlap_type="each",
-   show_items="sign",
-   item_cex=3,
-   item_degrees=20,
-   expand_fraction=0.1,
-   max_items=10000,
-   show_segments=FALSE,
-   proportional=TRUE)
+meme_list <- list(`Car A`=c("leather seats", "no sunroof", "SUV", "20mpg"),
+   `Car B`=c("cloth seats", "sedan", "sunroof", "40mpg"),
+   `Car A&Car B`=c("power locks", "power windows", "trunk storage"))
+venn_meme(meme_list,
+   font_cex=c(2, 1, 1),
+   outerborder.lwd=0, innerborder.lwd=0,
+   proportional=TRUE,
+   # outerborder="white", outerborder.lwd=1, innerborder=NA,
+   set_colors=c("orange", "firebrick3"),
+   poly_alpha=0.9,
+   item_buffer=-0.4, show_labels="Ni", show_segments=FALSE)
 ```
 
-<img src="man/figures/README-vennitems_2p-1.png" width="100%" />
+<img src="man/figures/README-venn_meme-1.png" width="100%" />

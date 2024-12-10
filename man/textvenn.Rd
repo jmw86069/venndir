@@ -20,6 +20,8 @@ textvenn(
   sep = "&",
   blend_preset = "ryb",
   curate_df = NULL,
+  lightMode = jamba::checkLightMode(),
+  debug = NULL,
   verbose = FALSE,
   ...
 )
@@ -64,6 +66,18 @@ during color blending operations.}
 
 \item{curate_df}{\code{data.frame} or \code{NULL} passed to \code{curate_venn_labels()}.}
 
+\item{lightMode}{\code{logical} default \code{jamba::checkLightMode()} checks
+whether the console has a light background, and therefore needs
+to have darker text. This check is incomplete, it assumes
+RStudio has a light background, and everything else is dark.
+To override consistently, set the option below, or add to \code{.Rprofile}:
+\itemize{
+\item \code{options("jam.lightMode"=TRUE)} will force lightMode=TRUE, for
+light background and darker text.
+\item \code{options("jam.lightMode"=FALSE)} will force lightMode=FALSE, for
+dark background and lighter text.
+}}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \value{
@@ -79,6 +93,10 @@ using text, intended to be displayed using mono-spaced font
 on an R console.
 }
 \examples{
+# for this purpose, set lightMode=TRUE to ensure darker text
+options(jam.lightMode=TRUE)
+
+# generate test data
 setlist <- make_venn_test(n_items=100, do_signed=TRUE)
 
 # two-way Venn by default shows concordance

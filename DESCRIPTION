@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.46.900
+Version: 0.0.47.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -8,24 +8,26 @@ Authors@R: c(
        comment=c(ORCID="0000-0002-9510-2848"),
        role=c("aut", "cre")))
 Maintainer: James M. Ward <jmw86069@gmail.com>
-Description: Directional Venn diagrams and set overlaps.
-Depends: R (>= 3.0.0)
+Description: Venn and proportional Euler diagrams with optional
+   directionality.
+Depends: R (>= 3.6.0)
 biocViews:
-Imports: jamba(>= 0.0.101.900),
-    colorjam(>= 0.0.26.900),
+Imports: jamba(>= 0.0.105.900),
+    colorjam(>= 0.0.28.900),
     pracma,
     polyclip,
     polylabelr,
-    gridtext,
     data.table,
     gridExtra,
     gridGeometry(>= 0.4.1),
+    gtable,
+    eulerr,
     methods
 Suggests:
-    eulerr,
+    marquee,
+    gridtext,
     Matrix,
     knitr,
-    gridBase,
     rmarkdown,
     testthat (>= 2.1.0),
     vwline,
@@ -36,8 +38,8 @@ LazyData: true
 Remotes: github::jmw86069/jamba,
     github::jmw86069/colorjam,
     github::pmur002/gridgeometry
-URL: http://github.com/jmw86069/venndir
-BugReports: http://github.com/jmw86069/venndir/issues
+URL: https://jmw86069.github.io/venndir
+BugReports: https://github.com/jmw86069/venndir/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr

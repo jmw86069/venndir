@@ -1,5 +1,69 @@
 # TODO for venndir
 
+## 09dec2024
+
+* Consider `bookdown` package docs with examples.
+* Allow custom item fontface.
+* Allow item coordinate nudging, and/or customization/persistence.
+* Combine help docs for `venndir()` and `render_venndir()`.
+* Consider `textvenn()` option for HTML output, via `print_colordf()`
+
+## 05dec2024
+
+* Improve outside label assignment, use nearest available outside point,
+after labels are spread by `min_degrees`.
+
+   * Iterate each outside label, find nearest point/distance.
+   For labels sharing the same nearest point, assign to closest one. Repeat.
+   * Can be added into `label_outside_JamPolygon()` as second step,
+   after it calculates the label position outside (or simulates that).
+   * Larger rework would be to assign outside labels only when needed,
+   then reassign also only when adding or removing outside visibility?
+   Might be unnecessary if the rework above is effective.
+
+* Consider some visual default settings?
+
+   * no set border
+   * white set border
+
+* Consider adding `outerborder`,`innerborder` optional `...` arguments,
+into the Venndir metadata for persistence?
+* Fix overlap labels shown outside for fully internalized sets, proportional.
+
+   * An intersection overlap count should not be positioned outside together
+   with an outside set label, since it means something different outside.
+   * Overlap count label is not properly "grouped" with parent set label,
+   though it is co-located. It should probably not be co-located, since
+   it has different meaning than other unique set overlap labels.
+
+* DONE. Debug multi-line overlap label being cropped when second line is wider
+than the first line. Potential error with `"grobwidth"`.
+* Legend:
+
+   * DONE. Add some buffer space for left-aligned counts in "Size" column.
+   * Consider option not to colorize the legend.
+
+## 30nov2024
+
+* Consider option to "flip/mirror" the coordinates, for example trying
+to reproduce published layout, or optimize visual order of labels.
+* Refactor label rendering
+
+   * New functions `assembly_venndir_label()`, `repack_grobs()`.
+   * Change to use `grid::frameGrob()` to build label parts.
+   * Store font style in metadata, optionally per-overlap in `label_df`.
+   Consider: main, count, signed, item
+   * Store `template` in metadata, optionally per-overlap in `label_df`
+   * Store `show_labels` in metadata, optionally per-overlap in `label_df`
+   * Consider using `grid::textGrob()` as default.
+   
+      * Make `gridtext` and/or `marquee` optional?
+
+* `render_venndir()`
+
+   * call new label functions, drop `draw_gridtext_groups()`
+   * drop `group_labels` argument
+
 ## 19nov2024
 
 Residual todo items of note:
@@ -33,6 +97,7 @@ Residual todo items of note:
 
 * Test `marquee` as drop-in replacement for `gridtext`. Goals:
 
+   * Note it requires R-4.3.0 or higher, might be too restrictive.
    * Improve inconsistent font kerning
    * Enable custom styling of labels.
    * Test large number of item labels compared with grid and gridtext.

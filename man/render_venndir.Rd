@@ -167,6 +167,8 @@ There are pre-defined label styles.
 }}
 
 \item{fontfamily}{\code{character} string to define the fontfamily.
+Default is "sans" because it should get mapped to a supported font
+for each graphics device.
 The \code{fontfamily} must match a recognized font for the given output
 device, and this font must be capable of producing UTF-8 / Unicode
 characters, in order to print up arrow and down arrow.
@@ -272,6 +274,82 @@ for the graphical objects, specifically the use of coordinate
 }
 \description{
 Render venndir output
+}
+\details{
+\subsection{About fonts and unicode symbols}{
+
+R handles unicode symbols for each graphics device somewhat independently.
+Creating a PNG uses a different set of fonts than creating a PDF.
+Not all fonts used for PNG are compatible with PDF, and vice versa.
+(It is not solely an R problem.)
+
+For the most part, users should not have to care about these details...
+
+How this affects venndir:
+
+Not every font registered in R supports extended unicode characters
+\code{upArrow} and \code{downArrow}, which causes it to draw blank boxes like \verb{[]}.
+The quick options:
+\itemize{
+\item Try a different \code{fontfamily} that may support the characters of interest.
+\item Try a different grob type, see \code{text_grob_type="marquee"} below.
+\item Install \code{extrafont}, which may be useful for installing consistent
+fonts to be used with PNG and PDF output formats.
+}
+}
+
+\subsection{Additional options}{
+
+Several options are passed through \code{...} (ellipses) to internal
+functions, documented below:
+\itemize{
+\item \code{L_threshold} is passed to \code{make_color_contrast()} and controls
+the _L_uminance at which text is either dark or light.
+\item \code{text_grob_type} is passed to \code{assemble_venndir_labels()} and controls
+the text \code{grid} graphical object (grob) type used.
+Note that \code{"marquee"} requires the \code{marquee} package, which implicitly
+requires R-4.3 or newer, though somehow that is not a formal dependency.
+R-4.3 adds glyph rendering, which is required by \code{marquee}.
+\itemize{
+\item \code{text_grob_type="textGrob"} (default) uses \code{grid::textGrob()}
+which only handles text, and no markdown. It is also fastest.
+\item \code{text_grob_type="richtext_grob"} uses \code{gridtext::richtext_grob()},
+and requires the \code{gridtext} package.
+It handles a subset of markdown (bold, italics, but not bullets),
+and a subset of HTML markup such as inline CSS styles.
+It sometimes produces visual glitches, where whitespace between
+words can be inconsistent, otherwise it would have been the default.
+\item \code{text_grob_type="marquee"} uses \code{marquee::marquee_grob()}, which
+requires the \code{marquee} package. It may rarely cause a full R crash
+on MacOS, apparently due to font handling subsystems, otherwise it
+would have been the default. Its rendering of Unicode is outstanding,
+since it uses \code{systemfonts} to substitute any missing glyphs per font,
+for example the upArrow/downArrow symbols.
+It handles full markdown, including bullets, but not tables, nor HTML.
+It does not support table format, through version 0.1.0, however.
+}
+\item \code{fontfamilies} is passed to \code{assemble_venndir_label()}, as a \code{list}
+with three named elements: \code{"overlap"}, \code{"count"}, \code{"signed"}.
+\itemize{
+\item The fontfamily can be customized for each element, which may be
+useful for a custom font for the overlap label, and a different font
+(e.g. one that contains upArrow/downArrow unicode characters) for
+the count and signed count labels.
+\item The custom font is also accepted by \code{venndir_legender()} for
+consistency.
+}
+\item \code{outerborder},\code{outerborder.lwd},\code{innerborder},\code{innerborder.lwd},
+\code{border},\code{border.lwd} - these arguments are passed to \code{plot.JamPolygon()}
+and override internal values when defined. They can be used to produce
+interesting visual variations of the Venn diagram. For example:
+\itemize{
+\item \verb{outerborder.lwd=0, innerborder.lwd=0, border="white", border.lwd=3}
+will use a white border.
+\item \verb{outerborder.lwd=0, innerborder.lwd=4, border="white", border.lwd=1}
+will use a wide internal border, and thin white line between overlaps.
+}
+}
+}
 }
 \seealso{
 Other venndir core: 

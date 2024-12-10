@@ -454,13 +454,9 @@ venndir_label_style <- function
                label_has_shape);
          set_is_not_hidden <- (label_is_set &
                !set_is_hidden);
-               # (!is.na(venndir_output$label_df$x) |
-               #    !is.na(venndir_output$label_df$ref_polygon)) &
-               # label_has_shape);
          venndir_output$label_df$set_is_hidden <- set_is_hidden;
          ## 0.0.34.900 - unsure if these variables are useful to store
          venndir_output$label_df$set_is_not_hidden <- set_is_not_hidden;
-         # venndir_output$label_df$label_has_shape <- label_has_shape;
          if (any(set_is_hidden)) {
             set_hidden <- venndir_output$label_df$overlap_set[set_is_hidden];
             set_hidden_match <- match(set_hidden,
@@ -468,8 +464,10 @@ venndir_label_style <- function
             # jamba::printDebug("set_hidden_match:");print(set_hidden_match);# debug
             # jamba::printDebug("venn_polygons_df:");print(venndir_output$venn_spdf);# debug
             # 0.0.34.900 - change to use ref_polygon
-            venndir_output$label_df[set_is_hidden, c("x", "y", "x_offset", "y_offset")] <- 
-               data.frame(venndir_output$venn_spdf)[set_hidden_match, c("x_label", "y_label", "x_offset", "y_offset")];
+            venndir_output$label_df[set_is_hidden, c("x", "y",
+               "x_offset", "y_offset")] <- data.frame(
+                  venndir_output$venn_spdf)[set_hidden_match, c("x_label",
+                     "y_label", "x_offset", "y_offset")];
             venndir_output$label_df$overlap[set_is_hidden] <- "outside";
             # jamba::printDebug("venndir_label_style() hidden sets label_df:");print(venndir_output$label_df);# debug
             # stop("Stopping here");# debug
@@ -508,9 +506,6 @@ venndir_label_style <- function
       
       ######################################################
       # count labels
-      #jamba::printDebug("count labels, count:", count,
-      #   ", signed:", signed, ", items:", items, ", max_items:", max_items);
-      #print(venndir_output$label_df);
       # new logic
       venndir_output$label_df$count <- ifelse(
          venndir_output$label_df$show_items %in% "none",
@@ -573,8 +568,7 @@ venndir_label_style <- function
       )
       # update hidden to "none"
       venndir_output$label_df$count[venndir_output$label_df$set_is_hidden] <- "none"
-      
-      
+
       # check for inside area threshold
       # label_area_ok TRUE/FALSE
       if (any(!label_area_ok)) {
@@ -586,7 +580,6 @@ venndir_label_style <- function
                venndir_output$label_df[[itype]]);
          }
       }
-      
       
       # update offset coordinates
       # jamba::printDebug("venndir_output$label_df:");print(venndir_output$label_df);
@@ -600,271 +593,6 @@ venndir_label_style <- function
          venndir_output$label_df$y_offset[has_outside] <- (venndir_output$venn_spdf$y_outside[sp_index2[has_outside]] - 
                venndir_output$label_df$y[has_outside]);
       }
-   }
-   
-   ## define: "tb_inside", "tb_outside", "lr_inside", "lr_outside"
-   # tb_outside/tb_inside are defined by overlap and count
-   main_rows <- which(venndir_output$label_df$type %in% "main");
-   main_ref_polygons <- setdiff(
-      venndir_output$label_df$ref_polygon[main_rows], NA);
-   # jamba::printDebug("main_ref_polygons:");print(main_ref_polygons);# debug
-   main_ref_polygons_tboi <- jamba::rbindList(lapply(main_ref_polygons,
-      function(main_ref_polygon){
-         subdf <- subset(venndir_output$label_df, ref_polygon %in% main_ref_polygon);
-         # when overlap and count contain "outside" we set tbo=TRUE
-         tbo <- FALSE;
-         if ("outside" %in% subdf$overlap &&
-               "outside" %in% subdf$count) {
-            tbo <- TRUE;
-         }
-         tbi <- FALSE;
-         if ("inside" %in% subdf$overlap &&
-               "inside" %in% subdf$count) {
-            tbi <- TRUE;
-         }
-         data.frame(ref_polygon=main_ref_polygon, tbo=tbo, tbi=tbi)
-      }))
-   venndir_output$label_df$tb_outside <- FALSE;
-   venndir_output$label_df$tb_inside <- FALSE;
-   matchrp2 <- match(venndir_output$label_df$ref_polygon,
-      main_ref_polygons_tboi$ref_polygon)
-   venndir_output$label_df$tb_outside <- jamba::rmNA(naValue=FALSE,
-      main_ref_polygons_tboi$tbo[matchrp2]);
-   venndir_output$label_df$tb_inside <- jamba::rmNA(naValue=FALSE,
-      main_ref_polygons_tboi$tbi[matchrp2]);
-   # jamba::printDebug("main_ref_polygons_tboi:");print(main_ref_polygons_tboi);# debug
-   
-   # lr_inside/lr_outside are only relevant when "signed" is in label_df$type
-   venndir_output$label_df$lr_outside <- FALSE;
-   venndir_output$label_df$lr_inside <- FALSE;
-   if ("signed" %in% venndir_output$label_df$type) {
-      main_ref_polygons_lroi <- jamba::rbindList(lapply(main_ref_polygons,
-         function(main_ref_polygon){
-         subdf <- subset(venndir_output$label_df, ref_polygon %in% main_ref_polygon);
-         subdfmain <- subset(subdf, type %in% "main");
-         subdfsigned <- subset(subdf, type %in% "signed");
-         lri <- FALSE;
-         if ("inside" %in% c(subdfmain$overlap, subdfmain$count) &&
-               "inside" %in% subdfsigned$count) {
-            lri <- TRUE;
-         }
-         lro <- FALSE;
-         if ("outside" %in% c(subdfmain$overlap, subdfmain$count) &&
-               "outside" %in% subdfsigned$count) {
-            lro <- TRUE;
-         }
-         data.frame(ref_polygon=main_ref_polygon, lro=lro, lri=lri)
-      }))
-      # jamba::printDebug("main_ref_polygons_lroi:");print(main_ref_polygons_lroi);# debug
-      matchrp2 <- match(venndir_output$label_df$ref_polygon,
-         main_ref_polygons_lroi$ref_polygon)
-      venndir_output$label_df$lr_outside <- jamba::rmNA(naValue=FALSE,
-         main_ref_polygons_lroi$lro[matchrp2]);
-      venndir_output$label_df$lr_inside <- jamba::rmNA(naValue=FALSE,
-         main_ref_polygons_lroi$lri[matchrp2]);
-      ## Assign values from main_ref_polygons_lroi into label_df by ref_polygon
-   }
-   
-   # group labels
-   label_left_outside <- (venndir_output$label_df$type %in% "main" &
-         (venndir_output$label_df$overlap %in% "outside" |
-               venndir_output$label_df$count %in% "outside"));
-   label_left_inside <- (venndir_output$label_df$type %in% "main" &
-         (venndir_output$label_df$overlap %in% "inside" |
-               venndir_output$label_df$count %in% "inside"));
-   label_right_outside <- (!venndir_output$label_df$type %in% "main" &
-         venndir_output$label_df$count %in% "outside");
-   label_right_inside <- (!venndir_output$label_df$type %in% "main" &
-         venndir_output$label_df$count %in% "inside");
-   venndir_output$label_df$label_left_outside <- label_left_outside;
-   venndir_output$label_df$label_left_inside <- label_left_inside;
-   venndir_output$label_df$label_right_outside <- label_right_outside;
-   venndir_output$label_df$label_right_inside <- label_right_inside;
-
-   # 0.0.34.900 - update to handle ref_polygon
-   # - store input_label_df to retain the original "count" and "overlap" values
-   # - When "ref_polygon" does not equal "overlap_set" this is an exception
-   #   where the logic cannot occur on the same row.
-   # - Need to know when a set label pointing to internal overlap_set
-   #   will also have to appear together with the count label from that
-   #   overlap_set.
-   # - Consider annotating when the group of labels contains:
-   #   "leftright" - when set or count labels and signed labels are together
-   #   "topbottom" - when set or overlap label and count or signed labels
-   #   are together
-   #
-   # "lr_inside", "lr_outside", "tb_inside", "tb_outside"
-   input_label_df <- venndir_output$label_df;
-   # jamba::printDebug("input_label_df:");print(input_label_df);# debug
-
-   ## This section should not be necessary, use tb_outside/tb_inside instead
-   if (FALSE) {
-      venndir_output$label_df$changed <- FALSE;
-      if ("ref_polygon" %in% colnames(venndir_output$label_df) &&
-            any(duplicated(jamba::rmNA(venndir_output$label_df$ref_polygon)))) {
-         dupe_rp_rows <- duplicated(jamba::rmNA(
-            venndir_output$label_df$ref_polygon));
-         dupe_rps <- unique(jamba::rmNA(
-            venndir_output$label_df$ref_polygon)[dupe_rp_rows]);
-         for (dupe_rp in dupe_rps) {
-            subdf <- subset(venndir_output$label_df, ref_polygon %in% dupe_rp &
-                  type %in% "main");
-            subdf$count <- tail(subdf$count, 1);
-            subdf$overlap <- head(subdf$count, 1);
-            # jamba::printDebug("subdf:");print(subdf);# debug
-            matchsub <- match(rownames(subdf), rownames(venndir_output$label_df));
-            venndir_output$label_df$overlap[matchsub] <- subdf$overlap;
-            venndir_output$label_df$count[matchsub] <- subdf$count;
-            venndir_output$label_df$changed[matchsub] <- TRUE;
-            # jamba::printDebug("subdf$count:");print(subdf$count);# debug
-         }
-      }
-   }
-   
-   # fill some optionally missing values
-   if (!"vjust" %in% colnames(venndir_output$venn_spdf)) {
-      venndir_output$venn_spdf$vjust <- 0.5;
-   }
-   if (!"hjust" %in% colnames(venndir_output$venn_spdf)) {
-      venndir_output$venn_spdf$hjust <- 0.5;
-   }
-   
-   # define text adjust for left-right alignment relative to the label coordinate
-   # left outside labels
-   # llo_adjx <- rep(0.5, length(label_right_inside));
-   # Problem: venn_jps does not have "vjust"
-   # jamba::printDebug("sp_index2:");print(sp_index2);# debug
-   # jamba::printDebug("venndir_output$label_df$overlap_set[label_left_outside]:");print(venndir_output$label_df$overlap_set[label_left_outside]);# debug
-   # jamba::printDebug("venndir_output$label_df$overlap_set[label_right_outside]:");print(venndir_output$label_df$overlap_set[label_right_outside]);# debug
-   # stop("stopping here");# debug
-   llo_adjx <- ifelse(
-      venndir_output$label_df$label_left_outside %in% TRUE &
-         venndir_output$label_df$lr_outside %in% TRUE,
-      1,
-      ifelse(
-         venndir_output$label_df$label_right_outside %in% TRUE &
-            venndir_output$label_df$lr_outside %in% TRUE,
-         0,
-         0.5));
-   lli_adjx <- ifelse(
-      venndir_output$label_df$label_left_inside %in% TRUE &
-         venndir_output$label_df$lr_inside %in% TRUE,
-      1,
-      ifelse(
-         venndir_output$label_df$label_right_inside %in% TRUE &
-            venndir_output$label_df$lr_inside %in% TRUE,
-         0,
-         0.5));
-   llo_adjy <- ifelse(
-      venndir_output$label_df$label_left_outside %in% TRUE &
-         venndir_output$label_df$tb_outside %in% TRUE,
-      0,
-      0.5);
-   lli_adjy <- ifelse(
-      venndir_output$label_df$label_left_inside %in% TRUE &
-         venndir_output$label_df$tb_inside %in% TRUE,
-      0,
-      0.5);
-   
-   ## Old logic below
-   if (FALSE) {
-      llo_adjx[label_left_outside] <- ifelse(
-         venndir_output$label_df$overlap_set[label_left_outside] %in%
-            venndir_output$label_df$overlap_set[label_right_outside],
-         1,
-         jamba::rmNA(venndir_output$venn_spdf$vjust[sp_index2[label_left_outside]],
-            naValue=0.5));
-      llo_adjx[label_right_outside] <- ifelse(
-         venndir_output$label_df$overlap_set[label_right_outside] %in%
-            venndir_output$label_df$overlap_set[label_left_outside],
-         0,
-         jamba::rmNA(venndir_output$venn_spdf$vjust[sp_index2[label_right_outside]],
-            naValue=0.5));
-      llo_adjy <- rep(0.5, length(label_right_inside));
-      llo_adjy[label_left_outside] <- ifelse(
-         (venndir_output$label_df$overlap[label_left_outside] %in% "outside" &
-               venndir_output$label_df$count[label_left_outside] %in% "outside"),
-         0,
-         ifelse(
-            venndir_output$label_df$overlap_set[label_left_outside] %in%
-               venndir_output$label_df$overlap_set[label_right_outside],
-            0.5,
-            ifelse(venndir_output$label_df$count[label_left_outside] %in% "outside",
-               1 - jamba::rmNA(venndir_output$venn_spdf$hjust[sp_index2[label_left_outside]],
-                  naValue=0.5),
-               jamba::rmNA(venndir_output$venn_spdf$hjust[sp_index2[label_left_outside]],
-                  naValue=0.5))
-         )
-      );
-      
-      # left inside labels
-      lli_adjx <- rep(0.5, length(label_right_inside));
-      lli_adjx[label_left_inside] <- ifelse(
-         venndir_output$label_df$overlap_set[label_left_inside] %in%
-            venndir_output$label_df$overlap_set[label_right_inside],
-         1,
-         0.5);
-      lli_adjx[label_right_inside] <- ifelse(
-         venndir_output$label_df$overlap_set[label_right_inside] %in%
-            venndir_output$label_df$overlap_set[label_left_inside],
-         0,
-         0.5);
-      
-      lli_adjy <- rep(0.5, length(label_right_inside));
-      lli_adjy[label_left_inside] <- ifelse(
-         venndir_output$label_df$overlap[label_left_inside] %in% "inside" &
-            venndir_output$label_df$count[label_left_inside] %in% "inside",
-         0,
-         ifelse(venndir_output$label_df$type %in% "main",
-            0.5,
-            jamba::rmNA(venndir_output$venn_spdf$hjust[sp_index2[label_left_inside]],
-               naValue=0.5)));
-   }
-   
-   venndir_output$label_df$llo_adjx <- llo_adjx;
-   venndir_output$label_df$llo_adjy <- llo_adjy;
-   venndir_output$label_df$lli_adjx <- lli_adjx;
-   venndir_output$label_df$lli_adjy <- lli_adjy;
-   
-   # apply text adjust to each label
-   # hjust does x-axis justification
-   #   (0=right side of point, 1=left side of point, 0.5=centered)
-   venndir_output$label_df$hjust_outside <- llo_adjx;
-   venndir_output$label_df$hjust_inside <- lli_adjx;
-   
-   ## 0.0.34.900 - experiment center-align the set label
-   # - not quite ready yet, the signed labels are not properly adjusted
-   if (FALSE) {
-      adjust_main_o <- (venndir_output$label_df$type %in% "main" &
-            venndir_output$label_df$overlap %in% "outside")
-      adjust_main_i <- (venndir_output$label_df$type %in% "main" &
-            venndir_output$label_df$overlap %in% "inside")
-      venndir_output$label_df$hjust_outside[adjust_main_o] <- 0.5;
-      venndir_output$label_df$hjust_inside[adjust_main_i] <- 0.5;
-      
-      adjust_signed_o <- (venndir_output$label_df$type %in% "signed" &
-            venndir_output$label_df$count %in% "outside" &
-            venndir_output$label_df$lr_outside)
-      adjust_signed_i <- (venndir_output$label_df$type %in% "signed" &
-            venndir_output$label_df$count %in% "inside" &
-            venndir_output$label_df$lr_inside);
-      venndir_output$label_df$vjust_outside[adjust_signed_o] <- 0;
-      venndir_output$label_df$vjust_inside[adjust_signed_i] <- 0;
-   }
-   
-   # vjust does y-axis justification
-   #   (0=above point, 1=below point, 0.5=centered)
-   if (FALSE) {
-      venndir_output$label_df$vjust_outside <- ifelse(venndir_output$label_df$type %in% "main",
-         1 - llo_adjy,
-         venndir_output$label_df$vjust);
-      venndir_output$label_df$vjust_inside <- ifelse(venndir_output$label_df$type %in% "main",
-         1 - lli_adjy,
-         venndir_output$label_df$vjust);
-   } else {
-      # test
-      venndir_output$label_df$vjust_outside <- venndir_output$label_df$vjust;
-      venndir_output$label_df$vjust_inside <- venndir_output$label_df$vjust;
    }
    
    # toupdate
@@ -916,18 +644,6 @@ venndir_label_style <- function
                return(j)
             }
          }
-      } else {
-         stop("Input format not recognized. SpatialPoints are no longer supported.")
-         # spt <- sp::SpatialPoints(ixy);
-         # venn_spdf <- venndir_output$venn_spdf[venndir_output$venn_spdf$type %in% "overlap",];
-         # spwhich <- which(venndir_output$venn_spdf$type %in% "overlap")
-         # for (j in spwhich) {
-         #    sp <- venndir_output$venn_spdf[j,];
-         #    # TODO: replace rgeos::gContains() with polyclip::pointinpolygon()
-         #    if (rgeos::gContains(sp, spt)) {
-         #       return(j);
-         #    }
-         # }
       }
       return(NA)
    });

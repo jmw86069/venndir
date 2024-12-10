@@ -89,6 +89,8 @@
 #'    using the second value twice.
 #'    * When three values are provided, they are used as-is without change.
 #' @param fontfamily `character` string to define the fontfamily.
+#'    Default is "sans" because it should get mapped to a supported font
+#'    for each graphics device.
 #'    The `fontfamily` must match a recognized font for the given output
 #'    device, and this font must be capable of producing UTF-8 / Unicode
 #'    characters, in order to print up arrow and down arrow.
@@ -302,7 +304,7 @@ venndir <- function
  max_items=3000,
  show_zero=FALSE,
  font_cex=c(1, 1, 0.7),
- fontfamily="Arial",
+ fontfamily="sans",
  # show_set=c("main", "all", "none"),
  show_label=NA,
  display_counts=TRUE,
@@ -706,14 +708,15 @@ venndir <- function
       venn_jps@polygons$y_offset <- venn_jps@polygons$y_outside - venn_jps@polygons$y_label;
       
       # define label positioning relative to the coordinate point
-      venn_jps@polygons$vjust <- 0.5;
-      venn_jps@polygons$hjust <- 0.5;
-      venn_jps@polygons$vjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
-         ixy["label", "adjx"]
-      });
-      venn_jps@polygons$hjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
-         ixy["label", "adjy"]
-      });
+      ## 0.0.47.900 - vjust/hjust no longer used
+      # venn_jps@polygons$vjust <- 0.5;
+      # venn_jps@polygons$hjust <- 0.5;
+      # venn_jps@polygons$vjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
+      #    ixy["label", "adjx"]
+      # });
+      # venn_jps@polygons$hjust[jamba::rmNA(whichset)] <- sapply(ploxy, function(ixy){
+      #    ixy["label", "adjy"]
+      # });
    }
    
    # show_set: whether to display each overlap label
@@ -750,12 +753,12 @@ venndir <- function
          nlabel_df$venn_counts));
    
    # label alignment
-   main_vjust <- rep(0.5, length(main_x));
-   main_halign <- rep(0.5, length(main_x));
-   main_hjust <- rep(1, length(main_x));
-   if ("overlap" %in% overlap_type) {
-      main_hjust <- rep(0.5, length(main_x));
-   }
+   # main_vjust <- rep(0.5, length(main_x));
+   # main_halign <- rep(0.5, length(main_x));
+   # main_hjust <- rep(1, length(main_x));
+   # if ("overlap" %in% overlap_type) {
+   #    main_hjust <- rep(0.5, length(main_x));
+   # }
    
    ## Labels for each overlap
    # - using gCounts from signed_overlaps() above
@@ -803,12 +806,12 @@ venndir <- function
    # signed label positions
    signed_x <- rep(main_x, gCounts_len);
    signed_y <- rep(main_y, gCounts_len);
-   signed_vjust <- unname(unlist(lapply(gCounts_len, function(i){
-      iseq <- seq_len(i) - 1;
-      iseq - mean(iseq);
-   }))) + 0.5;
-   signed_hjust <- rep(0, length(signed_x));
-   signed_halign <- rep(0, length(signed_x));
+   # signed_vjust <- unname(unlist(lapply(gCounts_len, function(i){
+   #    iseq <- seq_len(i) - 1;
+   #    iseq - mean(iseq);
+   # }))) + 0.5;
+   # signed_hjust <- rep(0, length(signed_x));
+   # signed_halign <- rep(0, length(signed_x));
    
    # # signed label positions
    # x_signed <- rep(x_main, gCounts_len);
@@ -908,9 +911,9 @@ venndir <- function
       x_offset=0,
       y_offset=0,
       show_label=NA,
-      vjust=c(main_vjust, signed_vjust),
-      hjust=c(main_hjust, signed_hjust),
-      halign=c(main_halign, signed_halign),
+      # vjust=c(main_vjust, signed_vjust),
+      # hjust=c(main_hjust, signed_hjust),
+      # halign=c(main_halign, signed_halign),
       rot=rep(0, label_n),
       color=unlist(c(label_color_main, gbase_colors)),
       fontsize=rep(c(14 * font_cex[2], 14 * font_cex[3]),
@@ -954,13 +957,14 @@ venndir <- function
    #
    # Todo: verify this works properly when all rows are always present
    #
-   for (i in unique(label_df$overlap_set)) {
-      irows <- (label_df$overlap_set %in% i & 
-            label_df$show_label %in% c(NA, TRUE));
-      if (length(unique(label_df[irows,"type"])) == 1) {
-         label_df[irows,"hjust"] <- 0.5;
-      }
-   }
+   ## 0.0.47.900 - no longer used
+   # for (i in unique(label_df$overlap_set)) {
+   #    irows <- (label_df$overlap_set %in% i & 
+   #          label_df$show_label %in% c(NA, TRUE));
+   #    if (length(unique(label_df[irows,"type"])) == 1) {
+   #       label_df[irows,"hjust"] <- 0.5;
+   #    }
+   # }
    
    ## Optionally return items
    if (TRUE %in% return_items) {

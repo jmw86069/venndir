@@ -10,7 +10,7 @@ venn_meme(
   item_cex = 1,
   item_degrees = 0,
   item_buffer = -0.85,
-  item_style = c("gridtext", "text"),
+  item_style = c("text", "gridtext"),
   keep_item_order = TRUE,
   show_items = "item",
   show_labels = "i",
@@ -109,22 +109,30 @@ bix <- list(
    `s&cs`="Data<br>Science",
    `cs&b`="Computational<br>Biology",
    `s&cs&b`="Bioinformatics")
-venn_meme(bix, proportional=TRUE)
+venn_meme(bix)
 
-# some customizations
+# some customizations, proportional=TRUE looks better
 venn_meme(bix,
    proportional=TRUE,
+   outerborder="#FFFFFF99", innerborder=NA,
    rotate_degrees=360/6,
-   item_cex=rep(c(2, 1.4, 2), c(3, 3, 1)))
+   item_cex=rep(c(2, 1.4, 2) * 1.3, c(3, 3, 1)))
 
-# what the heck
-wth <- list(
-   WHAT=c("What", "What the", "What heck", "What the heck"),
-   THE=c("the", "What the", "the heck", "What the heck"),
-   ACTUAL=c("actual"),
-   HECK=c("heck", "What heck", "the heck", "What the heck"))
-wth <- lapply(wth[c(1,2,4)], function(i){gsub(" ", "<br>", i)})
-venn_meme(wth, item_cex=1.4, fontfamily="Impact")
+# superhero?
+avlist <- c(
+AV="LEX<br>LUTHOR",
+ML="MOUNTAIN<br>LION",
+T="TODDLER",
+`AV&ML`="Wants to<br>kill you",
+`AV&T`="Goes off on<br>a lot of rambling<br>monologues",
+`ML&T`="Resists<br>taking a bath",
+`AV&ML&T`="Impossible<br>to reason with"
+)
+venn_meme(avlist, fontfamily="Trebuchet MS",
+   set_colors=c("maroon", "palegoldenrod", "skyblue"),
+   outerborder="white", innerborder=NA,
+   item_cex=rep(c(2, 1.6, 1.3, 1.7, 1.5),
+      c(3, 1, 1, 1, 1)))
 
 # what the actual heck
 wtahv <- c("What", "the", "actual", "HECK");
@@ -138,24 +146,14 @@ venn_meme(wtah, item_cex=0.7, fontfamily="Impact")
 
 # circular 4-way shapes
 venn_meme(wtah, proportional=TRUE, shape="circle",
+   outerborder="grey", innerborder=NA,
    item_cex=0.8, fontfamily="Impact")
 
 # for proportional diagrams it may be helpful to use shape="ellipse"
-venn_meme(wtah, proportional=TRUE, shape="ellipse", item_cex=0.8)
-
-# superhero?
-avlist <- c(
-AV="LEX<br>LUTHOR",
-ML="MOUNTAIN<br>LION",
-T="TODDLER",
-`AV&ML`="Wants to<br>kill you",
-`AV&T`="Goes off on<br>a lot of rambling<br>monologues",
-`ML&T`="Resists<br>taking a bath",
-`AV&ML&T`="Impossible<br>to reason with"
-)
-venn_meme(avlist, fontfamily="Trebuchet MS",
-   item_cex=rep(c(2, 1.6, 1.3, 1.7, 1.5),
-      c(3, 1, 1, 1, 1)))
+venn_meme(wtah, proportional=TRUE, shape="ellipse",
+   outerborder="white", innerborder=NA,
+   fontfamily="Impact",
+   item_cex_factor=0.6)
 
 # happiness in sports
 em <- list(
@@ -169,9 +167,8 @@ em <- list(
 )
 #   `a&c`="Scrolling<br>through your<br>Twitter feed",
 #   `a&b&c`="Being<br>a sports<br>fan"
-venn_meme(em, fontfamily="Georgia",
-   set_colors=c("gold", "dodgerblue3", "firebrick3"),
-   item_cex=rep(c(2.3, 1.8, 1.8), c(3, 3, 1)))
+venn_meme(em, fontfamily="serif", item_cex_factor=0.9,
+   set_colors=c("gold", "dodgerblue3", "firebrick3"))
 
 # Mister Venn
 mrvenn <- c(
@@ -198,7 +195,9 @@ r="Rich",
 `r&sty&fh`="Mr<br>Monopoly",
 `sty&fh&str&t&f&fu&r`="Mr T"
 )
-venn_meme(mrvenn, proportional=TRUE, fontfamily="Georgia")
+venn_meme(mrvenn, item_cex_factor=0.7,
+   outerborder="white", innerborder=NA,
+   proportional=TRUE, fontfamily="Avenir")
 
 # example of ordered item labels
 item_list <- list(
@@ -217,12 +216,14 @@ item_list <- list(
       "Increased\ntype I IFN")))
 vo <- venndir::venn_meme(x=item_list,
    fontfamily="Times New Roman",
+   outerborder="white", innerborder=NA,
    item_cex=c(1.3, 1.2, 1.3) ,
    item_buffer=c(-0.5, -0.2, -0.75),
    set_colors=c("darkorchid3", "gold"),
    poly_alpha=0.3,
    xyratio=5, spread=TRUE,
-   dither_cex=0)
+   item_style="gridtext",
+   jitter_cex=0)
 
 }
 \seealso{
