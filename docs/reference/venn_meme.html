@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.47.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,10 +49,11 @@
 <span>  item_cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  item_degrees <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  item_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.85</span>,</span>
-<span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text"</span>, <span class="st">"gridtext"</span><span class="op">)</span>,</span>
+<span>  item_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text"</span>, <span class="st">"richtext_grob"</span>, <span class="st">"gridtext"</span><span class="op">)</span>,</span>
 <span>  keep_item_order <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_items <span class="op">=</span> <span class="st">"item"</span>,</span>
 <span>  show_labels <span class="op">=</span> <span class="st">"i"</span>,</span>
+<span>  set_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plot_warning <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  draw_legend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -126,7 +127,26 @@ settings designed to create a Venn Meme. This output
 is expected to display usually one or a few item labels
 inside each Venn overlap region, and no other counts or
 set labels.</p>
-<p>The argument <code>item_cex</code> is used to adjust item font size,
+<p>When given a <code>character</code> vector or <code>list</code> of <code>character</code> vectors,
+with no names, it will deduce the number of Venn sets by the
+length:</p><ul><li><p>1: one set</p></li>
+<li><p>up to 3: two-set Venn with overlap</p></li>
+<li><p>up to 7: three-set Venn with overlaps. Effort is made for overlaps
+to be defined "clockwise" starting between the first and second sets.</p></li>
+<li><p>up to 15: four-set Venn, with two special cases:</p><ul><li><p>up to 13 length, and when <code>proportional=TRUE</code>, it will create
+proportional circles, showing only the 13 overlaps visibly possible.
+The overlaps are recognized in order they appear, clockwise around
+the center.
+Use <code>venn_meme(1:13, proportional=TRUE)</code> to see the order.</p></li>
+<li><p>up to 15 length, and/or <code>proportional=FALSE</code>, it will create
+non-proportional ellipses.
+Use <code>venn_meme(1:15)</code> to see the order of overlaps.</p></li>
+</ul></li>
+<li><p>up to 31: five-set Venn with overlaps.</p><ul><li><p>Use <code>venn_meme(1:31)</code> to see the order of overlaps.</p></li>
+<li><p>As of yet, the order of overlaps is not defined clockwise.
+Good luck with that!</p></li>
+</ul></li>
+</ul><p>The argument <code>item_cex</code> is used to adjust item font size,
 and this vector is applied to items in each overlap set in order,
 by the number of overlap sets, then in sorted order of the set
 names in the order provided. For specific definitive ordering,

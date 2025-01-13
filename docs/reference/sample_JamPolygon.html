@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.47.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,7 +23,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="http://github.com/jmw86069/venndir/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmw86069/venndir/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -33,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Sample points within JamPolygon</h1>
-      <small class="dont-index">Source: <a href="http://github.com/jmw86069/venndir/blob/HEAD/R/JamPolygon.R" class="external-link"><code>R/JamPolygon.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/R/JamPolygon.R" class="external-link"><code>R/JamPolygon.R</code></a></small>
       <div class="d-none name"><code>sample_JamPolygon.Rd</code></div>
     </div>
 
@@ -49,13 +49,14 @@
 <span>  xyratio <span class="op">=</span> <span class="fl">1.2</span>,</span>
 <span>  spread <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  n_ratio <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"offset"</span>, <span class="st">"rectangle"</span><span class="op">)</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"offset"</span>, <span class="st">"columns"</span><span class="op">)</span>,</span>
 <span>  buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>,</span>
 <span>  width_buffer <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  max_width_buffer <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  byCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-y"</span>, <span class="st">"x"</span><span class="op">)</span>,</span>
 <span>  algorithm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"split"</span>, <span class="st">"seq"</span><span class="op">)</span>,</span>
 <span>  do_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_seq <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -106,8 +107,9 @@ shape.</p></li>
 <dt id="arg-pattern">pattern<a class="anchor" aria-label="anchor" href="#arg-pattern"></a></dt>
 <dd><p><code>character</code> string indicating how to array the points:</p><ul><li><p><code>"offset"</code> (default) uses a rectangular grid where alternating
 points on each row are offset slightly on the y-axis.</p></li>
-<li><p><code>"rectangle"</code> uses a rectangular grid with points on each row
-that share the same y-axis value.</p></li>
+<li><p><code>"columns"</code> uses a rectangular grid with points on each row
+that share the same y-axis value. Essentially the same as "offset"
+using offset=0.</p></li>
 </ul></dd>
 
 
@@ -129,18 +131,20 @@ then subdivides between failure/success to find the optimal final <code>n</code>
 During testing it was substantially faster and more accurate than
 the previous algorithm <code>"seq"</code>.</p></li>
 <li><p><code>"seq"</code>: attempts a linear sequence of <code>n</code> values with gradual
-increases.
-The approach is slow, testing values iteratively without regard
-to the relative success, number of "points in polygon" compared to
-the number requested. It also used a fixed "step size" which sometimes
-produced more valid points than requested, and required using a subset
-of points, see argument <code>spread</code>.</p></li>
+increases. It may be slightly more accurate, always finding the lowest
+value, at the expense of brute force speed.</p></li>
 </ul></dd>
 
 
 <dt id="arg-do-plot">do_plot<a class="anchor" aria-label="anchor" href="#arg-do-plot"></a></dt>
 <dd><p><code>logical</code> indicating whether to create a plot to illustrate
 the process.</p></dd>
+
+
+<dt id="arg-n-seq">n_seq<a class="anchor" aria-label="anchor" href="#arg-n-seq"></a></dt>
+<dd><p><code>numeric</code>, default NULL, used to provide a custom sequence
+of <code>n</code> values to attempt, used for internal testing but may be useful
+to provide exact values determined by an external approach.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -220,21 +224,21 @@ In future, consider hexagonal, diamond, or diagonal.</p></li>
 <span class="r-in"><span>   fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gold"</span>, <span class="st">"firebrick"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">jp3</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"JamPolygon"</span>, polygons<span class="op">=</span><span class="va">df3</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"seq"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-1.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"split"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, spread<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-2.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"seq"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-3.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"split"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"seq"</span>, spread<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-4.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="st">"seq"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sample_JamPolygon-5.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, xyratio<span class="op">=</span><span class="fl">0.6</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="sample_JamPolygon-5.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">60</span>, buffer<span class="op">=</span><span class="op">-</span><span class="fl">0.3</span>, spread<span class="op">=</span><span class="cn">FALSE</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, xyratio<span class="op">=</span><span class="fl">0.6</span>, algorithm<span class="op">=</span><span class="st">"seq"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-6.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, xyratio<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">1.5</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sample_JamPolygon</span><span class="op">(</span><span class="va">jp3</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, n<span class="op">=</span><span class="fl">40</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span>, pattern<span class="op">=</span><span class="st">"columns"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sample_JamPolygon-7.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

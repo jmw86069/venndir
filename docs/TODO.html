@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.47.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,8 +39,36 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_10jan2025">10jan2025<a class="anchor" aria-label="anchor" href="#id_10jan2025"></a></h2>
+<ul><li>
+<p>Further refine label spacing. Currently assembles multiple gtables, however the outer buffers add, making the gap between label types too large. Strategies to try:</p>
+<ul><li>
+<p>More clearly define expected output:</p>
+<ul><li>
+<code>label_borders$overlap</code> - defines buffer between overlap label lines, and the buffer around the overall label. When overlap is not used for the label, for now use the count buffer, so that its buffer will scale properly with respect to its font size.</li>
+<li>
+<code>label_borders$count</code> - defines buffer between count label lines. Also defines outer buffer when overlap label is not present.</li>
+<li>
+<code>label_borders$signed</code> - defines buffer between signed label lines. When the overlap and count labels are not present, it should probably still use the count buffer, but could use the signed buffer.</li>
+</ul></li>
+<li>
+<p><code><a href="https://gtable.r-lib.org/reference/gtable_add_space.html" class="external-link">gtable::gtable_add_row_space()</a></code>, <code><a href="https://gtable.r-lib.org/reference/gtable_add_padding.html" class="external-link">gtable::gtable_add_padding()</a></code> instead of applying a buffer around each row. Confirm it adds spacing between rows, and separately around the set.</p>
+<ul><li>For each label type (overlap, count, signed), add label a row.</li>
+<li>For <code>template="tall"</code> append rows using rbind, then add row spacing, where spacing between overlap-&gt;count uses overlap, and count-&gt;signed uses count sizing.</li>
+<li>For <code>template="wide"</code> append count,signed using cbind, then add column spacing using the count sizing. Then append overlap to counts with rbind, and use row spacing where overlap-&gt;counts uses overlap sizing.</li>
+</ul></li>
+<li><p><code><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">gridExtra::grid.arrange()</a></code> potential alternative to assemble gtable in one shot, instead of gtable pieces which are then assembled? Unclear whether it can arrange grobs that are not full-page.</p></li>
+<li><p>Consider method to adjust buffer sizes relative to the font size.</p></li>
+</ul></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_09dec2024">09dec2024<a class="anchor" aria-label="anchor" href="#id_09dec2024"></a></h2>
-<ul><li>Consider <code>bookdown</code> package docs with examples.</li>
+<ul><li>DONE. Consider “vertical” item label fill geometry, for “columnar arrangement”.</li>
+<li>Make font label spacing scale up or down with font size.</li>
+<li>Consider multi-column legend, to make it wider and flatter.</li>
+<li>Debug outside label positioning with 4+ proportional sets.</li>
+<li>Debug error with empty proportional sets.</li>
+<li>Consider <code>bookdown</code> package docs with examples.</li>
 <li>Allow custom item fontface.</li>
 <li>Allow item coordinate nudging, and/or customization/persistence.</li>
 <li>Combine help docs for <code><a href="reference/venndir.html">venndir()</a></code> and <code><a href="reference/render_venndir.html">render_venndir()</a></code>.</li>

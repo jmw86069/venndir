@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.47.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,35 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.48.900" id="venndir-0048900">venndir 0.0.48.900<a class="anchor" aria-label="anchor" href="#venndir-0048900"></a></h2>
+<ul><li>bumped <code>colorjam&gt;=0.0.30.900</code> to pick up new color blending for additive alpha blending, useful for repeating a transparent color and having the color become more intense with each overlap.</li>
+</ul><div class="section level3">
+<h3 id="bug-fixes-0-0-48-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-48-900"></a></h3>
+<ul><li>Fixed error in <code><a href="../reference/venndir_legender.html">venndir_legender()</a></code> with empty signed lists.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-48-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-48-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/find_venn_overlaps_JamPolygon.html">find_venn_overlaps_JamPolygon()</a></code> called by <code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>Color blending uses an improved algorithm in colorjam for additive alpha blending. For example, transparent red used for three sets will become progressively less transparent with each overlap. It should probably be more dramatic, but it’s a good start.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venn_meme.html">venn_meme()</a></code></p>
+<ul><li>changed order that default text labels are applied to 3-way and 4-way Venn, with special case of 4-way proportional Venn (Euler) coded so the overlaps are filled clockwise. Effort to make it easy to copy Venn memes observed in the wild.</li>
+</ul></li>
+<li><p><code><a href="../reference/label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code> calls updated version of <code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code></p></li>
+<li>
+<p><code><a href="../reference/sample_JamPolygon.html">sample_JamPolygon()</a></code></p>
+<ul><li>Added <code>pattern="columns"</code> layout option to enforce all points on the same row, an alternative to the default hexagonal/triangular.</li>
+<li>Updated logic to choose appropriate subset of points when more than <code>n</code> are defined. Now takes all of the first row when <code>spread=FALSE</code>. When <code>spread=TRUE</code> it spreads points by column, then row, which somehow improves the visual result, resulting in fewer weird clusters of points.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/assemble_venndir_label.html">assemble_venndir_label()</a></code></p>
+<ul><li>Label assembly was adjusted to add customizable label line spacing, and label padding. Added graphical tests.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.47.900" id="venndir-0047900">venndir 0.0.47.900<a class="anchor" aria-label="anchor" href="#venndir-0047900"></a></h2>
 <ul><li>Added to Imports: <code>eulerr</code>, <code>gtable</code> (lightweight, also used by ggplot2)</li>
 <li>Added to Suggests: <code>gridtext</code>, <code>marquee</code>
@@ -60,6 +89,10 @@
 <li>Help docs include useful <code>...</code> arguments passed to internal functions.</li>
 <li>Now calls <code>assemble_venndir_labels()</code>, not <code>draw_gridtext_groups()</code>.</li>
 <li>Argument <code>group_labels</code> is dropped, all labels are grouped.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venn_meme.html">venn_meme()</a></code></p>
+<ul><li>Changed default <code>item_style="text"</code> to avoid kerning issues with gridtext.</li>
 </ul></li>
 <li>
 <p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code></p>
@@ -354,7 +387,7 @@
 <p><code><a href="../reference/textvenn.html">textvenn()</a></code></p>
 <ul><li>now returns column <code>"color"</code> mainly used for <code><a href="../reference/venndir_to_df.html">venndir_to_df()</a></code>
 </li>
-<li>calls <code><a href="https://rdrr.io/pkg/colorjam/man/col_linear_xf.html" class="external-link">colorjam::col_linear_xf()</a></code> for better colorization of counts when <code>color_by_counts=TRUE</code>.</li>
+<li>calls <code><a href="https://jmw86069.github.io/colorjam/reference/col_linear_xf.html" class="external-link">colorjam::col_linear_xf()</a></code> for better colorization of counts when <code>color_by_counts=TRUE</code>.</li>
 </ul></li>
 <li>
 <p><code><a href="../reference/get_venn_polygon_shapes.html">get_venn_polygon_shapes()</a></code></p>
@@ -910,7 +943,7 @@
 <h2 class="pkg-version" data-toc-text="0.0.18.900" id="venndir-0018900">venndir 0.0.18.900<a class="anchor" aria-label="anchor" href="#venndir-0018900"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-0-18-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-18-900"></a></h3>
-<p>To resolve issue <a href="https://github.com/jmw86069/venndir/issues/2" class="external-link">#2</a>, the <code>colorjam</code> package was updated to add prefix to call <code><a href="https://rdrr.io/pkg/jamba/man/tcount.html" class="external-link">jamba::tcount()</a></code> to function <code><a href="https://rdrr.io/pkg/colorjam/man/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code>. When the <code>colorjam</code> package is loaded, using <code><a href="http://github.com/jmw86069/colorjam" class="external-link">library(colorjam)</a></code> or <code><a href="http://github.com/jmw86069/colorjam" class="external-link">require(colorjam)</a></code> it automatically also loads jamba so its functions are available. However, when <code><a href="https://rdrr.io/pkg/colorjam/man/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code> is called directly, without formally loading the <code>colorjam</code> package, the <code>jamba</code> functions are <strong>not</strong> loaded. This issue caused the error, which unfortunately causes the <code><a href="../reference/venndir.html">venndir()</a></code> function to fail unless <code>jamba</code> or <code>colorjam</code> packages have been loaded previously.</p>
+<p>To resolve issue <a href="https://github.com/jmw86069/venndir/issues/2" class="external-link">#2</a>, the <code>colorjam</code> package was updated to add prefix to call <code><a href="https://rdrr.io/pkg/jamba/man/tcount.html" class="external-link">jamba::tcount()</a></code> to function <code><a href="https://jmw86069.github.io/colorjam/reference/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code>. When the <code>colorjam</code> package is loaded, using <code><a href="https://jmw86069.github.io/colorjam" class="external-link">library(colorjam)</a></code> or <code><a href="https://jmw86069.github.io/colorjam" class="external-link">require(colorjam)</a></code> it automatically also loads jamba so its functions are available. However, when <code><a href="https://jmw86069.github.io/colorjam/reference/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code> is called directly, without formally loading the <code>colorjam</code> package, the <code>jamba</code> functions are <strong>not</strong> loaded. This issue caused the error, which unfortunately causes the <code><a href="../reference/venndir.html">venndir()</a></code> function to fail unless <code>jamba</code> or <code>colorjam</code> packages have been loaded previously.</p>
 <p>All that said, the “fix” is to require the updated <code>colorjam(&gt;= 0.0.22.950)</code> package version that includes this fix.</p>
 </div>
 </div>
