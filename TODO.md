@@ -1,7 +1,47 @@
 # TODO for venndir
 
+## 10jan2025
+
+* Further refine label spacing. Currently assembles multiple gtables,
+however the outer buffers add, making the gap between label types too large.
+Strategies to try:
+
+   * More clearly define expected output:
+   
+      * `label_borders$overlap` - defines buffer between overlap label lines,
+      and the buffer around the overall label.
+      When overlap is not used for the label, for now use the count buffer,
+      so that its buffer will scale properly with respect to its font size.
+      * `label_borders$count` - defines buffer between count label lines.
+      Also defines outer buffer when overlap label is not present.
+      * `label_borders$signed` - defines buffer between signed label lines.
+      When the overlap and count labels are not present, it should probably
+      still use the count buffer, but could use the signed buffer.
+      
+   * `gtable::gtable_add_row_space()`, `gtable::gtable_add_padding()`
+   instead of applying a buffer around each row.
+   Confirm it adds spacing between rows, and separately around the set.
+   
+      * For each label type (overlap, count, signed), add label a row.
+      * For `template="tall"` append rows using rbind, then
+      add row spacing, where spacing between overlap->count uses overlap,
+      and count->signed uses count sizing.
+      * For `template="wide"` append count,signed using cbind, then add
+      column spacing using the count sizing. Then append overlap to counts
+      with rbind, and use row spacing where overlap->counts uses overlap sizing.
+
+   * `gridExtra::grid.arrange()` potential alternative to assemble gtable
+   in one shot, instead of gtable pieces which are then assembled?
+   Unclear whether it can arrange grobs that are not full-page.
+   * Consider method to adjust buffer sizes relative to the font size.
+
 ## 09dec2024
 
+* DONE. Consider "vertical" item label fill geometry, for "columnar arrangement".
+* Make font label spacing scale up or down with font size.
+* Consider multi-column legend, to make it wider and flatter.
+* Debug outside label positioning with 4+ proportional sets.
+* Debug error with empty proportional sets.
 * Consider `bookdown` package docs with examples.
 * Allow custom item fontface.
 * Allow item coordinate nudging, and/or customization/persistence.

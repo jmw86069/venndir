@@ -202,7 +202,10 @@ find_venn_overlaps_JamPolygon <- function
       whichYes <- which(i %in% 1);
       whichNo <- which(i %in% 0);
       i_names <- colnames(el1)[whichYes];
-      venn_color <- colorjam::blend_colors(venn_colors[i_names],
+      venn_color <- colorjam::blend_colors(
+         venn_colors[i_names],
+         apply_alpha=TRUE,
+         flatten_alpha=TRUE,
          preset=blend_preset,
          ...);
       border <- jamba::makeColorDarker(venn_color,

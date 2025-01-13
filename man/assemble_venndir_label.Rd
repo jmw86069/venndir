@@ -18,8 +18,8 @@ assemble_venndir_label(
   fontfaces = list(signed = "plain", count = c("plain", "bold.italic"), overlap = "bold"),
   fontcolors = list(signed = c("red3", "dodgerblue3", "grey55"), count = "black", overlap
     = "black"),
-  label_borders = list(signed = grid::unit(1, "mm"), count = grid::unit(2, "mm"), overlap
-    = grid::unit(3, "mm")),
+  label_borders = list(signed = grid::unit(1, "mm"), count = grid::unit(1, "mm"), overlap
+    = grid::unit(1, "mm")),
   do_frame = TRUE,
   frame_r = grid::unit(0.1, "snpc"),
   frame_border = "#44444477",

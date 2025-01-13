@@ -203,8 +203,8 @@ assemble_venndir_label <- function
     count="black",
     overlap="black"),
  label_borders=list(signed=grid::unit(1, "mm"),
-    count=grid::unit(2, "mm"),
-    overlap=grid::unit(3, "mm")),
+    count=grid::unit(1, "mm"),
+    overlap=grid::unit(1, "mm")),
  do_frame=TRUE,
  frame_r=grid::unit(0.1, "snpc"),
  frame_border="#44444477",
@@ -268,7 +268,8 @@ assemble_venndir_label <- function
       text_grob_type <- "textGrob";
    }
    if ("textGrob" %in% text_grob_type) {
-      label_borders$signed <- label_borders$signed + grid::unit(1, "mm")
+      # label_borders$signed <- label_borders$signed + grid::unit(1, "mm")
+      label_borders$signed <- label_borders$signed + grid::unit(0.0, "mm")
    }
    
    # sign1 <- "\u2191\u2191 1,234"
@@ -305,6 +306,12 @@ assemble_venndir_label <- function
          fc <- rep(fontcolors$signed, length.out=sn)[[i]];
          fm <- rep(fontfamilies$signed, length.out=sn)[[i]];
          fb <- rep(unname(label_borders$signed), length.out=4);
+         # new: remove top border for first entry when template="tall" and count exists
+         if ("tall" %in% template && length(count_labels) > 0) {
+            fb <- fb * c(1, 1, 0, 1);
+            # print("fb:");print(fb);# debug
+         }
+         
          fb_signed <- fb;
          if (length(fs) == 0) {
             fs <- 10;
@@ -316,21 +323,32 @@ assemble_venndir_label <- function
             fc <- "grey55";
          }
          # "tall" is center-justified, "wide" is left-justified
-         signed_just<- "left";
-         signed_x <- grid::unit(0, "npc") +
-            grid::unit(use_buffers_mm / 2, "mm");
+         # signed_hjust <- "left";
+         signed_hjust <- 0; # 0 left
+         signed_vjust <- 0.5; # 0.5 center
+         if ("tall" %in% template & length(count_labels) > 0 && i == 1) {
+            signed_vjust <- 0.5; # 1 top
+         }
+         ## previous
+         # signed_x <- grid::unit(0, "npc") +
+         #    grid::unit(use_buffers_mm / 2, "mm");
+         ## new
+         # signed_x <- grid::unit(0, "npc") + fb_signed * 0.5;
+         signed_x <- grid::unit(0, "npc");
          
          ## optionally center labels for "tall" template
          # but it looks better left-justified (imo)
          # if ("tall" %in% template) {
-         #    signed_just <- "center";
+         #    signed_hjust <- "center";
          #    signed_x <- grid::unit(0.5, "npc");
          # }
          
          if ("textGrob" %in% text_grob_type) {
             grob_sign1 <- grid::textGrob(
                label=signed_labels[[i]],
-               just=signed_just, x=signed_x,
+               hjust=signed_hjust,
+               vjust=signed_vjust,
+               x=signed_x,
                gp=grid::gpar(col=fc,
                   fontface=ff,
                   fontfamily=fm,
@@ -343,7 +361,8 @@ assemble_venndir_label <- function
             # bottom buffer corrects small whitespace diff compared to textGrob
             fi <- grepl("italic", ff);
             fweight <- gsub("italic|[.]", "", gsub("plain", "normal", ff));
-            signed_just <- paste0(signed_just, "-ink");
+            signed_hjust <- paste0(signed_hjust, "-ink");
+            signed_vjust <- paste0(signed_vjust, "-ink");
             grob_sign1 <- marquee::marquee_grob(
                text=signed_labels[[i]],
                ignore_html=TRUE,
@@ -369,8 +388,8 @@ assemble_venndir_label <- function
                      grid::unit(0, "pt")),
                   align="left"),
                # hjust="center-ink",
-               hjust=signed_just,
-               vjust="center-ink");
+               hjust=signed_hjust,
+               vjust=signed_vjust);
                # vjust="top-ink");
             # grid::grid.draw(grob_sign1);# debug
          } else if ("richtext_grob" %in% text_grob_type) {
@@ -379,12 +398,15 @@ assemble_venndir_label <- function
                   "richtext_grob");
             }
             # bottom buffer corrects small whitespace diff compared to textGrob
-            signed_hjust <- ifelse("center" %in% signed_just, 0.5,
-               ifelse("left" %in% signed_just, 0, 1))
+            signed_hjust <- ifelse("center" %in% signed_hjust, 0.5,
+               ifelse("left" %in% signed_hjust, 0, 1))
+            signed_vjust <- ifelse("center" %in% signed_vjust, 0.5,
+               ifelse("top" %in% signed_vjust, 1, 0))
             grob_sign1 <- gridtext::richtext_grob(
                x=signed_x,
                y=grid::unit(0.5, "npc"),
                hjust=signed_hjust,
+               vjust=signed_vjust,
                text=signed_labels[[i]],
                margin=grid::unit(c(0, 0, -1, 0), "pt"),
                padding=grid::unit(c(0, 0, -1, 0), "pt"),
@@ -587,6 +609,7 @@ assemble_venndir_label <- function
       return(invisible(NULL))
    }
    
+   ####################################
    # gtable grob_strat
    {
       grob_list <- jamba::rmNULL(list(
@@ -594,18 +617,35 @@ assemble_venndir_label <- function
          count_grobs=count_grobs,
          overlap_grobs=overlap_grobs))
       # iterate each type, convert to gtable
-      gt_list <- lapply(jamba::nameVectorN(jamba::rmNULL(grob_list)), function(iname){
+      gt_list <- lapply(jamba::nameVectorN(grob_list), function(iname){
          igrobs <- grob_list[[iname]]
-         ihtlist <- lapply(igrobs, function(igrob){
-            grid::grobHeight(igrob) + grid::unit(use_buffers_mm[iname], "mm")
+         # print("iname:");print(iname);# debug
+         ihtlist <- lapply(seq_along(igrobs), function(igrob_num){
+            igrob <- igrobs[[igrob_num]];
+            ## old
+            # grid::grobHeight(igrob) + grid::unit(use_buffers_mm[iname], "mm")
+            ## new
+            if ("signed_grobs" %in% iname && "count_grobs" %in% names(grob_list) && igrob_num == 1) {
+               grid::grobHeight(igrob) + label_borders[[gsub("_grobs", "", iname)]] * 1
+            } else {
+               grid::grobHeight(igrob) + label_borders[[gsub("_grobs", "", iname)]]
+            }
+            # grid::grobHeight(igrob) + label_borders[[gsub("_grobs", "", iname)]] * 0.5
          })
+         # if ("signed_grobs" %in% iname) {
+         #    print("ihtlist:");print(ihtlist);# debug
+         # }
          if (length(ihtlist) > 1) {
             ihts <- do.call(grid::unit.c, ihtlist)
          } else {
             ihts <- ihtlist[[1]];
          }
          iwdlist <- lapply(igrobs, function(igrob){
-            grid::grobWidth(igrob) + grid::unit(use_buffers_mm[iname], "mm")
+            ## old
+            # grid::grobWidth(igrob) + grid::unit(use_buffers_mm[iname], "mm")
+            ## new
+            # grid::grobWidth(igrob) + label_borders[[gsub("_grobs", "", iname)]]
+            grid::grobWidth(igrob) + label_borders[[gsub("_grobs", "", iname)]] * 0.5
          })
          if (length(iwdlist) > 1) {
             iwd <- do.call(max, iwdlist)
@@ -631,14 +671,18 @@ assemble_venndir_label <- function
          if (any(grepl("count", names(gt_list)))) {
             use_ws <- grid::unit.c(
                gtable::gtable_width(gt_list$count_grobs) +
-                  grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"),
+                  label_borders[["count"]] * 1,
+                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"),
                gtable::gtable_width(gt_list$signed_grobs) +
-                  grid::unit(use_buffers_mm["signed_grobs"] * 0.1, "mm"));
+                  label_borders[["signed"]] * 1)
+                  # grid::unit(use_buffers_mm["signed_grobs"] * 0.1, "mm"));
             use_hs <- grid::unit.c(
                gtable::gtable_height(gt_list$count_grobs) +
-                  grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"),
+                  label_borders[["count"]] * 2,
+                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"),
                gtable::gtable_height(gt_list$signed_grobs) +
-                  grid::unit(use_buffers_mm["signed_grobs"] * 0.1, "mm"));
+                  label_borders[["signed"]] * 2)
+                  # grid::unit(use_buffers_mm["signed_grobs"] * 0.1, "mm"));
             if ("wide" %in% template) {
                gt23 <- gtable::gtable_row("count_signed",
                   list(gt_list$count_grobs,
@@ -664,20 +708,34 @@ assemble_venndir_label <- function
          if (length(gt23) > 0) {
             use_ws <- grid::unit.c(
                gtable::gtable_width(gt1) +
-                  grid::unit(use_buffers_mm["overlap_grobs"] * 0.1, "mm"),
+                  label_borders[["overlap"]] * 2,
+                  # grid::unit(use_buffers_mm["overlap_grobs"] * 0.1, "mm"),
                gtable::gtable_width(gt23) +
-                  grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"));
+                  label_borders[["count"]] * 2)
+                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"));
             use_hs <- grid::unit.c(
                gtable::gtable_height(gt1) +
-                  grid::unit(use_buffers_mm["overlap_grobs"] * 0.1, "mm"),
+                  label_borders[["overlap"]] * 2,
+                  # grid::unit(use_buffers_mm["overlap_grobs"] * 0.1, "mm"),
                gtable::gtable_height(gt23) +
-                  grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"));
+                  label_borders[["count"]] * 2)
+                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"));
             gtfinal <- gtable::gtable_col("overlap_count_signed",
                list(gt1, gt23),
                width=max(use_ws),
                heights=use_hs)
          } else {
-            gtfinal <- gt1;
+            # gtfinal <- gt1;
+            use_ws <- grid::unit.c(
+               gtable::gtable_width(gt1) +
+                  label_borders[["overlap"]] * 2)
+            use_hs <- grid::unit.c(
+               gtable::gtable_height(gt1) +
+                  label_borders[["overlap"]] * 2)
+            gtfinal <- gtable::gtable_col("overlap_count_signed",
+               list(gt1),
+               width=use_ws,
+               heights=use_hs)
          }
       } else if (length(gt23) > 0) {
          gtfinal <- gt23

@@ -2117,15 +2117,15 @@ polyclip_to_JamPolygon <- function
 #'    fill=c("gold", "firebrick"))
 #' jp3 <- new("JamPolygon", polygons=df3);
 #' 
+#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE)
+#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, spread=TRUE)
 #' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="seq")
-#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="split")
-#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE)
-#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="split")
-#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="seq")
+#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="seq", spread=TRUE)
 #' 
-#' sample_JamPolygon(jp3[1,], n=40, xyratio=1.5, do_plot=TRUE)
+#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, xyratio=0.6)
+#' sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, xyratio=0.6, algorithm="seq")
 #' 
-#' sample_JamPolygon(jp3[1,], n=40, xyratio=1/1.5, do_plot=TRUE)
+#' sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, pattern="columns")
 #' 
 #' @param jp `JamPolygon`
 #' @param n `integer` number of points required
@@ -2153,8 +2153,9 @@ polyclip_to_JamPolygon <- function
 #' @param pattern `character` string indicating how to array the points:
 #'    * `"offset"` (default) uses a rectangular grid where alternating
 #'    points on each row are offset slightly on the y-axis.
-#'    * `"rectangle"` uses a rectangular grid with points on each row
-#'    that share the same y-axis value.
+#'    * `"columns"` uses a rectangular grid with points on each row
+#'    that share the same y-axis value. Essentially the same as "offset"
+#'    using offset=0.
 #' @param buffer `numeric` optional buffer used to adjust the `jp` polygon
 #'    size overall, where negative values will slightly shrink the
 #'    polygon border. Points are sampled after this adjustment.
@@ -2167,14 +2168,13 @@ polyclip_to_JamPolygon <- function
 #'    During testing it was substantially faster and more accurate than
 #'    the previous algorithm `"seq"`.
 #'    * `"seq"`: attempts a linear sequence of `n` values with gradual
-#'    increases.
-#'    The approach is slow, testing values iteratively without regard
-#'    to the relative success, number of "points in polygon" compared to
-#'    the number requested. It also used a fixed "step size" which sometimes
-#'    produced more valid points than requested, and required using a subset
-#'    of points, see argument `spread`.
+#'    increases. It may be slightly more accurate, always finding the lowest
+#'    value, at the expense of brute force speed.
 #' @param do_plot `logical` indicating whether to create a plot to illustrate
 #'    the process.
+#' @param n_seq `numeric`, default NULL, used to provide a custom sequence
+#'    of `n` values to attempt, used for internal testing but may be useful
+#'    to provide exact values determined by an external approach.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are ignored.
 #' 
@@ -2186,7 +2186,7 @@ sample_JamPolygon <- function
  spread=FALSE,
  n_ratio=1,
  pattern=c("offset",
-    "rectangle"),
+    "columns"),
  buffer=-0.2,
  width_buffer=0.1,
  max_width_buffer=10,
@@ -2194,6 +2194,7 @@ sample_JamPolygon <- function
  algorithm=c("split",
     "seq"),
  do_plot=FALSE,
+ n_seq=NULL,
  verbose=FALSE,
  ...)
 {
@@ -2265,13 +2266,71 @@ sample_JamPolygon <- function
    # bounding box
    xyrange <- bbox_JamPolygon(use_jp);
    
+   # custom function to take n points from a list
+   # limit_n_points(A, pip, n)
+   limit_n_points <- function(A, pip=TRUE, n=1, spread=FALSE,
+      verbose=FALSE, ...) {
+      #
+      Adf <- data.frame(x=A$x[pip],
+         y=A$y[pip]);
+      rowrank <- jamba::nameVector(rank(-unique(Adf$y)), unique(Adf$y));
+      colrank <- jamba::nameVector(rank(unique(Adf$x)), unique(Adf$x));
+      Adf$colnum <- colrank[as.character(Adf$x)]
+      Adf$rownum <- rowrank[as.character(Adf$y)]
+      if (TRUE %in% spread) {
+         Adf <- jamba::mixedSortDF(Adf, byCols=c("colnum", "rownum"));
+         row_seq <- round(seq(from=1, to=nrow(Adf), length.out=n))
+         Adf$final_keep <- FALSE;
+         Adf$final_keep[row_seq] <- TRUE;
+         Adf_use <- subset(Adf, final_keep %in% TRUE);
+         Adf_use <- jamba::mixedSortDF(Adf_use, byCols=c("rownum", "colnum"));
+         A <- list(x=Adf_use$x, y=Adf_use$y)
+         return(A)
+         
+      }
+      Adf <- jamba::mixedSortDF(Adf, byCols=c("rownum", "colnum"));
+      
+      if (n >= nrow(Adf)) {
+         A <- list(x=Adf$x, y=Adf$y)
+         return(A)
+      }
+      
+      # take the middle points
+      hval <- (nrow(Adf) - n) / 2;
+      hval1 <- floor(hval);
+      hval2 <- ceiling(hval);
+      pip_set <- seq_len(nrow(Adf));
+      pip_seq <- head(pip_set, -hval2)
+      if (hval1 > 0) {
+         pip_seq <- tail(pip_seq, -hval1)
+      }
+      Adf$keep <- FALSE;
+      Adf$keep[pip_seq] <- TRUE;
+      
+      # optionally take first rownum after evenly spacing labels
+      Adf_sub <- subset(Adf, keep %in% TRUE);
+      Adf_minrow <- min(Adf_sub$rownum)
+      start_row <- match(Adf_minrow, Adf$rownum)
+      row_seq <- seq(from=start_row, length=n);
+      Adf$final_keep <- FALSE;
+      Adf$final_keep[row_seq] <- TRUE;
+      Adf_use <- subset(Adf, final_keep %in% TRUE);
+      if (TRUE %in% verbose) {
+         jamba::printDebug("Adf_minrow: ", Adf_minrow);# debug
+         jamba::printDebug("Adf: ");print(Adf);# debug
+      }
+
+      A <- list(x=Adf_use$x, y=Adf_use$y)
+      return(A)
+   }
+   
    # custom function to wrap some re-usable logic
    #
    # array_points() defines a grid of points covering the bounding box
    array_points <- function
    (xyrange,
     n=100,
-    pattern="rectangle",
+    pattern="columns",
     verbose=FALSE,
     do_plot=FALSE,
     ...)
@@ -2284,9 +2343,6 @@ sample_JamPolygon <- function
       # bonus points: allow different aspect ratio for x/y spacing
       xstep <- istep * xyratio;
       ystep <- istep / xyratio;
-      if ("triangle" %in% pattern) {
-         ystep <- ystep * 2;
-      }
       if (verbose) {
          jamba::printDebug("sample_JamPolygon(): ",
             "array_points(): ",
@@ -2296,16 +2352,23 @@ sample_JamPolygon <- function
       # define x sequence
       xseq <- seq(from=xyrange[1, 1], to=xyrange[1, 2], by=xstep);
       xseq <- xseq - (tail(xseq, 1) - xyrange[1, 2]) / 2;
+      
       # define y sequence
       yseq <- seq(from=xyrange[2, 1], to=xyrange[2, 2], by=ystep);
       yseq <- yseq - (tail(yseq, 1) - xyrange[2, 2]) / 2;
       yseq <- rev(yseq);
       
-      # define point sequence
+      # define point sequence with regular rectangular grid pattern
       xuse <- rep(xseq, length(yseq));
       yuse <- rep(yseq, each=length(xseq));
       
-      # optional offsets
+      # optional offset strategies:
+      # - "offset"
+      #    defines up/down placement, every other entry half-height up
+      #
+      # - "angled" (to be implemented)
+      #    applies offset so each entry is progressively higher/lower
+      #   
       if (length(xseq) > 1) {
          if (any(c("offset") %in% pattern)) {
             if (length(yseq) == 1) {
@@ -2314,14 +2377,14 @@ sample_JamPolygon <- function
                ystep <- diff(head(yseq, 2));
             }
             if ("offset" %in% pattern) {
-               # offset
+               # offset half-height between rows
                offset_height <- ystep / 2;
+               # adjust by half this offset height
                yadjust <- offset_height / 2;
                offset_row <- rep(c(0, offset_height),
                   length.out=length(xseq));
             }
-            # hexagonal (skip for now)
-            offset_row2 <- rep(c(0, NA), length.out=length(xseq));
+            # adjust point sequence
             yuse <- yuse - yadjust + offset_row;
             isna <- is.na(yuse);
             yuse <- yuse[!isna];
@@ -2344,7 +2407,11 @@ sample_JamPolygon <- function
          jamba::printDebug("sample_JamPolygon(): ",
             "Algorithm ", "'seq'");
       }
-      n_seq <- unique(round(seq(from=n * 1, to=n * 50, by=ceiling(n / 50))));
+      if (length(n_seq) > 0 && any(n_seq >= n)) {
+         # use n_seq as provided
+      } else {
+         n_seq <- unique(round(seq(from=n * 1, to=n * 50, by=ceiling(n / 50))));
+      }
       if (verbose) {
          nseq_vals <- c(head(n_seq, 3), "...", tail(n_seq, 2))
          jamba::printDebug("sample_JamPolygon(): ",
@@ -2364,7 +2431,7 @@ sample_JamPolygon <- function
          # jamba::printDebug("use_jp:");print(use_jp);# debug
          if (verbose) {
             jamba::printDebug("sample_JamPolygon(): ",
-               "Iteration ", match(try_n, n_seq));
+               "Iteration ", match(try_n, n_seq), ", try_n:", try_n);
          }
          A <- array_points(xyrange,
             n=try_n,
@@ -2387,16 +2454,11 @@ sample_JamPolygon <- function
          }
          # print(table(pip))
          if (sum(pip) >= (target_n)) {
-            if (TRUE %in% spread) {
-               pip_set <- which(pip);
-               pip_seq <- pip_set[seq(from=1, to=length(pip_set), length.out=n)]
-               pip[] <- FALSE;
-               pip[pip_seq] <- TRUE;
-            } else {
-               pip_seq <- head(which(pip), n);
-               pip[] <- FALSE;
-               pip[pip_seq] <- TRUE;
-            }
+            use_A <- limit_n_points(A=A,
+               pip=pip,
+               n=n,
+               spread=spread,
+               ...)
             break;
          }
       }
@@ -2504,51 +2566,74 @@ sample_JamPolygon <- function
       A <- last_piplist$A;
       pip <- last_piplist$pip;
       # assume success
-      if (sum(pip) > n) {
-         pip_set <- which(pip);
-         if (TRUE %in% spread) {
-            
-            # evenly spaced by order
-            pip_seq <- pip_set[seq(from=1, to=length(pip_set), length.out=n)]
-
-            pip[] <- FALSE;
-            pip[pip_seq] <- TRUE;
-         } else {
-            # first n points
-            pip_seq <- head(pip_set, n);
-            
-            # points in the middle
-            hval <- (length(pip_set) - n) / 2;
-            hval1 <- floor(hval);
-            hval2 <- ceiling(hval);
-            pip_seq <- tail(head(pip_set, -hval2), -hval1)
-            if (hval1 > 0) {
-               pip_seq <- tail(head(pip_set, -hval2), -hval1)
-            } else {
-               pip_seq <- head(pip_set, -hval2)
-            }
-
-            pip[] <- FALSE;
-            pip[pip_seq] <- TRUE;
-         }
+      if (sum(pip) >= n) {
+         use_A <- limit_n_points(A=A,
+            pip=pip,
+            n=n,
+            spread=spread,
+            ...)
+# 
+#          pip_set <- which(pip);
+#          if (TRUE %in% spread) {
+#             
+#             # evenly spaced by order
+#             pip_seq <- pip_set[seq(from=1, to=length(pip_set), length.out=n)]
+# 
+#             pip[] <- FALSE;
+#             pip[pip_seq] <- TRUE;
+#          } else {
+#             # first n points
+#             pip_seq <- head(pip_set, n);
+#             
+#             # points in the middle
+#             hval <- (length(pip_set) - n) / 2;
+#             hval1 <- floor(hval);
+#             hval2 <- ceiling(hval);
+#             pip_seq <- tail(head(pip_set, -hval2), -hval1)
+#             if (hval1 > 0) {
+#                pip_seq <- tail(head(pip_set, -hval2), -hval1)
+#             } else {
+#                pip_seq <- head(pip_set, -hval2)
+#             }
+# 
+#             pip[] <- FALSE;
+#             pip[pip_seq] <- TRUE;
+#          }
       }
    } else {
       stop(paste0("algorithm '", algorithm, "' is not yet implemented."))
    }
    
-   ptcol <- ifelse(pip, "gold", "grey")
+   # Adf <- data.frame(x=A$x[pip],
+   #    y=A$y[pip]);
+   # colrank <- jamba::nameVector(rank(unique(Adf$x)), unique(Adf$x));
+   # rowrank <- jamba::nameVector(rank(unique(Adf$y)), unique(Adf$y));
+   # Adf$colnum <- colrank[as.character(Adf$x)]
+   # Adf$rownum <- rowrank[as.character(Adf$y)]
+   # Adf <- jamba::mixedSortDF(Adf, byCols=c("rownum", "colnum"));
+   # jamba::printDebug("head(Adf):");print(head(Adf));# debug
+   
+   # ptcol <- ifelse(pip, "gold", "grey")
+   ptcol <- "gold";
    # ptcol[seq_along(ptcol) > n] <- "grey85";
    # ptpch <- ifelse(seq_along(ptcol) <= n, 20, 4);
    ptpch <- 20;
+   
+   # Todo: define label adjustment relative to leftmost/rightmost point
+   # in contiguous sets.
    
    # optional plot
    if (2 %in% do_plot) {
       xyrange <- bbox_JamPolygon(jp);
       plot(NULL, type="n", xlim=xyrange[1,], ylim=xyrange[2,]);
-      text(x=A$x, y=A$y, col=ptcol, label=seq_along(A$x));
+      text(x=use_A$x,
+         y=use_A$y,
+         col=ptcol,
+         label=seq_along(use_A$x));
    } else if (1 %in% do_plot) {
-      xuse <- A$x;
-      yuse <- A$y;
+      xuse <- use_A$x;
+      yuse <- use_A$y;
+      # pip <- TRUE;
       #
       use_fill <- "dodgerblue";
       if (!identical(jp, use_jp)) {
@@ -2563,19 +2648,20 @@ sample_JamPolygon <- function
       grid::grid.points(x=adjx(xuse),
          y=adjy(yuse),
          pch=ptpch,
-         size=grid::unit(pip*4 + 2, "mm"),
+         size=grid::unit(TRUE*4 + 2, "mm"),
          gp=grid::gpar(col=ptcol),
          default.units="snpc")
       grid::grid.text(x=0.5, y=0.45,
          label=paste0("n=", n,
-            "\ntotal pts=", length(xuse),
-            "\nusable n=", sum(pip)),
+            "\ntotal pts=", length(A$x),
+            "\nusable n=", sum(pip),
+            "\nfinal n=", length(use_A$x)),
          default.units="snpc")
       grid::popViewport();
    }
    Adf <- jamba::mixedSortDF(
-      data.frame(x=A$x[pip],
-         y=A$y[pip]),
+      data.frame(x=use_A$x,
+         y=use_A$y),
       byCols=byCols);
    # A <- list(x=A$x[pip], y=A$y[pip]);
    A <- list(x=Adf$x,

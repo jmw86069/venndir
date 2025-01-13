@@ -10,13 +10,14 @@ sample_JamPolygon(
   xyratio = 1.2,
   spread = FALSE,
   n_ratio = 1,
-  pattern = c("offset", "rectangle"),
+  pattern = c("offset", "columns"),
   buffer = -0.2,
   width_buffer = 0.1,
   max_width_buffer = 10,
   byCols = c("-y", "x"),
   algorithm = c("split", "seq"),
   do_plot = FALSE,
+  n_seq = NULL,
   verbose = FALSE,
   ...
 )
@@ -58,8 +59,9 @@ shape.
 \itemize{
 \item \code{"offset"} (default) uses a rectangular grid where alternating
 points on each row are offset slightly on the y-axis.
-\item \code{"rectangle"} uses a rectangular grid with points on each row
-that share the same y-axis value.
+\item \code{"columns"} uses a rectangular grid with points on each row
+that share the same y-axis value. Essentially the same as "offset"
+using offset=0.
 }}
 
 \item{buffer}{\code{numeric} optional buffer used to adjust the \code{jp} polygon
@@ -77,16 +79,16 @@ then subdivides between failure/success to find the optimal final \code{n}.
 During testing it was substantially faster and more accurate than
 the previous algorithm \code{"seq"}.
 \item \code{"seq"}: attempts a linear sequence of \code{n} values with gradual
-increases.
-The approach is slow, testing values iteratively without regard
-to the relative success, number of "points in polygon" compared to
-the number requested. It also used a fixed "step size" which sometimes
-produced more valid points than requested, and required using a subset
-of points, see argument \code{spread}.
+increases. It may be slightly more accurate, always finding the lowest
+value, at the expense of brute force speed.
 }}
 
 \item{do_plot}{\code{logical} indicating whether to create a plot to illustrate
 the process.}
+
+\item{n_seq}{\code{numeric}, default NULL, used to provide a custom sequence
+of \code{n} values to attempt, used for internal testing but may be useful
+to provide exact values determined by an external approach.}
 
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
@@ -128,15 +130,15 @@ df3 <- data.frame(name=c("polygon1", "polygon2"),
    fill=c("gold", "firebrick"))
 jp3 <- new("JamPolygon", polygons=df3);
 
+sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE)
+sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, spread=TRUE)
 sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="seq")
-sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="split")
-sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE)
-sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="split")
-sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, algorithm="seq")
+sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, algorithm="seq", spread=TRUE)
 
-sample_JamPolygon(jp3[1,], n=40, xyratio=1.5, do_plot=TRUE)
+sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, xyratio=0.6)
+sample_JamPolygon(jp3[1,], n=60, buffer=-0.3, spread=FALSE, do_plot=TRUE, xyratio=0.6, algorithm="seq")
 
-sample_JamPolygon(jp3[1,], n=40, xyratio=1/1.5, do_plot=TRUE)
+sample_JamPolygon(jp3[1,], n=40, do_plot=TRUE, pattern="columns")
 
 }
 \seealso{

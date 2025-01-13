@@ -21,7 +21,7 @@ label_fill_JamPolygon(
   jitter_color = 0.07,
   jitter_degrees = 0,
   apply_n_scale = TRUE,
-  label_method = c("hexagonal"),
+  label_method = c("offset", "columns"),
   draw_labels = TRUE,
   seed = 1,
   plot_style = c("none", "JamPolygon"),
@@ -90,11 +90,16 @@ The intent is for a single label or small number of labels to
 appear near the center.}
 
 \item{label_method}{\code{character} string (default "hexagonal") to define
-the label layout. Currently only \code{"hexagonal"} is implemented.
-After testing some approaches in \code{sf::st_sample()} and
-\code{spatstat.random::rThomas()}, the other options were interesting
-but ultimately not more effective specifically for character labels.
-Both packages have heavy R dependencies and were avoided.}
+the label layout. Passed as \code{pattern} to \code{sample_JamPolygon()}.
+\itemize{
+\item \code{"offset"} implements close to hexagonal/triangular arrangement,
+with adjustable xy ratio via argument \code{xyratio}. Every other point
+is "offset" upward by half the row height.
+\item \code{"columns"} implements effectively the same approach with no
+y-offset, so that items are always in proper rectangular grid format.
+Preferred for column-organization, and typically works best with
+larger \code{xyratio} values.
+}}
 
 \item{draw_labels}{\code{logical} (default \code{TRUE}) indicating whether to
 draw labels, however it is only used when \code{plot_style="JamPolygon"}.
@@ -211,10 +216,13 @@ lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 100),
    ref_jp=jp3, plot_style="JamPolygon")
 lfj2 <- label_fill_JamPolygon(jp3[2,], labels=rep("X", 40),
    buffer=-0.5,
+   label_method="columns",
    ref_jp=jp3, plot_style="JamPolygon")
 
 jp3p <- plot(jp3);
-lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 1), apply_n_scale=FALSE,
+lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 87),
+   apply_n_scale=FALSE,
+   spread=TRUE,
    ref_jp=jp3, plot_style="JamPolygon")
 
 }

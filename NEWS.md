@@ -1,3 +1,44 @@
+# venndir 0.0.48.900
+
+* bumped `colorjam>=0.0.30.900` to pick up new color blending for
+additive alpha blending, useful for repeating a transparent color
+and having the color become more intense with each overlap.
+
+## bug fixes
+
+* Fixed error in `venndir_legender()` with empty signed lists.
+
+## changes to existing functions
+
+* `find_venn_overlaps_JamPolygon()` called by `venndir()`
+
+   * Color blending uses an improved algorithm in colorjam for
+   additive alpha blending. For example, transparent red used for
+   three sets will become progressively less transparent with each
+   overlap. It should probably be more dramatic, but it's a good start.
+
+* `venn_meme()`
+
+   * changed order that default text labels are applied to 3-way and 4-way
+   Venn, with special case of 4-way proportional Venn (Euler) coded
+   so the overlaps are filled clockwise. Effort to make it easy
+   to copy Venn memes observed in the wild.
+
+* `label_fill_JamPolygon()` calls updated version of `sample_JamPolygon()`
+* `sample_JamPolygon()`
+
+   * Added `pattern="columns"` layout option to enforce all points on the
+   same row, an alternative to the default hexagonal/triangular.
+   * Updated logic to choose appropriate subset of points when more than `n`
+   are defined. Now takes all of the first row when `spread=FALSE`.
+   When `spread=TRUE` it spreads points by column, then row, which somehow
+   improves the visual result, resulting in fewer weird clusters of points.
+
+* `assemble_venndir_label()`
+
+   * Label assembly was adjusted again, now with customizable border
+   sizes.
+
 # venndir 0.0.47.900
 
 * Added to Imports: `eulerr`, `gtable` (lightweight, also used by ggplot2)

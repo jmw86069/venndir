@@ -522,6 +522,9 @@ venndir_legender <- function
    gcdf2 <- NULL;
    if (TRUE %in% legend_signed) {
       sv <- jamba::rbindList(lapply(seq_along(setlist), function(isetlist){
+         if (length(unlist(setlist[isetlist])) == 0) {
+            return(NULL)
+         }
          idf <- signed_overlaps(setlist[isetlist],
             overlap_type="each",
             return_items=FALSE);

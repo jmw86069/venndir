@@ -12,6 +12,30 @@
 #' inside each Venn overlap region, and no other counts or
 #' set labels.
 #' 
+#' When given a `character` vector or `list` of `character` vectors,
+#' with no names, it will deduce the number of Venn sets by the
+#' length:
+#' * 1: one set
+#' * up to 3: two-set Venn with overlap
+#' * up to 7: three-set Venn with overlaps. Effort is made for overlaps
+#' to be defined "clockwise" starting between the first and second sets.
+#' * up to 15: four-set Venn, with two special cases:
+#' 
+#'    * up to 13 length, and when `proportional=TRUE`, it will create
+#'    proportional circles, showing only the 13 overlaps visibly possible.
+#'    The overlaps are recognized in order they appear, clockwise around
+#'    the center.
+#'    Use `venn_meme(1:13, proportional=TRUE)` to see the order.
+#'    * up to 15 length, and/or `proportional=FALSE`, it will create
+#'    non-proportional ellipses.
+#'    Use `venn_meme(1:15)` to see the order of overlaps.
+#' 
+#' * up to 31: five-set Venn with overlaps.
+#' 
+#'    * Use `venn_meme(1:31)` to see the order of overlaps.
+#'    * As of yet, the order of overlaps is not defined clockwise.
+#'    Good luck with that!
+#' 
 #' The argument `item_cex` is used to adjust item font size,
 #' and this vector is applied to items in each overlap set in order,
 #' by the number of overlap sets, then in sorted order of the set
@@ -209,26 +233,54 @@ venn_meme <- function
  item_degrees=0,
  item_buffer=-0.85,
  item_style=c("text",
+    "richtext_grob",
     "gridtext"),
  keep_item_order=TRUE,
  show_items="item",
  show_labels="i",
+ set_colors=NULL,
  plot_warning=FALSE,
  draw_legend=FALSE,
  verbose=FALSE,
  ...)
 {
    #
+   setorder <- NULL;
    if (length(names(x)) == 0) {
       if (length(x) <= 3) {
          setnames <- rownames(make_venn_combn_df(LETTERS[1:2]));
          names(x) <- setnames[seq_along(x)];
       } else if (length(x) <= 7) {
          setnames <- rownames(make_venn_combn_df(LETTERS[1:3]));
-         names(x) <- setnames[seq_along(x)];
-      } else if (length(x) <= 15) {
+         usek <- c(1, 2, 3, 4, 6, 5, 7);
+         setnamesk <- setnames[usek];
+         names(x) <- setnamesk[seq_along(x)];
+      } else if (length(x) <= 13 && TRUE %in% proportional) {
+         # 4-set Venn with proportional circles
          setnames <- rownames(make_venn_combn_df(LETTERS[1:4]));
-         names(x) <- setnames[seq_along(x)];
+         usek <- c(1, 2, 3, 4, 5, 8, 10, 7, 11, 14, 13, 12, 15);
+         setnamesk <- setnames[usek];
+         names(x) <- setnamesk[seq_along(x)];
+         # cexk <- match(intersect(setnames, setnamesk), setnamesk)
+         if (length(item_cex) > 1) {
+            setnameso <- rownames(make_venn_combn_df(LETTERS[c(4, 3, 1, 2)]));
+            setnamesos <- jamba::cPasteS(sep="&", strsplit(setnameso, "&"));
+            cexk <- match(setnamesos[usek], intersect(setnameso, setnamesk));
+            item_cex <- rep(item_cex, length.out=13)
+            names(item_cex) <- setnamesk;
+            item_cex <- jamba::rmNA(naValue=1, item_cex[setnamesos])
+            names(item_cex) <- setnameso;
+         }
+      } else if (length(x) <= 15) {
+         # 4-set non-proportional Venn
+         setnames <- rownames(make_venn_combn_df(LETTERS[1:4]));
+         usek <- c(1, 2, 3, 4, 5, 8, 10, 9, 7, 6, 11, 14, 12, 13, 15);
+         setnamesk <- setnames[usek];
+         names(x) <- setnamesk[seq_along(x)];
+         if (length(item_cex) > 1) {
+            cexk <- match(setnames, setnamesk);
+            item_cex <- rep(item_cex, length.out=15)[cexk];
+         }
       } else if (length(x) <= 31) {
          setnames <- rownames(make_venn_combn_df(LETTERS[1:5]));
          names(x) <- setnames[seq_along(x)];
@@ -241,7 +293,7 @@ venn_meme <- function
       x <- lapply(x, function(i){
          gsub("<br>", "\n", i);
       })
-   } else if ("gridtext" %in% item_style) {
+   } else if (any(c("richtext_grob", "gridtext") %in% item_style)) {
       x <- lapply(x, function(i){
          gsub("\n", "<br>", i);
       })
@@ -251,9 +303,33 @@ venn_meme <- function
    if (verbose) {
       jamba::printDebug("venn_meme(): ",
          "Calling overlaplist2setlist()");
+      jamba::printDebug("x:");print(x);# debug
    }
    setlist <- overlaplist2setlist(x);
 
+   ## special handling of 3-set proportional Venn
+   if (length(setlist) == 3 && TRUE %in% proportional) {
+      k <- c(1, 3, 2);
+      setlist <- setlist[k]
+      if (length(set_colors) == 0) {
+         set_colors <- colorjam::rainbowJam(3,
+            ...)[k];
+      } else {
+         set_colors <- rep(set_colors, length.out=4)[k];
+      }
+   }
+   ## special handling of 4-set proportional Venn
+   if (length(setlist) == 4 && TRUE %in% proportional) {
+      k <- c(4, 3, 1, 2);
+      setlist <- setlist[k]
+      if (length(set_colors) == 0) {
+         set_colors <- colorjam::rainbowJam(4,
+            ...)[k];
+      } else {
+         set_colors <- rep(set_colors, length.out=4)[k];
+      }
+   }
+   
    # if (length(item_cex) == 1) {
    #    item_cex <- rep(item_cex, 2);
    # }
@@ -266,6 +342,7 @@ venn_meme <- function
       show_items=show_items,
       show_labels=show_labels,
       keep_item_order=keep_item_order,
+      set_colors=set_colors,
       # label_preset="meme",
       item_degrees=item_degrees,
       item_cex=item_cex * 1,

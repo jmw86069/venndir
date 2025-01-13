@@ -974,6 +974,9 @@ venndir <- function
    }
 
    ## Create metadata options
+   if (length(fontfamily) == 0) {
+      fontfamily <- "";
+   }
    metadata <- list(
       main=main,
       overlap_type=overlap_type,

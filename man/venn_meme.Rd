@@ -10,10 +10,11 @@ venn_meme(
   item_cex = 1,
   item_degrees = 0,
   item_buffer = -0.85,
-  item_style = c("text", "gridtext"),
+  item_style = c("text", "richtext_grob", "gridtext"),
   keep_item_order = TRUE,
   show_items = "item",
   show_labels = "i",
+  set_colors = NULL,
   plot_warning = FALSE,
   draw_legend = FALSE,
   verbose = FALSE,
@@ -69,6 +70,33 @@ settings designed to create a Venn Meme. This output
 is expected to display usually one or a few item labels
 inside each Venn overlap region, and no other counts or
 set labels.
+
+When given a \code{character} vector or \code{list} of \code{character} vectors,
+with no names, it will deduce the number of Venn sets by the
+length:
+\itemize{
+\item 1: one set
+\item up to 3: two-set Venn with overlap
+\item up to 7: three-set Venn with overlaps. Effort is made for overlaps
+to be defined "clockwise" starting between the first and second sets.
+\item up to 15: four-set Venn, with two special cases:
+\itemize{
+\item up to 13 length, and when \code{proportional=TRUE}, it will create
+proportional circles, showing only the 13 overlaps visibly possible.
+The overlaps are recognized in order they appear, clockwise around
+the center.
+Use \code{venn_meme(1:13, proportional=TRUE)} to see the order.
+\item up to 15 length, and/or \code{proportional=FALSE}, it will create
+non-proportional ellipses.
+Use \code{venn_meme(1:15)} to see the order of overlaps.
+}
+\item up to 31: five-set Venn with overlaps.
+\itemize{
+\item Use \code{venn_meme(1:31)} to see the order of overlaps.
+\item As of yet, the order of overlaps is not defined clockwise.
+Good luck with that!
+}
+}
 
 The argument \code{item_cex} is used to adjust item font size,
 and this vector is applied to items in each overlap set in order,

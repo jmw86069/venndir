@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.47.900
+Version: 0.0.48.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -13,7 +13,7 @@ Description: Venn and proportional Euler diagrams with optional
 Depends: R (>= 3.6.0)
 biocViews:
 Imports: jamba(>= 0.0.105.900),
-    colorjam(>= 0.0.28.900),
+    colorjam(>= 0.0.30.900),
     pracma,
     polyclip,
     polylabelr,
