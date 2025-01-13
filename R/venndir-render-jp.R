@@ -1473,7 +1473,6 @@ render_venndir <- function
                g_labels_list),
             name="labels");
          # return grobs
-         jp_grobList$label_borders <- NULL;
          jp_grobList$labels <- g_labels_gTree;
       }
    }

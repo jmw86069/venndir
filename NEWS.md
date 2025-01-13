@@ -36,8 +36,8 @@ and having the color become more intense with each overlap.
 
 * `assemble_venndir_label()`
 
-   * Label assembly was adjusted again, now with customizable border
-   sizes.
+   * Label assembly was adjusted to add customizable label line
+   spacing, and label padding. Added graphical tests.
 
 # venndir 0.0.47.900
 

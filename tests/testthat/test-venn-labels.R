@@ -23,7 +23,7 @@ test_that("venn_labels_3way_wide_0space", {
    set.seed(123)
    run_venndir5nospace <- function() {
       venndir(make_venn_test(10000, 3, do_signed=TRUE),
-         label_borders=list(overlap=grid::unit(0, "mm"), count=grid::unit(0, "mm"), signed=grid::unit(0, "mm")),
+         label_spacing=list(overlap=grid::unit(0, "mm"), count=grid::unit(0, "mm"), signed=grid::unit(0, "mm")),
          template="wide", label_style="lite box")
    }
    if (jamba::check_pkg_installed("vdiffr")) {
@@ -31,11 +31,24 @@ test_that("venn_labels_3way_wide_0space", {
    }
 })
 
+test_that("venn_labels_3way_wide_1space_0pad", {
+   set.seed(123)
+   run_venndir5nospace <- function() {
+      venndir(make_venn_test(10000, 3, do_signed=TRUE),
+         label_spacing=list(overlap=grid::unit(1, "mm"), count=grid::unit(1, "mm"), signed=grid::unit(1, "mm")),
+         label_padding=list(overlap=grid::unit(0, "mm"), count=grid::unit(0, "mm"), signed=grid::unit(0, "mm")),
+         template="wide", label_style="lite box")
+   }
+   if (jamba::check_pkg_installed("vdiffr")) {
+      vdiffr::expect_doppelganger("Venn 3-way labels, template='wide', 1 space, 0 pad", run_venndir5nospace)
+   }
+})
+
 test_that("venn_labels_3way_wide_0space_pct", {
    set.seed(123)
    run_venndir5nospace <- function() {
       venndir(make_venn_test(10000, 3, do_signed=TRUE), show_labels="ncps",
-         label_borders=list(overlap=grid::unit(0, "mm"), count=grid::unit(0, "mm"), signed=grid::unit(0, "mm")),
+         label_spacing=list(overlap=grid::unit(0, "mm"), count=grid::unit(0, "mm"), signed=grid::unit(0, "mm")),
          template="wide", label_style="lite box")
    }
    if (jamba::check_pkg_installed("vdiffr")) {

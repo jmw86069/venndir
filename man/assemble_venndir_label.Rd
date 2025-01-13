@@ -18,7 +18,9 @@ assemble_venndir_label(
   fontfaces = list(signed = "plain", count = c("plain", "bold.italic"), overlap = "bold"),
   fontcolors = list(signed = c("red3", "dodgerblue3", "grey55"), count = "black", overlap
     = "black"),
-  label_borders = list(signed = grid::unit(1, "mm"), count = grid::unit(1, "mm"), overlap
+  label_spacing = list(signed = grid::unit(1, "mm"), count = grid::unit(1, "mm"), overlap
+    = grid::unit(1, "mm")),
+  label_padding = list(signed = grid::unit(2, "mm"), count = grid::unit(1, "mm"), overlap
     = grid::unit(1, "mm")),
   do_frame = TRUE,
   frame_r = grid::unit(0.1, "snpc"),
@@ -55,7 +57,7 @@ of counts and signed counts when both are defined:
 \item{fontfamily}{\code{character} default "Helvetica" used as convenient
 default for \code{fontfamilies}.}
 
-\item{fontfamilies, fontsizes, fontfaces, fontcolors, label_borders}{\code{list}
+\item{fontfamilies, fontsizes, fontfaces, fontcolors, label_spacing}{\code{list}
 with three named elements: "overlap", "count", "signed", providing
 one or more values for each type of label. When multiple values
 are provided for a label type, these values are recycled to the
@@ -64,7 +66,7 @@ number of values.
 \item For example \code{signed_labels=c("^ 21", "v 24")}
 and \code{fontcolors=list(signed=c("red", "blue", "grey"))} would use
 \code{c("red", "blue")} for these two labels.
-\item The \code{label_borders} values refer to the border "buffer whitespace"
+\item The \code{label_spacing} values refer to the border "buffer whitespace"
 between adjacent labels for each type, line by line.
 By default: 1mm between signed labels; 2mm between count labels;
 3mm between overlap labels.

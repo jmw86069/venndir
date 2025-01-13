@@ -132,18 +132,20 @@
 #'    * `"tall"` places signed counts below counts.
 #' @param fontfamily `character` default "Helvetica" used as convenient
 #'    default for `fontfamilies`.
-#' @param fontfamilies,fontsizes,fontfaces,fontcolors,label_borders `list`
-#'    with three named elements: "overlap", "count", "signed", providing
+#' @param fontfamilies,fontsizes,fontfaces,fontcolors,label_spacing,label_padding
+#'    `list` with three named elements: "overlap", "count", "signed", providing
 #'    one or more values for each type of label. When multiple values
 #'    are provided for a label type, these values are recycled to the
 #'    number of values.
 #'    * For example `signed_labels=c("^ 21", "v 24")`
 #'    and `fontcolors=list(signed=c("red", "blue", "grey"))` would use
 #'    `c("red", "blue")` for these two labels.
-#'    * The `label_borders` values refer to the border "buffer whitespace"
-#'    between adjacent labels for each type, line by line.
-#'    By default: 1mm between signed labels; 2mm between count labels;
-#'    3mm between overlap labels.
+#'    * `label_spacing` defines the line-to-line spacing for each type of
+#'    label, used when there are multiple lines of text.
+#'    * `label_padding` defines the buffer "padding" around the final label,
+#'    whether the label is single-line or multiple-line.
+#'    Concise labels can be created with small label_spacing, but slightly
+#'    larger label_padding.
 #' @param do_frame `logical` default TRUE, indicating whether to define
 #'    a frame around the grouped labels, returning `grid::gTree` with the
 #'    frame and labels together as one "grob".
@@ -202,7 +204,10 @@ assemble_venndir_label <- function
  fontcolors=list(signed=c("red3", "dodgerblue3", "grey55"),
     count="black",
     overlap="black"),
- label_borders=list(signed=grid::unit(1, "mm"),
+ label_spacing=list(signed=grid::unit(1, "mm"),
+    count=grid::unit(1, "mm"),
+    overlap=grid::unit(1, "mm")),
+ label_padding=list(signed=grid::unit(2, "mm"),
     count=grid::unit(1, "mm"),
     overlap=grid::unit(1, "mm")),
  do_frame=TRUE,
@@ -267,17 +272,17 @@ assemble_venndir_label <- function
          "'textGrob' because 'gridtext' package is not installed."));
       text_grob_type <- "textGrob";
    }
-   if ("textGrob" %in% text_grob_type) {
-      # label_borders$signed <- label_borders$signed + grid::unit(1, "mm")
-      label_borders$signed <- label_borders$signed + grid::unit(0.0, "mm")
-   }
+   # if ("textGrob" %in% text_grob_type) {
+   #    ## label_spacing$signed <- label_spacing$signed + grid::unit(1, "mm")
+   #    label_spacing$signed <- label_spacing$signed
+   # }
    
    # sign1 <- "\u2191\u2191 1,234"
    # sign2 <- "\u2193\u2193 512"
    # count1 <- "11,246\n74%"
    # label1 <- "Set Label Goes Here\n(set A)"
    
-   # Todo: validate arguments: fontsizes,fontfaces,fontfamilies,label_borders
+   # Todo: validate arguments: fontsizes,fontfaces,fontfamilies,label_spacing
    # - confirm list, or expand into list
    # - confirm names: signed, count, overlap
    # - fill missing values as needed
@@ -294,9 +299,6 @@ assemble_venndir_label <- function
    # Assemble signed count labels
    signed_frame <- NULL;
    signed_grobs <- list();
-   fb_signed <- rep(0, 4);
-   fb_count <- rep(0, 4);
-   fb_overlap <- rep(0, 4);
    if (length(signed_labels) > 0) {
       sn <- length(signed_labels);
       # signed_frame <- grid::frameGrob()
@@ -305,14 +307,6 @@ assemble_venndir_label <- function
          ff <- rep(fontfaces$signed, length.out=sn)[[i]];
          fc <- rep(fontcolors$signed, length.out=sn)[[i]];
          fm <- rep(fontfamilies$signed, length.out=sn)[[i]];
-         fb <- rep(unname(label_borders$signed), length.out=4);
-         # new: remove top border for first entry when template="tall" and count exists
-         if ("tall" %in% template && length(count_labels) > 0) {
-            fb <- fb * c(1, 1, 0, 1);
-            # print("fb:");print(fb);# debug
-         }
-         
-         fb_signed <- fb;
          if (length(fs) == 0) {
             fs <- 10;
          }
@@ -329,11 +323,6 @@ assemble_venndir_label <- function
          if ("tall" %in% template & length(count_labels) > 0 && i == 1) {
             signed_vjust <- 0.5; # 1 top
          }
-         ## previous
-         # signed_x <- grid::unit(0, "npc") +
-         #    grid::unit(use_buffers_mm / 2, "mm");
-         ## new
-         # signed_x <- grid::unit(0, "npc") + fb_signed * 0.5;
          signed_x <- grid::unit(0, "npc");
          
          ## optionally center labels for "tall" template
@@ -433,8 +422,6 @@ assemble_venndir_label <- function
          ff <- rep(fontfaces$count, length.out=sn)[[i]];
          fc <- rep(fontcolors$count, length.out=sn)[[i]];
          fm <- rep(fontfamilies$count, length.out=sn)[[i]];
-         fb <- rep(unname(label_borders$count), length.out=4);
-         fb_count <- fb;
          if (length(fs) == 0) {
             fs <- 12;
          }
@@ -521,8 +508,6 @@ assemble_venndir_label <- function
          ff <- rep(fontfaces$overlap, length.out=sn)[[i]];
          fc <- rep(fontcolors$overlap, length.out=sn)[[i]];
          fm <- rep(fontfamilies$overlap, length.out=sn)[[i]];
-         fb <- rep(unname(label_borders$overlap), length.out=4);
-         fb_overlap <- fb;
          if (length(fs) == 0) {
             fs <- 14;
          }
@@ -609,8 +594,8 @@ assemble_venndir_label <- function
       return(invisible(NULL))
    }
    
-   ####################################
-   # gtable grob_strat
+   ################################################
+   # gtable grob_strat assembly of label components
    {
       grob_list <- jamba::rmNULL(list(
          signed_grobs=signed_grobs,
@@ -622,30 +607,16 @@ assemble_venndir_label <- function
          # print("iname:");print(iname);# debug
          ihtlist <- lapply(seq_along(igrobs), function(igrob_num){
             igrob <- igrobs[[igrob_num]];
-            ## old
-            # grid::grobHeight(igrob) + grid::unit(use_buffers_mm[iname], "mm")
-            ## new
-            if ("signed_grobs" %in% iname && "count_grobs" %in% names(grob_list) && igrob_num == 1) {
-               grid::grobHeight(igrob) + label_borders[[gsub("_grobs", "", iname)]] * 1
-            } else {
-               grid::grobHeight(igrob) + label_borders[[gsub("_grobs", "", iname)]]
-            }
-            # grid::grobHeight(igrob) + label_borders[[gsub("_grobs", "", iname)]] * 0.5
+            ## new without padding
+            grid::grobHeight(igrob)
          })
-         # if ("signed_grobs" %in% iname) {
-         #    print("ihtlist:");print(ihtlist);# debug
-         # }
          if (length(ihtlist) > 1) {
             ihts <- do.call(grid::unit.c, ihtlist)
          } else {
             ihts <- ihtlist[[1]];
          }
          iwdlist <- lapply(igrobs, function(igrob){
-            ## old
-            # grid::grobWidth(igrob) + grid::unit(use_buffers_mm[iname], "mm")
-            ## new
-            # grid::grobWidth(igrob) + label_borders[[gsub("_grobs", "", iname)]]
-            grid::grobWidth(igrob) + label_borders[[gsub("_grobs", "", iname)]] * 0.5
+            grid::grobWidth(igrob)
          })
          if (length(iwdlist) > 1) {
             iwd <- do.call(max, iwdlist)
@@ -656,12 +627,20 @@ assemble_venndir_label <- function
             grobs=igrobs,
             width=iwd,
             heights=ihts)
+         # add buffer between rows when buffer is non-zero
+         if (length(ihtlist) > 1 &&
+               as.numeric(label_spacing[[gsub("_grobs", "", iname)]]) > 0) {
+            gt1 <- gtable::gtable_add_row_space(x=gt1,
+               height=label_spacing[[gsub("_grobs", "", iname)]])
+         }
+         gt1
       })
 
       # combine gtable objects
       gt1 <- NULL;
       gt23 <- NULL;
       gtfinal <- NULL;
+      roundradius <- label_padding[["overlap"]];
       # top row uses overlap_grobs
       if (any(grepl("overlap", names(gt_list)))) {
          gt1 <- gt_list$overlap_grobs
@@ -670,31 +649,31 @@ assemble_venndir_label <- function
       if (any(grepl("sign", names(gt_list)))) {
          if (any(grepl("count", names(gt_list)))) {
             use_ws <- grid::unit.c(
-               gtable::gtable_width(gt_list$count_grobs) +
-                  label_borders[["count"]] * 1,
-                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"),
-               gtable::gtable_width(gt_list$signed_grobs) +
-                  label_borders[["signed"]] * 1)
-                  # grid::unit(use_buffers_mm["signed_grobs"] * 0.1, "mm"));
+               gtable::gtable_width(gt_list$count_grobs),
+               gtable::gtable_width(gt_list$signed_grobs)
+            )
             use_hs <- grid::unit.c(
-               gtable::gtable_height(gt_list$count_grobs) +
-                  label_borders[["count"]] * 2,
-                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"),
-               gtable::gtable_height(gt_list$signed_grobs) +
-                  label_borders[["signed"]] * 2)
-                  # grid::unit(use_buffers_mm["signed_grobs"] * 0.1, "mm"));
+               gtable::gtable_height(gt_list$count_grobs),
+               gtable::gtable_height(gt_list$signed_grobs)
+            )
             if ("wide" %in% template) {
                gt23 <- gtable::gtable_row("count_signed",
                   list(gt_list$count_grobs,
                      gt_list$signed_grobs),
                   widths=use_ws,
                   height=max(use_hs))
+               # add spacing between columns
+               gt23 <- gtable::gtable_add_col_space(x=gt23,
+                  width=label_spacing[["count"]])
             } else if ("tall" %in% template) {
                gt23 <- gtable::gtable_col("count_signed",
                   list(gt_list$count_grobs,
                      gt_list$signed_grobs),
                   width=max(use_ws),
                   heights=use_hs)
+               # add spacing between rows
+               gt23 <- gtable::gtable_add_row_space(x=gt23,
+                  height=label_spacing[["count"]])
             }
          } else {
             gt23 <- gt_list$signed_grobs
@@ -704,41 +683,39 @@ assemble_venndir_label <- function
             gt23 <- gt_list$count_grobs
          }
       }
+      ## Assemble overlap with count/signed gtables
       if (length(gt1) > 0) {
+         # overlap label exists
          if (length(gt23) > 0) {
             use_ws <- grid::unit.c(
-               gtable::gtable_width(gt1) +
-                  label_borders[["overlap"]] * 2,
-                  # grid::unit(use_buffers_mm["overlap_grobs"] * 0.1, "mm"),
-               gtable::gtable_width(gt23) +
-                  label_borders[["count"]] * 2)
-                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"));
+               gtable::gtable_width(gt1),
+               gtable::gtable_width(gt23))
             use_hs <- grid::unit.c(
-               gtable::gtable_height(gt1) +
-                  label_borders[["overlap"]] * 2,
-                  # grid::unit(use_buffers_mm["overlap_grobs"] * 0.1, "mm"),
-               gtable::gtable_height(gt23) +
-                  label_borders[["count"]] * 2)
-                  # grid::unit(use_buffers_mm["count_grobs"] * 0.1, "mm"));
+               gtable::gtable_height(gt1),
+               gtable::gtable_height(gt23))
             gtfinal <- gtable::gtable_col("overlap_count_signed",
                list(gt1, gt23),
                width=max(use_ws),
                heights=use_hs)
+            ## add space between elements
+            gtfinal <- gtable::gtable_add_row_space(x=gtfinal,
+               height=label_spacing[["overlap"]])
+            ## add padding around label
+            gtfinal <- gtable::gtable_add_padding(x=gtfinal,
+               padding=rep(label_padding[["overlap"]], length.out=4))
          } else {
-            # gtfinal <- gt1;
-            use_ws <- grid::unit.c(
-               gtable::gtable_width(gt1) +
-                  label_borders[["overlap"]] * 2)
-            use_hs <- grid::unit.c(
-               gtable::gtable_height(gt1) +
-                  label_borders[["overlap"]] * 2)
-            gtfinal <- gtable::gtable_col("overlap_count_signed",
-               list(gt1),
-               width=use_ws,
-               heights=use_hs)
+            # overlap label is used by itself
+            ## add padding around label
+            gtfinal <- gtable::gtable_add_padding(x=gt1,
+               padding=rep(label_padding[["overlap"]], length.out=4))
          }
       } else if (length(gt23) > 0) {
+         roundradius <- label_padding[["count"]];
+         ## previous
          gtfinal <- gt23
+         ## add padding around label
+         gtfinal <- gtable::gtable_add_padding(x=gt23,
+            padding=rep(label_padding[["count"]], length.out=4))
       }
       overlap_frame <- gtfinal;
    }
@@ -782,10 +759,11 @@ assemble_venndir_label <- function
          frame_r <- 0;
       }
       frame_r <- head(frame_r, 1);
+      frame_r <- roundradius;
       if (!grid::is.unit(frame_r)) {
          frame_r <- grid::unit(frame_r, "snpc");
       }
-      
+
       if (inherits(use_frame, "gtable")) {
          use_h <- gtable::gtable_height(use_frame);
          use_w <- gtable::gtable_width(use_frame);
@@ -815,6 +793,7 @@ assemble_venndir_label <- function
          frame_r <- 0;
       }
       frame_r <- head(frame_r, 1);
+      frame_r <- roundradius * 1.5;
       if (inherits(overlap_frame, "gtable")) {
          gw <- gtable::gtable_width(overlap_frame);
          gh <- gtable::gtable_height(overlap_frame);
