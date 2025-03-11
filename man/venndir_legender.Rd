@@ -2,14 +2,17 @@
 % Please edit documentation in R/venndir-legend.R
 \name{venndir_legender}
 \alias{venndir_legender}
-\title{Add optional legend to venndir figures (developmental)}
+\title{Add legend to venndir figure}
 \usage{
 venndir_legender(
   venndir_output = NULL,
-  x = "bottomleft",
   setlist = NULL,
+  x = "bottomleft",
   set_colors = NULL,
+  legend_style = c("grid", "data.frame"),
   unicode = TRUE,
+  legend_headers = c(Set = "Set", Size = "Size", Percentage = "Percentage", Sign =
+    "Sign"),
   sign_count_delim = NULL,
   keep_newlines = FALSE,
   legend_total = TRUE,
@@ -19,7 +22,6 @@ venndir_legender(
   combine_size = TRUE,
   legend_color_style = c("fill", "border"),
   box.lwd = 0,
-  legend_style = c("grid", "data.frame"),
   item_type = "",
   header_color = "#000000",
   header_bg = "#FFFFFF00",
@@ -43,25 +45,54 @@ venndir_legender(
 )
 }
 \arguments{
-\item{venndir_output}{\code{Venndir} object returned by \code{venndir()},
-which is used to generate the legend counts.
-When supplied, the \code{set_colors} are also defined by this object.}
+\item{venndir_output}{\code{Venndir} object, default NULL, or one of:
+\itemize{
+\item \code{Venndir} object, also used to define \code{set_colors} when applicable
+\item \code{list} representing \code{setlist}
+\item \code{data.frame} output from \code{signed_overlaps()}
+}}
+
+\item{setlist}{\code{list}, default NULL, used when \code{venndir_output} is NULL
+\itemize{
+\item \code{list} representing \code{setlist}
+\item \code{data.frame} with output from \code{signed_overlaps()}, with columns
+\code{"sets"}, \code{"overlap"}, \code{"count"}. It may include \code{"each"} which is
+required to display signed counts with \code{legend_signed=TRUE}.
+}}
 
 \item{x}{\code{character} string indicating the position of the legend,
 as passed to \code{graphics::legend()} when \code{legend_style="base"}.
 Not relevant when \code{legend_style="data.frame"}.}
-
-\item{setlist}{\code{list} alternative when \code{venndir_output} is not supplied
-as a \code{Venndir} object. Used internally by \code{textvenn()}.}
 
 \item{set_colors}{\code{character} optional vector of R colors, whose names
 should match \code{names(setlist)}. When not supplied, colors are inferred
 from \code{venndir_output}, and when that is not supplied, colors are
 defined using \code{colorjam::rainbowJam()}.}
 
+\item{legend_style}{\code{character} string, default \code{"grid"} with the
+legend style, with these options:
+\itemize{
+\item \code{"grid"} generates a grid \code{grob} using \code{gridExtra::grid.table()}.
+\item \code{"data.frame"} generates the legend \code{data.frame}.
+}}
+
 \item{unicode}{\code{logical} default TRUE, whether to use unicode arrows
 for signed counts, used when \code{legend_signed=TRUE}.
 This argument is passed to \code{curate_venn_labels()}.}
+
+\item{legend_headers}{\code{character} vector with headers to use,
+named by the default heading. To display no column header,
+set \code{legend_headers=NULL} or \code{legend_headers=FALSE}.
+Recognized names:
+\itemize{
+\item "Set" - the header for the set names, default "Set".
+\item "Label" - when \code{labels} or \code{legend_labels} are defined, the
+header "Label" can be customized.
+\item "Size" - the header for the set sizes, default "Size".
+\item "Sign" - the header for the set signs, default "Sign".
+\item "Percentage" - the header for the set size percentage overall,
+default "Percentage".
+}}
 
 \item{keep_newlines}{\code{logical} indicating whether to keep newlines
 (line breaks) in the set labels used in the Venn legend.}
@@ -110,12 +141,6 @@ used, \code{c("fill", "border")} are default:
 \item{box.lwd}{\code{numeric} used to define the box line width,
 as passed to \code{graphics::legend()} when \code{legend_style="base"}.}
 
-\item{legend_style}{\code{character} string indicating the style of legend:
-\itemize{
-\item \code{"grid"} uses \code{gridExtra::grid.table()}
-\item \code{"data.frame"} only returns the venndir legend \code{data.frame}.
-}}
-
 \item{item_type}{\code{character} string used as a suffix to the counts
 displayed in the legend. Use \code{item_type=""} or \code{item_type=NULL}
 to hide this suffix.}
@@ -132,18 +157,20 @@ is also applied to all cells in the table. Note that the line is
 drawn with line width \code{lwd}.
 }}
 
-\item{lwd}{\code{numeric} value for line width used for the cell border
+\item{lwd}{\code{numeric}, default 1, cell border line width used
 in the legend table, when \code{legend_style="grid"}.}
 
-\item{x_inset, y_inset}{\code{grid::unit} object that defines the inset
-distance away from each plot edge, along the x-axis and y-axis,
+\item{x_inset, y_inset}{\code{grid::unit}, default 2 lines each, used
+when \code{legend_style="grid"} to position the legend relative to \code{x},
+useful when positioning the legend near the edge \code{x="bottomleft"}.
+The inset controls distance from the plot edge, along the x- and y-axes,
 respectively. For example \code{x_inset=grid::unit(2, "lines")} will
 place the legend table 2 character lines (which are defined by
 line height for typical character size) away from the left or
-right edge of the plot. Any valid \code{grid::unit} can be used, however
-using \code{"lines"} units provides some consistent width rather
-than using \code{"npc"} in terms of fraction of overall plot width
-or height.}
+right edge of the plot. Any valid \code{grid::unit} can be used.
+Note that the metric is "plot edge", and the plot is fixed 1:1 aspect,
+so for wide plot devices a negative \code{x_inset} may be used to nudge
+the legend outside the typical plot boundary.}
 
 \item{font_cex}{\code{numeric} adjustment to default font sizes. The default
 font size with \code{legend_style="grid"} uses a 12 point font, so to adjust
@@ -153,19 +180,20 @@ to a specific font size like 8 points, use: \code{font_cex=8/12}}
 and is used in \code{fontfamilies} by default. However \code{fontfamilies}
 takes priority when defined.}
 
-\item{fontfamilies}{\code{list} with named elements: \code{"overlap"}, \code{"count"},
-\code{"signed"}, to allow a custom font for each element of the legend.
-This argument is also used by \code{assemble_venndir_label()}.
+\item{fontfamilies}{\code{list} with named elements
+to allow a custom font for each element of the legend, consistent
+with usage by \code{assemble_venndir_label()}.
 \itemize{
-\item The "overlap" font is used for set names, and column headers.
-Column headers are currently always bold.
-\item Note that "overlap" is used for \code{"Size"} and \code{"Percent"} columns, and
-when \code{combine_size=TRUE} the signed counts are in the same cell
-and therefore use the same font.
-\item When \code{combine_size=FALSE} the signed counts use "signed".
+\item \code{"overlap"}: used for set labels and column headers,
+and column headers are currently always bold font.
+\item \code{"count"}: used for main counts in "Size", and percentage in
+"Percentage" when displayed.
+\item \code{"signed"}: used for signed counts, when shown and when
+\code{combine_size=FALSE}, otherwise the signed labels are combined
+with count labels and they re-use the same font as \code{"count"} above.
 }}
 
-\item{table_theme}{\code{list} of theme parameters as described in
+\item{table_theme}{\code{list} default NULL, optional theme as described in
 \code{gridExtra::tableGrob()}, and \code{gridExtra::ttheme_default()}.
 When supplied, the \code{font_cex} argument is ignored.
 The \code{list} components include:
@@ -178,25 +206,26 @@ The \code{list} components include:
 within each cell
 }}
 
-\item{draw_legend}{\code{logical} indicating whether to draw the resulting
-legend. Because this function is in development, the \code{legend_style="grid"}
-seems to be preferred, however it may be useful to return the
-\code{grob} object for manipulation before rendering inside the active
-plot. In that case, use arguments: \verb{legend_style="grid", draw_legend=FALSE}.}
+\item{draw_legend}{\code{logical}, default TRUE, whether to draw the resulting
+legend. When \code{FALSE} the data is returned based upon \code{legend_style},
+when \code{legend_style="grid"} it returns a grid \code{grob}, otherwise
+it returns \code{data.frame}.}
 
-\item{alias}{\code{character} vector with optional set aliases, experimental
-feature to allow referring to entries in \code{setlist} by shorter aliases.
-Note that \code{names(alias)} must also match \code{names(setlist)}.
-Note: The argument \code{labels} is more likely to be useful, since
-the original call to \code{venndir()} should use \code{setlist} with aliased
-names, and expanded labels would be provided separately.}
+\item{alias}{\code{character}, default NULL, optional set aliases,
+intended to add a new first column to the legend with these
+aliases. Useful to display a short label in the legend table,
+while also supplying a longer label via \code{names(setlist)}
+or \code{labels}.
+This argument differs from \code{labels} in that \code{labels} replaces
+the \code{names(setlist)} in the legend table with \code{labels}.
+However, \code{alias} adds a new column to the table as column 1.}
 
-\item{labels}{\code{character} vector with optional set labels, experimental
-feature to supply a longer label associated with each entry in \code{setlist}.
-Note that \code{names(labels)} must also match \code{names(setlist)}.
-Note: The most useful workflow would be to assign short aliases to
-\code{names(setlist)} when calling \code{venndir()}, then use the original long
-label names as argument \code{labels} here.}
+\item{labels}{\code{character} default NULL, optional custom labels to
+display in place of \code{names(setlist)} in the legend table.
+Note: \code{names(labels)} must also match \code{names(setlist)}.
+This argument differs from \code{labels} in that \code{labels} replaces
+the \code{names(setlist)} in the legend table with \code{labels}.
+However, \code{alias} adds a new column to the table as column 1.}
 
 \item{legend_padding}{\code{numeric} or \code{grid::unit} used to define padding for
 each table cell. This value is only used when \code{table_theme} is not
@@ -218,9 +247,7 @@ legend \code{grob} object is returned which can then be manipulated
 before rendering.
 }
 \description{
-Add optional legend to venndir figures (developmental). This function
-is being evaluated and developed, and will very likely change
-again in an upcoming release.
+Add legend to venndir figure
 }
 \details{
 Note this function is experimental and is under active development. The
@@ -253,6 +280,12 @@ vo <- venndir(setlist)
 # move to different corner
 vo <- venndir(setlist, legend_x="bottomleft")
 
+# add alias column
+vo <- venndir(setlist,
+   legend_labels=setNames(paste0("Items detected in ", LETTERS[1:3]),
+      names(setlist)),
+   alias=setNames(LETTERS[1:3], names(setlist)))
+
 # turn off the default legend
 vo <- venndir(setlist, draw_legend=FALSE)
 venndir_legender(setlist=setlist,
@@ -262,20 +295,54 @@ venndir_legender(setlist=setlist,
 # test multi-line labels
 names(setlist) <- c("Group B-<br>Group A",
    "Group C-<br>\nGroup B",
-   "Group_C-<br>\nGroupA")
+   "Group C-<br>\nGroup A")
 vo <- venndir(setlist,
    draw_legend=FALSE,
+   font_cex=1.3,
+   fontfamily="Arial",
+   expand_fraction=c(-0.1, 0.4, -0.1, -0.1),
    show_segments=FALSE)
 venndir_legender(setlist=setlist,
    venndir_output=vo,
+   font_cex=1.3,
    x="bottomleft")
-
-# Same as above, showing how to render the legend_grob.
-# This method also "hides" the column headers.
+   
+# some common customizations
 vo <- venndir(setlist,
-   show_segments=FALSE,
    draw_legend=FALSE,
-   font_cex=c(1, 1, 0.5, 0.5))
+   expand_fraction=c(0.2, 0.2, 0.2, 0.2)*3,
+   font_cex=0.7,
+   fontfamily="Arial")
+venndir_legender(vo,
+   legend_headers=c(Set="Comparison",
+      Size="Counts (Signed Counts)"),
+   legend_color_style=c("nofill", "blackborder"),
+   x="bottomleft")
+venndir_legender(vo,
+   combine_size=FALSE,
+   legend_headers=c(Set="Comparison",
+      Size="Counts", Sign="(Signed Counts)"),
+   legend_color_style=c("nofill", "blackborder"),
+   x="bottomright")
+venndir_legender(vo,
+   combine_size=FALSE,
+   combine_sign=FALSE,
+   legend_headers=c(Set="Comparison",
+      Size="Counts", Sign="(Signed Counts)"),
+   legend_color_style=c("nofill", "blackborder"),
+   x="topright")
+venndir_legender(vo,
+   legend_percent=TRUE,
+   legend_headers=c(Set="Comparison",
+   Percentage="Pct.",
+      Size="Counts", Sign="(Signed Counts)"),
+   legend_color_style=c("nofill", "blackborder"),
+   x="topleft")
+
+# Example showing how to render the legend_grob
+# which may offer some flexibility.
+vo <- venndir(setlist,
+   draw_legend=FALSE)
 legend_grob <- venndir_legender(setlist=setlist,
    venndir_output=vo,
    draw_legend=FALSE,

@@ -1,39 +1,77 @@
 # TODO for venndir
 
+## 10mar2025
+
+* DONE. Make `venndir_legender()` title labels customizable.
+* Partial. Add legend to `textvenn()`. Capability is there, not included
+into the function yet. Want to add color.
+* Consider `venndir_options()` as mechanism to adjust default values.
+* Consider method to convert `signed_overlaps()` to setlist.
+* Consider helper function `is_signed()` to review `list` input.
+* Consider long-term approach to `label_fill()` that more accurately
+fits/resizes/positions labels into the available space. Similar to
+however wordcloud tools work.
+
+## 05mar2025
+
+* Consider ggplot2
+
+   * perhaps new geoms (JamPolygon compatibility)
+   * potential ability to use `ggrepel`
+
+* Consider option for shadowText, `ggshadowtext` for clarity of text
+
+* Consider small, "logo-size" Venn graphic, simplified to use in
+smaller schematics, insets, or `gt` tables similar to sparklines.
+See `gtExtras` package for example sparklines. Perhaps venndir there?
+* Consider: Filling polygon by color to indicate % concordance?
+Similar to using `show_items="sign"` except proper area fill.
+
+## 24jan2025
+
+* Fancy ideas for item labeling. Problem: Sometimes with gene symbols,
+most genes are short "APOE", "MAP3K1", but others are "ENSMUSG00000141751".
+Consider strategy to handle "long strings".
+
+   1. Define "long string"
+   
+      * multiple words?
+      * more than x-fold `nchar()` character length than median length?
+      * more than fixed `nchar()` character length, and/or number of words?
+
+   2. Strategies to handle
+
+      * shrink the font size, proportional to string length.
+      * For long item strings, use a narrow font. Might handle 2-fold effects.
+      * Consider word wrap, only useful for multi-words. Or hyphenated?
+      * Consider option to truncate after max `nchar()` or max words.
+
+## 17jan2025
+
+* Consider option not to merge count and outside set labels, particularly
+when the count label is placed outside. Currently the counts for "A" are
+placed underneath set label "A" when it appears outside. This grouping
+makes sense sometimes, but may not make sense with proportional labels,
+especially when the set label is manually nudged in the figure.
+
+## 13jan2025
+
+* Implement specific methods to handle DEG results as input
+
+   * DESeq2 "hits"
+   * limma-voom hits - either by `limma::topTable()`
+
 ## 10jan2025
 
-* Further refine label spacing. Currently assembles multiple gtables,
+* DONE. Further refine label spacing. Currently assembles multiple gtables,
 however the outer buffers add, making the gap between label types too large.
 Strategies to try:
 
-   * More clearly define expected output:
-   
-      * `label_borders$overlap` - defines buffer between overlap label lines,
-      and the buffer around the overall label.
-      When overlap is not used for the label, for now use the count buffer,
-      so that its buffer will scale properly with respect to its font size.
-      * `label_borders$count` - defines buffer between count label lines.
-      Also defines outer buffer when overlap label is not present.
-      * `label_borders$signed` - defines buffer between signed label lines.
-      When the overlap and count labels are not present, it should probably
-      still use the count buffer, but could use the signed buffer.
-      
-   * `gtable::gtable_add_row_space()`, `gtable::gtable_add_padding()`
-   instead of applying a buffer around each row.
-   Confirm it adds spacing between rows, and separately around the set.
-   
-      * For each label type (overlap, count, signed), add label a row.
-      * For `template="tall"` append rows using rbind, then
-      add row spacing, where spacing between overlap->count uses overlap,
-      and count->signed uses count sizing.
-      * For `template="wide"` append count,signed using cbind, then add
-      column spacing using the count sizing. Then append overlap to counts
-      with rbind, and use row spacing where overlap->counts uses overlap sizing.
+   * DONE. `gtable::gtable_add_row_space()`, `gtable::gtable_add_padding()` -
+   more clearly apply spacing between multi-rows of the same label type,
+   spacing between rows of different label types, then padding around the
+   grouped label.
 
-   * `gridExtra::grid.arrange()` potential alternative to assemble gtable
-   in one shot, instead of gtable pieces which are then assembled?
-   Unclear whether it can arrange grobs that are not full-page.
-   * Consider method to adjust buffer sizes relative to the font size.
 
 ## 09dec2024
 

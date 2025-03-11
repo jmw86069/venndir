@@ -4,7 +4,7 @@
 \alias{plot.JamPolygon}
 \title{Plot JamPolygon object}
 \usage{
-\method{plot}{JamPolygon}(
+plot.JamPolygon(
   x,
   y,
   xlim = NULL,

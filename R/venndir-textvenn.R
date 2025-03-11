@@ -77,6 +77,11 @@
 #' # basic text Venn with directionality
 #' textvenn(setlist, sets=c(1,2,3), "each")
 #' 
+#' # simple way to show legend
+#' venndir_legender(textvenn(setlist, overlap_type="each"),
+#'    combine_size=FALSE,
+#'    legend_style="data.frame")
+#' 
 #' @export
 textvenn <- function
 (setlist,

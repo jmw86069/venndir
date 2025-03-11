@@ -57,8 +57,7 @@ of counts and signed counts when both are defined:
 \item{fontfamily}{\code{character} default "Helvetica" used as convenient
 default for \code{fontfamilies}.}
 
-\item{fontfamilies, fontsizes, fontfaces, fontcolors, label_spacing}{\code{list}
-with three named elements: "overlap", "count", "signed", providing
+\item{fontfamilies, fontsizes, fontfaces, fontcolors, label_spacing, label_padding}{\code{list} with three named elements: "overlap", "count", "signed", providing
 one or more values for each type of label. When multiple values
 are provided for a label type, these values are recycled to the
 number of values.
@@ -66,10 +65,12 @@ number of values.
 \item For example \code{signed_labels=c("^ 21", "v 24")}
 and \code{fontcolors=list(signed=c("red", "blue", "grey"))} would use
 \code{c("red", "blue")} for these two labels.
-\item The \code{label_spacing} values refer to the border "buffer whitespace"
-between adjacent labels for each type, line by line.
-By default: 1mm between signed labels; 2mm between count labels;
-3mm between overlap labels.
+\item \code{label_spacing} defines the line-to-line spacing for each type of
+label, used when there are multiple lines of text.
+\item \code{label_padding} defines the buffer "padding" around the final label,
+whether the label is single-line or multiple-line.
+Concise labels can be created with small label_spacing, but slightly
+larger label_padding.
 }}
 
 \item{do_frame}{\code{logical} default TRUE, indicating whether to define

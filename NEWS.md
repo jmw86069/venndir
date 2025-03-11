@@ -1,3 +1,14 @@
+# venndir 0.0.49.900
+
+## Changes
+
+* Now requires the CRAN jamba, version 1.0.0 or higher. Woot.
+* `venndir_legender()`
+
+   * New argument `legend_headers` allows custom legend header labels.
+   * Output to `legend_style="data.frame"` is now consistent.
+   * Added tests to cover most custom options.
+
 # venndir 0.0.48.900
 
 * bumped `colorjam>=0.0.30.900` to pick up new color blending for
