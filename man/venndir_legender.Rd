@@ -37,9 +37,10 @@ venndir_legender(
   draw_legend = TRUE,
   alias = NULL,
   labels = NULL,
-  legend_padding = 3,
+  legend_padding = 2,
   set_suffix = "",
   vp = NULL,
+  fg_fun = marquee_text_grob,
   verbose = FALSE,
   ...
 )
@@ -227,8 +228,9 @@ This argument differs from \code{labels} in that \code{labels} replaces
 the \code{names(setlist)} in the legend table with \code{labels}.
 However, \code{alias} adds a new column to the table as column 1.}
 
-\item{legend_padding}{\code{numeric} or \code{grid::unit} used to define padding for
-each table cell. This value is only used when \code{table_theme} is not
+\item{legend_padding}{\code{numeric} or \code{grid::unit}, default 5, padding for
+each table cell. This value is also adjusted by \code{font_cex}.
+This value is only used when \code{table_theme} is not
 provided.}
 
 \item{set_suffix}{\code{character} string (default \code{""}) used as optional
@@ -300,7 +302,7 @@ vo <- venndir(setlist,
    draw_legend=FALSE,
    font_cex=1.3,
    fontfamily="Arial",
-   expand_fraction=c(-0.1, 0.4, -0.1, -0.1),
+   expand_fraction=c(-0.1, 0.4, -0.1, 0.1),
    show_segments=FALSE)
 venndir_legender(setlist=setlist,
    venndir_output=vo,
@@ -317,12 +319,14 @@ venndir_legender(vo,
    legend_headers=c(Set="Comparison",
       Size="Counts (Signed Counts)"),
    legend_color_style=c("nofill", "blackborder"),
+   font_cex=0.8,
    x="bottomleft")
 venndir_legender(vo,
    combine_size=FALSE,
    legend_headers=c(Set="Comparison",
       Size="Counts", Sign="(Signed Counts)"),
    legend_color_style=c("nofill", "blackborder"),
+   font_cex=0.8,
    x="bottomright")
 venndir_legender(vo,
    combine_size=FALSE,
@@ -330,6 +334,7 @@ venndir_legender(vo,
    legend_headers=c(Set="Comparison",
       Size="Counts", Sign="(Signed Counts)"),
    legend_color_style=c("nofill", "blackborder"),
+   font_cex=0.8,
    x="topright")
 venndir_legender(vo,
    legend_percent=TRUE,
@@ -337,6 +342,7 @@ venndir_legender(vo,
    Percentage="Pct.",
       Size="Counts", Sign="(Signed Counts)"),
    legend_color_style=c("nofill", "blackborder"),
+   font_cex=0.8,
    x="topleft")
 
 # Example showing how to render the legend_grob
@@ -369,18 +375,11 @@ vo <- venndir(setlist,
    show_segments=FALSE,
    draw_legend=FALSE)
 venndir_legender(venndir_output=vo,
-   font_cex=0.8,
+   font_cex=1,
    setlist=setlist,
    labels=jamba::nameVector(
       paste0("This is set ", LETTERS[1:5]),
       names(setlist)))
-
-# Venn with no border, and more transparent colors
-vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
-vo124@jps@polygons$border.lwd <- 0.1
-vo124@jps@polygons$innerborder.lwd <- 0.1
-vor124 <- render_venndir(vo124, draw_legend=FALSE)
-venndir_legender(setlist=setlist, venndir_output=vo124)
 
 }
 \seealso{

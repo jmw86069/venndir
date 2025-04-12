@@ -162,8 +162,9 @@
 #'    This argument differs from `labels` in that `labels` replaces
 #'    the `names(setlist)` in the legend table with `labels`.
 #'    However, `alias` adds a new column to the table as column 1.
-#' @param legend_padding `numeric` or `grid::unit` used to define padding for
-#'    each table cell. This value is only used when `table_theme` is not
+#' @param legend_padding `numeric` or `grid::unit`, default 5, padding for
+#'    each table cell. This value is also adjusted by `font_cex`.
+#'    This value is only used when `table_theme` is not
 #'    provided.
 #' @param set_suffix `character` string (default `""`) used as optional
 #'    suffix, and previously used `":"` but was changed to `""`.
@@ -205,7 +206,7 @@
 #'    draw_legend=FALSE,
 #'    font_cex=1.3,
 #'    fontfamily="Arial",
-#'    expand_fraction=c(-0.1, 0.4, -0.1, -0.1),
+#'    expand_fraction=c(-0.1, 0.4, -0.1, 0.1),
 #'    show_segments=FALSE)
 #' venndir_legender(setlist=setlist,
 #'    venndir_output=vo,
@@ -222,12 +223,14 @@
 #'    legend_headers=c(Set="Comparison",
 #'       Size="Counts (Signed Counts)"),
 #'    legend_color_style=c("nofill", "blackborder"),
+#'    font_cex=0.8,
 #'    x="bottomleft")
 #' venndir_legender(vo,
 #'    combine_size=FALSE,
 #'    legend_headers=c(Set="Comparison",
 #'       Size="Counts", Sign="(Signed Counts)"),
 #'    legend_color_style=c("nofill", "blackborder"),
+#'    font_cex=0.8,
 #'    x="bottomright")
 #' venndir_legender(vo,
 #'    combine_size=FALSE,
@@ -235,6 +238,7 @@
 #'    legend_headers=c(Set="Comparison",
 #'       Size="Counts", Sign="(Signed Counts)"),
 #'    legend_color_style=c("nofill", "blackborder"),
+#'    font_cex=0.8,
 #'    x="topright")
 #' venndir_legender(vo,
 #'    legend_percent=TRUE,
@@ -242,6 +246,7 @@
 #'    Percentage="Pct.",
 #'       Size="Counts", Sign="(Signed Counts)"),
 #'    legend_color_style=c("nofill", "blackborder"),
+#'    font_cex=0.8,
 #'    x="topleft")
 #' 
 #' # Example showing how to render the legend_grob
@@ -274,18 +279,11 @@
 #'    show_segments=FALSE,
 #'    draw_legend=FALSE)
 #' venndir_legender(venndir_output=vo,
-#'    font_cex=0.8,
+#'    font_cex=1,
 #'    setlist=setlist,
 #'    labels=jamba::nameVector(
 #'       paste0("This is set ", LETTERS[1:5]),
 #'       names(setlist)))
-#' 
-#' # Venn with no border, and more transparent colors
-#' vo124 <- venndir(setlist, sets=c(1, 2, 4), poly_alpha=0.4, do_plot=FALSE)
-#' vo124@jps@polygons$border.lwd <- 0.1
-#' vo124@jps@polygons$innerborder.lwd <- 0.1
-#' vor124 <- render_venndir(vo124, draw_legend=FALSE)
-#' venndir_legender(setlist=setlist, venndir_output=vo124)
 #' 
 #' @export
 venndir_legender <- function
@@ -327,9 +325,10 @@ venndir_legender <- function
  draw_legend=TRUE,
  alias=NULL,
  labels=NULL,
- legend_padding=3,
+ legend_padding=2,
  set_suffix="",
  vp=NULL,
+ fg_fun=marquee_text_grob,
  verbose=FALSE,
  ...)
 {
@@ -962,23 +961,24 @@ venndir_legender <- function
             gridlegend_df_use[[icol]],
             cell_padding[[2]]);
       }
+      use_padding <- grid::unit(c(1, 1) * font_cex, "mm");
       if (length(table_theme) == 0) {
          use_hjust1 <- ifelse(
             grepl("Size$|Percent", colnames(gridlegend_df_use)), 1, 0)
          use_hjust <- rep(use_hjust1,
             each=nrow(gridlegend_df_use))
+         # adjust legend_padding by font_cex, convert to mm
          if (length(legend_padding) == 0) {
-            legend_padding <- c(3, 3);
-         }
-         use_padding <- grid::unit(c(3, 3), "mm");
-         if (grid::is.unit(legend_padding)) {
-            use_padding <- legend_padding;
+            legend_padding <- formals(venndir_legender)$legend_padding;
          }
          if (is.numeric(legend_padding)) {
             legend_padding <- rep(legend_padding, length.out=2);
+            legend_padding <- legend_padding * font_cex;
             use_padding <- grid::unit(legend_padding, "mm");
+         } else if (grid::is.unit(legend_padding)) {
+            use_padding <- legend_padding;
          }
-         
+
          table_theme <- gridExtra::ttheme_default(
             base_size=12 * font_cex,
             base_family=fontfamilies$overlap,
@@ -1002,6 +1002,11 @@ venndir_legender <- function
          cell_padding=cell_padding)
 
       # create the tableGrob
+      if (length(fg_fun) > 0 && inherits(fg_fun, "function")) {
+         table_theme$core$fg_fun <- fg_fun;
+         table_theme$colhead$fg_fun <- fg_fun;
+      }
+      # legend_grob <- jamba::call_fn_ellipsis(gridExtra::tableGrob,
       legend_grob <- gridExtra::tableGrob(
          rows=NULL,
          theme=table_theme,
@@ -1017,6 +1022,13 @@ venndir_legender <- function
                   ldf$l == col &
                   ldf$name == name)
          }
+         # enforce consistent row heights
+         # otherwise the Total without arrows can be shorter than others
+         rowheights <- legend_grob$heights;
+         maxrowheight <- max(rowheights);
+         newheights <- do.call(grid::unit.c,
+            rep(list(maxrowheight), length(rowheights)));
+         legend_grob$heights <- newheights;
          # custom function to update existing gpar values
          update_gpar_values <- function
          (gp,
@@ -1028,8 +1040,10 @@ venndir_legender <- function
             }
             return(gp)
          }
+         
          # adjust the top row
          for (icol in seq_len(ncol(gridlegend_df_use))) {
+            # header background fill
             ind <- find_cell(legend_grob, 1, icol, "colhead-bg")
             use_hjust <- 0;
             if (icol == ncol(gridlegend_df_use)) {
@@ -1037,25 +1051,38 @@ venndir_legender <- function
                use_hjust <- 1;
             }
             if (length(ind) > 0) {
+               # manually adjust some attributes
                legend_grob$grobs[ind][[1]][["gp"]] <- update_gpar_values(
                   gp=legend_grob$grobs[ind][[1]][["gp"]],
                   gp_list=list(fill=header_bg,
                      col=header_border,
                      lwd=lwd))
-               # legend_grob$grobs[ind][[1]][["gp"]] <- grid::gpar(
-               #    fill=header_bg,
-               #    col=header_border,
-               #    lwd=lwd)
-               # legend_grob$grobs[ind][[1]][["gp"]] <- gpar_vlist;
             }
+            # header foreground style
             ind <- find_cell(legend_grob, 1, icol, "colhead-fg")
             if (length(ind) > 0) {
-               legend_grob$grobs[ind][[1]][["gp"]] <- update_gpar_values(
-                  gp=legend_grob$grobs[ind][[1]][["gp"]],
-                  gp_list=list(
-                     col=header_color))
-               # legend_grob$grobs[ind][[1]][["gp"]] <- grid::gpar(
-               #    col=header_color)
+               if (FALSE %in% "textGrob") {
+                  # textGrob only
+                  legend_grob$grobs[ind][[1]][["gp"]] <- update_gpar_values(
+                     gp=legend_grob$grobs[ind][[1]][["gp"]],
+                     gp_list=list(
+                        col=make_color_contrast(header_color, header_bg)))
+               } else if (TRUE) {
+                  # marquee grob only
+                  # adjust vertical alignment for marquee
+                  # legend_grob$grobs[ind][[1]][["y"]] <- grid::unit(0.12, "npc")
+                  # adjust based upon use_padding
+                  legend_grob$grobs[ind][[1]][["y"]] <- use_padding[1] * 1/2;
+                  # font color
+                  legend_grob$grobs[ind][[1]][["text"]][["color"]] <- rep(
+                     make_color_contrast(header_color, header_bg),
+                     length.out=length(
+                        legend_grob$grobs[ind][[1]][["text"]][["color"]]));
+                  legend_grob$grobs[ind][[1]][["shape"]][["col"]] <- rep(
+                     make_color_contrast(header_color, header_bg),
+                     length.out=length(
+                        legend_grob$grobs[ind][[1]][["shape"]][["col"]]));
+               }
             }
          }
          # iterate each row
@@ -1063,6 +1090,8 @@ venndir_legender <- function
          for (irow in seq_len(nrow(legend_df))) {
             for (icol in seq_len(ncol(gridlegend_df_use))) {
                icolname <- colnames(gridlegend_df_use)[icol];
+               
+               # iterate foreground
                ind <- find_cell(legend_grob, irow + 1, icol, "core-fg")
                for (ind0 in unique(ind)) {
                   use_fontfamily <- fontfamilies$overlap;
@@ -1071,17 +1100,44 @@ venndir_legender <- function
                   } else if (any(grepl("Sign|^[ ]*$", icolname))) {
                      use_fontfamily <- fontfamilies$signed;
                   }
-                  # Todo: Consider substituting marquee() to handle arrows?
-                  legend_grob$grobs[ind0][[1]][["gp"]] <- update_gpar_values(
-                     gp=legend_grob$grobs[ind0][[1]][["gp"]],
-                     gp_list=list(
-                        # fontface="bold",
-                        fontfamily=use_fontfamily,
-                        col=jamba::setTextContrastColor(legend_df$color[irow])))
+                  
+                  # manually adjust some attributes
+                  if (FALSE %in% "textGrob") {
+                     # textGrob type only
+                     legend_grob$grobs[ind0][[1]][["gp"]] <- update_gpar_values(
+                        gp=legend_grob$grobs[ind0][[1]][["gp"]],
+                        gp_list=list(
+                           fontfamily=use_fontfamily,
+                           col=jamba::setTextContrastColor(
+                              legend_df$color[irow])))
+                  } else if (TRUE) {
+                     # marquee object
+                     # adjust vertical alignment for marquee
+                     # legend_grob$grobs[ind0][[1]][["y"]] <- grid::unit(0.12, "npc")
+                     # adjust based upon use_padding
+                     legend_grob$grobs[ind0][[1]][["y"]] <- use_padding[1] * 1/2;
+                     # font color
+                     legend_grob$grobs[ind0][[1]][["text"]][["color"]] <- rep(
+                        jamba::setTextContrastColor(legend_df$color[irow]),
+                        length.out=length(
+                           legend_grob$grobs[ind0][[1]][["text"]][["color"]]));
+                     # fontfamily
+                     legend_grob$grobs[ind0][[1]][["text"]][["family"]] <- rep(
+                        use_fontfamily,
+                        length.out=length(
+                           legend_grob$grobs[ind0][[1]][["text"]][["family"]]));
+                     # shape font color
+                     legend_grob$grobs[ind0][[1]][["shape"]][["col"]] <- rep(
+                        jamba::setTextContrastColor(legend_df$color[irow]),
+                        length.out=length(
+                           legend_grob$grobs[ind0][[1]][["shape"]][["col"]]));
+                  }
                   # legend_grob$grobs[ind0][[1]][["gp"]] <- grid::gpar(
                   #    # fontface="bold",
                   #    col=jamba::setTextContrastColor(legend_df$color[irow]))
                }
+               
+               # iterate background
                ind <- find_cell(legend_grob, irow + 1, icol, "core-bg")
                for (ind0 in unique(ind)) {
                   if (verbose) {

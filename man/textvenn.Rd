@@ -111,13 +111,13 @@ textvenn(setlist, sets=c(1,2,3), overlap_type="each")
 # larger number of items
 setlist <- make_venn_test(n_items=1000000, sizes=200000, do_signed=TRUE)
 # text Venn with directionality
-textvenn(setlist, sets=c(1,2,3), "agreement")
+textvenn(setlist, sets=c(1,4), "agreement")
 
 # basic text Venn with directionality
-textvenn(setlist, sets=c(1,2,3), "each")
+textvenn(setlist, sets=c(3,4), "each")
 
 # simple way to show legend
-venndir_legender(textvenn(setlist, overlap_type="each"),
+venndir_legender(textvenn(setlist, sets=c(1,2,4), overlap_type="overlap"),
    combine_size=FALSE,
    legend_style="data.frame")
 

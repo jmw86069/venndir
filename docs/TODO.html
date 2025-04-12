@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.50.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,26 +39,127 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_12apr2025">12apr2025<a class="anchor" aria-label="anchor" href="#id_12apr2025"></a></h2>
+<ul><li><p>Signed labeling: Hide concordance/agreement for singlets, improve method to curate signs.</p></li>
+<li><p>DONE. Require marquee&gt;=1.0.0 in order to avoid the rare R crash on MacOS when using fonts whose font file path includes a space.</p></li>
+<li>
+<p>MOSTLY COMPLETE. Consider transitioning all text grobs to use types:</p>
+<ul><li>
+<code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code>, <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code>, <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>
+</li>
+<li>Consider theming or argument to specify which type of grob to use.</li>
+<li>Only marquee guarantees Unicode arrows, but lacks enhanced markdown in <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> such as css styling, and inserted images.</li>
+</ul></li>
+<li><p>DONE. Consider wrapper for <code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> as drop-in replacement for <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code>, specifically to use with <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::tableGrob()</a></code></p></li>
+<li><p>Migrate item text rendering to permit marquee, deprecating gridtext.</p></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_04apr2025">04apr2025<a class="anchor" aria-label="anchor" href="#id_04apr2025"></a></h2>
+<ul><li><p>Consider new <code>show_labels</code> option “T” for Total count per group, Dimitris for example used “Set A (1,234)”</p></li>
+<li>
+<p>DONE. Consider dependency <code>marquee(&gt;=1.0.0)</code></p>
+<ul><li>It requires <code>freetype2</code> (libfreetype) which may not be available conveniently on all systems.</li>
+<li>Otherwise it could resolve “all” issues with Unicode characters, using internal font substitutions where necessary.</li>
+<li>Potential drop-in replacement for: <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code>
+</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_28mar2025">28mar2025<a class="anchor" aria-label="anchor" href="#id_28mar2025"></a></h2>
+<ul><li>
+<p>PARTIAL. Fix issue with <code>fontfamily</code> sometimes not displaying Unicode arrows.</p>
+<ul><li>Default <code>fontfamily="sans"</code> does not work for default MacOS on external device (non-ragg). “Helvetica” does not work on linux.</li>
+<li>Consider dependency ‘systemfonts&gt;=1.1.0’, test whether it automatically upgrades the Unicode glyph matching.</li>
+<li>On MacOS R-4.3.3 using ‘r-oldrel’ the binary packages are marquee-0.1.0, systemfonts-1.1.0 which are old, before the crash fix (spaces in font filenames cause segfault and crash R session). Installing from source fails, it requires an updated build flag: <code>withr::with_makevars(c(OBJCXXFLAGS = "${CXX17STD}"), install.packages('marquee', type='source'))</code> However it still fails to find the conda-installed <code>libfreetype.6.dylib</code>, unknown reason.</li>
+</ul></li>
+<li>
+<p><code><a href="reference/venndir.html">venndir()</a></code></p>
+<ul><li>DONE. Change defaults back to <code>innerborder.lwd=0.5</code>, <code>outerborder.lwd=0.5</code>, borders should be less visibly intrusive.</li>
+<li>Consider global option “lwd” that effectively scales existing line widths, as convenient way to adjust lines.</li>
+<li>DONE. Make <code>fontfamily</code> work by default for all common devices, meaning the upArrow and downArrow unicode should be properly displayed. Currently <code>fontfamily="sans"</code> MacOS displays [] empty boxes for arrows when not using ragg RStudio graphics device. Ugh.</li>
+<li>
+<code>overlap_type="agreement"</code> should hide the signed counts for individual (non-overlapping) sets. It is not meaningful to say hits are in agreement when it only involves one set.</li>
+<li>Small thing: Red + blue = purple. The purple needs improvement.</li>
+<li>
+<code>show_labels</code> should be vectorized, to apply to each overlap in order. (This is not as intuitive as you’d think since the sets appear in label_df, then the overlap sets.)</li>
+</ul></li>
+<li>
+<p>Improve <code><a href="reference/make_color_contrast.html">make_color_contrast()</a></code></p>
+<ul><li>Fix <code>C_floor</code>. Figure out why output colors are desaturated.</li>
+</ul></li>
+<li>
+<p>Improve <code><a href="reference/curate_venn_labels.html">venndir::curate_venn_labels()</a></code></p>
+<ul><li>Make default <code>curate_df</code> more visible. Perhaps a package object?</li>
+</ul></li>
+<li>
+<p>Consider “Upset” export to UpSetR, and/or the ComplexHeatmap implementation.</p>
+<ul><li>Bonus points for figuring out if it’s possible to include sign, for example in ComplexHeatmap can the bars be stacked, colorized by sign?</li>
+</ul></li>
+<li>
+<p>Consider some type of “styling” object or system, with overall settings:</p>
+<ul><li>innerborder, innerborder.lwd, outerborder, outerborder.lwd, border, border.lwd,</li>
+<li>template (tall/wide),</li>
+<li>fontfamily/fontfamilies, fontsizes, fontfaces, fontcolors, label_spacing (list), label_padding (list),</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_10mar2025">10mar2025<a class="anchor" aria-label="anchor" href="#id_10mar2025"></a></h2>
+<ul><li>DONE. Make <code><a href="reference/venndir_legender.html">venndir_legender()</a></code> title labels customizable.</li>
+<li>Partial. Add legend to <code><a href="reference/textvenn.html">textvenn()</a></code>. Capability is there, not included into the function yet. Want to add color.</li>
+<li>Consider <code>venndir_options()</code> as mechanism to adjust default values.</li>
+<li>Consider method to convert <code><a href="reference/signed_overlaps.html">signed_overlaps()</a></code> to setlist.</li>
+<li>Consider helper function <code>is_signed()</code> to review <code>list</code> input.</li>
+<li>Consider long-term approach to <code>label_fill()</code> that more accurately fits/resizes/positions labels into the available space. Similar to however wordcloud tools work.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_05mar2025">05mar2025<a class="anchor" aria-label="anchor" href="#id_05mar2025"></a></h2>
+<ul><li>
+<p>Consider ggplot2</p>
+<ul><li>perhaps new geoms (JamPolygon compatibility)</li>
+<li>potential ability to use <code>ggrepel</code>
+</li>
+</ul></li>
+<li><p>Consider option for shadowText, <code>ggshadowtext</code> for clarity of text</p></li>
+<li><p>Consider small, “logo-size” Venn graphic, simplified to use in smaller schematics, insets, or <code>gt</code> tables similar to sparklines. See <code>gtExtras</code> package for example sparklines. Perhaps venndir there?</p></li>
+<li><p>Consider: Filling polygon by color to indicate % concordance? Similar to using <code>show_items="sign"</code> except proper area fill.</p></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_24jan2025">24jan2025<a class="anchor" aria-label="anchor" href="#id_24jan2025"></a></h2>
+<ul><li>
+<p>Fancy ideas for item labeling. Problem: Sometimes with gene symbols, most genes are short “APOE”, “MAP3K1”, but others are “ENSMUSG00000141751”. Consider strategy to handle “long strings”.</p>
+<ol style="list-style-type: decimal"><li>
+<p>Define “long string”</p>
+<ul><li>multiple words?</li>
+<li>more than x-fold <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar()</a></code> character length than median length?</li>
+<li>more than fixed <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar()</a></code> character length, and/or number of words?</li>
+</ul></li>
+<li>
+<p>Strategies to handle</p>
+<ul><li>shrink the font size, proportional to string length.</li>
+<li>For long item strings, use a narrow font. Might handle 2-fold effects.</li>
+<li>Consider word wrap, only useful for multi-words. Or hyphenated?</li>
+<li>Consider option to truncate after max <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar()</a></code> or max words.</li>
+</ul></li>
+</ol></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_17jan2025">17jan2025<a class="anchor" aria-label="anchor" href="#id_17jan2025"></a></h2>
+<ul><li>Consider option not to merge count and outside set labels, particularly when the count label is placed outside. Currently the counts for “A” are placed underneath set label “A” when it appears outside. This grouping makes sense sometimes, but may not make sense with proportional labels, especially when the set label is manually nudged in the figure.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_13jan2025">13jan2025<a class="anchor" aria-label="anchor" href="#id_13jan2025"></a></h2>
+<ul><li>
+<p>Implement specific methods to handle DEG results as input</p>
+<ul><li>DESeq2 “hits”</li>
+<li>limma-voom hits - either by <code><a href="https://rdrr.io/pkg/limma/man/toptable.html" class="external-link">limma::topTable()</a></code>
+</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_10jan2025">10jan2025<a class="anchor" aria-label="anchor" href="#id_10jan2025"></a></h2>
 <ul><li>
-<p>Further refine label spacing. Currently assembles multiple gtables, however the outer buffers add, making the gap between label types too large. Strategies to try:</p>
-<ul><li>
-<p>More clearly define expected output:</p>
-<ul><li>
-<code>label_borders$overlap</code> - defines buffer between overlap label lines, and the buffer around the overall label. When overlap is not used for the label, for now use the count buffer, so that its buffer will scale properly with respect to its font size.</li>
-<li>
-<code>label_borders$count</code> - defines buffer between count label lines. Also defines outer buffer when overlap label is not present.</li>
-<li>
-<code>label_borders$signed</code> - defines buffer between signed label lines. When the overlap and count labels are not present, it should probably still use the count buffer, but could use the signed buffer.</li>
-</ul></li>
-<li>
-<p><code><a href="https://gtable.r-lib.org/reference/gtable_add_space.html" class="external-link">gtable::gtable_add_row_space()</a></code>, <code><a href="https://gtable.r-lib.org/reference/gtable_add_padding.html" class="external-link">gtable::gtable_add_padding()</a></code> instead of applying a buffer around each row. Confirm it adds spacing between rows, and separately around the set.</p>
-<ul><li>For each label type (overlap, count, signed), add label a row.</li>
-<li>For <code>template="tall"</code> append rows using rbind, then add row spacing, where spacing between overlap-&gt;count uses overlap, and count-&gt;signed uses count sizing.</li>
-<li>For <code>template="wide"</code> append count,signed using cbind, then add column spacing using the count sizing. Then append overlap to counts with rbind, and use row spacing where overlap-&gt;counts uses overlap sizing.</li>
-</ul></li>
-<li><p><code><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">gridExtra::grid.arrange()</a></code> potential alternative to assemble gtable in one shot, instead of gtable pieces which are then assembled? Unclear whether it can arrange grobs that are not full-page.</p></li>
-<li><p>Consider method to adjust buffer sizes relative to the font size.</p></li>
+<p>DONE. Further refine label spacing. Currently assembles multiple gtables, however the outer buffers add, making the gap between label types too large. Strategies to try:</p>
+<ul><li>DONE. <code><a href="https://gtable.r-lib.org/reference/gtable_add_space.html" class="external-link">gtable::gtable_add_row_space()</a></code>, <code><a href="https://gtable.r-lib.org/reference/gtable_add_padding.html" class="external-link">gtable::gtable_add_padding()</a></code> - more clearly apply spacing between multi-rows of the same label type, spacing between rows of different label types, then padding around the grouped label.</li>
 </ul></li>
 </ul></div>
 <div class="section level2">
@@ -1026,7 +1127,7 @@
 <p>could provide a few common adjustment functions</p>
 <ul><li>word wrap: when label is too wide, it imposes word wrapping of whitespace</li>
 <li>shortener: when label is too wide, it crops and makes labels unique</li>
-<li>aliaser: assigns single values from <code>LETTERS</code> or <code><a href="https://rdrr.io/pkg/jamba/man/colNum2excelName.html" class="external-link">jamba::colNum2excelName()</a></code>
+<li>aliaser: assigns single values from <code>LETTERS</code> or <code><a href="https://jmw86069.github.io/jamba/reference/colNum2excelName.html" class="external-link">jamba::colNum2excelName()</a></code>
 </li>
 </ul></li>
 </ul></li>

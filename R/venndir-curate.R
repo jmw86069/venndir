@@ -168,14 +168,7 @@ curate_venn_labels <- function
       x <- gsub("^[ ]*|[ ]*$", "",
          jamba::cPaste(x_new, sep=""))
    }
-   
-   # 0.0.26.900: process using gsub() which can re-replace certain character
-   # for (i in seq_len(nrow(curate_df))) {
-   #    x <- gsub(curate_df[i,"from"],
-   #       curate_df[i,type],
-   #       x);
-   # }
-   
+
    if ("color" %in% type) {
       x <- gsub("^[ ]+|[ ]+$", "",
          gsub("[ ]+", " ", x));

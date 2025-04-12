@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.50.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,7 +176,7 @@ argument <code>sizes</code>, which takes priority over <code>min_size</code>, an
 <span class="r-in"><span>   min_size<span class="op">=</span><span class="fl">5</span>,</span></span>
 <span class="r-in"><span>   max_size<span class="op">=</span><span class="fl">25</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">set_im</span> <span class="op">&lt;-</span> <span class="fu"><a href="list2im_opt.html">list2im_opt</a></span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/pasteByRow.html" class="external-link">pasteByRow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">set_im</span><span class="op">)</span><span class="op">*</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/pasteByRow.html" class="external-link">pasteByRow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">set_im</span><span class="op">)</span><span class="op">*</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0_0_1 0_1_0 0_1_1 1_0_0 1_0_1 1_1_0 1_1_1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     9    12     5    10     3     5     1 </span>
@@ -185,7 +185,7 @@ argument <code>sizes</code>, which takes priority over <code>min_size</code>, an
 <span class="r-in"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu">make_venn_test</span><span class="op">(</span>n_items<span class="op">=</span><span class="fl">100</span>,</span></span>
 <span class="r-in"><span>   n_sets<span class="op">=</span><span class="fl">3</span>,</span></span>
 <span class="r-in"><span>   do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/sdim.html" class="external-link">sdim</a></span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/sdim.html" class="external-link">sdim</a></span><span class="op">(</span><span class="va">setlist</span><span class="op">)</span>;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       rows   class</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> set_A   32 numeric</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> set_B   16 numeric</span>
@@ -212,7 +212,7 @@ argument <code>sizes</code>, which takes priority over <code>min_size</code>, an
 <span class="r-out co"><span class="r-pr">#&gt;</span> set_A&amp;set_B&amp;set_C|1 1 1     1         1 1 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Familiar named overlap counts</span></span></span>
-<span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/nameVector.html" class="external-link">nameVector</a></span><span class="op">(</span><span class="va">sv1</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"count"</span>,<span class="st">"sets"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/nameVector.html" class="external-link">nameVector</a></span><span class="op">(</span><span class="va">sv1</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"count"</span>,<span class="st">"sets"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             set_A             set_B             set_C       set_A&amp;set_B </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                16                 7                 7                 8 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       set_A&amp;set_C       set_B&amp;set_C set_A&amp;set_B&amp;set_C </span>

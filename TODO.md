@@ -1,5 +1,94 @@
 # TODO for venndir
 
+## 12apr2025
+
+* Signed labeling: Hide concordance/agreement for singlets,
+improve method to curate signs.
+
+* DONE. Require marquee>=1.0.0 in order to avoid the rare R crash on MacOS when
+using fonts whose font file path includes a space.
+* MOSTLY COMPLETE. Consider transitioning all text grobs to use types:
+
+   * `marquee::marquee_grob()`, `grid::textGrob()`, `gridtext::richtext_grob()`
+   * Consider theming or argument to specify which type of grob to use.
+   * Only marquee guarantees Unicode arrows, but lacks enhanced markdown
+   in `gridtext::richtext_grob()` such as css styling, and inserted images.
+
+* DONE. Consider wrapper for `marquee::marquee_grob()` as drop-in
+replacement for `grid::textGrob()`, specifically to use with
+`gridExtra::tableGrob()`
+* Migrate item text rendering to permit marquee, deprecating gridtext.
+
+## 04apr2025
+
+* Consider new `show_labels` option "T" for Total count per group,
+Dimitris for example used "Set A (1,234)"
+* DONE. Consider dependency `marquee(>=1.0.0)`
+
+   * It requires `freetype2` (libfreetype) which may not be available
+   conveniently on all systems.
+   * Otherwise it could resolve "all" issues with Unicode characters,
+   using internal font substitutions where necessary.
+   * Potential drop-in replacement for: `grid::textGrob()`
+
+## 28mar2025
+
+* PARTIAL. Fix issue with `fontfamily` sometimes not displaying Unicode arrows.
+
+   * Default `fontfamily="sans"` does not work for default MacOS on
+   external device (non-ragg). "Helvetica" does not work on linux.
+   * Consider dependency 'systemfonts>=1.1.0', test whether it automatically
+   upgrades the Unicode glyph matching.
+   * On MacOS R-4.3.3 using 'r-oldrel' the binary packages are marquee-0.1.0,
+   systemfonts-1.1.0 which are old, before the crash fix (spaces in font
+   filenames cause segfault and crash R session).
+   Installing from source fails, it requires an updated build flag:
+   `withr::with_makevars(c(OBJCXXFLAGS = "${CXX17STD}"), install.packages('marquee', type='source'))`
+   However it still fails to find the conda-installed `libfreetype.6.dylib`,
+   unknown reason.
+
+* `venndir()`
+
+   * DONE. Change defaults back to `innerborder.lwd=0.5`, `outerborder.lwd=0.5`,
+   borders should be less visibly intrusive.
+   * Consider global option "lwd" that effectively scales existing
+   line widths, as convenient way to adjust lines.
+   * DONE. Make `fontfamily` work by default for all common devices,
+   meaning the upArrow and downArrow unicode should be properly
+   displayed.
+   Currently `fontfamily="sans"` MacOS displays [] empty boxes
+   for arrows when not using ragg RStudio graphics device. Ugh.
+   * `overlap_type="agreement"` should hide the signed counts for
+   individual (non-overlapping) sets. It is not meaningful to say
+   hits are in agreement when it only involves one set.
+   * Small thing: Red + blue = purple. The purple needs improvement.
+   * `show_labels` should be vectorized, to apply to each overlap in order.
+   (This is not as intuitive as you'd think since the sets appear
+   in label_df, then the overlap sets.)
+
+* Improve `make_color_contrast()`
+
+   * Fix `C_floor`. Figure out why output colors are desaturated.
+
+* Improve `venndir::curate_venn_labels()`
+
+   * Make default `curate_df` more visible. Perhaps a package object?
+
+* Consider "Upset" export to UpSetR, and/or the ComplexHeatmap implementation.
+
+   * Bonus points for figuring out if it's possible to include sign,
+   for example in ComplexHeatmap can the bars be stacked, colorized by
+   sign?
+
+* Consider some type of "styling" object or system, with overall settings:
+
+   * innerborder, innerborder.lwd, outerborder, outerborder.lwd,
+   border, border.lwd,
+   * template (tall/wide),
+   * fontfamily/fontfamilies, fontsizes, fontfaces,
+   fontcolors, label_spacing (list), label_padding (list),
+   
+
 ## 10mar2025
 
 * DONE. Make `venndir_legender()` title labels customizable.

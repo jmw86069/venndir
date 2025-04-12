@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.50.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,8 +163,8 @@ all parts are moved the identical amount.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># plot the difference</span></span></span>
 <span class="r-in"><span><span class="va">plot_jpdiff</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">fillb</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/alpha2col.html" class="external-link">alpha2col</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.9</span>, <span class="va">b</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">fill</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span>  <span class="va">filla</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jamba/man/alpha2col.html" class="external-link">alpha2col</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.3</span>, <span class="va">fillb</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">fillb</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/alpha2col.html" class="external-link">alpha2col</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.9</span>, <span class="va">b</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">fill</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span>  <span class="va">filla</span> <span class="op">&lt;-</span> <span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/alpha2col.html" class="external-link">alpha2col</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.3</span>, <span class="va">fillb</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">rbind2</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">filla</span>, <span class="va">fillb</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    label<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">a</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">name</span>, <span class="st">"old"</span><span class="op">)</span>,</span></span>

@@ -156,17 +156,20 @@
 #' @param frame_border,frame_fill `character` R colors used when
 #'    `do_frame=TRUE` for the frame border, and color fill, respectively.
 #'    Default is black border, cream/beige fill.
-#' @param text_grob_type `character` default `"textGrob"` indicating the
+#' @param text_grob_type `character` default `"marquee"` indicating the
 #'    type of text grob to use for labels. In future, this choice should
 #'    be substantially improved, but for now it is user choice.
-#'    * `"textGrob"` uses `grid::textGrob()` - solid all-around, however
-#'    it does not support markdown.
 #'    * `"marquee"` uses `marquee::marquee_grob()` - best overall:
 #'    Supports markdown, and fallback glyph use so up/down arrows are
 #'    displayed even for fonts that do not include them.
 #'    Not compatible with MacOS and R-4.4.1 or older, so it will revert
 #'    to `"textGrob"` in that specific scenario.
-#'    * `"richtext_grob"` uses `gridtext::richtext_grob()` - solid
+#'    * `"textGrob"` uses `grid::textGrob()` - solid all-around, however
+#'    it does not support markdown.
+#'    * `"gridtext"` (deprecated) uses `gridtext::richtext_grob()` -
+#'    alternative for markdown support, however some graphics devices show
+#'    inconsistent spacing between words.
+#'    * `"richtext_grob"` (deprecated) uses `gridtext::richtext_grob()` -
 #'    alternative for markdown support, however some graphics devices show
 #'    inconsistent spacing between words.
 #' @param debug `character` default FALSE, indicating whether to run
@@ -215,8 +218,9 @@ assemble_venndir_label <- function
  frame_border="#44444477",
  frame_fill="#FDDD6644",
  text_grob_type=c(
-    "textGrob",
     "marquee",
+    "textGrob",
+    "gridtext",
     "richtext_grob"),
  debug=FALSE,
  verbose=FALSE,
@@ -225,14 +229,15 @@ assemble_venndir_label <- function
    template <- match.arg(template);
 
    text_grob_type <- match.arg(text_grob_type);
+   # In theory marquee will always be installed, but just in case
    if ("marquee" %in% text_grob_type &&
-         !jamba::check_pkg_installed("marquee")) {
+         !requireNamespace("marquee", quietly=TRUE)) {
       warning(paste0("Changed text_grob_type 'marquee' to ",
-         "'richtext_grob' because 'marquee' package is not installed."));
-      text_grob_type <- "richtext_grob";
+         "'textGrob' because 'marquee' package is not installed."));
+      text_grob_type <- "textGrob";
    }
    
-   # check ecclectic mix of things that causes R crash
+   ## check ecclectic mix of things that causes R crash
    # - R-4.4.1 or lower/older
    # - MacOS operating system
    # - fonts with whitespace in the font file path
@@ -243,20 +248,14 @@ assemble_venndir_label <- function
    #     returns "Avenir Next.ttc"
    #     In fact, every different weight returns a different/random font
    #     with italic=TRUE.
-   if ("marquee" %in% text_grob_type) {
+   ## This code is disabled but kept for future utility
+   if (FALSE && "marquee" %in% text_grob_type) {
       older_than_R442 <- (compareVersion("4.4.2",
          paste(R.version$major, R.version$minor, sep=".")) == 1);
       is_macos <- grepl("^darwin", R.version$os);
       all_fms <- unique(unlist(fontfamilies));
-      # if (length(all_fms) > 0) {
-      #    # check only fontfamily values in use
-      #    sfdf <- systemfonts::font_info(rep(all_fms, each=4),
-      #       bold=c(FALSE, TRUE, FALSE, TRUE),
-      #       italic=c(FALSE, FALSE, TRUE, TRUE))
-      # } else {
-         # check all font files
-         sfdf <- systemfonts::system_fonts();
-      # }
+      # check all font files
+      sfdf <- systemfonts::system_fonts();
       any_path_whitespace <- any(grepl(" ", sfdf$path));
       if (older_than_R442 && is_macos && any_path_whitespace) {
          # change to textGrob
@@ -266,17 +265,16 @@ assemble_venndir_label <- function
          text_grob_type <- "textGrob";
       }
    }
+   if ("gridtext" %in% text_grob_type) {
+      text_grob_type <- "richtext_grob";
+   }
    if ("richtext_grob" %in% text_grob_type &&
-         !jamba::check_pkg_installed("gridtext")) {
+         !requireNamespace("gridtext", quietly=TRUE)) {
       warning(paste0("Changed text_grob_type 'richtext_grob' to ",
          "'textGrob' because 'gridtext' package is not installed."));
       text_grob_type <- "textGrob";
    }
-   # if ("textGrob" %in% text_grob_type) {
-   #    ## label_spacing$signed <- label_spacing$signed + grid::unit(1, "mm")
-   #    label_spacing$signed <- label_spacing$signed
-   # }
-   
+
    # sign1 <- "\u2191\u2191 1,234"
    # sign2 <- "\u2193\u2193 512"
    # count1 <- "11,246\n74%"
@@ -350,55 +348,57 @@ assemble_venndir_label <- function
             # bottom buffer corrects small whitespace diff compared to textGrob
             fi <- grepl("italic", ff);
             fweight <- gsub("italic|[.]", "", gsub("plain", "normal", ff));
-            signed_hjust <- paste0(signed_hjust, "-ink");
-            signed_vjust <- paste0(signed_vjust, "-ink");
+            if (any(signed_hjust %in% c(0, 0.5, 1))) {
+               signed_hjust <- c(`0`="left", `0.5`="center", `1`="right")[
+                  as.character(signed_hjust)];
+               signed_hjust <- paste0(signed_hjust, "-ink");
+            }
+            if (any(signed_vjust %in% c(0, 0.5, 1))) {
+               signed_vjust <- c(`0`="bottom", `0.5`="center", `1`="top")[
+                  as.character(signed_vjust)];
+               signed_vjust <- paste0(signed_vjust, "-ink");
+            }
+            kk <- 2 * fs / 12;
             grob_sign1 <- marquee::marquee_grob(
                text=signed_labels[[i]],
                ignore_html=TRUE,
                width=NA,
-               # y=grid::unit(1, "snpc") - grid::unit(0.05, "char"),
-               # y=grid::unit(1, "snpc"),
                y=grid::unit(0.5, "npc"),
                x=grid::unit(signed_x, "npc"),
                default.units="snpc",
+               force_body_margin=TRUE,
                style=marquee::classic_style(
                   base_size=fs,
                   body_font=fm,
                   italic=fi,
                   weight=fweight,
                   color=fc,
-                  margin=marquee::trbl(grid::unit(-2, "pt"),
+                  margin=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
-                     grid::unit(-2, "pt"),
+                     grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt")),
-                  padding=marquee::trbl(grid::unit(0, "pt"),
+                  padding=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
-                     grid::unit(-2, "pt"),
+                     grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt")),
                   align="left"),
-               # hjust="center-ink",
                hjust=signed_hjust,
                vjust=signed_vjust);
-               # vjust="top-ink");
             # grid::grid.draw(grob_sign1);# debug
          } else if ("richtext_grob" %in% text_grob_type) {
             if (verbose) {
                jamba::printDebug("assemble_venndir_label(): ",
                   "richtext_grob");
             }
-            # bottom buffer corrects small whitespace diff compared to textGrob
-            signed_hjust <- ifelse("center" %in% signed_hjust, 0.5,
-               ifelse("left" %in% signed_hjust, 0, 1))
-            signed_vjust <- ifelse("center" %in% signed_vjust, 0.5,
-               ifelse("top" %in% signed_vjust, 1, 0))
+            kk <- 0.25 * fs / 12;
             grob_sign1 <- gridtext::richtext_grob(
                x=signed_x,
                y=grid::unit(0.5, "npc"),
                hjust=signed_hjust,
                vjust=signed_vjust,
                text=signed_labels[[i]],
-               margin=grid::unit(c(0, 0, -1, 0), "pt"),
-               padding=grid::unit(c(0, 0, -1, 0), "pt"),
+               margin=grid::unit(c(-1*kk, 0, -1*kk, 0), "pt"),
+               padding=grid::unit(c(-1*kk, 0, -1*kk, 0), "pt"),
                # box_gp=grid::gpar(col="red", fill=NA), # optional debug border
                gp=grid::gpar(col=fc,
                   fontface=ff,
@@ -442,6 +442,7 @@ assemble_venndir_label <- function
          } else if ("marquee" %in% text_grob_type) {
             fi <- grepl("italic", ff);
             fweight <- gsub("italic|[.]", "", gsub("plain", "normal", ff));
+            kk <- 1 * fs / 12;
             grob_count1 <- marquee::marquee_grob(
                text=count_labels[[i]],
                ignore_html=TRUE,
@@ -450,6 +451,7 @@ assemble_venndir_label <- function
                y=grid::unit(0.5, "npc"),
                x=grid::unit(0.5, "npc"),
                default.units="snpc",
+               force_body_margin=TRUE,
                style=marquee::classic_style(
                   base_size=fs,
                   body_font=fm,
@@ -457,13 +459,13 @@ assemble_venndir_label <- function
                   weight=fweight,
                   color=fc,
                   # background="gold",
-                  margin=marquee::trbl(grid::unit(-3, "pt"),
+                  margin=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
-                     grid::unit(-3, "pt"),
+                     grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt")),
-                  padding=marquee::trbl(grid::unit(0, "pt"),
+                  padding=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
-                     grid::unit(-0, "pt"),
+                     grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt")),
                   align="center"
                ),
@@ -475,6 +477,7 @@ assemble_venndir_label <- function
                   "richtext_grob");
             }
             # bottom buffer corrects small whitespace diff compared to textGrob
+            kk <- 0.5 * fs / 12;
             grob_count1 <- gridtext::richtext_grob(
                x=grid::unit(0.5, "npc"),
                y=grid::unit(0.5, "npc"),
@@ -482,10 +485,8 @@ assemble_venndir_label <- function
                # text=gsub("([^\n])\n([^\n])", "\\1<br>\n\\2", count_labels[[i]]),
                # text=gsub("\n", "!<br>!", count_labels[[i]]),
                text=count_labels[[i]],
-               margin=grid::unit(c(0, 0, -2, 0), "pt"),
-               padding=grid::unit(c(0, 0, -2, 0), "pt"),
-               # margin=grid::unit(c(0, 0, -0, 0), "pt"),
-               # padding=grid::unit(c(0, 0, -0, 0), "pt"),
+               margin=grid::unit(c(-1*kk, 0, -1*kk, 0), "pt"),
+               padding=grid::unit(c(-1*kk, 0, -1*kk, 0), "pt"),
                # box_gp=grid::gpar(col="red", fill=NA), # optional debug border
                gp=grid::gpar(col=fc,
                   fontface=ff,
@@ -534,6 +535,7 @@ assemble_venndir_label <- function
          } else if ("marquee" %in% text_grob_type) {
             fi <- grepl("italic", ff);
             fweight <- gsub("italic|[.]", "", gsub("plain", "normal", ff));
+            kk <- fs / 12;
             grob_overlap1 <- marquee::marquee_grob(
                text=gsub("\n", "\n\n", overlap_labels[[i]]),
                ignore_html=TRUE,
@@ -542,6 +544,7 @@ assemble_venndir_label <- function
                y=grid::unit(0.5, "npc"),
                x=grid::unit(0.5, "npc"),
                default.units="snpc",
+               force_body_margin=TRUE,
                style=marquee::classic_style(
                   base_size=fs,
                   body_font=fm,
@@ -549,14 +552,14 @@ assemble_venndir_label <- function
                   weight=fweight,
                   # weight="normal",
                   color=fc,
-                  # background="gold",
-                  margin=marquee::trbl(grid::unit(-1, "pt"),
+                  # background="gold", # optional for debug
+                  margin=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
-                     grid::unit(-1, "pt"),
+                     grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt")),
-                  padding=marquee::trbl(grid::unit(0, "pt"),
+                  padding=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
-                     grid::unit(-4, "pt"),
+                     grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt")),
                   align="center"
                ),
@@ -568,6 +571,7 @@ assemble_venndir_label <- function
                   "richtext_grob");
             }
             # bottom buffer corrects small whitespace diff compared to textGrob
+            kk <- 0.25 * fs / 12;
             grob_overlap1 <- gridtext::richtext_grob(
                x=grid::unit(0.5, "npc"),
                y=grid::unit(0.5, "npc"),
@@ -575,8 +579,10 @@ assemble_venndir_label <- function
                vjust=0.5,
                text=gsub("([^\n])\n([^\n])", "\\1<br>\n\\2", overlap_labels[[i]]),
                # text=overlap_labels[[i]],
-               margin=grid::unit(c(0, 0, -2, 0), "pt"),
-               padding=grid::unit(c(0, 0, -2, 0), "pt"),
+               # margin=grid::unit(c(0, 0, -2, 0), "pt"),
+               # padding=grid::unit(c(0, 0, -2, 0), "pt"),
+               margin=grid::unit(c(1*kk, 0, 1*kk, 0), "pt"),
+               padding=grid::unit(c(1*kk, 0, 1*kk, 0), "pt"),
                # box_gp=grid::gpar(col="red", fill=NA), # optional debug border
                gp=grid::gpar(col=fc,
                   fontface=ff,
@@ -720,10 +726,14 @@ assemble_venndir_label <- function
       overlap_frame <- gtfinal;
    }
    
-
+   # adjust roundradius by fontsizes
+   roundradius <- min(unlist(fontsizes)) / 12 * roundradius;
+   
    # if ("overlap" %in% debug) {
    if (any(c("signed", "count", "overlap", "list", "groblist") %in% debug)) {
-      jamba::printDebug("Doing debug='", debug, "'");# debug
+      if (TRUE %in% verbose) {
+         jamba::printDebug("Doing debug='", debug, "'");# debug
+      }
       grid::grid.newpage()
       # add roundrect around grob
       if ("list" %in% debug) {
@@ -760,6 +770,7 @@ assemble_venndir_label <- function
       }
       frame_r <- head(frame_r, 1);
       frame_r <- roundradius;
+      
       if (!grid::is.unit(frame_r)) {
          frame_r <- grid::unit(frame_r, "snpc");
       }
@@ -793,7 +804,7 @@ assemble_venndir_label <- function
          frame_r <- 0;
       }
       frame_r <- head(frame_r, 1);
-      frame_r <- roundradius * 1.5;
+      # frame_r <- roundradius * 1.5;
       if (inherits(overlap_frame, "gtable")) {
          gw <- gtable::gtable_width(overlap_frame);
          gh <- gtable::gtable_height(overlap_frame);

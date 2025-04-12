@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 options(knitr.table.format='markdown')
+options(warn=FALSE)
 ```
 
 # venndir
@@ -52,16 +53,12 @@ enough to compare genes affected by two experiments, it is critical
 to compare the direction of change. How else can we discriminate
 the effects of disease from the effects of a cure?
 
-```{r venn_intro}
-# silence the warnings
-options("warn"=-1)
-
+```{r venn_intro, fig.alt="Venn diagram with directional counts included"}
 library(venndir)
 
 vo <- venndir(make_venn_test(100, 2, do_signed=TRUE),
    proportional=TRUE,
    overlap_type="each", font_cex=1.2)
-
 ```
 
 ## Features of venndir
@@ -76,23 +73,22 @@ to create test `setlist` data.
 
 ```{r venn_setlist}
 setlist <- make_venn_test(100, 3)
-setlist
 ```
 
-A `setlist` is a list of vectors. The names of the list,
-one for each vector, are the set names. Each vector contains
-items which are the subject of the Venn overlaps.
+* `setlist` is a `list` of `character` vectors.
+* The names of the list `names(setlist)` are the set names.
+* Each vector contains items which are the subject of the Venn overlaps.
 
-Given a `setlist`, you can create a Venn diagram with `venndir()`:
+Now you can create a Venn diagram with `venndir()`:
 
-```{r venn_1}
+```{r venn_1, fig.alt="Venn diagram showing default output. There are no directional counts because the setlist did not contain directional information."}
 venndir(setlist)
 ```
 
-You can make a proportional Venn diagram,
-also known as a Euler diagram. Add argument `proportional=TRUE`.
+You can make a proportional Venn diagram, known as a Euler diagram.
+Add argument `proportional=TRUE`.
 
-```{r venn_1e}
+```{r venn_1e, fig.alt="Euler diagram showing a proportional Venn diagram."}
 vo <- venndir(setlist,
    proportional=TRUE)
 ```
@@ -100,17 +96,20 @@ vo <- venndir(setlist,
 
 ## Venn Direction
 
-The namesake of this package is Venn with directionality!
+The namesake of this package is Venn with directionality! **VennDir**
 
-Test with: `make_venn_test(..., do_signed=TRUE)`.
-Each item is associated with a numerical direction:
+Use the testing function to create example data:  
+`make_venn_test(..., do_signed=TRUE)`
+
+The `setlist` is a `list` as before, except now the values are:
 
 * `+1` for up
 * `-1` for down
 
-Each vector in `setlist_dir` is a named vector,
-whose **names** are the items, and whose **values** are
-the direction, with `+1` or `-1`. Take a look.
+Each vector is a named vector,  
+whose **vector names** are the items, and  
+whose **vector values** are the directions.  
+Take a look.
 
 ```{r venn_setlist_signed}
 setlist_dir <- make_venn_test(100, 3, do_signed=TRUE)
@@ -118,39 +117,44 @@ setlist_dir
 ```
 
 
-For biological data, **direction is important and relevant**.
+**For biological data, direction is important, and relevant**.
 Up- or down-regulation might be the difference between disease
-or treatment.
+and treatment.
 
-> Note `make_venn_tests()` can simulate concordance,
-and the default is `concordance=0.5`. Concordance is a
-measure of how frequently two directions are the same, and
-is defined `(agree - disagree) / (n)`. Thus, `concordance=0` means
-there are the same number that agree as disagree in direction,
-and `concordance=1` means every element agrees in direction.
+> Aside: `make_venn_tests()` can simulate concordance.  
+Concordance measures how frequently two directions are the same.
+Kruskal's Concordance is defined: `(agree - disagree) / (n)`.  
+Thus, `concordance=0` means there are the same number that agree
+as disagree in direction, and `concordance=1` means every element
+agrees in direction.
 
-There are different ways to summarize directional overlaps:
+There are different ways to visualize directionality:
 
-* `overlap_type="concordance"` - **(default for signed input)**:
-Concordant up \u2191, down \u2193, and discordant X.
-* `overlap_type="overlap"` - **(default for basic input)**:
-Overlap counts only.
-* `overlap_type="agreement"` - Agreement and disagreement.
-* `overlap_type="each"` - Counts for each combination of directions.
+1. `overlap_type="concordance"` - **(default for signed input)**:
+Concordant up `R cat("\u2191")`, down `R cat("\u2193")`, and discordant X.
+2. `overlap_type="overlap"` - **(default for non-signed input)**:
+Show overlap counts only.
+3. `overlap_type="agreement"` - Show only **Agreement** (up/up and down/down),
+and **Disagreement** (up/down and down/up).
+4. `overlap_type="each"` - Show all combination of up and down directions.
 
 
 ### overlap_type="concordance"
 
-```{r venndir_1}
-venndir(setlist_dir, font_cex=c(1.5, 1.5, 1))
+```{r venndir_1, fig.alt="Venn diagram showing directional counts, summarized using 'concordance'."}
+venndir(setlist_dir,
+   font_cex=c(1.5, 1.5, 1),
+   main='overlap_type="concordance"')
 ```
 
 This approach is effective at conveying direction, without too many details.
 
 ### overlap_type="each"
 
-```{r venndir_each}
-venndir(setlist_dir, overlap_type="each")
+```{r venndir_each, fig.alt="Venn diagram showing directional counts, summarized using 'each'."}
+venndir(setlist_dir, overlap_type="each",
+   font_cex=c(1.5, 1.5, 1),
+   main='overlap_type="each"')
 ```
 
 This option shows the count for each combination.
@@ -158,28 +162,34 @@ This option shows the count for each combination.
 ### overlap_type="agreement"
 
 
-```{r venndir_agreement}
-venndir(setlist_dir, overlap_type="agreement")
+```{r venndir_agreement, fig.alt="Venn diagram showing directional counts, summarized using 'agreement'."}
+venndir(setlist_dir,
+   font_cex=c(1.5, 1.5, 1),
+   overlap_type="agreement",
+   main='overlap_type="agreement"')
 ```
 
 This option is preferred for overall agreement, without all the details.
 
 ### overlap_type="overlap"
 
-```{r venndir_overlap}
-venndir(setlist_dir, overlap_type="overlap")
+```{r venndir_overlap, fig.alt="Venn diagram showing directional counts, summarized using 'overlap'."}
+venndir(setlist_dir,
+   font_cex=c(1.5, 1.5, 1),
+   overlap_type="overlap",
+   main='overlap_type="overlap"')
 ```
 
 Venn "Classic".
 
 
-## Proportional Venn Direction
+## Euler Direction
 
 Add argument `proportional=TRUE` to
 display a proportional Venn diagram (Euler diagram),
 which uses the excellent `eulerr` R package.
 
-```{r venndir_each_p}
+```{r venndir_each_p, fig.alt="Proportional Euler diagram showing directional counts."}
 vo <- venndir(setlist_dir,
    proportional=TRUE,
    font_cex=c(1.3, 0.9, 0.7))
@@ -192,7 +202,7 @@ label placement. (Bookdown docs forthcoming.)
 For very small overlap regions, `inside_percent_threshold=5` will
 move labels outside when the area is less than 5% of the total.
 
-```{r venndir_overlap_p}
+```{r venndir_overlap_p, fig.alt="Proportional Euler diagram with modified count labels."}
 venndir(setlist_dir,
    proportional=TRUE,
    label_style="lite box",
@@ -200,6 +210,16 @@ venndir(setlist_dir,
    font_cex=c(1.3, 1))
 ```
 
+The signed labels are arranged in "wide" format, but
+"tall" may be more visually appealing.
+
+```{r venndir_overlap_tall_p, fig.alt="Proportional Euler diagram with count labels arranged in 'tall' format."}
+venndir(setlist_dir,
+   proportional=TRUE,
+   template="tall",
+   label_style="lite box",
+   font_cex=c(1.3, 1))
+```
 
 ## Customizing the Venn diagram
 
@@ -230,10 +250,10 @@ indicates where to place the label.
 
 The letters:
 
-* N = the set name
-* C = the overlap count
-* S = the signed overlap count(s)
-* i = the overlapping items
+* **N** = the set name
+* **C** = the overlap count
+* **S** = the signed overlap count(s)
+* **i** = the overlapping items
 
 Guidance:
 
@@ -251,18 +271,21 @@ moved outside. (There isn't a great way to place item labels around
 the count labels. Maybe in future.)
 
 
-```{r label_preset_1}
+```{r label_preset_1, fig.alt="Venn diagram showing set label placement inside the Venn circles"}
+setlist <- make_venn_test(1000, 3)
 vo4 <- venndir(setlist,
    show_labels="ncs",
+   main="Set labels are placed inside.",
    inside_percent_threshold=0)
 ```
 
 Hide line segments with `show_segments=FALSE`
 
-```{r label_preset_1l}
+```{r label_preset_1l, fig.alt="Venn diagram with set labels outside the Venn circles, and line segments are hidden."}
 vo4l <- venndir(setlist,
    show_labels="Ncs",
    show_segments=FALSE,
+   main="Set labels are outside, with hidden line segments.",
    inside_percent_threshold=0)
 ```
 
@@ -272,16 +295,17 @@ Specific overlaps can be modified or highlighted, using either
 `modify_venndir_overlap()` or `highlight_venndir_overlap()`.
 Labels can be adjusted, moved, resized, etc.
 
-```{r highlights}
+```{r highlights, fig.alt="Venn diagram with a specific overlap highlighted with yellow fill color."}
 vo4h <- highlight_venndir_overlap(vo4l,
    outerborder="red", outerborder.lwd=3,
    overlap_set="set_A&set_B")
 render_venndir(vo4h, main="Highlight for **set_A&set_B**")
+```
 
+```{r highlights_2, fig.alt="Venn diagram with all overlaps involving set B highlighted with yellow fill color."}
 vo4h <- highlight_venndir_overlap(vo4l,
    overlap_set=unique(grep("set_B", vo4l@jps@polygons$venn_name, value=TRUE)))
 render_venndir(vo4h, main="All overlaps **set_B** and not **set_D**")
-
 ```
 
 ## Text Venn for the R Console
@@ -292,9 +316,6 @@ Text Venn diagrams are surprisingly convenient for remote server work!
 The first example is the basic Venn overlap, without direction.
 
 ```{r textvenn_1, results='asis'}
-# Options are used for the RMarkdown
-# options("jam.htmlOut"=TRUE, "jam.comment"=FALSE)
-
 setlist <- make_venn_test(1000, 3, do_signed=TRUE)
 names(setlist) <- gsub("set_", "", names(setlist));
 textvenn(setlist, overlap_type="overlap", htmlOut=TRUE)
@@ -317,9 +338,10 @@ textvenn(setlist, overlap_type="concordance", unicode=FALSE, htmlOut=TRUE)
 
 ## Nudge Venn circles
 
-The overlap `set_A&set_B` has 1 count, but is not displayed.
+Sometimes when making a proportional Euler diagram, the
+overlaps cannot all be displayed. Consider this example:
 
-```{r nudge_1}
+```{r nudge_1, fig.alt="Euler diagram showing overlaps and count labels. One overlap is not represented because the Euler circles did not represent it."}
 overlaps <- c(set_A=187, set_B=146, set_C=499,
    `set_A&set_B`=1,
    `set_A&set_C`=181,
@@ -336,51 +358,49 @@ vn <- venndir(setlist_o,
    set_colors=c("firebrick2", "dodgerblue", "#BBBBBB"))
 ```
 
-Use argument `circle_nudge` to move a Venn circle using
+The overlap `set_A&set_B` has 1 count, but is not displayed.
+
+Use argument `circle_nudge` to move a specific Venn circle using
 x,y coordinates.
 
-```{r nudge_2}
+```{r nudge_2, fig.alt="Euler diagram after nudging one of the circles so that the missing overlap would be displayed."}
+# define the nudge
+circle_nudge <- list(
+   set_A=c(1, 0),
+   set_B=c(-1, 0))
+# apply the nudge
 vo_nudge <- venndir(setlist_o,
    font_cex=1.4,
    proportional=TRUE, inside_percent_threshold=2,
    outerborder="white", outerborder.lwd=2, innerborder=NA,
-   circle_nudge=list(set_A=c(1, 0), set_B=c(-1, 0)),
+   circle_nudge=circle_nudge,
    set_colors=c("firebrick2", "dodgerblue", "#BBBBBB"))
 ```
 
 
 ## Item labels
 
-Adding item labels can be convenient for the most common next
-question: ***"What are those?"***
+When looking at a Venn diagram,
+a common *very next question* is  
+"**What items are shared?**"
 
-Add "i" to the `show_labels` argument, for example
-change `show_labels="Nc"` to `show_labels="Ni"`.
+Add `"i"` to the `show_labels` argument, for example  
+`show_labels="Ni"`
 
-Optionally adjust `show_items="sign item"` to include the sign, the item,
-or both (default).
-
-
-```{r vennitems_1}
+```{r vennitems_1, fig.alt="Venn diagram with item labels inside the Venn overlap regions."}
 setlist <- make_venn_test(33, 3, do_signed=TRUE, item_prefix="item");
 vo <- venndir(setlist,
    item_cex=0.8,
-   show_segments=FALSE,
-   poly_alpha=0.4,
-   sign_count_delim="",
-   outerborder="white", outerborder.lwd=1, innerborder=NA,
-   show_labels="Ni",
-   # fontfamily="Arial",
-   show_items="sign item");
+   show_labels="Ni")
 ```
 
-Note that `show_items="sign"` displays only the directional arrow,
-used in the proportional Euler diagram.
+You can show both the sign and the item name, or just one.  
+Argument `show_items="sign"` will display only the direction.
 
-```{r vennitems_1p}
+```{r vennitems_1p, fig.alt="Venn diagram with directional arrows inside the Venn diagram overlap regions."}
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
 venndir(setlist,
-   poly_alpha=0.3,
+   fontfamily="Arial",
    show_labels="Ni",
    item_cex=1.5,
    show_items="sign",
@@ -390,30 +410,43 @@ venndir(setlist,
 The sign is an interesting visual summary when there are too
 many labels to display otherwise.
 
-```{r vennitems_2}
+```{r vennitems_2, fig.alt="Venn diagram with a large number of directional arrows inside the Venn overlap regions."}
 setlist <- make_venn_test(850, 3, do_signed=TRUE);
 venndir(setlist,
-   poly_alpha=0.3,
-   # rotate_degrees=60,
-   outerborder="white", outerborder.lwd=1, innerborder=NA,
+   fontfamily="Arial",
    show_labels="Ni",
    show_items="sign",
    item_cex=1.5,
-   item_degrees=15,
-   item_buffer=-0.05,
-   show_segments=FALSE,
-   combine_size=FALSE,
+   item_buffer=0,
    max_items=10000);
 ```
 
 ## Venn Memes
 
 More examples will be in the bookdown docs, and some fun ones
-are in `venn_meme()`.
+are in `venn_meme()`.  
 Here is a simple example:
 
-```{r venn_meme}
-meme_list <- list(`Car A`=c("leather seats", "no sunroof", "SUV", "20mpg"),
+```{r venn_meme_bix, fig.alt="Venn meme showing three Venn circles, Stats, Computer Science, and Biology, as they relate to Bioinformatics as the intersection of all three."}
+bix <- list(
+   s="Stats",
+   cs="Computer<br>Science",
+   b="Biology",
+   `s&b`="Biostatistics",
+   `s&cs`="Data<br>Science",
+   `cs&b`="Computational<br>Biology",
+   `s&cs&b`="Bioinformatics")
+venn_meme(bix,
+   outerborder.lwd=0,
+   innerborder="white")
+```
+
+You can provide a list of vectors, for example this fun example
+comparing two cars:
+
+```{r venn_meme, fig.alt="Venn meme comparing attributes of two cars, with labels shown in unique and shared sections of the Venn diagram."}
+meme_list <- list(
+   `Car A`=c("leather seats", "no sunroof", "SUV", "20mpg"),
    `Car B`=c("cloth seats", "sedan", "sunroof", "40mpg"),
    `Car A&Car B`=c("power locks", "power windows", "trunk storage"))
 venn_meme(meme_list,
@@ -422,8 +455,10 @@ venn_meme(meme_list,
    proportional=TRUE,
    # outerborder="white", outerborder.lwd=1, innerborder=NA,
    set_colors=c("orange", "firebrick3"),
-   poly_alpha=0.9,
-   item_buffer=-0.4, show_labels="Ni", show_segments=FALSE)
+   # poly_alpha=0.9,
+   # item_buffer=-0.4,
+   show_labels="Ni",
+   show_segments=FALSE)
 ```
 
 

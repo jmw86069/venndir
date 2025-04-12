@@ -1,3 +1,31 @@
+# venndir 0.0.50.900
+
+## Changes
+
+* Big change to labels, now the default uses marquee for consistent Unicode
+arrows. Spacing was adjusted in legends and count labels.
+* Moved marquee(>= 1.0.0) to Imports, new version avoids potential crash
+on MacOS.
+* Moved gridtext to Enhances, it is now deprecated.
+* Added tests for `marquee::marquee_grob()` across fonts with Unicode arrows,
+with `grid::textGrob()` showing arrows consistently for marquee and not grid.
+
+## Changes to existing functions
+
+* `venndir()` - Reduced default border width, it was too distracting.
+* `assemble_venndir_label()`
+
+   * New default `text_grob_type="marquee"`
+   * Rounded rectangles are scaled to the smallest font size,
+   previously they used a small, fixed radius.
+   * Label padding is more consistently adjusted for font sizes.
+
+* `venndir_legender()`
+
+   * New default uses marquee.
+   * Padding is adjusted by font size, making the table smaller by default.
+
+
 # venndir 0.0.49.900
 
 ## Changes

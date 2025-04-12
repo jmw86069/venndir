@@ -51,7 +51,7 @@ venndir(
   verbose = FALSE,
   debug = 0,
   circle_nudge = NULL,
-  lwd = 1,
+  lwd = 0.3,
   rotate_degrees = 0,
   ...
 )

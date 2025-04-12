@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.48.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.50.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,45 @@
       <small>Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.50.900" id="venndir-0050900">venndir 0.0.50.900<a class="anchor" aria-label="anchor" href="#venndir-0050900"></a></h2>
+<div class="section level3">
+<h3 id="changes-0-0-50-900">Changes<a class="anchor" aria-label="anchor" href="#changes-0-0-50-900"></a></h3>
+<ul><li>Big change to labels, now the default uses marquee for consistent Unicode arrows. Spacing was adjusted in legends and count labels.</li>
+<li>Moved marquee(&gt;= 1.0.0) to Imports, new version avoids potential crash on MacOS.</li>
+<li>Moved gridtext to Enhances, it is now deprecated.</li>
+<li>Added tests for <code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> across fonts with Unicode arrows, with <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code> showing arrows consistently for marquee and not grid.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-50-900">Changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-50-900"></a></h3>
+<ul><li><p><code><a href="../reference/venndir.html">venndir()</a></code> - Reduced default border width, it was too distracting.</p></li>
+<li>
+<p><code><a href="../reference/assemble_venndir_label.html">assemble_venndir_label()</a></code></p>
+<ul><li>New default <code>text_grob_type="marquee"</code>
+</li>
+<li>Rounded rectangles are scaled to the smallest font size, previously they used a small, fixed radius.</li>
+<li>Label padding is more consistently adjusted for font sizes.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>New default uses marquee.</li>
+<li>Padding is adjusted by font size, making the table smaller by default.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.49.900" id="venndir-0049900">venndir 0.0.49.900<a class="anchor" aria-label="anchor" href="#venndir-0049900"></a></h2>
+<div class="section level3">
+<h3 id="changes-0-0-49-900">Changes<a class="anchor" aria-label="anchor" href="#changes-0-0-49-900"></a></h3>
+<ul><li><p>Now requires the CRAN jamba, version 1.0.0 or higher. Woot.</p></li>
+<li>
+<p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code></p>
+<ul><li>New argument <code>legend_headers</code> allows custom legend header labels.</li>
+<li>Output to <code>legend_style="data.frame"</code> is now consistent.</li>
+<li>Added tests to cover most custom options.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.48.900" id="venndir-0048900">venndir 0.0.48.900<a class="anchor" aria-label="anchor" href="#venndir-0048900"></a></h2>
 <ul><li>bumped <code>colorjam&gt;=0.0.30.900</code> to pick up new color blending for additive alpha blending, useful for repeating a transparent color and having the color become more intense with each overlap.</li>
@@ -247,7 +286,7 @@
 </ul></li>
 <li>
 <p><code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code></p>
-<ul><li>New argument <code>keep_item_order=FALSE</code> by default sorts all items using <code><a href="https://rdrr.io/pkg/jamba/man/mixedSort.html" class="external-link">jamba::mixedSort()</a></code> (proper alphanumeric sort). When <code>keep_item_order=TRUE</code> it will keep items in the same order they originally appeared, which allows a fixed item label order when displaying item labels.</li>
+<ul><li>New argument <code>keep_item_order=FALSE</code> by default sorts all items using <code><a href="https://jmw86069.github.io/jamba/reference/mixedSort.html" class="external-link">jamba::mixedSort()</a></code> (proper alphanumeric sort). When <code>keep_item_order=TRUE</code> it will keep items in the same order they originally appeared, which allows a fixed item label order when displaying item labels.</li>
 </ul></li>
 <li>
 <p><code><a href="../reference/venn_meme.html">venn_meme()</a></code></p>
@@ -537,7 +576,7 @@
 <ul><li>
 <p><code><a href="../reference/venndir.html">venndir()</a></code> - relatively minor update, fixes unnamed <code>setlist</code> or <code>setlist</code> with duplicate or <code>NA</code> names.</p>
 <ul><li>Validates that <code>names(setlist)</code> are defined, otherwise integer numbers are defined in order.</li>
-<li>Validates that <code>names(setlist)</code> are unique, and not <code>NA</code>, otherwise it calls <code><a href="https://rdrr.io/pkg/jamba/man/makeNames.html" class="external-link">jamba::makeNames()</a></code> to create unique names.</li>
+<li>Validates that <code>names(setlist)</code> are unique, and not <code>NA</code>, otherwise it calls <code><a href="https://jmw86069.github.io/jamba/reference/makeNames.html" class="external-link">jamba::makeNames()</a></code> to create unique names.</li>
 </ul></li>
 </ul></div>
 <div class="section level3">
@@ -876,7 +915,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-22-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-22-900"></a></h3>
 <ul><li>
-<code><a href="../reference/textvenn.html">textvenn()</a></code> was throwing an error with jamba version <code>0.0.83.900</code> caused by updates to <code><a href="https://rdrr.io/pkg/jamba/man/printDebug.html" class="external-link">jamba::printDebug()</a></code> used for printing colorized output. Dependency was bumped to <code>0.0.84.900</code> where the bug was fixed.</li>
+<code><a href="../reference/textvenn.html">textvenn()</a></code> was throwing an error with jamba version <code>0.0.83.900</code> caused by updates to <code><a href="https://jmw86069.github.io/jamba/reference/printDebug.html" class="external-link">jamba::printDebug()</a></code> used for printing colorized output. Dependency was bumped to <code>0.0.84.900</code> where the bug was fixed.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -923,7 +962,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-19-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-19-900"></a></h3>
 <ul><li>
-<code>polygon_label_fill()</code>: At last fixed an elusive bug causing certain item label scenarios to throw an error, turned out to be caused by lack of rownames on a matrix sorted by <code><a href="https://rdrr.io/pkg/jamba/man/mixedSortDF.html" class="external-link">jamba::mixedSortDF()</a></code>. The error occurred in an internal function <code>get_poly_points()</code> that iterates different labeling conditions until at least <code>n</code> label coordinates are returned. Apparently the function <code>spsample()</code> does not guarantee returning the same number of coordinate points as requested. This error must have bitten someone else somewhere in the R world, requesting 15 sampled points, then receiving only 12.</li>
+<code>polygon_label_fill()</code>: At last fixed an elusive bug causing certain item label scenarios to throw an error, turned out to be caused by lack of rownames on a matrix sorted by <code><a href="https://jmw86069.github.io/jamba/reference/mixedSortDF.html" class="external-link">jamba::mixedSortDF()</a></code>. The error occurred in an internal function <code>get_poly_points()</code> that iterates different labeling conditions until at least <code>n</code> label coordinates are returned. Apparently the function <code>spsample()</code> does not guarantee returning the same number of coordinate points as requested. This error must have bitten someone else somewhere in the R world, requesting 15 sampled points, then receiving only 12.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-19-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-19-900"></a></h3>
@@ -943,7 +982,7 @@
 <h2 class="pkg-version" data-toc-text="0.0.18.900" id="venndir-0018900">venndir 0.0.18.900<a class="anchor" aria-label="anchor" href="#venndir-0018900"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-0-18-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-18-900"></a></h3>
-<p>To resolve issue <a href="https://github.com/jmw86069/venndir/issues/2" class="external-link">#2</a>, the <code>colorjam</code> package was updated to add prefix to call <code><a href="https://rdrr.io/pkg/jamba/man/tcount.html" class="external-link">jamba::tcount()</a></code> to function <code><a href="https://jmw86069.github.io/colorjam/reference/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code>. When the <code>colorjam</code> package is loaded, using <code><a href="https://jmw86069.github.io/colorjam" class="external-link">library(colorjam)</a></code> or <code><a href="https://jmw86069.github.io/colorjam" class="external-link">require(colorjam)</a></code> it automatically also loads jamba so its functions are available. However, when <code><a href="https://jmw86069.github.io/colorjam/reference/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code> is called directly, without formally loading the <code>colorjam</code> package, the <code>jamba</code> functions are <strong>not</strong> loaded. This issue caused the error, which unfortunately causes the <code><a href="../reference/venndir.html">venndir()</a></code> function to fail unless <code>jamba</code> or <code>colorjam</code> packages have been loaded previously.</p>
+<p>To resolve issue <a href="https://github.com/jmw86069/venndir/issues/2" class="external-link">#2</a>, the <code>colorjam</code> package was updated to add prefix to call <code><a href="https://jmw86069.github.io/jamba/reference/tcount.html" class="external-link">jamba::tcount()</a></code> to function <code><a href="https://jmw86069.github.io/colorjam/reference/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code>. When the <code>colorjam</code> package is loaded, using <code><a href="https://jmw86069.github.io/colorjam" class="external-link">library(colorjam)</a></code> or <code><a href="https://jmw86069.github.io/colorjam" class="external-link">require(colorjam)</a></code> it automatically also loads jamba so its functions are available. However, when <code><a href="https://jmw86069.github.io/colorjam/reference/approx_degrees.html" class="external-link">colorjam::approx_degrees()</a></code> is called directly, without formally loading the <code>colorjam</code> package, the <code>jamba</code> functions are <strong>not</strong> loaded. This issue caused the error, which unfortunately causes the <code><a href="../reference/venndir.html">venndir()</a></code> function to fail unless <code>jamba</code> or <code>colorjam</code> packages have been loaded previously.</p>
 <p>All that said, the “fix” is to require the updated <code>colorjam(&gt;= 0.0.22.950)</code> package version that includes this fix.</p>
 </div>
 </div>
@@ -988,7 +1027,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-0-15-900">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-15-900"></a></h3>
 <ul><li>
-<code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> was not handling <code>factor</code> vectors as input, they were getting coerced to <code>integer</code> values instead of <code>character</code> values. This issue was caused by handling duplicate entries, in this case the duplicate entries were not renamed to unique entries by calling <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> for the <code>makeNamesFunc</code> part of <code><a href="https://rdrr.io/pkg/jamba/man/makeNames.html" class="external-link">jamba::makeNames()</a></code>. The base R assignment <code>names(x) &lt;- c(y)</code> coerces <code>factor</code> values in <code>y</code> to <code>integer</code> values, which in this case breaks the expected behavior. This seems like an edge case, but certainly one that <code>venndir</code> should handle without issue - it is not always clear when values are stored as factors instead of character, and the expected behavior in all cases is for <code>venndir</code> to treat <code>factor</code> as <code>character</code> values. (Thank you Dr. Ashley Brooks for bringing my attention to this issue!)</li>
+<code><a href="../reference/signed_overlaps.html">signed_overlaps()</a></code> was not handling <code>factor</code> vectors as input, they were getting coerced to <code>integer</code> values instead of <code>character</code> values. This issue was caused by handling duplicate entries, in this case the duplicate entries were not renamed to unique entries by calling <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> for the <code>makeNamesFunc</code> part of <code><a href="https://jmw86069.github.io/jamba/reference/makeNames.html" class="external-link">jamba::makeNames()</a></code>. The base R assignment <code>names(x) &lt;- c(y)</code> coerces <code>factor</code> values in <code>y</code> to <code>integer</code> values, which in this case breaks the expected behavior. This seems like an edge case, but certainly one that <code>venndir</code> should handle without issue - it is not always clear when values are stored as factors instead of character, and the expected behavior in all cases is for <code>venndir</code> to treat <code>factor</code> as <code>character</code> values. (Thank you Dr. Ashley Brooks for bringing my attention to this issue!)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-15-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-15-900"></a></h3>
@@ -1208,7 +1247,7 @@
 <div class="section level3">
 <h3 id="new-features-0-0-6-900">new features<a class="anchor" aria-label="anchor" href="#new-features-0-0-6-900"></a></h3>
 <ul><li>
-<code>label_polygon_fill()</code> new arguments <code>dither_cex</code> and <code>dither_color</code> which slightly adjust the <code>cex</code> and <code>color</code> values. The <code>cex</code> is uniformly distributed +/- the <code>dither_cex</code> value, as a fraction of the <code>cex</code>, the default is roughly 4% variation in <code>cex</code>. The <code>dither_color</code> is similar, it adds some heterogeneity to <code>darkFactor</code> and <code>sFactor</code> and calls <code><a href="https://rdrr.io/pkg/jamba/man/makeColorDarker.html" class="external-link">jamba::makeColorDarker()</a></code> to adjust brightness and saturation.</li>
+<code>label_polygon_fill()</code> new arguments <code>dither_cex</code> and <code>dither_color</code> which slightly adjust the <code>cex</code> and <code>color</code> values. The <code>cex</code> is uniformly distributed +/- the <code>dither_cex</code> value, as a fraction of the <code>cex</code>, the default is roughly 4% variation in <code>cex</code>. The <code>dither_color</code> is similar, it adds some heterogeneity to <code>darkFactor</code> and <code>sFactor</code> and calls <code><a href="https://jmw86069.github.io/jamba/reference/makeColorDarker.html" class="external-link">jamba::makeColorDarker()</a></code> to adjust brightness and saturation.</li>
 <li>
 <code>label_polygon_fill()</code> can plot the polygon buffer behind the labels, to review the effect of adjusting <code>scale_width</code> for each polygon.</li>
 <li>

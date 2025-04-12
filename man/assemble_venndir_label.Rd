@@ -26,7 +26,7 @@ assemble_venndir_label(
   frame_r = grid::unit(0.1, "snpc"),
   frame_border = "#44444477",
   frame_fill = "#FDDD6644",
-  text_grob_type = c("textGrob", "marquee", "richtext_grob"),
+  text_grob_type = c("marquee", "textGrob", "gridtext", "richtext_grob"),
   debug = FALSE,
   verbose = FALSE,
   ...
@@ -86,18 +86,21 @@ the plot coordinates, not the font size.}
 \code{do_frame=TRUE} for the frame border, and color fill, respectively.
 Default is black border, cream/beige fill.}
 
-\item{text_grob_type}{\code{character} default \code{"textGrob"} indicating the
+\item{text_grob_type}{\code{character} default \code{"marquee"} indicating the
 type of text grob to use for labels. In future, this choice should
 be substantially improved, but for now it is user choice.
 \itemize{
-\item \code{"textGrob"} uses \code{grid::textGrob()} - solid all-around, however
-it does not support markdown.
 \item \code{"marquee"} uses \code{marquee::marquee_grob()} - best overall:
 Supports markdown, and fallback glyph use so up/down arrows are
 displayed even for fonts that do not include them.
 Not compatible with MacOS and R-4.4.1 or older, so it will revert
 to \code{"textGrob"} in that specific scenario.
-\item \code{"richtext_grob"} uses \code{gridtext::richtext_grob()} - solid
+\item \code{"textGrob"} uses \code{grid::textGrob()} - solid all-around, however
+it does not support markdown.
+\item \code{"gridtext"} (deprecated) uses \code{gridtext::richtext_grob()} -
+alternative for markdown support, however some graphics devices show
+inconsistent spacing between words.
+\item \code{"richtext_grob"} (deprecated) uses \code{gridtext::richtext_grob()} -
 alternative for markdown support, however some graphics devices show
 inconsistent spacing between words.
 }}

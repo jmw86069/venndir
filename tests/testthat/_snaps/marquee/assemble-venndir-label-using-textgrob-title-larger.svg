@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' data-engine-version='2.0' width='720.00pt' height='576.00pt' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='720.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<polygon points='254.00,343.30 466.00,343.30 465.77,343.30 466.69,343.26 467.58,343.08 468.43,342.75 469.22,342.30 469.93,341.72 470.53,341.04 471.02,340.27 471.38,339.43 471.60,338.54 471.67,337.63 471.67,337.63 471.67,238.37 471.67,238.37 471.60,237.46 471.38,236.57 471.02,235.73 470.53,234.96 469.93,234.28 469.22,233.70 468.43,233.25 467.58,232.92 466.69,232.74 466.00,232.70 254.00,232.70 254.68,232.74 253.77,232.70 252.86,232.81 251.99,233.07 251.16,233.46 250.41,233.98 249.75,234.61 249.21,235.34 248.78,236.15 248.49,237.01 248.35,237.91 248.33,238.37 248.33,337.63 248.35,337.18 248.35,338.09 248.49,338.99 248.78,339.85 249.21,340.66 249.75,341.39 250.41,342.02 251.16,342.54 251.99,342.93 252.86,343.19 253.77,343.30 ' style='stroke-width: 0.75; stroke: #444444; stroke-opacity: 0.47; fill: #FDDD66; fill-opacity: 0.27;' />
+<text x='360.00' y='257.56' text-anchor='middle' style='font-size: 32.00px; font-weight: bold; font-family: sans;' textLength='142.31px' lengthAdjust='spacingAndGlyphs'>Set Name</text>
+<text x='360.00' y='282.41' text-anchor='middle' style='font-size: 32.00px; font-weight: bold; font-family: sans;' textLength='172.59px' lengthAdjust='spacingAndGlyphs'>sub, caption</text>
+<text x='291.21' y='314.19' text-anchor='middle' style='font-size: 32.00px; font-family: sans;' textLength='80.08px' lengthAdjust='spacingAndGlyphs'>1,234</text>
+<text x='291.21' y='333.54' text-anchor='middle' style='font-size: 24.00px; font-weight: bold; font-style: italic; font-family: sans;' textLength='48.04px' lengthAdjust='spacingAndGlyphs'>12%</text>
+<text x='334.08' y='301.76' style='font-size: 24.00px; fill: #CD0000; font-family: sans;' textLength='57.38px' lengthAdjust='spacingAndGlyphs'>↑↑ 15</text>
+<text x='334.08' y='321.12' style='font-size: 24.00px; fill: #1874CD; font-family: sans;' textLength='90.75px' lengthAdjust='spacingAndGlyphs'>↓↓ 2,234</text>
+<text x='334.08' y='340.47' style='font-size: 24.00px; fill: #8C8C8C; font-family: sans;' textLength='134.76px' lengthAdjust='spacingAndGlyphs'>textGrob P,q</text>
+<polygon points='254.00,343.30 466.00,343.30 465.77,343.30 466.69,343.26 467.58,343.08 468.43,342.75 469.22,342.30 469.93,341.72 470.53,341.04 471.02,340.27 471.38,339.43 471.60,338.54 471.67,337.63 471.67,337.63 471.67,238.37 471.67,238.37 471.60,237.46 471.38,236.57 471.02,235.73 470.53,234.96 469.93,234.28 469.22,233.70 468.43,233.25 467.58,232.92 466.69,232.74 466.00,232.70 254.00,232.70 254.68,232.74 253.77,232.70 252.86,232.81 251.99,233.07 251.16,233.46 250.41,233.98 249.75,234.61 249.21,235.34 248.78,236.15 248.49,237.01 248.35,237.91 248.33,238.37 248.33,337.63 248.35,337.18 248.35,338.09 248.49,338.99 248.78,339.85 249.21,340.66 249.75,341.39 250.41,342.02 251.16,342.54 251.99,342.93 252.86,343.19 253.77,343.30 ' style='stroke-width: 0.75; stroke: #444444; stroke-opacity: 0.47; fill: #FDDD66; fill-opacity: 0.27;' />
+<text x='360.00' y='257.56' text-anchor='middle' style='font-size: 32.00px; font-weight: bold; font-family: sans;' textLength='142.31px' lengthAdjust='spacingAndGlyphs'>Set Name</text>
+<text x='360.00' y='282.41' text-anchor='middle' style='font-size: 32.00px; font-weight: bold; font-family: sans;' textLength='172.59px' lengthAdjust='spacingAndGlyphs'>sub, caption</text>
+<text x='291.21' y='314.19' text-anchor='middle' style='font-size: 32.00px; font-family: sans;' textLength='80.08px' lengthAdjust='spacingAndGlyphs'>1,234</text>
+<text x='291.21' y='333.54' text-anchor='middle' style='font-size: 24.00px; font-weight: bold; font-style: italic; font-family: sans;' textLength='48.04px' lengthAdjust='spacingAndGlyphs'>12%</text>
+<text x='334.08' y='301.76' style='font-size: 24.00px; fill: #CD0000; font-family: sans;' textLength='57.38px' lengthAdjust='spacingAndGlyphs'>↑↑ 15</text>
+<text x='334.08' y='321.12' style='font-size: 24.00px; fill: #1874CD; font-family: sans;' textLength='90.75px' lengthAdjust='spacingAndGlyphs'>↓↓ 2,234</text>
+<text x='334.08' y='340.47' style='font-size: 24.00px; fill: #8C8C8C; font-family: sans;' textLength='134.76px' lengthAdjust='spacingAndGlyphs'>textGrob P,q</text>
+</g>
+</svg>
