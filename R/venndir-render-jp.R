@@ -365,7 +365,7 @@ render_venndir <- function
    # jamba::printDebug("show_items: ", show_items);# debug
    # show_items <- head(show_items, 1);
    item_style <- match.arg(item_style,
-      choices=c("default", "text", "gridtext"));
+      choices=c("default", "marquee", "text", "gridtext"));
 
    # validate other args
    if (length(expand_fraction) == 0) {
@@ -636,9 +636,62 @@ render_venndir <- function
             label_df$count %in% c("outside", "inside")))
          # & label_df$venn_counts > 0);
       
+      # 0.0.51.900 - silence "agreement/concordance" for single set overlaps
+      if ("curate_df" %in% names(venndir_output@metadata)) {
+         curate_df <- venndir_output@metadata[["curate_df"]];
+      } else {
+         if ("unicode" %in% names(venndir_output@metadata)) {
+            unicode <- venndir_output@metadata[["unicode"]];
+         } else {
+            # detect any unicode chars with integer value > 127
+            unicode <- any(sapply(label_df$text, function(i){
+               any(utf8ToInt(i) > 127)
+            }))
+         }
+         curate_df <- get_venndir_curate_df(unicode=unicode,
+            ...)
+      }
+      # Use "hide_singlet" if already defined in label_df
+      # Todo: Display hidden singlet when only showing signed values?
+      if (!"hide_singlet" %in% colnames(label_df)) {
+         label_df$hide_singlet <- FALSE;
+         if (inherits(curate_df, "data.frame") > 0 &&
+               "hide_singlet" %in% colnames(curate_df) &&
+               any(curate_df$hide_singlet %in% TRUE)) {
+            hide_vals <- subset(curate_df, hide_singlet %in% TRUE)$from;
+            hide_grep <- paste0(paste0("^(", hide_vals, ")$"), collapse="|");
+            hiderows <- (label_df$nsets %in% 1 &
+               grepl(hide_grep,
+                  gsub("^.+[|]", "", label_df$overlap_sign)));
+            # hide singlets matching the appropriate pattern
+            if (any(hiderows)) {
+               label_df[hiderows, "hide_singlet"] <- TRUE
+               show_label[hiderows] <- FALSE;
+            }
+         }
+      }
       # 0.0.34.900 -  experiment by adding show_label
       label_df$show_label <- show_label;
       
+      # 0.0.51.900 - re-apply "none" visibility for show_label=FALSE
+      if (any(label_df$show_label %in% FALSE)) {
+         noshow <- (label_df$show_label %in% FALSE);
+         icols <- intersect(c("count"), colnames(label_df));
+         for (icol in icols) {
+            label_df[noshow, icol] <- "none";
+         }
+      }
+      if (any(TRUE %in% label_df$hide_singlet)) {
+         if ("item_style" %in% colnames(label_df)) {
+            signitem <- grepl("sign.*item|item.*sign", label_df$item_style);
+            nssi <- (label_df$hide_singlet %in% TRUE & signitem);
+            if (any(nssi)) {
+               label_df[nssi, "item_style"] <- gsub("sign", "",
+                  label_df[nssi, "item_style"]);
+            }
+         }
+      }
+
       # 0.0.34.900 -  experiment by adding poly_ref_name
       if (!"ref_polygon" %in% colnames(label_df)) {
          matchjps <- match(label_df$overlap_set, rownames(venn_jp@polygons));
@@ -677,16 +730,20 @@ render_venndir <- function
          }
          # jamba::printDebug("show_label");
          # jamba::printDebug("table(label_df$overlap):");print(table(label_df$overlap));
-         label_outside <- (label_df$overlap %in% "outside" | label_df$count %in% "outside");
+         label_outside <- (label_df$overlap %in% "outside" |
+               label_df$count %in% "outside");
          
          # Determine if any offset labels require line segment
-         has_offset <- label_outside & (label_df$x_offset != 0 | label_df$y_offset != 0);
+         has_offset <- label_outside &
+            (label_df$x_offset != 0 | label_df$y_offset != 0);
          #
          # Todo: Deal with has_offset, for now set to FALSE
          # jamba::printDebug("label_outside:");print(table(label_outside));
          # jamba::printDebug("has_offset:");print(table(has_offset));
          #
          # Handle labels outside
+         # - Currently associates singlet labels together with the set name.
+         # - Dr. Theofilatos suggested not doing this association.
          if (any(show_label & has_offset)) {
             use_offset <- (show_label & has_offset);
             # use_offset <- (show_label & has_offset & label_df$venn_counts > 0);
@@ -700,16 +757,8 @@ render_venndir <- function
             names(sp_index) <- offset_sets;
             # jamba::printDebug("sp_index: ");print(sp_index);# debug
             
-            # 0.0.20.900 - fix order of preferred polygon labels
-            #sp_index <- match(offset_sets, venn_spdf$label);
-            # sp_index <- (length(venn_spdf$label) + 1 - 
-            #       match(offset_sets, 
-            #          rev(venn_spdf$label)));
             ## 0.0.32.900 - subset polygons for non-empty coordinates
             polygon_nonempty <- venn_jp@polygons$is_empty %in% 0;
-            # polygon_nonempty <- sapply(venn_jp@polygons$x, function(ix1){
-            #    length(jamba::rmNA(unlist(ix1))) > 0
-            # });
             use_jp <- venn_jp[which(polygon_nonempty), ];
             use_polygons <- use_jp@polygons;
             use_polygons$rownum <- seq_len(nrow(use_polygons));
@@ -722,10 +771,6 @@ render_venndir <- function
                kset1 <- head(grep(paste0("(^|&)", iset1, "($|&)"),
                   use_polygons$label), 1)
                iset2 <- use_polygons$rownum[kset1];
-               # } else {
-               #    iset2 <- head(grep(paste0("(^|&)", iset1, "($|&)"),
-               #       venn_jp@polygons$label), 1)
-               # }
                iset2
             })
 
@@ -880,7 +925,7 @@ render_venndir <- function
          
          # Todo: change "item_style" colname to "item_label"?
          # because item_style is used for something else
-         use_show_items <- head(items_df1$item_style, 1);
+         use_show_items <- tail(items_df1$item_style, 1);
          show_items_order <- strsplit(use_show_items, "[- _.]")[[1]];
          for (dio in show_items_order) {
             # jamba::printDebug("dio:", dio);# debug
@@ -906,6 +951,7 @@ render_venndir <- function
          color <- make_color_contrast(color1,
             y=bg,
             ...);
+         # define item coordinates
          lpf <- label_fill_JamPolygon(jp=venn_jp[tail(vis, 1), ],
             ref_jp=venn_jp,
             color=color,
@@ -1239,7 +1285,7 @@ render_venndir <- function
       itemlabels_df$color <- new_item_color;
       # jamba::printDebug("middle(itemlabels_df):");print(jamba::middle(itemlabels_df));
       #
-      if ("default" %in% item_style) {
+      if ("gridtext" %in% item_style) {
          # auto-detect
          item_style <- "text";
          # check for <br>, <span>, <sup>, <sub>, or *text* format
@@ -1248,13 +1294,13 @@ render_venndir <- function
             item_style <- "gridtext";
          }
       }
-      if ("marquee" %in% debug) {
-         # experimental
+      if (any(c("default", "marquee") %in% item_style) || "marquee" %in% debug) {
+         # use marquee by default
          # substitute style for each label
          # new_item_text <- paste0("{",
          #    itemlabels_df$color, " ",
          #    itemlabels_df$text, "}")
-         print("items marquee_grob");# debug
+         # print("items marquee_grob");# debug
          # define styles
          min_fontsize <- min(itemlabels_df$fontsize);
          item_style <- marquee::classic_style(
@@ -1263,17 +1309,18 @@ render_venndir <- function
             align="center")
          rel_fontsize <- round(itemlabels_df$fontsize / min_fontsize, digits=2);
          rel_fontsizeu <- jamba::nameVector(unique(rel_fontsize));
+         # Todo: Fix marquee style
          for (irel in unique(rel_fontsize)) {
             item_style <- marquee::modify_style(
-               style_set=item_style, 
-               paste0("rel.", irel), 
+               x=item_style,
+               paste0("rel.", irel),
                size=marquee::relative(irel))
          }
          new_item_text <- paste0(
             "{", paste0(".rel.", rel_fontsize), " ",
             "{", itemlabels_df$color, " ",
             itemlabels_df$text, "}", "}")
-         print(head(new_item_text));# debug
+         # print(head(new_item_text));# debug
          text_grob <- marquee::marquee_grob(
             text=new_item_text,
             ignore_html=TRUE,

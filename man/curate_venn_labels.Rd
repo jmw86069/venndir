@@ -28,11 +28,12 @@ The colnames are expected to include:
 \item \code{"from"} - regular expression patterns
 \item \code{"sign"} - replacement value when \code{type="sign"}
 \item \code{"color"} - replacement R color when \code{type="color"}
+\item \code{"hide_singlet"} - logical whether to display signed counts
+for singlet overlap sets.
 }}
 
-\item{unicode}{\code{logical} indicating whether to use Unicode characters
-when \code{type="sign"}. Note this argument only affects the default
-values, it is not applied when using a custom \code{curate_df}.}
+\item{unicode}{\code{logical} default TRUE, whether to use Unicode characters,
+passed to \code{get_venndir_curate_df}.}
 
 \item{blend_preset}{\code{character} string passed as \code{preset} to
 \code{colorjam::blend_colors()} to define the color wheel used
@@ -58,22 +59,16 @@ directional label such as \code{"0 1 0 -1"} suitable for display.
 It can output either Unicode or non-Unicode text label,
 or a corresponding color.
 
-The input currently recognizes directional labels such as
-\code{"0 -1 1 0"} or the character labels \code{"agreement"}, \code{"concordant"},
-\code{"mixed"}. Note that zeros \code{"0"} are typically removed
-before calling this function.
+The input is defined in a \code{data.frame} obtained from
+\code{get_venndir_curate_df()}, or using the user-provided \code{curate_df}.
 
-The input vector \code{x} is split using \code{strsplit()} using whitespace
-delimiter by default, then each full value is matched and replaced
-using \code{"from"} in \code{curate_df}.
+Each sign returned by \code{signed_overlaps()}
+is matched in the 'from' column, then replaced with values in the
+'sign' column, then colorized by the 'color' column.
 
-When \code{curate_df} is not supplied, default values are generated
-for \code{"from"} values: \code{"1"}, \code{"-1"}, \code{"0"}, \code{"concordant|agreement"},
-and \code{"mixed"}. Values are matched using regular expression \code{gsub()}
-however the full string must match, therefore \code{from="1"} will only
-match \code{"1"} and will not match \code{"-1"}.
+Note that zeros \code{"0"} are typically removed before calling this function.
 
-The \code{curate_df} must contain these three colnames:
+The \code{curate_df} must contain these four colnames:
 \itemize{
 \item \code{"from"} - regular expression patterns, which will be surrounded
 by \code{"^("} and \code{")$"} to ensure complete match.
@@ -81,12 +76,16 @@ by \code{"^("} and \code{")$"} to ensure complete match.
 when \code{type="sign"}.
 \item \code{"color"} - \code{character} R color to assign to each value matched
 in \code{"from"}, when \code{type="color"}.
+\item \code{"hide_singlet"} - \code{logical} indicating whether signed singlet counts
+should be hidden, for example "agreement" has no meaning when
+only one set is involved.
 }
 
-When two or more replacement values defined by \code{curate_df[,"sign"]} are
-present in one entry in \code{x}, the values are concatenated together
-with no whitespace. For example \code{"1 1"} becomes \code{"^^"} with no spacing.
-To impose whitespace between characters, define \code{sign=c("^ ", "v ")}
+Multiple signs are concatenated together, in the event the input overlap
+has multiple values, for example \code{"1 1"} becomes \code{"^^"} with no
+spacing.
+
+To impose whitespace between sign characters, define \code{sign=c("^ ", "v ")}
 to include whitespace. Any leading/trailing whitespace will be removed
 afterwards.
 }
@@ -107,6 +106,7 @@ jamba::printDebug(as.list(curate_venn_labels(venn_labels, "sign")),
 \seealso{
 Other venndir utility: 
 \code{\link{expand_range}()},
+\code{\link{get_venndir_curate_df}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},

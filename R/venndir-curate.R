@@ -8,33 +8,31 @@
 #' It can output either Unicode or non-Unicode text label,
 #' or a corresponding color.
 #' 
-#' The input currently recognizes directional labels such as
-#' `"0 -1 1 0"` or the character labels `"agreement"`, `"concordant"`,
-#' `"mixed"`. Note that zeros `"0"` are typically removed
-#' before calling this function.
+#' The input is defined in a `data.frame` obtained from
+#' `get_venndir_curate_df()`, or using the user-provided `curate_df`.
+#' 
+#' Each sign returned by `signed_overlaps()`
+#' is matched in the 'from' column, then replaced with values in the
+#' 'sign' column, then colorized by the 'color' column.
+#' 
+#' Note that zeros `"0"` are typically removed before calling this function.
 #'
-#' The input vector `x` is split using `strsplit()` using whitespace
-#' delimiter by default, then each full value is matched and replaced
-#' using `"from"` in `curate_df`.
-#'
-#' When `curate_df` is not supplied, default values are generated
-#' for `"from"` values: `"1"`, `"-1"`, `"0"`, `"concordant|agreement"`,
-#' and `"mixed"`. Values are matched using regular expression `gsub()`
-#' however the full string must match, therefore `from="1"` will only
-#' match `"1"` and will not match `"-1"`.
-#'
-#' The `curate_df` must contain these three colnames:
+#' The `curate_df` must contain these four colnames:
 #' * `"from"` - regular expression patterns, which will be surrounded
 #'    by `"^("` and `")$"` to ensure complete match.
 #' * `"sign"` - `character` replacement for each value matched in `"from"`
 #'    when `type="sign"`.
 #' * `"color"` - `character` R color to assign to each value matched
 #'    in `"from"`, when `type="color"`.
-#'
-#' When two or more replacement values defined by `curate_df[,"sign"]` are
-#' present in one entry in `x`, the values are concatenated together
-#' with no whitespace. For example `"1 1"` becomes `"^^"` with no spacing.
-#' To impose whitespace between characters, define `sign=c("^ ", "v ")`
+#' * `"hide_singlet"` - `logical` indicating whether signed singlet counts
+#'    should be hidden, for example "agreement" has no meaning when
+#'    only one set is involved.
+#' 
+#' Multiple signs are concatenated together, in the event the input overlap
+#' has multiple values, for example `"1 1"` becomes `"^^"` with no
+#' spacing.
+#' 
+#' To impose whitespace between sign characters, define `sign=c("^ ", "v ")`
 #' to include whitespace. Any leading/trailing whitespace will be removed
 #' afterwards.
 #' 
@@ -52,9 +50,10 @@
 #'    * `"from"` - regular expression patterns
 #'    * `"sign"` - replacement value when `type="sign"`
 #'    * `"color"` - replacement R color when `type="color"`
-#' @param unicode `logical` indicating whether to use Unicode characters
-#'    when `type="sign"`. Note this argument only affects the default
-#'    values, it is not applied when using a custom `curate_df`.
+#'    * `"hide_singlet"` - logical whether to display signed counts
+#'    for singlet overlap sets.
+#' @param unicode `logical` default TRUE, whether to use Unicode characters,
+#'    passed to `get_venndir_curate_df`.
 #' @param blend_preset `character` string passed as `preset` to
 #'    `colorjam::blend_colors()` to define the color wheel used
 #'    during color blending operations.
@@ -81,7 +80,8 @@
 #' @export
 curate_venn_labels <- function
 (x,
- type=c("sign", "color"),
+ type=c("sign",
+    "color"),
  curate_df=NULL,
  unicode=TRUE,
  blend_preset="ryb",
@@ -91,57 +91,22 @@ curate_venn_labels <- function
    if (length(x) == 0) {
       return(x)
    }
-   type <- match.arg(type);
-   if (length(curate_df) == 0) {
-      if (2 %in% unicode) {
-         curate_list <- list(
-            c("-1", "\u2193", "dodgerblue3"),
-            c("1", "\u2191", "firebrick"),
-            c("concordant|agreement", "\u2714", "dodgerblue3"), # check mark
-            c("mixed", "\u2716", "grey45")); # X mark
-            # c("mixed", "\u2928", "grey45")); # up/down diagonal cross arrows - not supported widely
-            # c("concordant|agreement", "\u2016", "dodgerblue3"), # double bar ||
-            # c("mixed", "\u2717", "grey45")); # X to go with check mark
-            # c("[ ]*mixed", "\u21C6", "grey45")); # left-right equilibrium arrows
-            # c("mixed", "\u2194", "grey45")); # left-right single arrow (small)
-            # c("mixed", "X", "grey45")); # uppercase X
-      } else if (1 %in% unicode) {
-         curate_list <- list(
-            c("-1", "\u2193", "dodgerblue3"),
-            c("1", "\u2191", "firebrick"),
-            c("0", "-", ""),
-            c("concordant|agreement", "\u2016", "dodgerblue3"), # double bar ||
-            c("mixed", "X", "grey45")); # uppercase X
-            # c("mixed", "\u58", "grey45")); # broken bar |
-            # c("mixed", "\u00A6", "grey45")); # broken bar |
-            # c("concordant|agreement", "\u2714", "dodgerblue3"), # check mark
-            # c("mixed", "\u2715", "grey45")); # X mark
-            # c("concordant|agreement", "=", "dodgerblue3"), # equal sign
-            # c("mixed", "X", "grey45"));
-            #c("mixed", "\u21C6", "grey45"));
-      } else {
-         curate_list <- list(
-            c("-1", "v", "dodgerblue3"),
-            c("1", "^", "firebrick"),
-            c("0", "-", ""),
-            c("concordant|agreement", "=", "dodgerblue3"),
-            c("mixed", "X", "grey45"));
-      }
-      curate_df <- data.frame(check.names=FALSE,
-         stringsAsFactors=FALSE,
-         jamba::rbindList(curate_list))
-      colnames(curate_df) <- c("from", "sign", "color");
-   } else {
-      if (!"data.frame" %in% class(curate_df)) {
-         curate_df <- data.frame(check.names=FALSE,
-            stringsAsFactors=FALSE,
-            curate_df);
-      }
-      if (!"color" %in% colnames(curate_df)) {
-         curate_df[,"color"] <- "#000000";
-      }
-   }
    
+   # 0.0.51.900 - move curate_df into get_venndir_curate_dr()
+   if (inherits(curate_df, "data.frame") && nrow(curate_df) > 0) {
+      # use curate_df
+      if (!"color" %in% colnames(curate_df)) {
+         curate_df$color <- "#000000";
+      }
+      if (!"hide_singlet" %in% colnames(curate_df)) {
+         curate_df$hide_singlet <- FALSE;
+      }
+   } else {
+      curate_df <- get_venndir_curate_df(unicode=unicode,
+         ...)
+   }
+   type <- match.arg(type);
+
    # 0.0.27.900: process using positional matching
    # iterate each character from each value in x
    x_split <- jamba::rmNULL(strsplit(x, split=split),

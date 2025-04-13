@@ -326,6 +326,7 @@ venndir <- function
  inside_percent_threshold=0,
  item_cex=1,
  item_style=c("default",
+    "marquee",
     "text",
     "gridtext"),
  item_buffer=-0.15,
@@ -762,6 +763,10 @@ venndir <- function
    
    ## Labels for each overlap
    # - using gCounts from signed_overlaps() above
+   if (length(curate_df) == 0) {
+      curate_df <- get_venndir_curate_df(unicode=unicode,
+         ...)
+   }
    gbase_labels <- curate_venn_labels(
       x=names(unlist(unname(gCounts))),
       unicode=unicode,
@@ -806,24 +811,7 @@ venndir <- function
    # signed label positions
    signed_x <- rep(main_x, gCounts_len);
    signed_y <- rep(main_y, gCounts_len);
-   # signed_vjust <- unname(unlist(lapply(gCounts_len, function(i){
-   #    iseq <- seq_len(i) - 1;
-   #    iseq - mean(iseq);
-   # }))) + 0.5;
-   # signed_hjust <- rep(0, length(signed_x));
-   # signed_halign <- rep(0, length(signed_x));
-   
-   # # signed label positions
-   # x_signed <- rep(x_main, gCounts_len);
-   # y_signed <- rep(y_main, gCounts_len);
-   # vjust_signed <- unname(unlist(lapply(gCounts_len, function(i){
-   #    iseq <- seq_len(i) - 1;
-   #    iseq - mean(iseq);
-   # }))) + 0.5;
-   # hjust_signed <- rep(0, length(x_signed));
-   # halign_signed <- rep(0, length(x_signed));
-   
-   
+
    # venndir_label_style() assigns these values
    label_fill_main <- rep(NA, nrow(nlabel_df));
    label_border_main <- rep(NA, nrow(nlabel_df));
@@ -992,6 +980,8 @@ venndir <- function
       item_cex=item_cex,
       item_style=item_style,
       item_degrees=item_degrees,
+      unicode=unicode,
+      curate_df=curate_df,
       segment_buffer=segment_buffer)
    
    # Create Venndir object

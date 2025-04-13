@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.50.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,13 +74,14 @@ rules. The input is coerced to <code>data.frame</code> if necessary.
 The colnames are expected to include:</p><ul><li><p><code>"from"</code> - regular expression patterns</p></li>
 <li><p><code>"sign"</code> - replacement value when <code>type="sign"</code></p></li>
 <li><p><code>"color"</code> - replacement R color when <code>type="color"</code></p></li>
+<li><p><code>"hide_singlet"</code> - logical whether to display signed counts
+for singlet overlap sets.</p></li>
 </ul></dd>
 
 
 <dt id="arg-unicode">unicode<a class="anchor" aria-label="anchor" href="#arg-unicode"></a></dt>
-<dd><p><code>logical</code> indicating whether to use Unicode characters
-when <code>type="sign"</code>. Note this argument only affects the default
-values, it is not applied when using a custom <code>curate_df</code>.</p></dd>
+<dd><p><code>logical</code> default TRUE, whether to use Unicode characters,
+passed to <code>get_venndir_curate_df</code>.</p></dd>
 
 
 <dt id="arg-blend-preset">blend_preset<a class="anchor" aria-label="anchor" href="#arg-blend-preset"></a></dt>
@@ -111,28 +112,25 @@ which is not intended.</p></dd>
 directional label such as <code>"0 1 0 -1"</code> suitable for display.
 It can output either Unicode or non-Unicode text label,
 or a corresponding color.</p>
-<p>The input currently recognizes directional labels such as
-<code>"0 -1 1 0"</code> or the character labels <code>"agreement"</code>, <code>"concordant"</code>,
-<code>"mixed"</code>. Note that zeros <code>"0"</code> are typically removed
-before calling this function.</p>
-<p>The input vector <code>x</code> is split using <code><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit()</a></code> using whitespace
-delimiter by default, then each full value is matched and replaced
-using <code>"from"</code> in <code>curate_df</code>.</p>
-<p>When <code>curate_df</code> is not supplied, default values are generated
-for <code>"from"</code> values: <code>"1"</code>, <code>"-1"</code>, <code>"0"</code>, <code>"concordant|agreement"</code>,
-and <code>"mixed"</code>. Values are matched using regular expression <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub()</a></code>
-however the full string must match, therefore <code>from="1"</code> will only
-match <code>"1"</code> and will not match <code>"-1"</code>.</p>
-<p>The <code>curate_df</code> must contain these three colnames:</p><ul><li><p><code>"from"</code> - regular expression patterns, which will be surrounded
+<p>The input is defined in a <code>data.frame</code> obtained from
+<code><a href="get_venndir_curate_df.html">get_venndir_curate_df()</a></code>, or using the user-provided <code>curate_df</code>.</p>
+<p>Each sign returned by <code><a href="signed_overlaps.html">signed_overlaps()</a></code>
+is matched in the 'from' column, then replaced with values in the
+'sign' column, then colorized by the 'color' column.</p>
+<p>Note that zeros <code>"0"</code> are typically removed before calling this function.</p>
+<p>The <code>curate_df</code> must contain these four colnames:</p><ul><li><p><code>"from"</code> - regular expression patterns, which will be surrounded
 by <code>"^("</code> and <code>")$"</code> to ensure complete match.</p></li>
 <li><p><code>"sign"</code> - <code>character</code> replacement for each value matched in <code>"from"</code>
 when <code>type="sign"</code>.</p></li>
 <li><p><code>"color"</code> - <code>character</code> R color to assign to each value matched
 in <code>"from"</code>, when <code>type="color"</code>.</p></li>
-</ul><p>When two or more replacement values defined by <code>curate_df[,"sign"]</code> are
-present in one entry in <code>x</code>, the values are concatenated together
-with no whitespace. For example <code>"1 1"</code> becomes <code>"^^"</code> with no spacing.
-To impose whitespace between characters, define <code>sign=c("^ ", "v ")</code>
+<li><p><code>"hide_singlet"</code> - <code>logical</code> indicating whether signed singlet counts
+should be hidden, for example "agreement" has no meaning when
+only one set is involved.</p></li>
+</ul><p>Multiple signs are concatenated together, in the event the input overlap
+has multiple values, for example <code>"1 1"</code> becomes <code>"^^"</code> with no
+spacing.</p>
+<p>To impose whitespace between sign characters, define <code>sign=c("^ ", "v ")</code>
 to include whitespace. Any leading/trailing whitespace will be removed
 afterwards.</p>
     </div>
@@ -140,6 +138,7 @@ afterwards.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other venndir utility:
 <code><a href="expand_range.html">expand_range</a>()</code>,
+<code><a href="get_venndir_curate_df.html">get_venndir_curate_df</a>()</code>,
 <code><a href="make_color_contrast.html">make_color_contrast</a>()</code>,
 <code><a href="make_venn_combn_df.html">make_venn_combn_df</a>()</code>,
 <code><a href="make_venn_test.html">make_venn_test</a>()</code>,
@@ -160,7 +159,7 @@ afterwards.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">venn_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0 1 0 -1"</span>, <span class="st">"1 -1"</span>, <span class="st">"1 1 1"</span>, <span class="st">"mixed"</span>, <span class="st">"agreement"</span>, <span class="st">"1 1 0 0"</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"sign"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "-↑-↓" "↑↓"   "↑↑↑"  "X"    "‖"    "↑↑--"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "-↑-↓" "↑↓"   "↑↑↑"  "X"    "="    "↑↑--"</span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"sign"</span>, unicode<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "-^-v" "^v"   "^^^"  "X"    "="    "^^--"</span>
 <span class="r-in"><span></span></span>
@@ -170,7 +169,7 @@ afterwards.</p>
 <span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/printDebug.html" class="external-link">printDebug</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"sign"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   collapse<span class="op">=</span><span class="st">", "</span>,</span></span>
 <span class="r-in"><span>   fgText<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"color"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">15:30:57</span>) 12Apr2025:   <span style="color: #AF5FAF;">-↑-↓</span>, <span style="color: #AF5FAF;">↑↓</span>, <span style="color: #D75F5F;">↑↑↑</span>, <span style="color: #6C6C6C;">X</span>, <span style="color: #0087D7;">‖</span>, <span style="color: #D75F5F;">↑↑--</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">18:53:16</span>) 13Apr2025:   <span style="color: #AF5FAF;">-↑-↓</span>, <span style="color: #AF5FAF;">↑↓</span>, <span style="color: #D75F5F;">↑↑↑</span>, <span style="color: #6C6C6C;">X</span>, <span style="color: #0087D7;">=</span>, <span style="color: #D75F5F;">↑↑--</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

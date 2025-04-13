@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.50.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,34 @@
       <small>Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.51.900" id="venndir-0051900">venndir 0.0.51.900<a class="anchor" aria-label="anchor" href="#venndir-0051900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-51-900">Changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-51-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>
+<strong>Change of behavior</strong>:<br>
+Now for <code>overlap_type="agreement"</code> the sign for ‘agreement’ is not shown for single-set overlaps since it has no meaning when only one set is involved.<br>
+The exception is when displaying items with only the “sign”, in that case the sign is still shown.</li>
+<li>
+<strong>Change of default</strong>: <code>item_style="marquee"</code> will now use marquee for item label rendering.</li>
+<li>Added some elements to Venndir metadata: <code>unicode</code>, <code>curate_df</code>
+</li>
+<li>Now calls <code><a href="../reference/get_venndir_curate_df.html">get_venndir_curate_df()</a></code> to define <code>curate_df</code> upfront.</li>
+</ul></li>
+<li><p><code><a href="../reference/venn_meme.html">venn_meme()</a></code> new default <code>item_style="default"</code> which thereby uses marquee, also <code>"marquee"</code> is added as a recognized option.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-0-51-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-51-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/get_venndir_curate_df.html">get_venndir_curate_df()</a></code></p>
+<ul><li>Convenient way to get the curate_df used to convert signed values to Unicode (or non-Unicode) symbols, and associated colors.</li>
+<li>
+<code><a href="../reference/curate_venn_labels.html">curate_venn_labels()</a></code> now calls this function to define <code>curate_df</code>.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.50.900" id="venndir-0050900">venndir 0.0.50.900<a class="anchor" aria-label="anchor" href="#venndir-0050900"></a></h2>
 <div class="section level3">

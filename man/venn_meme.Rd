@@ -10,7 +10,7 @@ venn_meme(
   item_cex = 1,
   item_degrees = 0,
   item_buffer = -0.85,
-  item_style = c("text", "richtext_grob", "gridtext"),
+  item_style = c("default", "marquee", "text", "gridtext"),
   keep_item_order = TRUE,
   show_items = "item",
   show_labels = "i",

@@ -249,6 +249,7 @@ render_venndir(vo4h2way, main="Two-way overlaps only")
 Other venndir utility: 
 \code{\link{curate_venn_labels}()},
 \code{\link{expand_range}()},
+\code{\link{get_venndir_curate_df}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{make_venn_test}()},

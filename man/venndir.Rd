@@ -36,7 +36,7 @@ venndir(
   venn_jp = NULL,
   inside_percent_threshold = 0,
   item_cex = 1,
-  item_style = c("default", "text", "gridtext"),
+  item_style = c("default", "marquee", "text", "gridtext"),
   item_buffer = -0.15,
   item_degrees = 0,
   sign_count_delim = " ",

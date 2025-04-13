@@ -1,3 +1,31 @@
+# venndir 0.0.51.900
+
+## Changes to existing functions
+
+* `venndir()`
+
+   * **Change of behavior**:  
+   Now for `overlap_type="agreement"` the sign for 'agreement' is not
+   shown for single-set overlaps since it has no meaning when only
+   one set is involved.  
+   The exception is when displaying items with only the "sign",
+   in that case the sign is still shown.
+   * **Change of default**: `item_style="marquee"` will now use marquee
+   for item label rendering.
+   * Added some elements to Venndir metadata: `unicode`, `curate_df`
+   * Now calls `get_venndir_curate_df()` to define `curate_df` upfront.
+
+* `venn_meme()` new default `item_style="default"` which thereby uses
+marquee, also `"marquee"` is added as a recognized option.
+
+## new functions
+
+* `get_venndir_curate_df()`
+
+   * Convenient way to get the curate_df used to convert signed values
+   to Unicode (or non-Unicode) symbols, and associated colors.
+   * `curate_venn_labels()` now calls this function to define `curate_df`.
+
 # venndir 0.0.50.900
 
 ## Changes
