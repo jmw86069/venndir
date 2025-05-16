@@ -19,11 +19,12 @@ add_orientation_JamPolygon(
 
 \item{flip_sign}{\code{integer} to indicate whether the orientation should
 be flipped, inverting the meaning of all returned values.
-This argument is intended to be used when defining inner and outer
-borders alongside something like \code{vwline::grid.vwline()} which
-defines border on the left and right, as it travels from point
-to point. By using \code{flip_sign=-1} it will flip the right and
-left sides accordingly.}
+For example, clockwise polygons by default are considered
+"solid", and counter-clockwise are considered "holes", for
+the purpose of interpreting nested polygons. When \code{flip_sign=-1}
+it reverses these assumptions.
+This option is experimental and intended mainly for internal
+testing.}
 
 \item{include_holes, include_clockwise, include_parent}{\code{logical}
 indicating whether to include additional columns to describe
@@ -95,7 +96,7 @@ add_orientation_JamPolygon(jp3,
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
 \code{\link{buffer_JamPolygon}()},

@@ -18,10 +18,10 @@
 #' That function accepts more sets, however not all overlaps may
 #' be represented in the output.
 #' 
-#' @returns `list` in polygon_list format with `"x"` and `"y"` elements,
-#'    or when `return_type="JamPolygon"` it returns `JamPolygon`.
+#' @returns `JamPolygon` representing Venn or Euler circles,
+#'    however this function does not subdivide circles by overlap.
 #' 
-#' @family venndir polygons
+#' @family venndir internal
 #' 
 #' @param counts `integer` vector whose names represent set overlaps,
 #'    where set names are separated by `sep` delimiter.

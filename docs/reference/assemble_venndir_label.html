@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -153,10 +153,10 @@ Not compatible with MacOS and R-4.4.1 or older, so it will revert
 to <code>"textGrob"</code> in that specific scenario.</p></li>
 <li><p><code>"textGrob"</code> uses <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code> - solid all-around, however
 it does not support markdown.</p></li>
-<li><p><code>"gridtext"</code> (deprecated) uses <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> -
+<li><p><code>"gridtext"</code> (deprecated) uses <code>gridtext::richtext_grob()</code> -
 alternative for markdown support, however some graphics devices show
 inconsistent spacing between words.</p></li>
-<li><p><code>"richtext_grob"</code> (deprecated) uses <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> -
+<li><p><code>"richtext_grob"</code> (deprecated) uses <code>gridtext::richtext_grob()</code> -
 alternative for markdown support, however some graphics devices show
 inconsistent spacing between words.</p></li>
 </ul></dd>
@@ -209,6 +209,19 @@ values: "plain", "bold", "italic", "bold.italic"</p></li>
 <li><p><code>fontcolors</code>: applies font color to each label in order</p></li>
 </ul></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other venndir internal:
+<code><a href="expand_range.html">expand_range</a>()</code>,
+<code><a href="get_venn_polygon_shapes.html">get_venn_polygon_shapes</a>()</code>,
+<code><a href="make_color_contrast.html">make_color_contrast</a>()</code>,
+<code><a href="make_venn_combn_df.html">make_venn_combn_df</a>()</code>,
+<code><a href="match_list.html">match_list</a>()</code>,
+<code><a href="print_color_df.html">print_color_df</a>()</code>,
+<code><a href="shrink_df.html">shrink_df</a>()</code>,
+<code><a href="simple_ellipse.html">simple_ellipse</a>()</code>,
+<code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -308,7 +321,7 @@ values: "plain", "bold", "italic", "bold.italic"</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

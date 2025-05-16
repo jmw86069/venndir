@@ -63,7 +63,7 @@
 #' When customizing the overlap set label fontsize, and border, it may
 #' be useful to move the labels to minimize overlaps.
 #' 
-#' @family jam JamPolygon
+#' @family venndir advanced
 #' 
 #' @examples
 #' testlist <- make_venn_test(n_sets=3, do_signed=TRUE);
@@ -302,7 +302,7 @@ modify_venndir_overlap <- function
 #'    to be visible between adjacent border lines.
 #'    To show the outerborder, use `outerborder.lwd=2` or higher.
 #' 
-#' @family venndir utility
+#' @family venndir advanced
 #' 
 #' @examples
 #' testlist4 <- make_venn_test(n_sets=4, do_signed=FALSE)

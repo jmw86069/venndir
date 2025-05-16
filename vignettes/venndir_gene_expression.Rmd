@@ -34,15 +34,18 @@ options("warn"=-1);
 library(venndir)
 ```
 
-Venndir was inspired by gene expression data, which contains
+Venndir was driven by gene expression analysis, which contains
 up/down directionality. Here are some examples showing how
 gene expression data can be used in `venndir`.
 
+The examples include `limma` and `DESeq2` as two common example
+workflows.
 
-### Generic example
+
+# Generic example
 
 The `venndir::make_venn_test()` function is useful to
-generate test data.
+generate test data, just to create a Venn diagram.
 
 ```{r generic_1}
 setlist <- make_venn_test(2500, 3,
@@ -53,13 +56,14 @@ venndir(setlist, overlap_type="agreement")
 
 
 
-### Venndir with limma results
+# Venndir with limma results
 
+## Illumina Case Study
 
 The `limma` package provides an extensive set of gene expression
 data analysis tools. The steps below reproduce the `Limma Users Guide`
 example `"Illumina Use Case"` in Section 17.3. This example
-requires data available at http://bioinf.wehi.edu.au/marray/IlluminaCaseStudy
+requires data available at https://bioinf.wehi.edu.au/marray/IlluminaCaseStudy
 copied to the current working directory.
 
 For the sake of this example, the steps assume the data is located
@@ -69,322 +73,575 @@ home directory.
 ```{r limma_1}
 illuminadir <- "~/IlluminaCaseStudy";
 do_limma <- FALSE;
+do_deseq2 <- FALSE;
 if (suppressPackageStartupMessages(require(limma)) && dir.exists(illuminadir)) {
-  do_limma <- TRUE;
+   do_limma <- TRUE;
+}
+if (do_limma && suppressPackageStartupMessages(require(DESeq2))) {
+   do_deseq2 <- TRUE;
 }
 if (do_limma) {
-  targets <- readTargets(path=illuminadir)
-  # import Illumina data
-  x <- read.ilmn(files="probe profile.txt.gz",
-     ctrlfiles="control probe profile.txt.gz",
-     other.columns="Detection",
-    path=illuminadir)
-  # define expressed probes
-  y <- neqc(x)
-  expressed <- rowSums(y$other$Detection < 0.05) >= 3;
-  y <- y[expressed,]
-  # calculate within-patient correlations
-  ct <- factor(targets$CellType)
-  design <- model.matrix(~0+ct);
-  colnames(design) <- levels(ct);
-  dupcor <- duplicateCorrelation(y,
-     design,
-     block=targets$Donor);
-  dupcor$consensus.correlation;
-
-  # fit linear model, paired by patient, with correlations
-  fit <- lmFit(y,
-     design,
-     block=targets$Donor,
-     correlation=dupcor$consensus.correlation);
-  # define contrasts
-  contrasts <- makeContrasts(ML-MS, 
-     LP-MS, 
-     ML-LP, 
-     levels=design)
-  
-  # fit contrasts
-  fit2 <- contrasts.fit(fit, contrasts);
-  
-  # eBayes
-  fit2 <- eBayes(fit2, trend=TRUE)
+   targets <- readTargets(path=illuminadir)
+   # import Illumina data
+   x <- read.ilmn(files="probe profile.txt.gz",
+      ctrlfiles="control probe profile.txt.gz",
+      other.columns="Detection",
+      path=illuminadir)
+   # define expressed probes
+   y <- neqc(x)
+   expressed <- rowSums(y$other$Detection < 0.05) >= 3;
+   # subset for expressed probes
+   y <- y[expressed,]
+   # calculate within-patient correlations
+   ct <- factor(targets$CellType)
+   design <- model.matrix(~0 + ct);
+   colnames(design) <- levels(ct);
+   dupcor <- duplicateCorrelation(y,
+      design,
+      block=targets$Donor);
+   dupcor$consensus.correlation;
+   
+   # fit linear model, paired by patient, with correlations
+   fit <- lmFit(y,
+      design,
+      block=targets$Donor,
+      correlation=dupcor$consensus.correlation);
+   # define contrasts
+   contrasts <- makeContrasts(ML-MS, 
+      LP-MS, 
+      ML-LP, 
+      levels=design)
+   
+   # fit contrasts
+   fit2 <- contrasts.fit(fit, contrasts);
+   
+   # eBayes
+   fit2 <- eBayes(fit2, trend=TRUE)
 }
 ```
 
-The steps are straightforward except that this example uses
-a paired linear model. Nonetheless the results is the same, 
-the resulting object is class `MArrayLM`.
+## lmFit() or eBayes() to incidence matrix
 
-The function `limma::decideTests()` applied adjusted P-value
-and log2 fold change filtering, and produces class `TestResults`
-which is actually a signed incidence matrix. Take a look at
-the output:
+The function `limma::decideTests()` will convert the
+output `MArrayLM` object (from `limma::lmFit()` or `limma::eBayes()`),
+first applying thresholds for adjusted P-value and log2 fold change.
+
+The output has class `TestResults` and is a signed incidence matrix!
+The values are already: `c(-1, 0, 1)`, which is perfect!
+
+Take a look at the output:
 
 ```{r limma_2}
 if (do_limma) {
-  # decideTests() creates a signed incidence matrix
-  fit2decide <- decideTests(fit2, method="global");
-  print(head(fit2decide))
+   # decideTests() creates a signed incidence matrix
+   fit2decide <- decideTests(fit2,
+      p.value=0.01, lfc=log2(1),
+      method="global");
+   print(fit2decide)
 }
 ```
 
-A signed incidence matrix can be converted to `setlist`
-with `im_value2list()`. Then call `venndir()`.
 
-The `"im_value"` refers to an incidence matrix with values (signs),
-and `"2list"` will convert to a `list`.
-The `list` returned will contain named vectors, where
-names are the item labels, and values are the signs.
+
+# Examples by Input Type
+
+## Incidence matrix
+
+A signed incidence matrix can be used directly, it is
+automatically converted to a signed `list`.
+
+For simplicity, we will show only the first two contrasts,
+using argument: `sets=c(1, 2)`
+
+```{r limma_3a}
+if (do_limma) {
+   venndir(fit2decide, sets=c(1, 2));
+}
+```
+
+## Signed set list
+
+The signed incidence matrix can be converted to a signed
+set list using `im_value2list()`.
 
 ```{r limma_3}
 if (do_limma) {
-  limmalist <- im_value2list(fit2decide);
-  venndir(limmalist, sets=c(1, 2));
+   limmalist <- im_value2list(fit2decide);
+   venndir(limmalist, sets=c(1, 2));
 }
 ```
 
 A few features are noticeable:
 
-1. The `limma` contrasts `"ML - MS"` and `"LP - MS"` are
-shown in each Venn circle. The numbers in each circle
-represent statistically significant changes given
-the `limma` thresholds.
-2. There is fairly high overlap between these gene lists,
-`3,681` probes are shared, which is more than not shared
-`2,922` and `2,303`, respectively.
-3. Almost all the overlapping probes are changing in the
-same direction in these two contrasts
+1. The `limma` contrasts `"ML - MS"` and `"LP - MS"` are shown,
+both involve a comparison "versus MS". It compares the
+ML differences from MS, to the LP differences from MS.
+2. The numbers are statistically significant changes given
+the statistical thresholds used by `limma::decideTests()`.
+3. There is fairly high overlap between these gene lists,
+`1,582` are shared.
+4. All of the shared changes have the same direction
+of change in `ML-MS` compared with `LP-MS`.
 
-    * `1,800` probes are up in both contrasts
-    * `1,856` probes are down in both contrasts
-    * `25` probes disagree in up-down or down-up direction
+   * `740` are up in both comparisons.
+   * `842` are down in both comparisons.
 
-4. Implied in #3, the shared probes are roughly evenly
-distributed between up and down.
+> Exercise for the reader: Consider using more lenient
+statistical thresholds, and test the overlap and directional
+concordance. Would you expect more lenient results to have
+the same concordance, or less concordance?
 
 
-#### Proportional Venn diagram (Euler)
+# Customizing the Diagram
 
-The data can be drawn with proportional circles, otherwise
-known as a Euler diagram, or proportional Venn diagram.
+## Proportional Venn (Euler)
 
-For this diagram, we will plot `sets=c(1, 3)` mostly
+The data can be drawn with proportional circles, which
+is a Euler diagram.
+
+For this diagram, we plot `sets=c(1, 3)` mostly
 because these are more visually interesting.
 
 ```{r limma_3p}
 if (do_limma) {
-  limmalist <- im_value2list(fit2decide);
   venndir(limmalist, sets=c(1, 3), proportional=TRUE);
 }
 ```
 
-#### overlap_type "agreement"
+## Customizing the labels
 
-An alternative approach to represent concordance is
-by "agreement", which combines up-up and down-down
-into one summary number.
+Sometimes proportional circles have tall-skinny overlap regions,
+so you can arrange the signed labels using argument: `template="tall"`.
 
-Use the argument `overlap_type="agreement"`.
+For kicks, we will also enlarge the main count labels using
+the second value in `font_cex=c(1.2, 1.5, 0.8)`. The first value
+controls the set label, the second controls the main count label,
+the third controls the signed count labels.
 
+```{r limma_3p_tall}
+if (do_limma) {
+   venndir(limmalist, sets=c(1, 3), proportional=TRUE,
+      font_cex=c(1, 1.5, 0.8),
+      template="tall");
+}
+```
+
+## overlap_type="agreement"
+
+The argument `overlap_type="agreement"` will summarize
+counts by agreement `"="`, or disagreement `"X"`.
+
+Notice that sets 2 and 3 are predominantly discordant.
+It may be confusing, but for this type of analysis,
+and these comparisons, this result is expected.
+The group `"LP"` is the test group in the first comparison,
+and `"LP"` is the control group in the second comparison.
 
 ```{r limma_4}
 if (do_limma) {
-  limmalist <- im_value2list(fit2decide);
-  venndir(limmalist, sets=c(1, 2), overlap_type="agreement");
+   venndir(limmalist, sets=c(2, 3), proportional=TRUE,
+      font_cex=c(1, 1.5, 0.8),
+      template="tall",
+      overlap_type="agreement");
 }
 ```
 
-#### overlap_type "each"
+## overlap_type="each"
 
-Finally, you can represent all the directional changes
-using `overlap_type="each"`.
+The argument `overlap_type="each"` will display counts for each
+combination of up and down. This option gives the most detail, but
+can sometimes be challenging to label clearly.
 
 ```{r limma_5}
 if (do_limma) {
-  limmalist <- im_value2list(fit2decide);
-  venndir(limmalist, sets=c(1, 2), overlap_type="each");
+   venndir(limmalist, sets=c(2, 3),
+      font_cex=c(1, 1.5, 0.8),
+      template="tall",
+      overlap_type="each");
 }
 ```
 
-#### Display item labels
+# Item labels
 
-It is sometimes interesting to show item labels inside the
-Venn diagram -- but 3,600 text labels are too many
-to be displayed!
+It is sometimes useful to show item labels inside the
+Venn diagram.
+**However please don't try it with 3,000+ labels!**
 
-For the purpose of this example, we will filter
-statistical hits using a higher fold change,
-and more significant P-value threshold -- just to
-reduce the labels.
+For this example, we apply a stringent statistical filter
+to reduce the number of hits.
 
-In practice, examples with >3000 hits should probably never be labeled
-unless printing full size on a poster (and even then, with small font!)
+## Sign Item label
 
 ```{r limma_6}
 if (do_limma) {
-  # increase stringency of statistical filtering
-  fit2decide2 <- decideTests(fit2,
-    p.value=1e-4,
-    lfc=4);
-  # convert to signed list
-  limmalist2 <- im_value2list(fit2decide2);
-  limmalist2 <- lapply(limmalist2, function(i){
-    jamba::nameVector(as.vector(i), names(i))
-  })
-  # display item labels
-  venndir(limmalist2,
-    sets=c(1, 2),
-    poly_alpha=0.3,
-    show_labels="Ni",
-    show_items="sign item",
-    item_cex=1,
-    item_degrees=4,
-    max_items=1000);
+   # increase stringency of statistical filtering
+   fit2decide2 <- decideTests(fit2,
+      p.value=1e-4,
+      lfc=5);
+   # increase stringency of statistical filtering
+   limmalist2 <- im_value2list(fit2decide2);
+   # display item labels
+   venndir(fit2decide2,
+      sets=c(1, 2),
+      show_labels="Ni",
+      item_degrees=2,
+      fontfamily="ArialNarrow",
+      show_items="sign item")
+}
+```
+
+## Gene labels
+
+This step "gets into the weeds" so to speak, but is more interesting
+than printing Illumina probe names. There is a little helper function
+`collapse_im()` intended to collapse an incidence matrix by row groups,
+which is a fancy way of saying "Make it per-gene".
+
+1. Convert Illumina probe names to Illumina gene symbols.
+2. Summarize the direction per gene with `collapse_im()`.
+
+The method prioritizes non-zero values, so that any evidence of a hit
+will be retained, using the majority direction.
+
+```{r limma_6g}
+if (do_limma) {
+   # filter for non-zero values
+   fit2decide2g <- subset(fit2decide2, rowSums(abs(fit2decide2)) > 0)
+   match2g <- match(rownames(fit2decide2g), rownames(y))
+   y_symbol <- ifelse(y$genes$SYMBOL %in% "",
+      rownames(y),
+      y$genes$SYMBOL)
+   row_genes <- y_symbol[match2g]
+   fit2gene <- collapse_im(fit2decide2g, row_genes)
+   
+   # display item labels
+   venndir(fit2gene,
+      xyratio=2.2,
+      # fontfamily="ArialNarrow",
+      fontfamily="Avenir Next Condensed",
+      sets=c(1, 2),
+      show_labels="Ni",
+      show_items="sign item")
 }
 ```
 
 
-### DIsplay item directions
+## Arrow labels
 
-The display of item labels brings up some potential
-benefits: it does indicate the relative density of labels,
-and relative quantity of up/down/mixed direction.
+When there are many items, sometimes it's nice to see just
+the arrows. It saves space, while also filling the
+polygon with the color associated with each direction.
 
-You can customize the item label so that it only displays
-the directional sign, and not the item. This technique may
-be good for higher number of items.
-
-Use argument `show_items="sign"`.
+Use argument: `show_items="sign"`
 
 ```{r limma_6s}
 if (do_limma) {
-  vo6s <- venndir(limmalist2,
-    sets=c(1, 2),
-    poly_alpha=0.3,
-    show_labels="Ni",
-    show_items="sign",
-    item_cex=1,
-    max_items=1000);
+   vo6s <- venndir(fit2decide2,
+      sets=c(1, 2),
+      label_style="shaded box",
+      proportional=TRUE,
+      show_labels="NcSi",
+      show_items="sign",
+      item_cex=2,
+      item_degrees=7,
+      max_items=1000);
 }
 ```
 
 
-#### Convert probes to genes
-
-The first item label figure highlights an important issue:
-`limma` and similar analysis tools test the probes,
-not the genes.Therefore the results represent
-Illumina probes, which are not very helpful by
-themselves.
-
-Fortunately in this case, the gene data is available in `y$genes`,
-so we can convert each row to a gene symbol. However there are multiple
-probes per gene symbol. For the sake of this example, we will choose
-the first of each gene symbol from the statistical hits.
-
-> There is another Jam R package function that may be helpful:
-`genejam::freshenGenes()`. This function takes one of more columns
-of gene symbols, gene accessions, gene identifiers, and returns
-the "best matching result" using Bioconductor gene annotation data.
-
-```{r limma_7}
-if (do_limma) {
-  # convert probe hits to gene hits
-  limmalist2 <- im_value2list(fit2decide2);
-  # iterate the hit list to convert to gene
-  limmalist2g <- lapply(limmalist2, function(i){
-    kdf <- data.frame(check.names=FALSE, i);
-    # use gene symbol
-    kdf$genes <- y$genes[rownames(kdf), "SYMBOL"];
-    # subset for unique genes with non-empty value
-    kdf_sub <- subset(kdf, nchar(genes) > 0 & !duplicated(genes))
-    # make a vector of signed direction
-    kdf_genes <- kdf_sub[, 1];
-    # name the vector using gene symbol
-    names(kdf_genes) <- kdf_sub$genes;
-    kdf_genes
-  })
-  venndir(limmalist2g, sets=c(1, 2),
-    show_labels="Ni",
-    show_items="sign item",
-    poly_alpha=0.3,
-    item_cex=1,
-    max_items=1000);
-}
-```
-
-
-### Three-way directional Venn
+# Three-way directional Venn
 
 The examples above purposefully used only two contrasts,
 because those two contrasts show very high concordance.
-An experiment design with three groups is quite common,
-and adding directionality for the third contrast can
-be confusing, and still useful. (See section below on interpreting
-three-group Venn diagrams.)
-
-```{r limma_8}
-if (do_limma) {
-  venndir(limmalist,
-    sets=c(1, 2, 3),
-    overlap_type="agreement");
-}
-```
 
 
-
-#### Comments on converting probe to gene
-
-When converting probes to genes, I usually run a quick
-test to see if any genes have statistically significant
-probes that are "up" and "down" -- I call these "bi-directional
-genes". If there are no bi-directional genes, then choosing one
-entry per gene is reasonable. I leave this evaluation to the
-scientist, but please post an issue if you have specific
-questions.
-
-For RNA-seq data, the input data matrix may already contain
-gene expression values -- as when using `tximport::tximport()`
-with the argument `tx2gene`; or when importing `featureCounts`
-data where each row represents one gene identifier. In those
-cases, no conversion is required.
-
-
-### Interesting examples and how to interpret them
-
-
-#### Three-group analysis
+## Three-group analysis
 
 One common type of analysis involves three experimental
 groups. For example:
 
-1. Control group
+1. Control
 2. Treatment A
 3. Treatment B
 
 The typical contrasts are:
 
-1. Treatment A - Control
-2. Treatment B - Control
-3. Treatment B - Treatment A
-
-Nothing particularly unusual about the experiment design,
-nor the contrasts, these are fairly standard and
-straightforward.
+1. A - Control
+2. B - Control
+3. A - B
 
 When creating a three-way Venn diagram, the results
 are also fairly straightforward. When the directionality
 is included, it can be more confusing, but also
-potentially much more informative.
+potentially much more informative. Note that the contrast (3)
+may be written `"A - B"` or `"B - A"`, and the order
+affects the directionality.
+
+```{r venn_compare_0}
+if (do_limma) {
+   fit2decide1 <- decideTests(fit2,
+      p.value=1e-3,
+      lfc=log2(1.5));
+   colnames(fit2decide1) <- c("A - C",
+      "B - C",
+      "A - B")
+   v <- venndir(fit2decide1,
+      sets=c(1, 2, 3),
+      overlap_type="agreement");
+}
+```
 
 There are a few potential scenarios:
 
-1. Treatment A does not affect similar genes as
-does Treatment B. This result is seen with low
-overlaps.
-2. Treatment A affects similar genes as Treatment B,
-but not with any particular concordance.
-3. Treatment A affects similar genes as Treatment B,
-with extremely high concordance.
+1. Treatment A does not affect the same genes as B.
+Few overlaps.
+2. Treatment A affects similar genes as B,
+but not with high concordance.
+3. Treatment A affects similar genes as B,
+with high concordance.
+
+An interesting question is whether A and B are different from each other.
+This is contrast (3) above: `"A - B"`
+
+We'll use the Venndir highlight feature to walk
+through the logic.
+
+```{r venn_compare_AB}
+if (do_limma) {
+   v2 <- venndir::highlight_venndir_overlap(v,
+      overlap_set="A - B")
+   plot(v2)
+}
+```
+
+These **46** hits are different between A and B, but are not
+independently different when comparing A to C, nor B to C.
+What does that mean?
+
+* It suggests that these are moderate treatment effects,
+because they aren't statistically significant when comparing
+to Control.
+* It also suggests that the moderate effects are in opposite
+direction in A and B compared to Control. (It is possible
+that Control has higher variability for these genes, but for now
+let's assume variability is reasonably consistent for all groups.)
+
+Taken together, one might expect the number here (46) to be lower than
+those for `"A - C"` or `"B - C"` simply because they are **only**
+hits when comparing A and B directly. If they were changes also seen in
+`"A - C"` they would appear in the section **214**.
+
+```{r venn_compare_AC_AB}
+if (do_limma) {
+   v3 <- venndir::highlight_venndir_overlap(v,
+      overlap_set="A - C&A - B")
+   plot(v3)
+}
+```
+
+* These **214** hits are "distinctively A", in that they are present `"A - C"`
+and `"A - B"`. There are two explanations for concordance or discordance here:
+
+   * Note these hits are not present in `"B - C"` therefore, they could be
+   considered "uniquely A".
+   * High concordance is expected, and suggests that these "A" changes
+   are unique to "A", and have significantly stronger effect in "A" than in "B".
+   * Discordance really should be extremely unlikely, since it would require
+   changes between `"A - B"` which are also not `"B - C"` changes.
 
 
+```{r venn_compare_BC_AB}
+if (do_limma) {
+   v4 <- venndir::highlight_venndir_overlap(v,
+      overlap_set="B - C&A - B")
+   plot(v4)
+}
+```
+
+* These **126** hits are "distinctively B", completely analogous to
+the "distinctively A" example above.
+
+However, note that all hits are discordant. It may be confusing at first,
+however, this effect is due to the order of the comparisons. "B" is
+the test group in `"B - C"`, but "B" is the control group in `"A - B"`.
+
+
+```{r venn_compare_AC_BC}
+if (do_limma) {
+   v5 <- venndir::highlight_venndir_overlap(v,
+      overlap_set="A - C&B - C")
+   plot(v5)
+}
+```
+
+* These **726** hits are shared by A and B compared with Control.
+The key question is whether the hits are concordant.
+This example represents the driving reason Venndir was created.
+
+There are two conceptual results:
+
+1. Overlap
+
+   * High overlap suggests "the same components are involved".
+   * Low overlap suggests "not many of the same components are involved."
+
+2. Directional concordance
+
+   a. **High concordance** suggests the components are affected in the same way.
+   This outcome suggests 'A' and 'B' have similar biological effect.
+   b. **Mixed concordance** suggests that components are *not* affected
+   similarly. In fact, this outcome argues against 'A' and 'B' having
+   similar biological effects.
+   c. **Low concordance** suggests the components are affected in the
+   *opposite* way. (This outcome may be equally compelling.)
+   This outcome suggests 'A' and 'B' have opposite biological effects,
+   for example disease and treatment.
+
+
+```{r venn_compare_AC_BC_AC}
+if (do_limma) {
+   v6 <- venndir::highlight_venndir_overlap(v,
+      overlap_set="A - C&B - C&A - B")
+   plot(v6)
+}
+```
+
+In my opinion, the concordance here is not useful to interpret.
+It may be interesting to display `overlap_type="each"`.
+
+```{r venn_compare_AC_BC_AC_each}
+if (do_limma) {
+   veach <- venndir(fit2decide1,
+      do_plot=FALSE,
+      sets=c(1, 2, 3),
+      overlap_type="each");
+   v6each <- venndir::highlight_venndir_overlap(veach,
+      overlap_set="A - C&B - C&A - B")
+   plot(v6each)
+}
+```
+
+* This plot is mainly useful when A and B have concordant effects
+compared with Control.
+
+   * When A and B are concordant, results should typically begin `^^` or `vv`.
+   * The third arrow indicates the contrast with higher magnitude.
+   * For example `^^^` is up in A-C, up in B-C, and higher in A-B.
+   Therefore A has a greater effect (up) than B.
+   * For example `vvv` is down in A-C, down in B-C, and even lower in A-B.
+   Therefore A has a greater effect (down) than B.
+   * However `^^v` is up in A-C, up in B-C, and lower in A-B.
+   Therefore B has a greater effect (up) than A.
+   * Similarly `vv^` is down in A-C, down in B-C, and higher in A-B.
+   Therefore B has a greater effect (down) than A.
+
+* When A and B are discordant, the third arrow should match the first arrow,
+and is therefore not informative.
+
+   * `^v^` is up in A-C, down in B-C. Therefore when comparing 'A-B' the
+   direction must also be up.
+   * `v^v` is down in A-C, up in B-C. Therefore when comparing 'A-B' the
+   direction must also be down.
+
+* To state it clearly, there should never be a scenario with `^vv` or `v^^`
+for the contrasts A-C, B-C, A-B. If this pattern occurs, it suggests two
+possibilities:
+
+   1. The contrasts are reversed, for example `'B-A'` instead of `'A-B'`.
+   This is fine, but adjust the expectations accordingly.
+   2. There may be high variability in the data, causing the estimated
+   directions to be unstable. It may occur when using imputed data in
+   place of missing or sparse data, or when there are outlier measurements
+   which are order of magnitude (10-fold or more) different than typical
+   expected results.
+
+# Venndir with DESeq2 results
+
+The same data is processed using DESeq2, with the caveat that
+this is Illumina microarray data - not RNA-seq data as intended
+for DESeq2. This example is purely to demonstrate the mechanics
+of the process.
+
+```{r deseq2_1}
+if (do_limma) {
+   # DESeq2 DataSet
+   targets$DonorNum <- factor(paste0("E", targets$Donor))
+   targets$CellType <- factor(targets$CellType)
+   countData <- round(2^(y$E) - 1);
+   countData[] <- as.integer(countData)
+   dds <- suppressMessages(
+      DESeq2::DESeqDataSetFromMatrix(
+         countData=countData,
+         rowData=y$genes,
+         colData=targets,
+         design=~0 + CellType + DonorNum)
+      )
+   # run DESeq
+   dds <- DESeq2::DESeq(dds)
+   # calculate contrasts
+   use_contrasts <- contrasts[c(1, 2, 3, 4, 4, 4), ];
+   rownames(use_contrasts) <- c(paste0("CellType", rownames(contrasts)),
+      tail(resultsNames(dds), 2))
+   
+   # iterate each contrast to produce DESeqResults
+   res_list <- lapply(jamba::nameVector(colnames(use_contrasts)),
+      function(i){
+      DESeq2::results(dds,
+         saveCols="SYMBOL",
+         contrast=use_contrasts[, i])
+   })
+   # filter for statistical hits
+   res_hits <- lapply(res_list, function(ires){
+      isub <- subset(ires, !is.na(padj) &
+            padj <= 0.01 &
+            abs(log2FoldChange) >= log2(2));
+      jamba::nameVector(sign(isub$log2FoldChange),
+         rownames(isub))
+   })
+   names(res_hits) <- paste0(names(res_hits), "\nDESeq2");
+}
+```
+
+## DESeq2 hits
+
+```{r deseq2_3a}
+if (do_deseq2) {
+   venndir(res_hits,
+      proportional=TRUE,
+      template="tall",
+      sets=c(1, 2));
+}
+```
+
+## Compare limma to DESeq2
+
+It's only natural to want to compare limma and DESeq2...
+Remember that DESeq2 is used here with microarray data
+only for educational purposes, and is not generally
+recommended for array data otherwise.
+That said, it does perform fairly well.
+
+```{r limma_deseq2_1}
+if (do_deseq2) {
+   use_list <- c(
+      limmalist[1:2],
+      res_hits[1:2])[c(1, 3, 4, 2)];
+   venndir(use_list,
+      font_cex=c(1, 1, 0.5),
+      overlap_type="agreement",
+      # alpha_by_counts=TRUE,
+      template="tall");
+}
+```
+
+Quick notes:
+
+* Notice there are more similarities within the same contrast
+(1,223 and 827). These are likely to be robust hits, detected
+by both limma and DESeq2.
+* There is a much lower overlap within each platform (519, 117)
+across the two contrasts. These are likely to be specific
+to each method, owing to limma's specialization in microarrays.
+* There are no shared hits across methods for different contrasts,
+which is also encouraging.
+* Almost all shared hits are concordant.

@@ -13,7 +13,7 @@
 #' is positioned outside the `sp` polygons, the text is assumed
 #' to be on a white background, using argument `bg`.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #'  
 #'  @param venndir_output `Venndir` object as returned by `venndir()`
 #'     or `render_venndir()`.

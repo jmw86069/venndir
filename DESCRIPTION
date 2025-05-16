@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.51.900
+Version: 0.0.52.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -8,8 +8,10 @@ Authors@R: c(
        comment=c(ORCID="0000-0002-9510-2848"),
        role=c("aut", "cre")))
 Maintainer: James M. Ward <jmw86069@gmail.com>
-Description: Venn and proportional Euler diagrams with optional
-   directionality.
+Description: Venn and proportional Euler diagrams that may also
+   indicate directionality of the items involved. Venn overlaps
+   may include text or item labels. Venn circles, overlap regions,
+   and fonts can be customized.
 Depends: R (>= 3.6.0)
 biocViews:
 Imports: jamba(>= 1.0.4),
@@ -17,22 +19,22 @@ Imports: jamba(>= 1.0.4),
     pracma,
     polyclip,
     polylabelr,
-    data.table,
     gridExtra,
     gridGeometry(>= 0.4.1),
     gtable,
     eulerr,
     marquee(>= 1.0.0),
-    methods
+    methods,
+    data.table
 Suggests:
     Matrix,
     knitr,
     rmarkdown,
     testthat (>= 2.1.0),
-    vwline,
     vdiffr
 Enhances:
-    gridtext
+    gridtext,
+    diffviewer
 License: MIT
 Encoding: UTF-8
 LazyData: true

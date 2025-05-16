@@ -4,6 +4,7 @@
 # venndir
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The `venndir` package provides Venn directional diagrams, that can
@@ -516,19 +517,18 @@ comparing two cars:
 
 ``` r
 meme_list <- list(
-   `Car A`=c("leather seats", "no sunroof", "SUV", "20mpg"),
+   `Car A`=c("leather seats", "SUV", "hardtop", "20mpg"),
    `Car B`=c("cloth seats", "sedan", "sunroof", "40mpg"),
    `Car A&Car B`=c("power locks", "power windows", "trunk storage"))
+
 venn_meme(meme_list,
-   font_cex=c(2, 1, 1),
-   outerborder.lwd=0, innerborder.lwd=0,
    proportional=TRUE,
-   # outerborder="white", outerborder.lwd=1, innerborder=NA,
-   set_colors=c("orange", "firebrick3"),
-   # poly_alpha=0.9,
-   # item_buffer=-0.4,
+   innerborder=NA, outerborder.lwd=1, outerborder="white",
+   item_cex=c(1.7, 1.8, 1.8),
    show_labels="Ni",
-   show_segments=FALSE)
+   set_colors=c("orange", "firebrick3"),
+   item_buffer=0.2,
+   xyratio=2)
 ```
 
 <img src="man/figures/README-venn_meme-1.png" alt="Venn meme comparing attributes of two cars, with labels shown in unique and shared sections of the Venn diagram." width="100%" />

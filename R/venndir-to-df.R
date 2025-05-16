@@ -8,7 +8,7 @@
 #' 
 #' * Accept input from `signed_overlaps()` for purely table summary.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #' 
 #' @returns object of class `"data.frame"` or `"knitr_kable"` based upon
 #'    argument `return_type`.

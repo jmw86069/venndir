@@ -5,8 +5,8 @@
 \title{Generate test sets for venndir}
 \usage{
 make_venn_test(
-  n_items = 1e+06,
-  n_sets = 4,
+  n_items = 200,
+  n_sets = 3,
   do_signed = FALSE,
   concordance = 0.5,
   min_size = ceiling(n_items/50),
@@ -133,20 +133,13 @@ textvenn(setlist, overlap_type="each")
 
 }
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
-\code{\link{expand_range}()},
-\code{\link{get_venndir_curate_df}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{match_list}()},
-\code{\link{modify_venndir_overlap}()},
-\code{\link{nudge_venndir_label}()},
+Other venndir core: 
 \code{\link{plot,Venndir,ANY-method}},
-\code{\link{print_color_df}()},
-\code{\link{shrink_df}()},
-\code{\link{three_point_angle}()},
-\code{\link{venndir_legender}()},
-\code{\link{venndir_to_df}()}
+\code{\link{render_venndir}()},
+\code{\link{signed_overlaps}()},
+\code{\link{textvenn}()},
+\code{\link{venn_meme}()},
+\code{\link{venndir}()},
+\code{\link{venndir_legender}()}
 }
-\concept{venndir utility}
+\concept{venndir core}

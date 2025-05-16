@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,16 +39,46 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_15may2025">15may2025<a class="anchor" aria-label="anchor" href="#id_15may2025"></a></h2>
+<ul><li>Debug warning on <code><a href="reference/assemble_venndir_label.html">assemble_venndir_label()</a></code> examples.</li>
+<li>Add more examples of gene expression data to the vignette, at least one example using DESeq2.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_01may2025">01may2025<a class="anchor" aria-label="anchor" href="#id_01may2025"></a></h2>
+<ul><li>
+<p>Fix issue with disappearing text when the font size is too small, seems specific to “sans” font, perhaps systemfonts?</p>
+<ul><li>Consider changing default font back to “Arial”</li>
+<li>Posted issue to marquee for review.</li>
+</ul></li>
+<li>
+<p>Fix item labels converted to single-line with marquee.</p>
+<ul><li>DONE. However, now fix issue with huge whitespace padding between lines.</li>
+</ul></li>
+<li>
+<p>Consider exposing other options for item labeling:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">*</span> <span class="st">`</span><span class="at">lineheight</span><span class="st">`</span>, other marquee style attributes<span class="sc">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="st">`</span><span class="at">background</span><span class="st">`</span>, <span class="st">`</span><span class="at">padding</span><span class="st">`</span>, <span class="st">`</span><span class="at">border</span><span class="st">`</span>, <span class="st">`</span><span class="at">border_size</span><span class="st">`</span>, <span class="st">`</span><span class="at">border_radius</span><span class="st">`</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="st">`</span><span class="at">outline</span><span class="st">`</span>, <span class="st">`</span><span class="at">outline_width</span><span class="st">`</span> <span class="sc">-</span> interesting option similar to shadowText</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="st">`</span><span class="at">align</span><span class="st">`</span> <span class="sc">-</span> when showing bullets, left<span class="sc">-</span>align may be preferred</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="sc">*</span> <span class="st">`</span><span class="at">wrapwidth</span><span class="st">`</span></span></code></pre></div>
+</li>
+<li>
+<p>Consider changing how <code>blend_colors()</code> is called for color fill</p>
+<ul><li>currently ignores <code>poly_alpha</code> when blending colors, and could look better by using alpha during that step.</li>
+<li>Also <code>blend_colors</code> itself may not be adding alpha aggressively enough with alpha &gt; 0.5, it seems not to do much.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_12apr2025">12apr2025<a class="anchor" aria-label="anchor" href="#id_12apr2025"></a></h2>
 <ul><li><p>Signed labeling: Hide concordance/agreement for singlets, improve method to curate signs.</p></li>
 <li><p>DONE. Require marquee&gt;=1.0.0 in order to avoid the rare R crash on MacOS when using fonts whose font file path includes a space.</p></li>
 <li>
 <p>MOSTLY COMPLETE. Consider transitioning all text grobs to use types:</p>
 <ul><li>
-<code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code>, <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code>, <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>
+<code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code>, <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code>, <code>gridtext::richtext_grob()</code>
 </li>
 <li>Consider theming or argument to specify which type of grob to use.</li>
-<li>Only marquee guarantees Unicode arrows, but lacks enhanced markdown in <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> such as css styling, and inserted images.</li>
+<li>Only marquee guarantees Unicode arrows, but lacks enhanced markdown in <code>gridtext::richtext_grob()</code> such as css styling, and inserted images.</li>
 </ul></li>
 <li><p>DONE. Consider wrapper for <code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> as drop-in replacement for <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::textGrob()</a></code>, specifically to use with <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::tableGrob()</a></code></p></li>
 <li><p>Migrate item text rendering to permit marquee, deprecating gridtext.</p></li>
@@ -260,7 +290,7 @@
 <ul><li>Linux system font kerning is inconsistent, unclear whether it is specific to gridtext, or <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code> also.</li>
 <li>Most labels could be created parts, then assembled.</li>
 <li>
-<code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code> could be used instead of <code>gridtext</code> for most labels. Test <code>grid.text()</code> as drop-in replacement for <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>. Note it lacks <code>r</code>,<code>padding</code>.</li>
+<code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code> could be used instead of <code>gridtext</code> for most labels. Test <code>grid.text()</code> as drop-in replacement for <code>gridtext::richtext_grob()</code>. Note it lacks <code>r</code>,<code>padding</code>.</li>
 <li>
 <code>marquee</code> could also be drop-in replacement. If it works best, all <code>gridtext</code> should be replaced with <code>marquee</code>.</li>
 </ul></li>
@@ -598,7 +628,7 @@
 <li>
 <p>Show how to extract items for each overlap.</p>
 <ul><li>Placeholder:</li>
-</ul><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+</ul><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">itemlist_by_overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">items</span>,</span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span>,</span>
 <span>      levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">vns</span><span class="op">@</span><span class="va">label_df</span><span class="op">$</span><span class="va">overlap_set</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -645,7 +675,7 @@
 <li>
 <p>Investigate R crash - probably specific to Quartz on MacOS Sonoma 14.4, 14.5</p>
 <ul><li>Reproducible workflow in RStudio:</li>
-</ul><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+</ul><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jmw86069.github.io/venndir">venndir</a></span><span class="op">)</span></span>
 <span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">3</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, show_labels<span class="op">=</span><span class="st">"ncs"</span><span class="op">)</span></span>
 <span><span class="co"># open new device</span></span>
@@ -670,7 +700,7 @@
 <ul><li>
 <p>DONE. Remove any calls to internal package functions, using <code>:::</code></p>
 <ul><li>
-<code>gridtext_richtext_grob()</code> is a custom function, must be removed. It calls internal functions in <code>gridtext</code> that can’t be ported easily, for example <code><a href="https://rdrr.io/r/base/CallExternal.html" class="external-link">.Call()</a></code>. The custom function was solely intended to allow vectorized <code>padding</code>, currently the bottom,left,top,right is applied to all labels, and cannot be custom for each label. The driving goal was to have smaller margins between signed count labels, since they usually have smaller font size. Otherwise the distance between signed labels, line-by-line, was too far. First option, just call <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> and remove the ability to use different padding. Second option, wrap the call inside <code><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply()</a></code> which is what is done inside gridtext for multiple grobs anyway. It won’t be any slower. Final option is to ask Dr. Claus Wilke to allow a list of vectors as input for argument <code>padding</code>.</li>
+<code>gridtext_richtext_grob()</code> is a custom function, must be removed. It calls internal functions in <code>gridtext</code> that can’t be ported easily, for example <code><a href="https://rdrr.io/r/base/CallExternal.html" class="external-link">.Call()</a></code>. The custom function was solely intended to allow vectorized <code>padding</code>, currently the bottom,left,top,right is applied to all labels, and cannot be custom for each label. The driving goal was to have smaller margins between signed count labels, since they usually have smaller font size. Otherwise the distance between signed labels, line-by-line, was too far. First option, just call <code>gridtext::richtext_grob()</code> and remove the ability to use different padding. Second option, wrap the call inside <code><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply()</a></code> which is what is done inside gridtext for multiple grobs anyway. It won’t be any slower. Final option is to ask Dr. Claus Wilke to allow a list of vectors as input for argument <code>padding</code>.</li>
 </ul></li>
 </ul></li>
 <li>
@@ -915,7 +945,7 @@
 <li><p><code>name</code> - unique entry, essentially <code><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames()</a></code></p></li>
 <li>
 <p><code>label</code> - by default uses <code>name</code> but can be anything including <code>NA</code>, also it can contain the same label as another polygon.</p>
-<ul><li>Unclear whether it can store <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>?</li>
+<ul><li>Unclear whether it can store <code>gridtext::richtext_grob()</code>?</li>
 </ul></li>
 <li><p><code>labels</code> - optional, label each multipart polygon - not implemented yet</p></li>
 <li><p><code>fill</code> - internal polygon fill color</p></li>
@@ -944,7 +974,7 @@
 <ul><li><p>Idea: Consider reporting “overlaps not shown” using <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::grid.table()</a></code></p></li>
 <li>
 <p>Related: Could <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::grid.table()</a></code> be used for Venn labels?</p>
-<ul><li>It would need to be rendered with <code>textGrob()</code> then replaced with <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>
+<ul><li>It would need to be rendered with <code>textGrob()</code> then replaced with <code>gridtext::richtext_grob()</code>
 </li>
 </ul></li>
 <li>
@@ -1142,19 +1172,19 @@
 <li><p>remove dependencies “sp” and “rgeos”.</p></li>
 <li>
 <p>replace “rgeos” functions with with built-in <code>sf</code> equivalents:</p>
-<ul><li>“rgeos” <code>gArea()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">sf::st_area()</a></code>
+<ul><li>“rgeos” <code>gArea()</code> -&gt; <code>sf::st_area()</code>
 </li>
-<li>“rgeos” <code>gDifference()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">sf::st_difference()</a></code>
+<li>“rgeos” <code>gDifference()</code> -&gt; <code>sf::st_difference()</code>
 </li>
-<li>“rgeos” <code>gBuffer()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">sf::st_buffer()</a></code>
+<li>“rgeos” <code>gBuffer()</code> -&gt; <code>sf::st_buffer()</code>
 </li>
-<li>“rgeos” <code>gIntersects()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_intersects()</a></code>
+<li>“rgeos” <code>gIntersects()</code> -&gt; <code>sf::st_intersects()</code>
 </li>
-<li>“rgeos” <code>gSimplify()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">sf::st_simplify()</a></code>
+<li>“rgeos” <code>gSimplify()</code> -&gt; <code>sf::st_simplify()</code>
 </li>
 <li>“rgeos” <code>gUnaryUnion()</code> -&gt; <code>sf::st_union(x)</code>
 </li>
-<li>“rgeos” <code>gContains()</code> -&gt; <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_contains()</a></code>
+<li>“rgeos” <code>gContains()</code> -&gt; <code>sf::st_contains()</code>
 </li>
 <li>“rgeos” <code>gUnion()</code> -&gt; <code>sf::st_union(x, y)</code>
 </li>
@@ -1212,13 +1242,13 @@
 <ul><li>calculation appears to use the overall percentage items.</li>
 <li>The default layout would place percentage velow the main counts:</li>
 </ul></li>
-</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr class="header"><th colspan="2" align="right"><div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
-</tr></thead><tbody><tr class="odd"><td align="right">overlap_count</td>
+</ul><table style="width:69%;" class="table"><colgroup><col width="29%"><col width="40%"></colgroup><thead><tr><th colspan="2" align="right"><div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>  set_name, overlap_name, or blank</span></code></pre></div></th>
+</tr></thead><tbody><tr><td align="right">overlap_count</td>
 <td rowspan="2" align="left">
 <p>^: up_counts</p>
 <p>v: down_counts</p>
 </td>
-</tr><tr class="even"><td align="right">[overlap_percent%]</td>
+</tr><tr><td align="right">[overlap_percent%]</td>
 </tr></tbody></table><ul><li>
 <p>Consider organizing labels using template styling, with commony used presets</p>
 <ul><li>See above for one example.</li>
@@ -1238,7 +1268,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

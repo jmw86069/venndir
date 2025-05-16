@@ -7,7 +7,7 @@
 #' `curate_df` in `venndir()`. The purpose is to make it more
 #' convenient to review and potentially modify the default values.
 #' 
-#' @family venndir utility
+#' @family venndir advanced
 #' 
 #' @returns `data.frame` with colnames:
 #'    * 'from' - `character` sign to match

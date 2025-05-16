@@ -38,7 +38,7 @@
 #' 
 #' @return `vector` of labels or colors, based upon argument `type`.
 #' 
-#' @family venndir utility
+#' @family venndir advanced
 #' 
 #' @param x `vector` of overlap labels.
 #' @param type `character` string where `type="sign"` will curate

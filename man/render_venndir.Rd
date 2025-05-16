@@ -353,9 +353,12 @@ will use a wide internal border, and thin white line between overlaps.
 }
 \seealso{
 Other venndir core: 
+\code{\link{make_venn_test}()},
+\code{\link{plot,Venndir,ANY-method}},
 \code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
 \code{\link{venn_meme}()},
-\code{\link{venndir}()}
+\code{\link{venndir}()},
+\code{\link{venndir_legender}()}
 }
 \concept{venndir core}

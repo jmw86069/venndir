@@ -136,7 +136,7 @@ the label on top of dark or bright colors. If the label
 is positioned outside the \code{sp} polygons, the text is assumed
 to be on a white background, using argument \code{bg}.
 }
-\concept{venndir utility
+\concept{venndir internal
 
 @param venndir_output \code{Venndir} object as returned by \code{venndir()}
 or \code{render_venndir()}.}

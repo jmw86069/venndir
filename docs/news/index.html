@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,28 @@
       <small>Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.52.900" id="venndir-0052900">venndir 0.0.52.900<a class="anchor" aria-label="anchor" href="#venndir-0052900"></a></h2>
+<ul><li>Removed dependency: vwline</li>
+</ul><div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-52-900">Changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-52-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>Default <code>fontfamily="Arial"</code> to avoid invisible text with small font sizes with <code>"sans"</code> or <code>"Helvetica"</code> on Mac raster output.</li>
+<li>Minor adjustment to color blending to use alpha upfront, overlaps tend to become more opaque which intuitively is what was expected.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>By default, plot title uses marquee, not gridtext.</li>
+</ul></li>
+<li><p><code><a href="../reference/make_venn_test.html">make_venn_test()</a></code> uses 200 items and 3 sets, as better defaults.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-0-52-900">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-52-900"></a></h3>
+<ul><li>
+<code><a href="../reference/collapse_im.html">collapse_im()</a></code> - convenient function to collapse probe-level, transcript-level, or peptide-level incidence matrix to gene-level. Useful for transcriptome (RNA-seq, microarray), proteomics (MS peptide), or other technologies that may have multiple assays for the same gene.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.51.900" id="venndir-0051900">venndir 0.0.51.900<a class="anchor" aria-label="anchor" href="#venndir-0051900"></a></h2>
 <div class="section level3">
@@ -246,7 +268,7 @@ The exception is when displaying items with only the “sign”, in that case th
 <ul><li>
 <code>show()</code> to summarize the contents</li>
 <li>
-<code>metadata()</code> and <code>metadata&lt;-</code>
+<code><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata()</a></code> and <code>metadata&lt;-</code>
 </li>
 <li>
 <code>setlist()</code> - returns the original setlist</li>
@@ -407,7 +429,7 @@ The exception is when displaying items with only the “sign”, in that case th
 <h3 id="changes-to-existing-functions-0-0-39-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-39-900"></a></h3>
 <ul><li>
 <p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
-<ul><li>Signed output now uses <code>":"</code> instead of <code>": "</code> between the directional arrow and the count, for example <code>"^^:20"</code> instead of <code>"^^: 20"</code>. Somehow the whitespace calculation is inconsistent, causing some labels to be wider than others with <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>, with much wider whitespace than anticipated. The effect was inconsistent even on the same machine, between RStudio and R console, and differed across other machines also. Workarounds include choosing different fonts, apparently some provide more reliable whitespace calculations. The change only occurs during rendering when <code>grobs</code> are created. The underlying <code>Venndir</code> data is not changed.</li>
+<ul><li>Signed output now uses <code>":"</code> instead of <code>": "</code> between the directional arrow and the count, for example <code>"^^:20"</code> instead of <code>"^^: 20"</code>. Somehow the whitespace calculation is inconsistent, causing some labels to be wider than others with <code>gridtext::richtext_grob()</code>, with much wider whitespace than anticipated. The effect was inconsistent even on the same machine, between RStudio and R console, and differed across other machines also. Workarounds include choosing different fonts, apparently some provide more reliable whitespace calculations. The change only occurs during rendering when <code>grobs</code> are created. The underlying <code>Venndir</code> data is not changed.</li>
 </ul></li>
 <li>
 <p><code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code>, affecting <code><a href="../reference/venndir.html">venndir()</a></code> and <code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
@@ -576,7 +598,7 @@ The exception is when displaying items with only the “sign”, in that case th
 </li>
 <li>The figure is rendered with one call to <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> instead of being done piecemeal, making it appear faster.</li>
 <li>No longer calls custom <code>gridtext_richtext_grob()</code>, since that also calls functions internal to the gridtext package. It was done in order to supply vector of different <code>padding</code> values.</li>
-<li>Instead calls <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> in a list.</li>
+<li>Instead calls <code>gridtext::richtext_grob()</code> in a list.</li>
 </ul></li>
 <li>
 <p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code></p>
@@ -896,7 +918,7 @@ The exception is when displaying items with only the “sign”, in that case th
 <li>
 <code>plot_warning</code> label is placed relative to the bottom of the plot figure, not the plot border, giving a bit more space below the typical proportional Venn diagram.</li>
 </ul></li>
-<li><p><code><a href="../reference/render_venndir.html">render_venndir()</a></code> calls <code>gridtext_richtext_grob()</code> instead of <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> to enable vectorized <code>padding</code>.</p></li>
+<li><p><code><a href="../reference/render_venndir.html">render_venndir()</a></code> calls <code>gridtext_richtext_grob()</code> instead of <code>gridtext::richtext_grob()</code> to enable vectorized <code>padding</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-functions-0-0-24-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-24-900"></a></h3>
@@ -1121,8 +1143,8 @@ The exception is when displaying items with only the “sign”, in that case th
 <div class="section level3">
 <h3 id="new-functions-experimental-for-plotly-0-0-12-900">new functions (experimental for plotly)<a class="anchor" aria-label="anchor" href="#new-functions-experimental-for-plotly-0-0-12-900"></a></h3>
 <ul><li>
-<code><a href="../reference/to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code> and <code><a href="../reference/to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code> were added for rudimentary compatibility when using <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> with <code><a href="https://wilkelab.org/ggtext/reference/geom_richtext.html" class="external-link">ggtext::geom_richtext()</a></code> and <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html" class="external-link">ggtext::geom_textbox()</a></code>. These functions do display text inside plotly figure, however: (1) they do not cleanly use text positioning, even with <code>textposition</code>;</li>
-</ul><ol start="2" style="list-style-type: decimal"><li>plotly does not interpret markdown, so any markdown text is displayed as-is. Ultimately plotly support will probably be added to <code><a href="../reference/render_venndir.html">render_venndir()</a></code> via <code>plot_style="plotly"</code> then using <code><a href="https://rdrr.io/pkg/plotly/man/plot_ly.html" class="external-link">plotly::plot_ly()</a></code> commands in native form.</li>
+<code><a href="../reference/to_basic.GeomRichText.html">to_basic.GeomRichText()</a></code> and <code><a href="../reference/to_basic.GeomTextBox.html">to_basic.GeomTextBox()</a></code> were added for rudimentary compatibility when using <code>plotly::ggplotly()</code> with <code>ggtext::geom_richtext()</code> and <code>ggtext::geom_textbox()</code>. These functions do display text inside plotly figure, however: (1) they do not cleanly use text positioning, even with <code>textposition</code>;</li>
+</ul><ol start="2" style="list-style-type: decimal"><li>plotly does not interpret markdown, so any markdown text is displayed as-is. Ultimately plotly support will probably be added to <code><a href="../reference/render_venndir.html">render_venndir()</a></code> via <code>plot_style="plotly"</code> then using <code>plotly::plot_ly()</code> commands in native form.</li>
 </ol></div>
 </div>
     <div class="section level2">
@@ -1145,7 +1167,7 @@ The exception is when displaying items with only the “sign”, in that case th
 <div class="section level3">
 <h3 id="new-functions-0-0-10-900">new functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-10-900"></a></h3>
 <ul><li>
-<code>draw_gridtext_groups()</code> does the work for grouping multiple <code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> labels together, using <code>x, y, overlap_set</code> to define the grouping. This method also aligns text relative to a line segment if present, by using <code><a href="../reference/degrees_to_adj.html">degrees_to_adj()</a></code>. A by-product of the approach is that labels are now centered by the label width, instead of having left/right components which may differ in width.</li>
+<code>draw_gridtext_groups()</code> does the work for grouping multiple <code>gridtext::richtext_grob()</code> labels together, using <code>x, y, overlap_set</code> to define the grouping. This method also aligns text relative to a line segment if present, by using <code><a href="../reference/degrees_to_adj.html">degrees_to_adj()</a></code>. A by-product of the approach is that labels are now centered by the label width, instead of having left/right components which may differ in width.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -1396,7 +1418,7 @@ The exception is when displaying items with only the “sign”, in that case th
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

@@ -38,7 +38,7 @@
 #'    values: "plain", "bold", "italic", "bold.italic"
 #'    * `fontcolors`: applies font color to each label in order
 #' 
-#' @family venndir label
+#' @family venndir internal
 #' 
 #' @examples
 #' pdf.options(encoding="ISOLatin1.enc")

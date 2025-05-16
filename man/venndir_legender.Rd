@@ -383,20 +383,13 @@ venndir_legender(venndir_output=vo,
 
 }
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
-\code{\link{expand_range}()},
-\code{\link{get_venndir_curate_df}()},
-\code{\link{make_color_contrast}()},
-\code{\link{make_venn_combn_df}()},
+Other venndir core: 
 \code{\link{make_venn_test}()},
-\code{\link{match_list}()},
-\code{\link{modify_venndir_overlap}()},
-\code{\link{nudge_venndir_label}()},
 \code{\link{plot,Venndir,ANY-method}},
-\code{\link{print_color_df}()},
-\code{\link{shrink_df}()},
-\code{\link{three_point_angle}()},
-\code{\link{venndir_to_df}()}
+\code{\link{render_venndir}()},
+\code{\link{signed_overlaps}()},
+\code{\link{textvenn}()},
+\code{\link{venn_meme}()},
+\code{\link{venndir}()}
 }
-\concept{venndir utility}
+\concept{venndir core}

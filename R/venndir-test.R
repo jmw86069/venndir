@@ -25,7 +25,7 @@
 #' argument `sizes`, which takes priority over `min_size`, and
 #' `max_size`.
 #' 
-#' @family venndir utility
+#' @family venndir core
 #' 
 #' @return `list` of items, either as a list of item vectors,
 #' or when `do_signed=TRUE` the list of vectors, where vector
@@ -104,8 +104,8 @@
 #' 
 #' @export
 make_venn_test <- function
-(n_items=1000000,
- n_sets=4,
+(n_items=200,
+ n_sets=3,
  do_signed=FALSE,
  concordance=0.5,
  min_size=ceiling(n_items / 50),

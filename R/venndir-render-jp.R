@@ -1163,7 +1163,9 @@ render_venndir <- function
       }
       bg_fill_adj <- jamba::alpha2col(bg_fill, alpha=bg_alpha_adj);
       canvas_alpha <- max_bg_alpha - bg_alpha_adj;
-      canvas_adj <- jamba::alpha2col(rep("white", length(canvas_alpha)), alpha=canvas_alpha)
+      canvas_adj <- jamba::alpha2col(
+         rep("white", length(canvas_alpha)),
+         alpha=canvas_alpha)
       todo_color_list <- lapply(seq_along(box_fill), function(jc){
          c(box_fill[jc], bg_fill_adj[jc], canvas_adj[jc])
       })
@@ -1231,9 +1233,22 @@ render_venndir <- function
       main <- jamba::cPaste(main, sep="<br>\n");
       nlines <- length(strsplit(main, "<br>")[[1]])
       #
-      if ("marquee" %in% debug &&
-            jamba::check_pkg_installed("marquee") &&
-            getRversion() >= "4.3.0") {
+      if ("gridtext" %in% debug) {
+         main_grob <- gridtext::richtext_grob(
+            text=main,
+            x=0.5,
+            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
+            default.units="snpc",
+            gp=grid::gpar(
+               # col=itemlabels_df$color,
+               fontsize=16 * font_cex[1]),
+            r=grid::unit(c(0, 0, 0, 0), "pt"),
+            padding=grid::unit(c(0, 0, 0, 0), "pt"),
+            margin=grid::unit(c(0, 0, 0, 0), "pt"),
+            vp=jp_viewport,
+            hjust=0.5,
+            vjust=1);
+      } else if (jamba::check_pkg_installed("marquee")) {
          main_grob <- marquee::marquee_grob(
             text=main,
             ignore_html=TRUE,
@@ -1250,21 +1265,6 @@ render_venndir <- function
             vp=jp_viewport,
             hjust="center",
             vjust="top");
-      } else {
-         main_grob <- gridtext::richtext_grob(
-            text=main,
-            x=0.5,
-            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
-            default.units="snpc",
-            gp=grid::gpar(
-               # col=itemlabels_df$color,
-               fontsize=16 * font_cex[1]),
-            r=grid::unit(c(0, 0, 0, 0), "pt"),
-            padding=grid::unit(c(0, 0, 0, 0), "pt"),
-            margin=grid::unit(c(0, 0, 0, 0), "pt"),
-            vp=jp_viewport,
-            hjust=0.5,
-            vjust=1);
       }
       jp_grobList$main_title <- main_grob;
    }
@@ -1305,8 +1305,15 @@ render_venndir <- function
          min_fontsize <- min(itemlabels_df$fontsize);
          item_style <- marquee::classic_style(
             base_size=min_fontsize,
+            lineheight=0.9,
+            # outline="white", outline_width=2,
+            # background="palegoldenrod",
+            # border="black", border_size=marquee::trbl(1, 1, 1, 1), border_radius=3,
+            # padding=marquee::trbl(1, 3, 1, 3),
             body_font=fontfamily,
             align="center")
+            # align="left")
+         
          rel_fontsize <- round(itemlabels_df$fontsize / min_fontsize, digits=2);
          rel_fontsizeu <- jamba::nameVector(unique(rel_fontsize));
          # Todo: Fix marquee style
@@ -1316,13 +1323,21 @@ render_venndir <- function
                paste0("rel.", irel),
                size=marquee::relative(irel))
          }
+         # jamba::printDebug("head(itemlabels_df$text):");print(head(itemlabels_df$text));# debug
          new_item_text <- paste0(
             "{", paste0(".rel.", rel_fontsize), " ",
             "{", itemlabels_df$color, " ",
-            itemlabels_df$text, "}", "}")
-         # print(head(new_item_text));# debug
+            # itemlabels_df$text,
+            gsub("([^ ])\n", "\\1  \n",
+               gsub('<br>|<br/>', '  \n', itemlabels_df$text)),
+            "}", "}")
+         # new_item_text <- gsub("([^ ])\n", "\\1\n",
+         #    gsub('<br>|<br/>', '  \n', itemlabels_df$text))
+         # jamba::printDebug("head(new_item_text):");print(head(new_item_text));# debug
          text_grob <- marquee::marquee_grob(
             text=new_item_text,
+            force_body_margin=TRUE,
+            width=NA,
             ignore_html=TRUE,
             name="venndir_main",
             x=adjx(itemlabels_df$x),

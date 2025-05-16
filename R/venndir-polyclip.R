@@ -2,7 +2,7 @@
 
 #' Simple ellipse function
 #' 
-#' @family venndir polygons
+#' @family venndir internal
 #' 
 #' @export
 simple_ellipse <- function

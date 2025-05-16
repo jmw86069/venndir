@@ -235,4 +235,16 @@ grid::grid.points(x=grid::unit(c(0.25, 0.25), "snpc"),
 pdf.options(encoding="ISOLatin1.enc")
 
 }
-\concept{venndir label}
+\seealso{
+Other venndir internal: 
+\code{\link{expand_range}()},
+\code{\link{get_venn_polygon_shapes}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{match_list}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{simple_ellipse}()},
+\code{\link{venndir_to_df}()}
+}
+\concept{venndir internal}

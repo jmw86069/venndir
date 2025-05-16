@@ -147,17 +147,32 @@
 #'    fill=c("gold", "firebrick"))
 #' jp3 <- new("JamPolygon", polygons=df3);
 #' 
+#' # each polygon is filled individually
 #' jp3p <- plot(jp3);
-#' 
 #' lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 100),
-#'    ref_jp=jp3, plot_style="JamPolygon")
+#'    ref_jp=jp3, plot_style="JamPolygon", color="darkorange3")
+#' # sometimes manual adjustment of xyratio can find the right fit
 #' lfj2 <- label_fill_JamPolygon(jp3[2,], labels=rep("X", 40),
+#'    color="gold",
 #'    buffer=-0.5,
-#'    label_method="columns",
+#'    label_method="columns", xyratio=0.7,
+#'    ref_jp=jp3, plot_style="JamPolygon")
+#' 
+#' jp3p <- plot(jp3);
+#' lfj12 <- label_fill_JamPolygon(jp3, labels=rep("X", 80),
+#'    buffer=-0.5,
+#'    label_method="offset", xyratio=2,
 #'    ref_jp=jp3, plot_style="JamPolygon")
 #' 
 #' jp3p <- plot(jp3);
 #' lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 87),
+#'    apply_n_scale=FALSE,
+#'    spread=TRUE,
+#'    ref_jp=jp3, plot_style="JamPolygon")
+#' 
+#' jp3p <- plot(jp3, label="");
+#' lfj1 <- label_fill_JamPolygon(jp3[1,],
+#'    labels=c("One\nlabel", "Another label", "Yet  \nanother label"),
 #'    apply_n_scale=FALSE,
 #'    spread=TRUE,
 #'    ref_jp=jp3, plot_style="JamPolygon")
@@ -341,28 +356,28 @@ label_fill_JamPolygon <- function
          jamba::printDebug("label_fill_JamPolygon(): ",
             "Preparing grid labels.")
       }
-      if (FALSE) {
-         g_labels <- gridtext::richtext_grob(
-            x=adjx(label_xy[,1]),
-            y=adjy(label_xy[,2]),
-            text=labels,
-            rot=-degrees,
-            default.units="snpc",
-            padding=grid::unit(2, "pt"),
-            r=grid::unit(2, "pt"),
-            vjust=0.5,
-            hjust=0.5,
-            halign=0.5,
-            vp=use_vp,
-            gp=grid::gpar(
-               col=color,
-               fontsize=fontsize * cex
-            ),
-            box_gp=grid::gpar(
-               col=border
-            )
-         );
-      } else {
+      # if (FALSE) {
+      #    g_labels <- gridtext::richtext_grob(
+      #       x=adjx(label_xy[,1]),
+      #       y=adjy(label_xy[,2]),
+      #       text=labels,
+      #       rot=-degrees,
+      #       default.units="snpc",
+      #       padding=grid::unit(2, "pt"),
+      #       r=grid::unit(2, "pt"),
+      #       vjust=0.5,
+      #       hjust=0.5,
+      #       halign=0.5,
+      #       vp=use_vp,
+      #       gp=grid::gpar(
+      #          col=color,
+      #          fontsize=fontsize * cex
+      #       ),
+      #       box_gp=grid::gpar(
+      #          col=border
+      #       )
+      #    );
+      # } else {
          g_labels <- grid::grid.text(
             x=adjx(label_xy[,1]),
             y=adjy(label_xy[,2]),
@@ -382,7 +397,7 @@ label_fill_JamPolygon <- function
             #    col=border
             # )
          );
-      }
+      # }
       if (TRUE %in% draw_labels && length(dev.list()) > 0) {
          if (verbose) {
             jamba::printDebug("label_fill_JamPolygon(): ",

@@ -41,6 +41,7 @@ venndir(setlist, proportional=TRUE)
 }
 \seealso{
 Other venndir conversion: 
+\code{\link{collapse_im}()},
 \code{\link{im2list}()},
 \code{\link{im_value2list}()},
 \code{\link{list2im_opt}()},

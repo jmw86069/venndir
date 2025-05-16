@@ -494,7 +494,7 @@ signed_overlaps <- function
 #'    are `0` or `1` indicating whether each set should have
 #'    a value in each row.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #' 
 #' @param x either character vector of set names, or integer number
 #'    of sets.

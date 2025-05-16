@@ -108,7 +108,7 @@ area_JamPolygon(jp3, return_list=TRUE)
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
 \code{\link{buffer_JamPolygon}()},

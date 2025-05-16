@@ -1,5 +1,38 @@
 # TODO for venndir
 
+## 15may2025
+
+* Debug warning on `assemble_venndir_label()` examples.
+* Add more examples of gene expression data to the vignette,
+at least one example using DESeq2.
+
+## 01may2025
+
+* Fix issue with disappearing text when the font size is too small,
+seems specific to "sans" font, perhaps systemfonts?
+
+   * Consider changing default font back to "Arial"
+   * Posted issue to marquee for review.
+
+* Fix item labels converted to single-line with marquee.
+
+   * DONE. However, now fix issue with huge whitespace padding between lines.
+
+* Consider exposing other options for item labeling:
+   
+      * `lineheight`, other marquee style attributes:
+      `background`, `padding`, `border`, `border_size`, `border_radius`,
+      `outline`, `outline_width` - interesting option similar to shadowText
+      `align` - when showing bullets, left-align may be preferred
+      * `wrapwidth`
+
+* Consider changing how `blend_colors()` is called for color fill
+
+   * currently ignores `poly_alpha` when blending colors, and
+   could look better by using alpha during that step.
+   * Also `blend_colors` itself may not be adding alpha aggressively
+   enough with alpha > 0.5, it seems not to do much.
+
 ## 12apr2025
 
 * Signed labeling: Hide concordance/agreement for singlets,

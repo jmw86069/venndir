@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@
 <span>  max_items <span class="op">=</span> <span class="fl">3000</span>,</span>
 <span>  show_zero <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  font_cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0.7</span><span class="op">)</span>,</span>
-<span>  fontfamily <span class="op">=</span> <span class="st">"sans"</span>,</span>
+<span>  fontfamily <span class="op">=</span> <span class="st">"Arial"</span>,</span>
 <span>  show_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  display_counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  poly_alpha <span class="op">=</span> <span class="fl">0.6</span>,</span>
@@ -196,7 +196,7 @@ region.</p></li>
 <dt id="arg-main">main<a class="anchor" aria-label="anchor" href="#arg-main"></a></dt>
 <dd><p><code>character</code> string used as a plot title, default NULL
 will render no title. When provided, it is rendered using
-<code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code> which enables some Markdown-style
+<code>gridtext::richtext_grob()</code> which enables some Markdown-style
 formatting. The title is stored in <code>venndir@metadata$main</code>
 for persistence.</p></dd>
 
@@ -368,7 +368,7 @@ which is markedly faster.</p></li>
 markdown.</p></li>
 <li><p><code>"gridtext"</code>:  substantially slower for a large number of labels,
 but enables use of limited markdown by calling
-<code><a href="https://wilkelab.org/gridtext/reference/richtext_grob.html" class="external-link">gridtext::richtext_grob()</a></code>.
+<code>gridtext::richtext_grob()</code>.
 Mostly useful for <code><a href="venn_meme.html">venn_meme()</a></code>.</p></li>
 </ul></dd>
 
@@ -479,12 +479,87 @@ for the graphical objects, specifically the use of coordinate
 <code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a></code> measure <code>"snpc"</code>, which maintains a fixed aspect ratio.</p></li>
 </ul></div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>This function takes 'setlist' <code>list</code> as input, produces a <code>Venndir</code> object
+and plots the data by default.</p>
+<p>When the input 'setlist' is a <code>list</code> of <code>character</code> vectors, it will
+produce basic Venn overlap counts.</p>
+<p>When the input 'setlist' is a 'list' of <code>numeric</code> vectors, the vector
+element names are used as items, and the values are considered the
+directionality, or "sign". The overlaps are tabulated and delineated
+by the 'overlap_type' requested:</p><ul><li><p>overlap_type="detect" - by default it will use "concordance" when
+the input data contains directionality.</p></li>
+<li><p>overlap_type="concordance" - counts are organized as up/up or down/down,
+or "discordant".</p></li>
+<li><p>overlap_type="each" - counts are organized by each combination of up/down
+for each overlap.</p></li>
+<li><p>overlap_type="overlap" - counts are organized without using sign.</p></li>
+<li><p>overlap_type="agreement" - counts are organized by "agreement" (up/up,
+or down/down), or "disagreement" (up/down, down/up).</p></li>
+</ul><div class="section">
+<h3 id="label-options">Label options<a class="anchor" aria-label="anchor" href="#label-options"></a></h3>
+
+<ul><li><p>The argument 'show_labels' is used to define which labels are displayed.</p></li>
+<li><p>Labels are enabled using a single letter, defined below.</p><ul><li><p>UPPERCASE places the label outside.</p></li>
+<li><p>lowercase places the label inside the Venn diagram.</p></li>
+<li><p>Note that some labels cannot be placed outside (item labels).
+Similarly, when item labels are enabled, counts cannot be displayed
+inside, and must be outside or hidden.</p></li>
+</ul></li>
+<li><p><code>N</code> - set _N_ame</p></li>
+<li><p><code>c</code> - _c_ount for each overlap</p></li>
+<li><p><code>s</code> - _s_igned count for each overlap</p></li>
+<li><p><code>p</code> - _p_ercent total items represented in each overlap</p></li>
+<li><p><code>i</code> - _i_tem labels for those items within each overlap</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="item-labels">Item labels<a class="anchor" aria-label="anchor" href="#item-labels"></a></h3>
+
+<ul><li><p>When item labels are enabled, the placement is defined by
+<code><a href="label_fill_JamPolygon.html">label_fill_JamPolygon()</a></code>, which uses an offset method, essentially
+filling rows of labels left-to-right, alternating higher/lower
+across each row.</p></li>
+<li><p>Items are sorted by sign if present, then by label.</p><ul><li><p>To control the order that the signs are sorted, see
+<code><a href="curate_venn_labels.html">curate_venn_labels()</a></code> and argument <code>curate_df</code> to define
+custom order for each sign.</p></li>
+<li><p>For <code><a href="venn_meme.html">venn_meme()</a></code> item labels, they are displayed in the same order
+as provided.</p></li>
+</ul></li>
+<li><p>Item label font size is adjusted by default for each overlap polygon,
+proportional to the available area relative to the total Venn area.</p></li>
+<li><p>Item label font sizes can be customized using <code>item_cex</code>.</p><ul><li><p>A single value will be applied to the auto-scaling font sizes,
+adjusting all fonts consistently.</p></li>
+<li><p>Multiple values will be recycled across the total number of overlap
+regions, applying font size to each region as drawn in order.</p></li>
+</ul></li>
+<li><p>Items can be rendered using <code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> (default) or
+<code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code>.</p><ul><li><p>The default marquee interprets items as markdown, which enables
+text styling, line wrap, and potentially embedded images. Mostly,
+marquee offers the best support for Unicode arrows using whichever
+font is requested.
+Note that items use commonmark syntax, so to force line wrap, one
+must end a line with two spaces, then newline, for example:
+<code>"one line[space][space]\nsecond line"</code></p></li>
+<li><p>The potential benefit of <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code> is speed, and that
+it displays items exactly as provided with no markdown interpretation.
+This function will not display all Unicode characters for all fonts,
+due to inconsistencies in how R fonts are supported.
+(It's a long history.)</p></li>
+</ul></li>
+</ul></div>
+
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other venndir core:
+<code><a href="make_venn_test.html">make_venn_test</a>()</code>,
+<code><a href="Venndir-methods.html">plot,Venndir,ANY-method</a></code>,
 <code><a href="render_venndir.html">render_venndir</a>()</code>,
 <code><a href="signed_overlaps.html">signed_overlaps</a>()</code>,
 <code><a href="textvenn.html">textvenn</a>()</code>,
-<code><a href="venn_meme.html">venn_meme</a>()</code></p></div>
+<code><a href="venn_meme.html">venn_meme</a>()</code>,
+<code><a href="venndir_legender.html">venndir_legender</a>()</code></p></div>
     </div>
 
     <div class="section level2">
@@ -539,7 +614,7 @@ for the graphical objects, specifically the use of coordinate
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

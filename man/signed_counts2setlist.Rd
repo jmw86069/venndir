@@ -64,6 +64,7 @@ venndir(signed_counts2setlist(signed_counts(vo)), overlap_type="each")
 }
 \seealso{
 Other venndir conversion: 
+\code{\link{collapse_im}()},
 \code{\link{counts2setlist}()},
 \code{\link{im2list}()},
 \code{\link{im_value2list}()},

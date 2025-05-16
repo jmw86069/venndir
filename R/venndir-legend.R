@@ -24,7 +24,7 @@
 #' * Consider bottom-justifying text in each cell, left-justifying text
 #' labels, and right-justifying numeric values.
 #' 
-#' @family venndir utility
+#' @family venndir core
 #' 
 #' @param venndir_output `Venndir` object, default NULL, or one of:
 #'    * `Venndir` object, also used to define `set_colors` when applicable

@@ -81,20 +81,15 @@ expand_range(list(xlim=xlim, ylim=ylim))
 
 }
 \seealso{
-Other venndir utility: 
-\code{\link{curate_venn_labels}()},
-\code{\link{get_venndir_curate_df}()},
+Other venndir internal: 
+\code{\link{assemble_venndir_label}()},
+\code{\link{get_venn_polygon_shapes}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
-\code{\link{make_venn_test}()},
 \code{\link{match_list}()},
-\code{\link{modify_venndir_overlap}()},
-\code{\link{nudge_venndir_label}()},
-\code{\link{plot,Venndir,ANY-method}},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
-\code{\link{three_point_angle}()},
-\code{\link{venndir_legender}()},
+\code{\link{simple_ellipse}()},
 \code{\link{venndir_to_df}()}
 }
-\concept{venndir utility}
+\concept{venndir internal}

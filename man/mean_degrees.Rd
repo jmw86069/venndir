@@ -47,12 +47,13 @@ mean_degrees(c(0, 270))
 
 }
 \seealso{
-Other venndir spatial: 
+Other venndir geometry: 
 \code{\link{degrees_to_adj}()},
 \code{\link{diff_degrees}()},
 \code{\link{display_angles}()},
 \code{\link{mean_degree_arc}()},
 \code{\link{rescale_coordinates}()},
-\code{\link{spread_degrees}()}
+\code{\link{spread_degrees}()},
+\code{\link{three_point_angle}()}
 }
-\concept{venndir spatial}
+\concept{venndir geometry}

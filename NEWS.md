@@ -1,3 +1,30 @@
+# venndir 0.0.52.900
+
+* Removed dependency: vwline
+
+## Changes to existing functions
+
+* `venndir()`
+
+   * Default `fontfamily="Arial"` to avoid invisible text with small
+   font sizes with `"sans"` or `"Helvetica"` on Mac raster output.
+   * Minor adjustment to color blending to use alpha upfront, overlaps
+   tend to become more opaque which intuitively is what was expected.
+
+* `render_venndir()`
+
+   * By default, plot title uses marquee, not gridtext.
+
+* `make_venn_test()` uses 200 items and 3 sets, as better defaults.
+
+## New functions
+
+* `collapse_im()` - convenient function to collapse probe-level,
+transcript-level, or peptide-level incidence matrix to gene-level.
+Useful for transcriptome (RNA-seq, microarray), proteomics (MS peptide),
+or other technologies that may have multiple assays for the same gene.
+
+
 # venndir 0.0.51.900
 
 ## Changes to existing functions

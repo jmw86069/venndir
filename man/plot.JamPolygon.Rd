@@ -20,7 +20,6 @@ plot.JamPolygon(
   do_viewport = TRUE,
   do_pop_viewport = TRUE,
   do_draw = TRUE,
-  do_experimental = TRUE,
   verbose = FALSE,
   debug = FALSE,
   ...
@@ -90,9 +89,6 @@ or other \code{grid} functions.}
 When \code{do_draw=FALSE}, it also forces \code{do_newpage=FALSE},
 \code{do_viewport=FALSE}, and \code{do_pop_viewport=FALSE}.}
 
-\item{do_experimental}{\code{logical} indicating whether to use experimental
-rendering with \code{gridGeometry} as potential replacement for \code{vwline}.}
-
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
 \item{debug}{\code{logical} (default FALSE) indicating whether to enable
@@ -125,13 +121,27 @@ This function is a general purpose function to plot \code{JamPolygon}
 objects using \code{grid} graphics.
 
 It currently calls direct rendering functions, for example
-\code{grid::grid.path()}, \code{grid::grid.lines()}.
+\code{grid::pathGrob()}, \code{grid::grid.lines()}, \code{gridGeometry::polyoffsetGrob()}
+to render complex, potentially nested polygons with or without
+holes, and with inner, outer, and/or direct border.
 
 Rendering guidelines used by this function:
 \itemize{
-\item Each polygon is rendered in order, and in series.
+\item Each polygon is rendered in order, and in series, with no
+parallelization.
 \item All polygon labels are rendered afterward, so that labels
-are not covered by subsequent polygons.
+are not covered by subsequent polygons. Labels are intended
+to appear "on top" of all rendered polygons.
+\item Borders are drawn after each polygon "fill" is performed, so
+the border can modify the look of the fill. Borders are rendered
+with inner, outer, then direct border, in that order. The polygon
+area "fill" is also shrunk by the width defined by \code{innerborder.lwd},
+unless \code{innerborder} is NA, so that the inner border does not
+affect the same region represented by the area fill.
+\item Since polygons are drawn in the order they are provided by the
+\code{JamPolygon} object, one polygon may be drawn on top of another
+polygon, using default R methods to overlay one color onto another,
+for example with optional alpha transparency.
 }
 \subsection{Rendering options recognized in \code{jp@polygons}:}{
 \itemize{
@@ -139,21 +149,43 @@ are not covered by subsequent polygons.
 will not be rendered.
 \item \code{label_color} - color used to render each polygon label.
 \item \code{family}, \code{fontsize} - font family, and font point size used to render
-each polygon label.
+each polygon label, passed to \code{grid::gpar()} by default. Note that
+\code{venndir()} and \code{render_venndir()} may internally call
+\code{marquee::marquee_grob()} which does not use \code{grid::gpar()}.
 \item \code{x}, \code{y} - x- and y-coordinates to define each polygon or multipolygon.
+These columns are required for a \code{JamPolygon} object.
 \item \code{fill} - polygon fill color, or \code{NA} for no fill color.
-\item \code{border}, \code{border.lwd} - border color and line width (outer border)
-\item \code{innerborder}, \code{innerborder.lwd} - inner border and line width
+\item \code{innerborder}, \code{innerborder.lwd} - inner border and line width.
+The inner border is drawn inside the polygon absolute boundary.
+\item \code{outerborder}, \code{outerborder.lwd} - inner border and line width
+The inner border is drawn outside the polygon absolute boundary.
+\item \code{border}, \code{border.lwd} - border color and line width (outer border).
+The border is drawn on top of the polygon absolute boundary. Note
+that when two polygons share the same border, one border will
+necessarily overwrite the other. For this reason, the innerborder
+may be useful in order to preserve the color of each polygon border
+without overlap.
+}
 }
 
-Todo:
+\subsection{Return grobs}{
+\itemize{
+\item To return the list of grobs to be drawn without drawing them,
+use \code{do_draw=FALSE}, which also does not call \code{grid::grid.newpage()}.
+}
+}
+
+\subsection{Todo}{
 \enumerate{
 \item Enable arguments in \code{...} to override equivalent values in columns of
 \code{jp@polygons}.
+Partially complete.
 \item Convert \code{grid} rendering to generate graphical objects (grobs)
 which can be optionally rendered, or returned as a \code{gTree}.
+Mostly complete.
 \item Continue debugging the \code{vwline} graphical glitches which are
 apparent when rendering outer borders.
+Complete.
 See \link{https://github.com/pmur002/vwline/issues/2}.
 \itemize{
 \item Current recommendation is to render outer border after the inner
@@ -165,8 +197,14 @@ With sufficiently small inner border width, the graphical glitch may
 not be apparent.
 }
 \item Consider allowing labels for each multi-part polygon.
+Low priotity.
 \item Consider drawing optional x- and y-axis, although both could be added
 using \code{grid} functions.
+Low priority.
+\item Consider using different approach than \code{"snpc"} to enforce aspect
+ratio, for example ggplot2 uses \code{respect=TRUE} then leaves the x/y axis
+ranges intact. Making that change would affect other venndir functions
+that may assume scaled units are between 0 and 1.
 }
 }
 }
@@ -236,7 +274,7 @@ plot(jpz);
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

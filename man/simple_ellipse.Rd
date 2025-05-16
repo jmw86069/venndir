@@ -10,7 +10,15 @@ simple_ellipse(h, k, a, b = a, phi = 0, n = 200L)
 Simple ellipse function
 }
 \seealso{
-Other venndir polygons: 
-\code{\link{get_venn_polygon_shapes}()}
+Other venndir internal: 
+\code{\link{assemble_venndir_label}()},
+\code{\link{expand_range}()},
+\code{\link{get_venn_polygon_shapes}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{match_list}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{venndir_to_df}()}
 }
-\concept{venndir polygons}
+\concept{venndir internal}

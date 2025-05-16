@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,18 @@
 
       <dl><dt>
 
+          <code><a href="Venndir-methods.html">plot(<i>&lt;Venndir&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="Venndir-methods.html">length(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">setlist(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">names(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">show(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">metadata(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">`metadata&lt;-`(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">overlaplist(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">overlapdf(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">signed_counts(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">im(<i>&lt;Venndir&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot Venndir object</dd>
+      </dl><dl><dt>
+
+          <code><a href="make_venn_test.html">make_venn_test()</a></code>
+
+        </dt>
+        <dd>Generate test sets for venndir</dd>
+      </dl><dl><dt>
+
           <code><a href="render_venndir.html">render_venndir()</a></code>
 
         </dt>
@@ -76,6 +88,12 @@
 
         </dt>
         <dd>Directional Venn diagram</dd>
+      </dl><dl><dt>
+
+          <code><a href="venndir_legender.html">venndir_legender()</a></code>
+
+        </dt>
+        <dd>Add legend to venndir figure</dd>
       </dl></div><div class="section level2">
       <h2 id="import-and-conversion-functions">Import and Conversion Functions<a class="anchor" aria-label="anchor" href="#import-and-conversion-functions"></a></h2>
 
@@ -88,6 +106,12 @@
 
 
       <dl><dt>
+
+          <code><a href="collapse_im.html">collapse_im()</a></code>
+
+        </dt>
+        <dd>Collapse incidence matrix using row groups</dd>
+      </dl><dl><dt>
 
           <code><a href="counts2setlist.html">counts2setlist()</a></code>
 
@@ -130,9 +154,44 @@
         </dt>
         <dd>venndir conversion from signed overlap counts to setlist</dd>
       </dl></div><div class="section level2">
+      <h2 id="venndir-advanced-functions">venndir Advanced Functions<a class="anchor" aria-label="anchor" href="#venndir-advanced-functions"></a></h2>
+
+      <div class="section-desc"><p>Internal venndir advanced functions</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="curate_venn_labels.html">curate_venn_labels()</a></code>
+
+        </dt>
+        <dd>Curate Venn labels</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_venndir_curate_df.html">get_venndir_curate_df()</a></code>
+
+        </dt>
+        <dd>Define venndir curate data.frame</dd>
+      </dl><dl><dt>
+
+          <code><a href="modify_venndir_overlap.html">modify_venndir_overlap()</a></code> <code><a href="modify_venndir_overlap.html">highlight_venndir_overlap()</a></code>
+
+        </dt>
+        <dd>Modify Venndir by overlap</dd>
+      </dl><dl><dt>
+
+          <code><a href="nudge_venndir_label.html">nudge_venndir_label()</a></code>
+
+        </dt>
+        <dd>Nudge venndir labels</dd>
+      </dl></div><div class="section level2">
       <h2 id="jampolygon-object-and-functions">JamPolygon object and functions<a class="anchor" aria-label="anchor" href="#jampolygon-object-and-functions"></a></h2>
 
-      <div class="section-desc"><p>Functions for JamPolygon objects</p></div>
+      <div class="section-desc"><p>Mostly internal functions for JamPolygon objects</p></div>
 
 
     </div><div class="section level2">
@@ -148,7 +207,7 @@
         <dd>JamPolygon class</dd>
       </dl><dl><dt>
 
-          <code><a href="JamPolygon-methods.html">`[`(<i>&lt;JamPolygon&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="JamPolygon-methods.html">plot(<i>&lt;JamPolygon&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="JamPolygon-methods.html">rbind2.JamPolygon()</a></code> <code><a href="JamPolygon-methods.html">rbind2(<i>&lt;JamPolygon&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code>
+          <code><a href="JamPolygon-methods.html">`[`(<i>&lt;JamPolygon&gt;</i>)</a></code> <code><a href="JamPolygon-methods.html">plot(<i>&lt;JamPolygon&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="JamPolygon-methods.html">rbind2.JamPolygon()</a></code> <code><a href="JamPolygon-methods.html">rbind2(<i>&lt;JamPolygon&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code>
 
         </dt>
         <dd>Subset JamPolygon object</dd>
@@ -321,32 +380,9 @@
         </dt>
         <dd>Update attributes for a JamPolygon object</dd>
       </dl></div><div class="section level2">
-      <h2 id="venndir-polygon-functions">venndir polygon Functions<a class="anchor" aria-label="anchor" href="#venndir-polygon-functions"></a></h2>
+      <h2 id="venndir-geometric-functions">venndir Geometric Functions<a class="anchor" aria-label="anchor" href="#venndir-geometric-functions"></a></h2>
 
-      <div class="section-desc"><p>Functions for polygons</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="get_venn_polygon_shapes.html">get_venn_polygon_shapes()</a></code>
-
-        </dt>
-        <dd>Get Venn shapes as polygon_list</dd>
-      </dl><dl><dt>
-
-          <code><a href="simple_ellipse.html">simple_ellipse()</a></code>
-
-        </dt>
-        <dd>Simple ellipse function</dd>
-      </dl></div><div class="section level2">
-      <h2 id="venndir-spatial-functions">venndir Spatial Functions<a class="anchor" aria-label="anchor" href="#venndir-spatial-functions"></a></h2>
-
-      <div class="section-desc"><p>Functions for spatial objects and polygon manipulation</p></div>
+      <div class="section-desc"><p>Simple geometric calculations</p></div>
 
 
     </div><div class="section level2">
@@ -396,10 +432,16 @@
 
         </dt>
         <dd>Spread angles to minimum degrees difference</dd>
-      </dl></div><div class="section level2">
-      <h2 id="venndir-label-functions">venndir Label Functions<a class="anchor" aria-label="anchor" href="#venndir-label-functions"></a></h2>
+      </dl><dl><dt>
 
-      <div class="section-desc"><p>Helpful label functions</p></div>
+          <code><a href="three_point_angle.html">three_point_angle()</a></code>
+
+        </dt>
+        <dd>Calculate angle between three consecutive points</dd>
+      </dl></div><div class="section level2">
+      <h2 id="venndir-internal-functions">venndir Internal Functions<a class="anchor" aria-label="anchor" href="#venndir-internal-functions"></a></h2>
+
+      <div class="section-desc"><p>Venndir internal processing functions</p></div>
 
 
     </div><div class="section level2">
@@ -413,29 +455,6 @@
 
         </dt>
         <dd>Assemble grid grobs into venndir labels</dd>
-      </dl></div><div class="section level2">
-      <h2 id="venndir-utility-functions">venndir Utility Functions<a class="anchor" aria-label="anchor" href="#venndir-utility-functions"></a></h2>
-
-      <div class="section-desc"><p>Internal venndir utility functions</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="Venndir-methods.html">plot(<i>&lt;Venndir&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="Venndir-methods.html">length(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">setlist(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">names(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">show(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">metadata(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">`metadata&lt;-`(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">overlaplist(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">overlapdf(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">signed_counts(<i>&lt;Venndir&gt;</i>)</a></code> <code><a href="Venndir-methods.html">im(<i>&lt;Venndir&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot Venndir object</dd>
-      </dl><dl><dt>
-
-          <code><a href="curate_venn_labels.html">curate_venn_labels()</a></code>
-
-        </dt>
-        <dd>Curate Venn labels</dd>
       </dl><dl><dt>
 
           <code><a href="expand_range.html">expand_range()</a></code>
@@ -444,10 +463,10 @@
         <dd>Expand numeric range</dd>
       </dl><dl><dt>
 
-          <code><a href="get_venndir_curate_df.html">get_venndir_curate_df()</a></code>
+          <code><a href="get_venn_polygon_shapes.html">get_venn_polygon_shapes()</a></code>
 
         </dt>
-        <dd>Define venndir curate data.frame</dd>
+        <dd>Get Venn shapes as polygon_list</dd>
       </dl><dl><dt>
 
           <code><a href="make_color_contrast.html">make_color_contrast()</a></code>
@@ -462,28 +481,10 @@
         <dd>Make full Venn combination data.frame</dd>
       </dl><dl><dt>
 
-          <code><a href="make_venn_test.html">make_venn_test()</a></code>
-
-        </dt>
-        <dd>Generate test sets for venndir</dd>
-      </dl><dl><dt>
-
           <code><a href="match_list.html">match_list()</a></code>
 
         </dt>
         <dd>Match list elements to another list</dd>
-      </dl><dl><dt>
-
-          <code><a href="modify_venndir_overlap.html">modify_venndir_overlap()</a></code> <code><a href="modify_venndir_overlap.html">highlight_venndir_overlap()</a></code>
-
-        </dt>
-        <dd>Modify Venndir by overlap</dd>
-      </dl><dl><dt>
-
-          <code><a href="nudge_venndir_label.html">nudge_venndir_label()</a></code>
-
-        </dt>
-        <dd>Nudge venndir labels</dd>
       </dl><dl><dt>
 
           <code><a href="print_color_df.html">print_color_df()</a></code>
@@ -498,10 +499,10 @@
         <dd>Shrink data.frame by group</dd>
       </dl><dl><dt>
 
-          <code><a href="three_point_angle.html">three_point_angle()</a></code>
+          <code><a href="simple_ellipse.html">simple_ellipse()</a></code>
 
         </dt>
-        <dd>Calculate angle between three consecutive points</dd>
+        <dd>Simple ellipse function</dd>
       </dl><dl><dt>
 
           <code><a href="venndir_label_style.html">venndir_label_style()</a></code>
@@ -510,32 +511,14 @@
         <dd>venndir label style</dd>
       </dl><dl><dt>
 
-          <code><a href="venndir_legender.html">venndir_legender()</a></code>
-
-        </dt>
-        <dd>Add legend to venndir figure</dd>
-      </dl><dl><dt>
-
           <code><a href="venndir_to_df.html">venndir_to_df()</a></code>
 
         </dt>
         <dd>Convert venndir output to data.frame</dd>
       </dl></div><div class="section level2">
-      <h2 id="venndir-deprecated-functions">venndir deprecated functions<a class="anchor" aria-label="anchor" href="#venndir-deprecated-functions"></a></h2>
-
-      <div class="section-desc"><p>Deprecated functions losing support</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-
-    </div><div class="section level2">
       <h2 id="venndir-plotly-functions-experimental-">venndir plotly functions (experimental)<a class="anchor" aria-label="anchor" href="#venndir-plotly-functions-experimental-"></a></h2>
 
-      <div class="section-desc"><p>Functions for plotly compatibility (experimental)</p></div>
+      <div class="section-desc"><p>Experimental plotly compatibility</p></div>
 
 
     </div><div class="section level2">
@@ -565,7 +548,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

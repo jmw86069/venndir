@@ -23,7 +23,7 @@
 #'    The numeric vector will contain the range after
 #'    expansion.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #' 
 #' @param x `numeric` vector, or `list` of `numeric` vectors.
 #'    The input is converted to a range using `range(x, na.rm=TRUE)`

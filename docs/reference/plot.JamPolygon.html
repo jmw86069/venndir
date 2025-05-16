@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.51.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,6 @@
 <span>  do_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_pop_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  do_experimental <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -112,14 +111,14 @@ border on the border itself, default <code>TRUE</code> renders a thin grey line.
 
 <dt id="arg-linejoin">linejoin<a class="anchor" aria-label="anchor" href="#arg-linejoin"></a></dt>
 <dd><p><code>character</code> string (default <code>"bevel"</code>) passed to
-<code><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid::grid.path()</a></code> and <code>vwline::grid.vwline()</code> when rendering
+<code><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid::grid.path()</a></code> and <code><a href="https://rdrr.io/pkg/vwline/man/grid.vwline.html" class="external-link">vwline::grid.vwline()</a></code> when rendering
 polygons, and inner/outer polygon borders, respectively.
 Note that vwline version <code>0.2.2</code> displayed some graphical glitches
 when used with <code>"mitre"</code> and <code>"round"</code>, so <code>"bevel"</code> is the new default.</p></dd>
 
 
 <dt id="arg-mitrelimit">mitrelimit<a class="anchor" aria-label="anchor" href="#arg-mitrelimit"></a></dt>
-<dd><p><code>numeric</code> passed to <code>vwline::grid.vwline()</code> to adjust
+<dd><p><code>numeric</code> passed to <code><a href="https://rdrr.io/pkg/vwline/man/grid.vwline.html" class="external-link">vwline::grid.vwline()</a></code> to adjust
 the maximum extension at a line join caused by <code>linejoin="mitre"</code>.</p></dd>
 
 
@@ -159,11 +158,6 @@ When <code>do_draw=FALSE</code>, it also forces <code>do_newpage=FALSE</code>,
 <code>do_viewport=FALSE</code>, and <code>do_pop_viewport=FALSE</code>.</p></dd>
 
 
-<dt id="arg-do-experimental">do_experimental<a class="anchor" aria-label="anchor" href="#arg-do-experimental"></a></dt>
-<dd><p><code>logical</code> indicating whether to use experimental
-rendering with <code>gridGeometry</code> as potential replacement for <code>vwline</code>.</p></dd>
-
-
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p><code>logical</code> indicating whether to print verbose output.</p></dd>
 
@@ -171,7 +165,7 @@ rendering with <code>gridGeometry</code> as potential replacement for <code>vwli
 <dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
 <dd><p><code>logical</code> (default FALSE) indicating whether to enable
 debug operations. When <code>debug=TRUE</code> it is also passed to <code>grid</code>
-functions such as <code>vwline::grid.vwline()</code> to display internal
+functions such as <code><a href="https://rdrr.io/pkg/vwline/man/grid.vwline.html" class="external-link">vwline::grid.vwline()</a></code> to display internal
 calculations in the graphical output.</p></dd>
 
 
@@ -197,10 +191,24 @@ does not need to have the viewport defined.</p></li>
     <p>This function is a general purpose function to plot <code>JamPolygon</code>
 objects using <code>grid</code> graphics.</p>
 <p>It currently calls direct rendering functions, for example
-<code><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid::grid.path()</a></code>, <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid::grid.lines()</a></code>.</p>
-<p>Rendering guidelines used by this function:</p><ul><li><p>Each polygon is rendered in order, and in series.</p></li>
+<code><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid::pathGrob()</a></code>, <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid::grid.lines()</a></code>, <code><a href="https://rdrr.io/pkg/gridGeometry/man/grid.polyoffset.html" class="external-link">gridGeometry::polyoffsetGrob()</a></code>
+to render complex, potentially nested polygons with or without
+holes, and with inner, outer, and/or direct border.</p>
+<p>Rendering guidelines used by this function:</p><ul><li><p>Each polygon is rendered in order, and in series, with no
+parallelization.</p></li>
 <li><p>All polygon labels are rendered afterward, so that labels
-are not covered by subsequent polygons.</p></li>
+are not covered by subsequent polygons. Labels are intended
+to appear "on top" of all rendered polygons.</p></li>
+<li><p>Borders are drawn after each polygon "fill" is performed, so
+the border can modify the look of the fill. Borders are rendered
+with inner, outer, then direct border, in that order. The polygon
+area "fill" is also shrunk by the width defined by <code>innerborder.lwd</code>,
+unless <code>innerborder</code> is NA, so that the inner border does not
+affect the same region represented by the area fill.</p></li>
+<li><p>Since polygons are drawn in the order they are provided by the
+<code>JamPolygon</code> object, one polygon may be drawn on top of another
+polygon, using default R methods to overlay one color onto another,
+for example with optional alpha transparency.</p></li>
 </ul><div class="section">
 <h3 id="rendering-options-recognized-in-jp-polygons-">Rendering options recognized in <code>jp@polygons</code>:<a class="anchor" aria-label="anchor" href="#rendering-options-recognized-in-jp-polygons-"></a></h3>
 
@@ -208,17 +216,43 @@ are not covered by subsequent polygons.</p></li>
 will not be rendered.</p></li>
 <li><p><code>label_color</code> - color used to render each polygon label.</p></li>
 <li><p><code>family</code>, <code>fontsize</code> - font family, and font point size used to render
-each polygon label.</p></li>
-<li><p><code>x</code>, <code>y</code> - x- and y-coordinates to define each polygon or multipolygon.</p></li>
+each polygon label, passed to <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code> by default. Note that
+<code><a href="venndir.html">venndir()</a></code> and <code><a href="render_venndir.html">render_venndir()</a></code> may internally call
+<code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> which does not use <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>.</p></li>
+<li><p><code>x</code>, <code>y</code> - x- and y-coordinates to define each polygon or multipolygon.
+These columns are required for a <code>JamPolygon</code> object.</p></li>
 <li><p><code>fill</code> - polygon fill color, or <code>NA</code> for no fill color.</p></li>
-<li><p><code>border</code>, <code>border.lwd</code> - border color and line width (outer border)</p></li>
-<li><p><code>innerborder</code>, <code>innerborder.lwd</code> - inner border and line width</p></li>
-</ul><p>Todo:</p><ol><li><p>Enable arguments in <code>...</code> to override equivalent values in columns of
-<code>jp@polygons</code>.</p></li>
+<li><p><code>innerborder</code>, <code>innerborder.lwd</code> - inner border and line width.
+The inner border is drawn inside the polygon absolute boundary.</p></li>
+<li><p><code>outerborder</code>, <code>outerborder.lwd</code> - inner border and line width
+The inner border is drawn outside the polygon absolute boundary.</p></li>
+<li><p><code>border</code>, <code>border.lwd</code> - border color and line width (outer border).
+The border is drawn on top of the polygon absolute boundary. Note
+that when two polygons share the same border, one border will
+necessarily overwrite the other. For this reason, the innerborder
+may be useful in order to preserve the color of each polygon border
+without overlap.</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="return-grobs">Return grobs<a class="anchor" aria-label="anchor" href="#return-grobs"></a></h3>
+
+<ul><li><p>To return the list of grobs to be drawn without drawing them,
+use <code>do_draw=FALSE</code>, which also does not call <code><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid::grid.newpage()</a></code>.</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="todo">Todo<a class="anchor" aria-label="anchor" href="#todo"></a></h3>
+
+<ol><li><p>Enable arguments in <code>...</code> to override equivalent values in columns of
+<code>jp@polygons</code>.
+Partially complete.</p></li>
 <li><p>Convert <code>grid</code> rendering to generate graphical objects (grobs)
-which can be optionally rendered, or returned as a <code>gTree</code>.</p></li>
+which can be optionally rendered, or returned as a <code>gTree</code>.
+Mostly complete.</p></li>
 <li><p>Continue debugging the <code>vwline</code> graphical glitches which are
 apparent when rendering outer borders.
+Complete.
 See https://github.com/pmur002/vwline/issues/2.</p><ul><li><p>Current recommendation is to render outer border after the inner
 border, and with outer border at least the same or larger width
 as the inner border. Otherwise, for acute angles, inner border may
@@ -227,9 +261,15 @@ outer border is drawn afterward, it will fully cover the inner border.
 With sufficiently small inner border width, the graphical glitch may
 not be apparent.</p></li>
 </ul></li>
-<li><p>Consider allowing labels for each multi-part polygon.</p></li>
+<li><p>Consider allowing labels for each multi-part polygon.
+Low priotity.</p></li>
 <li><p>Consider drawing optional x- and y-axis, although both could be added
-using <code>grid</code> functions.</p></li>
+using <code>grid</code> functions.
+Low priority.</p></li>
+<li><p>Consider using different approach than <code>"snpc"</code> to enforce aspect
+ratio, for example ggplot2 uses <code>respect=TRUE</code> then leaves the x/y axis
+ranges intact. Making that change would affect other venndir functions
+that may assume scaled units are between 0 and 1.</p></li>
 </ol></div>
 
     </div>
@@ -238,7 +278,7 @@ using <code>grid</code> functions.</p></li>
     <div class="dont-index"><p>Other JamPolygon:
 <code><a href="JamPolygon-class.html">JamPolygon-class</a></code>,
 <code><a href="Venndir-class.html">Venndir-class</a></code>,
-<code><a href="JamPolygon-methods.html">[,JamPolygon,ANY,ANY,ANY-method</a></code>,
+<code><a href="JamPolygon-methods.html">[,JamPolygon-method</a></code>,
 <code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon</a>()</code>,
 <code><a href="area_JamPolygon.html">area_JamPolygon</a>()</code>,
 <code><a href="bbox_JamPolygon.html">bbox_JamPolygon</a>()</code>,
@@ -343,7 +383,7 @@ using <code>grid</code> functions.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

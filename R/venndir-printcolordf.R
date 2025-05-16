@@ -11,7 +11,7 @@
 #' Colors can be inverted using `dfinvert` that contains logical
 #' `TRUE` or `FALSE` values, provided as a `data.frame`.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #' 
 #' @param df `data.frame` with content to be printed to the R console.
 #' @param dfcolor `data.frame` with R compatible colors in each cell.
@@ -180,7 +180,7 @@ print_color_df <- function
 #' Similarly, pink on pink will return something close to
 #' red.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #'
 #' @param blend_preset `character` string passed as `preset` to
 #'    `colorjam::blend_colors()` to define the color wheel used

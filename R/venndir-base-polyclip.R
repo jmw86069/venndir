@@ -3,6 +3,83 @@
 #' 
 #' Directional Venn diagram
 #' 
+#' This function takes 'setlist' `list` as input, produces a `Venndir` object
+#' and plots the data by default.
+#' 
+#' When the input 'setlist' is a `list` of `character` vectors, it will
+#' produce basic Venn overlap counts.
+#' 
+#' When the input 'setlist' is a 'list' of `numeric` vectors, the vector
+#' element names are used as items, and the values are considered the
+#' directionality, or "sign". The overlaps are tabulated and delineated
+#' by the 'overlap_type' requested:
+#' 
+#' * overlap_type="detect" - by default it will use "concordance" when
+#' the input data contains directionality.
+#' * overlap_type="concordance" - counts are organized as up/up or down/down,
+#' or "discordant".
+#' * overlap_type="each" - counts are organized by each combination of up/down
+#' for each overlap.
+#' * overlap_type="overlap" - counts are organized without using sign.
+#' * overlap_type="agreement" - counts are organized by "agreement" (up/up, 
+#' or down/down), or "disagreement" (up/down, down/up).
+#' 
+#' ## Label options
+#' 
+#' * The argument 'show_labels' is used to define which labels are displayed.
+#' * Labels are enabled using a single letter, defined below.
+#' 
+#'    * UPPERCASE places the label outside.
+#'    * lowercase places the label inside the Venn diagram.
+#'    * Note that some labels cannot be placed outside (item labels).
+#'    Similarly, when item labels are enabled, counts cannot be displayed
+#'    inside, and must be outside or hidden.
+#' 
+#' * `N` - set _N_ame
+#' * `c` - _c_ount for each overlap
+#' * `s` - _s_igned count for each overlap
+#' * `p` - _p_ercent total items represented in each overlap
+#' * `i` - _i_tem labels for those items within each overlap
+#' 
+#' ## Item labels
+#' 
+#' * When item labels are enabled, the placement is defined by
+#' `label_fill_JamPolygon()`, which uses an offset method, essentially
+#' filling rows of labels left-to-right, alternating higher/lower
+#' across each row.
+#' * Items are sorted by sign if present, then by label.
+#' 
+#'    * To control the order that the signs are sorted, see
+#'    `curate_venn_labels()` and argument `curate_df` to define
+#'    custom order for each sign.
+#'    * For `venn_meme()` item labels, they are displayed in the same order
+#'    as provided.
+#' 
+#' * Item label font size is adjusted by default for each overlap polygon,
+#' proportional to the available area relative to the total Venn area.
+#' * Item label font sizes can be customized using `item_cex`.
+#' 
+#'    * A single value will be applied to the auto-scaling font sizes,
+#'    adjusting all fonts consistently.
+#'    * Multiple values will be recycled across the total number of overlap
+#'    regions, applying font size to each region as drawn in order.
+#' 
+#' * Items can be rendered using `marquee::marquee_grob()` (default) or
+#' `grid::grid.text()`.
+#' 
+#'    * The default marquee interprets items as markdown, which enables
+#'    text styling, line wrap, and potentially embedded images. Mostly,
+#'    marquee offers the best support for Unicode arrows using whichever
+#'    font is requested.  
+#'    Note that items use commonmark syntax, so to force line wrap, one
+#'    must end a line with two spaces, then newline, for example:
+#'    `"one line[space][space]\nsecond line"`
+#'    * The potential benefit of `grid::grid.text()` is speed, and that
+#'    it displays items exactly as provided with no markdown interpretation.
+#'    This function will not display all Unicode characters for all fonts,
+#'    due to inconsistencies in how R fonts are supported.
+#'    (It's a long history.)
+#' 
 #' @inheritParams signed_overlaps
 #' @param sets `integer` index with optional subset of sets in `setlist`
 #'    for the Venn diagram.
@@ -304,7 +381,7 @@ venndir <- function
  max_items=3000,
  show_zero=FALSE,
  font_cex=c(1, 1, 0.7),
- fontfamily="sans",
+ fontfamily="Arial",
  # show_set=c("main", "all", "none"),
  show_label=NA,
  display_counts=TRUE,
@@ -581,7 +658,8 @@ venndir <- function
    venn_jpol <- find_venn_overlaps_JamPolygon(
       jp=venn_jp,
       venn_counts=nCounts,
-      venn_colors=set_colors[names(venn_jp)],
+      # venn_colors=set_colors[names(venn_jp)],
+      venn_colors=jamba::alpha2col(set_colors[names(venn_jp)], alpha=poly_alpha),
       sep=sep,
       ...);
    # rownames(venn_jpol@polygons) <- names(venn_jpol);

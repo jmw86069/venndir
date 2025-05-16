@@ -22,7 +22,7 @@ venndir(
   max_items = 3000,
   show_zero = FALSE,
   font_cex = c(1, 1, 0.7),
-  fontfamily = "sans",
+  fontfamily = "Arial",
   show_label = NA,
   display_counts = TRUE,
   poly_alpha = 0.6,
@@ -385,6 +385,89 @@ for the graphical objects, specifically the use of coordinate
 \description{
 Directional Venn diagram
 }
+\details{
+This function takes 'setlist' \code{list} as input, produces a \code{Venndir} object
+and plots the data by default.
+
+When the input 'setlist' is a \code{list} of \code{character} vectors, it will
+produce basic Venn overlap counts.
+
+When the input 'setlist' is a 'list' of \code{numeric} vectors, the vector
+element names are used as items, and the values are considered the
+directionality, or "sign". The overlaps are tabulated and delineated
+by the 'overlap_type' requested:
+\itemize{
+\item overlap_type="detect" - by default it will use "concordance" when
+the input data contains directionality.
+\item overlap_type="concordance" - counts are organized as up/up or down/down,
+or "discordant".
+\item overlap_type="each" - counts are organized by each combination of up/down
+for each overlap.
+\item overlap_type="overlap" - counts are organized without using sign.
+\item overlap_type="agreement" - counts are organized by "agreement" (up/up,
+or down/down), or "disagreement" (up/down, down/up).
+}
+\subsection{Label options}{
+\itemize{
+\item The argument 'show_labels' is used to define which labels are displayed.
+\item Labels are enabled using a single letter, defined below.
+\itemize{
+\item UPPERCASE places the label outside.
+\item lowercase places the label inside the Venn diagram.
+\item Note that some labels cannot be placed outside (item labels).
+Similarly, when item labels are enabled, counts cannot be displayed
+inside, and must be outside or hidden.
+}
+\item \code{N} - set _N_ame
+\item \code{c} - _c_ount for each overlap
+\item \code{s} - _s_igned count for each overlap
+\item \code{p} - _p_ercent total items represented in each overlap
+\item \code{i} - _i_tem labels for those items within each overlap
+}
+}
+
+\subsection{Item labels}{
+\itemize{
+\item When item labels are enabled, the placement is defined by
+\code{label_fill_JamPolygon()}, which uses an offset method, essentially
+filling rows of labels left-to-right, alternating higher/lower
+across each row.
+\item Items are sorted by sign if present, then by label.
+\itemize{
+\item To control the order that the signs are sorted, see
+\code{curate_venn_labels()} and argument \code{curate_df} to define
+custom order for each sign.
+\item For \code{venn_meme()} item labels, they are displayed in the same order
+as provided.
+}
+\item Item label font size is adjusted by default for each overlap polygon,
+proportional to the available area relative to the total Venn area.
+\item Item label font sizes can be customized using \code{item_cex}.
+\itemize{
+\item A single value will be applied to the auto-scaling font sizes,
+adjusting all fonts consistently.
+\item Multiple values will be recycled across the total number of overlap
+regions, applying font size to each region as drawn in order.
+}
+\item Items can be rendered using \code{marquee::marquee_grob()} (default) or
+\code{grid::grid.text()}.
+\itemize{
+\item The default marquee interprets items as markdown, which enables
+text styling, line wrap, and potentially embedded images. Mostly,
+marquee offers the best support for Unicode arrows using whichever
+font is requested.
+Note that items use commonmark syntax, so to force line wrap, one
+must end a line with two spaces, then newline, for example:
+\code{"one line[space][space]\\nsecond line"}
+\item The potential benefit of \code{grid::grid.text()} is speed, and that
+it displays items exactly as provided with no markdown interpretation.
+This function will not display all Unicode characters for all fonts,
+due to inconsistencies in how R fonts are supported.
+(It's a long history.)
+}
+}
+}
+}
 \examples{
 setlist <- make_venn_test(100, 3, do_signed=FALSE);
 
@@ -418,9 +501,12 @@ vo <- venndir(setlist,
 }
 \seealso{
 Other venndir core: 
+\code{\link{make_venn_test}()},
+\code{\link{plot,Venndir,ANY-method}},
 \code{\link{render_venndir}()},
 \code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
-\code{\link{venn_meme}()}
+\code{\link{venn_meme}()},
+\code{\link{venndir_legender}()}
 }
 \concept{venndir core}

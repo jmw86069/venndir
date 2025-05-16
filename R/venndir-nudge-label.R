@@ -13,7 +13,7 @@
 #' This function does not determine whether labels are displayed inside
 #' or outside the Venn polygons.
 #' 
-#' @family venndir utility
+#' @family venndir advanced
 #' 
 #' @param venndir_output output from `venndir()` as `Venndir` object.
 #' @param set `character` name of the sets or overlaps to adjust.

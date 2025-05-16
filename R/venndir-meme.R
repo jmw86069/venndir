@@ -109,10 +109,11 @@
 #'    `s&cs`="Data<br>Science",
 #'    `cs&b`="Computational<br>Biology",
 #'    `s&cs&b`="Bioinformatics")
-#' venn_meme(bix)
+#' venn_meme(bix, fontfamily="Futura")
 #' 
 #' # some customizations, proportional=TRUE looks better
 #' venn_meme(bix,
+#'    fontfamily="Futura",
 #'    proportional=TRUE,
 #'    outerborder="#FFFFFF99", innerborder=NA,
 #'    rotate_degrees=360/6,
@@ -129,7 +130,7 @@
 #' `AV&ML&T`="Impossible<br>to reason with"
 #' )
 #' venn_meme(avlist, fontfamily="Trebuchet MS",
-#'    set_colors=c("maroon", "palegoldenrod", "skyblue"),
+#'    set_colors=c("maroon", "goldenrod", "skyblue"),
 #'    outerborder="white", innerborder=NA,
 #'    item_cex=rep(c(2, 1.6, 1.3, 1.7, 1.5),
 #'       c(3, 1, 1, 1, 1)))
@@ -142,11 +143,11 @@
 #'       jamba::pasteByRow(sep="<br>", im),
 #'       jamba::pasteByRow(sep="&", im))
 #' })))
-#' venn_meme(wtah, item_cex=0.7, fontfamily="Impact")
+#' venn_meme(wtah, item_cex=0.75, fontfamily="Impact")
 #' 
 #' # circular 4-way shapes
 #' venn_meme(wtah, proportional=TRUE, shape="circle",
-#'    outerborder="grey", innerborder=NA,
+#'    outerborder="grey45", innerborder=NA,
 #'    item_cex=0.8, fontfamily="Impact")
 #' 
 #' # for proportional diagrams it may be helpful to use shape="ellipse"
@@ -162,12 +163,12 @@
 #'    c="sudden<br>rage",
 #'    `a&b`="Eating<br>too much<br>spicy<br>food",
 #'    `b&c`="Stubbing<br>your toe,<br>twice",
-#'    `a&b&c`="Scrolling<br>through your<br>Twitter feed",
+#'    `a&b&c`="Scrolling<br>through<br>X.com",
 #'    `a&c`="Being<br>a sports<br>fan"
 #' )
-#' #   `a&c`="Scrolling<br>through your<br>Twitter feed",
+#' #   `a&c`="Scrolling<br>through your<br>X.com feed",
 #' #   `a&b&c`="Being<br>a sports<br>fan"
-#' venn_meme(em, fontfamily="serif", item_cex_factor=0.9,
+#' venn_meme(em, fontfamily="Optima", item_cex_factor=0.9,
 #'    set_colors=c("gold", "dodgerblue3", "firebrick3"))
 #' 
 #' # Mister Venn
@@ -197,32 +198,31 @@
 #' )
 #' venn_meme(mrvenn, item_cex_factor=0.7,
 #'    outerborder="white", innerborder=NA,
-#'    proportional=TRUE, fontfamily="Avenir")
+#'    proportional=TRUE, fontfamily="Arial Narrow")
 #' 
 #' # example of ordered item labels
 #' item_list <- list(
-#'    CLE=(c("**CLE**:",
-#'       "IFN&alpha; > IFN&beta;",
-#'       "Anti-malarials effective\ntherapy for\nskin disease")),
-#'    DM=(c("**DM**:",
-#'       "IFN&beta; > IFN&alpha;",
-#'       "Triggered by\nimmune stimulating\nherbal supplements",
-#'       "\n\nAnti-malarials\neffective in 25%,\ncommonly causes\nmorbilliform rash",
-#'       "\n\nCannabinoid receptor\nagonist proising\ntreatment"
+#'    CLE=(c("**Cutaneous Lupus**:",
+#'       "IFN⍺ > IFNβ",
+#'       "Anti-malarials effective  \ntherapy for  \nskin disease")),
+#'    DM=(c("**Dermatomyositis**:",
+#'       "IFNβ > IFN⍺",
+#'       "Triggered by  \nimmune stimulating  \nherbal supplements.  \n.  \n",
+#'       "  \nAnti-malarials  \neffective in 25%, but  \ncommon morbilliform rash  \n",
+#'       "  \nCannabinoid receptor  \nagonist treatment"
 #'       )),
 #'    `CLE&DM`=(c(
 #'       "Photosensitivity",
-#'       "Triggered by viral and\nbacterial infections",
+#'       "Triggered by viral &\nbacterial infections",
 #'       "Increased\ntype I IFN")))
 #' vo <- venndir::venn_meme(x=item_list,
-#'    fontfamily="Times New Roman",
-#'    outerborder="white", innerborder=NA,
-#'    item_cex=c(1.3, 1.2, 1.3) ,
+#'    fontfamily="PT Sans Narrow",
+#'    outerborder="white", innerborder="white",
+#'    item_cex=c(1.3, 1.2, 1.3),
 #'    item_buffer=c(-0.5, -0.2, -0.75),
-#'    set_colors=c("darkorchid3", "gold"),
-#'    poly_alpha=0.3,
+#'    set_colors=c("darkorchid4", "gold"),
+#'    poly_alpha=0.5,
 #'    xyratio=5, spread=TRUE,
-#'    item_style="gridtext",
 #'    jitter_cex=0)
 #' 
 #' @export

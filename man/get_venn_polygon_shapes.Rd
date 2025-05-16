@@ -47,8 +47,8 @@ sets are at the top.}
 \item{...}{additional arguments are ignored.}
 }
 \value{
-\code{list} in polygon_list format with \code{"x"} and \code{"y"} elements,
-or when \code{return_type="JamPolygon"} it returns \code{JamPolygon}.
+\code{JamPolygon} representing Venn or Euler circles,
+however this function does not subdivide circles by overlap.
 }
 \description{
 Get Venn shapes as polygon_list
@@ -82,7 +82,15 @@ plot(vjp, fill=venn_colors)
 
 }
 \seealso{
-Other venndir polygons: 
-\code{\link{simple_ellipse}()}
+Other venndir internal: 
+\code{\link{assemble_venndir_label}()},
+\code{\link{expand_range}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{match_list}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{simple_ellipse}()},
+\code{\link{venndir_to_df}()}
 }
-\concept{venndir polygons}
+\concept{venndir internal}

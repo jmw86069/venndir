@@ -210,17 +210,32 @@ df3 <- data.frame(name=c("polygon1", "polygon2"),
    fill=c("gold", "firebrick"))
 jp3 <- new("JamPolygon", polygons=df3);
 
+# each polygon is filled individually
 jp3p <- plot(jp3);
-
 lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 100),
-   ref_jp=jp3, plot_style="JamPolygon")
+   ref_jp=jp3, plot_style="JamPolygon", color="darkorange3")
+# sometimes manual adjustment of xyratio can find the right fit
 lfj2 <- label_fill_JamPolygon(jp3[2,], labels=rep("X", 40),
+   color="gold",
    buffer=-0.5,
-   label_method="columns",
+   label_method="columns", xyratio=0.7,
+   ref_jp=jp3, plot_style="JamPolygon")
+
+jp3p <- plot(jp3);
+lfj12 <- label_fill_JamPolygon(jp3, labels=rep("X", 80),
+   buffer=-0.5,
+   label_method="offset", xyratio=2,
    ref_jp=jp3, plot_style="JamPolygon")
 
 jp3p <- plot(jp3);
 lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 87),
+   apply_n_scale=FALSE,
+   spread=TRUE,
+   ref_jp=jp3, plot_style="JamPolygon")
+
+jp3p <- plot(jp3, label="");
+lfj1 <- label_fill_JamPolygon(jp3[1,],
+   labels=c("One\nlabel", "Another label", "Yet  \nanother label"),
    apply_n_scale=FALSE,
    spread=TRUE,
    ref_jp=jp3, plot_style="JamPolygon")
@@ -230,7 +245,7 @@ lfj1 <- label_fill_JamPolygon(jp3[1,], labels=rep("O", 87),
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
 \code{\link{Venndir-class}},
-\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

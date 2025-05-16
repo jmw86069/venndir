@@ -10,7 +10,7 @@
 #' 
 #' This function uses `data.table` for overall speed.
 #' 
-#' @family venndir utility
+#' @family venndir internal
 #' 
 #' @import data.table
 #' 
@@ -21,6 +21,7 @@
 #'    probe=paste0("probe", 1:6))
 #' shrink_df(testdf, by="SYMBOL", num_func=function(x){mean(x, na.rm=TRUE)})
 #' 
+#' # 60,000 row simulation
 #' testdftall <- do.call(rbind, lapply(1:10000, function(i){
 #'    idf <- testdf;
 #'    idf$SYMBOL <- paste0(idf$SYMBOL, "_", i);
@@ -31,9 +32,11 @@
 #'    by="SYMBOL",
 #'    num_func=function(x){mean(x, na.rm=TRUE)})
 #' 
-#' shrunk_tall2 <- jamses::shrinkDataFrame(testdftall,
-#'    groupBy="SYMBOL")
-#' head(shrunk_tall2, 12)
+#' if (requireNamespace("jamses", quietly=TRUE)) {
+#'    shrunk_tall2 <- jamses::shrinkDataFrame(testdftall,
+#'       groupBy="SYMBOL")
+#'    print(head(shrunk_tall2, 12))
+#' }
 #' 
 #' @export
 shrink_df <- function

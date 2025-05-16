@@ -43,7 +43,7 @@
 #' 
 #' @return `matrix` with `numeric` values after processing.
 #' 
-#' @family venndir spatial
+#' @family venndir geometry
 #' 
 #' @examples
 #' pts <- matrix(ncol=2, c(1:4, 6, 8, 5, 7));
@@ -231,7 +231,7 @@ rescale_coordinates <- function
 #' @param x,y `list` objects to be compared
 #' @param ... additional arguments are ignored.
 #'
-#' @family venndir utility
+#' @family venndir internal
 #' 
 #' @examples
 #' x <- list(a=LETTERS[1],

@@ -185,13 +185,27 @@ setMethod("plot",
 #' objects using `grid` graphics.
 #' 
 #' It currently calls direct rendering functions, for example
-#' `grid::grid.path()`, `grid::grid.lines()`.
+#' `grid::pathGrob()`, `grid::grid.lines()`, `gridGeometry::polyoffsetGrob()`
+#' to render complex, potentially nested polygons with or without
+#' holes, and with inner, outer, and/or direct border.
 #' 
 #' Rendering guidelines used by this function:
 #' 
-#' * Each polygon is rendered in order, and in series.
+#' * Each polygon is rendered in order, and in series, with no
+#' parallelization.
 #' * All polygon labels are rendered afterward, so that labels
-#' are not covered by subsequent polygons.
+#' are not covered by subsequent polygons. Labels are intended
+#' to appear "on top" of all rendered polygons.
+#' * Borders are drawn after each polygon "fill" is performed, so
+#' the border can modify the look of the fill. Borders are rendered
+#' with inner, outer, then direct border, in that order. The polygon
+#' area "fill" is also shrunk by the width defined by `innerborder.lwd`,
+#' unless `innerborder` is NA, so that the inner border does not
+#' affect the same region represented by the area fill.
+#' * Since polygons are drawn in the order they are provided by the
+#' `JamPolygon` object, one polygon may be drawn on top of another
+#' polygon, using default R methods to overlay one color onto another,
+#' for example with optional alpha transparency.
 #' 
 #' ## Rendering options recognized in `jp@polygons`:
 #' 
@@ -199,20 +213,39 @@ setMethod("plot",
 #' will not be rendered.
 #' * `label_color` - color used to render each polygon label.
 #' * `family`, `fontsize` - font family, and font point size used to render
-#' each polygon label.
+#' each polygon label, passed to `grid::gpar()` by default. Note that
+#' `venndir()` and `render_venndir()` may internally call
+#' `marquee::marquee_grob()` which does not use `grid::gpar()`.
 #' * `x`, `y` - x- and y-coordinates to define each polygon or multipolygon.
+#' These columns are required for a `JamPolygon` object.
 #' * `fill` - polygon fill color, or `NA` for no fill color.
-#' * `border`, `border.lwd` - border color and line width (outer border)
-#' * `innerborder`, `innerborder.lwd` - inner border and line width
+#' * `innerborder`, `innerborder.lwd` - inner border and line width.
+#' The inner border is drawn inside the polygon absolute boundary.
+#' * `outerborder`, `outerborder.lwd` - inner border and line width
+#' The inner border is drawn outside the polygon absolute boundary.
+#' * `border`, `border.lwd` - border color and line width (outer border).
+#' The border is drawn on top of the polygon absolute boundary. Note
+#' that when two polygons share the same border, one border will
+#' necessarily overwrite the other. For this reason, the innerborder
+#' may be useful in order to preserve the color of each polygon border
+#' without overlap.
 #' 
-#' Todo:
+#' ## Return grobs
+#' 
+#' * To return the list of grobs to be drawn without drawing them,
+#' use `do_draw=FALSE`, which also does not call `grid::grid.newpage()`.
+#' 
+#' ## Todo
 #' 
 #' 1. Enable arguments in `...` to override equivalent values in columns of
 #' `jp@polygons`.
+#' Partially complete.
 #' 2. Convert `grid` rendering to generate graphical objects (grobs)
 #' which can be optionally rendered, or returned as a `gTree`.
+#' Mostly complete.
 #' 3. Continue debugging the `vwline` graphical glitches which are
 #' apparent when rendering outer borders.
+#' Complete.
 #' See [https://github.com/pmur002/vwline/issues/2].
 #' 
 #'    * Current recommendation is to render outer border after the inner
@@ -222,9 +255,16 @@ setMethod("plot",
 #'    outer border is drawn afterward, it will fully cover the inner border.
 #'    With sufficiently small inner border width, the graphical glitch may
 #'    not be apparent.
+#' 
 #' 4. Consider allowing labels for each multi-part polygon.
+#' Low priotity.
 #' 5. Consider drawing optional x- and y-axis, although both could be added
 #' using `grid` functions.
+#' Low priority.
+#' 6. Consider using different approach than `"snpc"` to enforce aspect
+#' ratio, for example ggplot2 uses `respect=TRUE` then leaves the x/y axis
+#' ranges intact. Making that change would affect other venndir functions
+#' that may assume scaled units are between 0 and 1.
 #' 
 #' @family JamPolygon
 #' 
@@ -348,8 +388,6 @@ setMethod("plot",
 #'    `grid::grid.draw()` for each graphical object.
 #'    When `do_draw=FALSE`, it also forces `do_newpage=FALSE`,
 #'    `do_viewport=FALSE`, and `do_pop_viewport=FALSE`.
-#' @param do_experimental `logical` indicating whether to use experimental
-#'    rendering with `gridGeometry` as potential replacement for `vwline`.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param debug `logical` (default FALSE) indicating whether to enable
 #'    debug operations. When `debug=TRUE` it is also passed to `grid`
@@ -377,7 +415,6 @@ plot.JamPolygon <- function
  do_viewport=TRUE,
  do_pop_viewport=TRUE,
  do_draw=TRUE,
- do_experimental=TRUE,
  verbose=FALSE,
  debug=FALSE,
  ...)
@@ -464,7 +501,7 @@ plot.JamPolygon <- function
          x <- labelr_JamPolygon(x, add_to_jp=TRUE);
       }
    }
-   
+
    ################################################
    # Todo:
    # - permit dots values to override other graphical parameters
@@ -673,7 +710,7 @@ plot.JamPolygon <- function
          irowname <- rownames(x@polygons)[irow];
          # jamba::printDebug("irow:", irow, ", irowname:", irowname);# debug
          # render each polygon
-         if (TRUE %in% do_experimental) {
+         if (TRUE) {
             if (verbose) {
                jamba::printDebug("Rendering polygon with gridGeometry: ", irow);
             }
@@ -884,148 +921,10 @@ plot.JamPolygon <- function
             }
          }
          
-         ########################################
-         # render inner and outer borders
-         if (FALSE %in% do_experimental) {
-            for (border_type in c("inner", "outer")) {
-               if ("outer" %in% border_type) {
-                  use_border <- x@polygons$border[[irow]];
-                  osign <- 1;
-               } else {
-                  use_border <- x@polygons$innerborder[[irow]];
-                  osign <- -1;
-               }
-               ## confirm use_border is a color
-               if (length(use_border) == 0 ||
-                     any(is.na(use_border)) ||
-                     !jamba::isColor(use_border)) {
-                  # skip rows with no border color
-                  # next;
-                  use_border <- "#FFFFFF00";
-               }
-               if (verbose) {
-                  jamba::printDebug("Rendering ", border_type, " border: ",
-                     use_border, fgText=list("darkorange", use_border));
-               }
-               use_x <- x@polygons$x[[irow]];
-               use_y <- x@polygons$y[[irow]];
-               if (!is.list(use_x)) {
-                  use_x <- list(use_x);
-                  use_y <- list(use_y);
-               }
-               # iterate each polygon part
-               for (ipart in seq_along(use_x)) {
-                  part_x <- use_x[[ipart]];
-                  part_y <- use_y[[ipart]];
-                  part_x <- c(tail(part_x, 1), part_x, head(part_x, 0));
-                  part_y <- c(tail(part_y, 1), part_y, head(part_y, 0));
-                  npts <- length(part_x);
-                  if (npts == 0) {
-                     next;
-                  }
-                  part_orientation <- x@polygons$orientation[[irow]][[ipart]];
-                  if ("inner" %in% border_type) {
-                     lwd_pts <- jamba::rmNULL(x@polygons$innerborder.lwd[[irow]],
-                        nullValue=2);
-                     lty_pts <- jamba::rmNULL(x@polygons$innerborder.lty[[irow]],
-                        nullValue=1);
-                  } else {
-                     lwd_pts <- jamba::rmNULL(x@polygons$border.lwd[[irow]],
-                        nullValue=2);
-                     lty_pts <- jamba::rmNULL(x@polygons$border.lty[[irow]],
-                        nullValue=1);
-                  }
-                  # define line width at each point
-                  if (any(lwd_pts <= 0)) {
-                     lwd_pts[lwd_pts <= 0] <- 0.01;
-                  }
-                  use_w <- vwline::widthSpec(list(
-                     right=grid::unit(rep(
-                        lwd_pts * ((osign * part_orientation) > 0),
-                        # lwd_pts * (part_orientation != 0),
-                        npts), "pt"),
-                     left=grid::unit(rep(
-                        lwd_pts * ((osign * part_orientation) < 0),
-                        npts), "pt")));
-                  grobname <- paste0(irowname, ":vwlineGrob:",
-                     border_type, ":", ipart); # rowname:grob:type:num
-                  ## render the border
-                  vwline_grob <- vwline::vwlineGrob(
-                     x=adjx(part_x),
-                     y=adjy(part_y),
-                     w=use_w,
-                     open=FALSE,
-                     stepWidth=TRUE,
-                     mitrelimit=mitrelimit,
-                     linejoin=linejoin,
-                     lineend="butt",
-                     debug=debug,
-                     name=grobname,
-                     # vp=use_vp,
-                     gp=grid::gpar(
-                        fill=use_border,
-                        col=NA,
-                        lwd=1))
-                  ## update the viewport manually
-                  vwline_grob$vp <- use_vp;
-                  if (TRUE %in% do_draw) {
-                     grid::grid.draw(vwline_grob);
-                  }
-                  grob_list <- c(grob_list,
-                     setNames(list(vwline_grob), grobname));
-                  
-                  if (TRUE %in% render_thin_border) {
-                     # consider whether to draw a thin border as below
-                     # grobname <- paste0("border.", irow, ".", border_type, ".", ipart);# old style
-                     grobname <- paste0(irowname, ":pathGrob:",
-                        "border", ":", ipart); # rowname:grob:border:num
-                     path_grob2 <- grid::pathGrob(x=adjx(part_x),
-                        y=adjy(part_y),
-                        rule="evenodd",
-                        pathId=rep(1, length(part_x)),
-                        id=rep(1, length(part_x)),
-                        name=grobname,
-                        vp=use_vp,
-                        gp=grid::gpar(
-                           fill=NA,
-                           col="#00000022",
-                           lty=lty_pts,
-                           lwd=0.25));
-                     if (TRUE %in% do_draw) {
-                        grid::grid.draw(path_grob2);
-                     }
-                     grob_list <- c(grob_list,
-                        setNames(list(path_grob2), grobname));
-                  }
-                  
-                  if (FALSE) {
-                     # for debug only, print "1" at first point in polygon
-                     grid::grid.text(
-                        x=head(adjx(part_x), 1),
-                        y=head(adjy(part_y), 1),
-                        label="1",
-                        gp=grid::gpar(fontsize=8, color="black"))
-                  }
-               }
-            }
-         }
-         # optional debug, return the polygon
-         if (debug > 1) {
-            return(list(
-               x=(adjx(part_x)),
-               y=(adjy(part_y)),
-               w=use_w,
-               open=FALSE,
-               linejoin=linejoin,
-               gp=grid::gpar(
-                  fill=use_border,
-                  col=use_border,
-                  lwd=1)))
-         }
       }
    }
    # Debug print grob_list
-   # if (TRUE %in% do_experimental) {
+   # if (debug > 1) {
    #    jamba::printDebug("sdim(grob_list):");print(jamba::sdim(grob_list));# debug
    # }
    
@@ -1336,10 +1235,18 @@ setMethod("ncol",
 #' 
 #' Calculate angle between three consecutive points
 #' 
-#' @family venndir utility
+#' @family venndir geometry
+#' 
+#' @returns `numeric` angle defined by the three points, where
+#'    the second point is considered the vertex.
 #' 
 #' @param x `matrix` with first two columns assumed to contain `x`, `y`
 #'    coordinates.
+#' 
+#' @examples
+#' x <- cbind(x=c(1, 1, 3), y=c(2, 1, 1))
+#' three_point_angle(x)
+#' 
 #' @export
 three_point_angle <- function
 (x)
@@ -1381,11 +1288,12 @@ three_point_angle <- function
 #' @param jp `JamPolygon`
 #' @param flip_sign `integer` to indicate whether the orientation should
 #'    be flipped, inverting the meaning of all returned values.
-#'    This argument is intended to be used when defining inner and outer
-#'    borders alongside something like `vwline::grid.vwline()` which
-#'    defines border on the left and right, as it travels from point
-#'    to point. By using `flip_sign=-1` it will flip the right and
-#'    left sides accordingly.
+#'    For example, clockwise polygons by default are considered
+#'    "solid", and counter-clockwise are considered "holes", for
+#'    the purpose of interpreting nested polygons. When `flip_sign=-1`
+#'    it reverses these assumptions.
+#'    This option is experimental and intended mainly for internal
+#'    testing.
 #' @param include_holes,include_clockwise,include_parent `logical`
 #'    indicating whether to include additional columns to describe
 #'    multi-part polygons. The clockwise direction is used to define
