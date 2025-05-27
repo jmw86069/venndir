@@ -36,14 +36,20 @@
 #' to include whitespace. Any leading/trailing whitespace will be removed
 #' afterwards.
 #' 
-#' @return `vector` of labels or colors, based upon argument `type`.
+#' @returns `vector` of labels or colors, based upon argument `type`,
+#'    or when `type="all"` it returns `data.frame` with rows for each
+#'    entry in `x`.
 #' 
 #' @family venndir advanced
 #' 
 #' @param x `vector` of overlap labels.
-#' @param type `character` string where `type="sign"` will curate
-#'    `x` into directional sign, and `type="color"` will curate
-#'    `x` into corresponding directional color.
+#' @param type `character` string, default 'type'.
+#'    * `type="sign"` will curate `x` to sign
+#'    * `type="color"` will curate `x` to color
+#'    * `type="hide_singlet"` will indicate whether to hide singlet values,
+#'    intended for values such as "agreement" which are not useful
+#'    to display for singlet (single group) count values.
+#'    * `type="all"` will return all the above as `data.frame`.
 #' @param curate_df `data.frame` or `NULL` with optional curation 
 #'    rules. The input is coerced to `data.frame` if necessary.
 #'    The colnames are expected to include:
@@ -65,13 +71,13 @@
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
-#' options("warn"=-1); # make them stop
-#' 
 #' venn_labels <- c("0 1 0 -1", "1 -1", "1 1 1", "mixed", "agreement", "1 1 0 0");
 #' (curate_venn_labels(venn_labels, "sign"))
 #' (curate_venn_labels(venn_labels, "sign", unicode=FALSE))
 #' 
 #' (curate_venn_labels(venn_labels, "color"))
+#' 
+#' (curate_venn_labels(venn_labels, "all"))
 #' 
 #' jamba::printDebug(as.list(curate_venn_labels(venn_labels, "sign")),
 #'    collapse=", ",
@@ -81,7 +87,9 @@
 curate_venn_labels <- function
 (x,
  type=c("sign",
-    "color"),
+    "color",
+    "hide_singlet",
+    "all"),
  curate_df=NULL,
  unicode=TRUE,
  blend_preset="ryb",
@@ -91,7 +99,21 @@ curate_venn_labels <- function
    if (length(x) == 0) {
       return(x)
    }
-   
+   type <- match.arg(type);
+   if ("all" %in% type) {
+      #
+      types <- jamba::nameVector(c("sign", "color", "hide_singlet"))
+      out_df <- data.frame(lapply(types, function(itype){
+         curate_venn_labels(x=x,
+            type=itype,
+            curate_df=curate_df,
+            unicode=unicode,
+            blend_preset=blend_preset,
+            split=split,
+            ...)
+      }));
+      return(out_df)
+   }
    # 0.0.51.900 - move curate_df into get_venndir_curate_dr()
    if (inherits(curate_df, "data.frame") && nrow(curate_df) > 0) {
       # use curate_df
@@ -105,7 +127,6 @@ curate_venn_labels <- function
       curate_df <- get_venndir_curate_df(unicode=unicode,
          ...)
    }
-   type <- match.arg(type);
 
    # 0.0.27.900: process using positional matching
    # iterate each character from each value in x
@@ -129,9 +150,12 @@ curate_venn_labels <- function
    # combine entries
    if ("color" %in% type) {
       x <- jamba::cPaste(x_new, sep=" ")
-   } else {
+   } else if ("sign" %in% type) {
       x <- gsub("^[ ]*|[ ]*$", "",
          jamba::cPaste(x_new, sep=""))
+   } else if ("hide_singlet" %in% type) {
+      x <- sapply(x_new, function(i) all(as.logical(i)));
+      # x <- jamba::cPaste(x_new, sep=" ")
    }
 
    if ("color" %in% type) {

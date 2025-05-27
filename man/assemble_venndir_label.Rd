@@ -160,13 +160,11 @@ values: "plain", "bold", "italic", "bold.italic"
 }
 }
 \examples{
-pdf.options(encoding="ISOLatin1.enc")
 vl <- assemble_venndir_label(
    signed_labels=c("\u2191\u2191 15",
       "\u2193\u2193 23"),
    debug="overlap")
 
-pdf.options(encoding="ISOLatin2.enc")
 vl <- assemble_venndir_label(
    overlap_labels=c("\u2191\u2191 15",
       "\u2193\u2193 23")[1],
@@ -196,7 +194,7 @@ vl5 <- assemble_venndir_label(
    signed_labels=c("\u2191\u2191 15",
       "\u2191\u2193 8",
       "\u2193\u2193 23"),
-   fontcolors=list(signed=c("red3", "darkorchid", "dodgerblue3")),
+   fontcolors=list(count="black", signed=c("red3", "darkorchid", "dodgerblue3")),
    count_labels=c("46", "12\%"),
    overlap_labels="Set Name Goes Here",
    debug="overlap")
@@ -232,19 +230,21 @@ grid::grid.points(x=grid::unit(c(0.25, 0.25), "snpc"),
    pch=3,
    gp=grid::gpar(cex=0.8, lwd=2, col="darkorange"));
 
-pdf.options(encoding="ISOLatin1.enc")
-
 }
 \seealso{
 Other venndir internal: 
+\code{\link{check_systemfonts_family}()},
 \code{\link{expand_range}()},
 \code{\link{get_venn_polygon_shapes}()},
+\code{\link{hexsticker_venndir}()},
 \code{\link{make_color_contrast}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{match_list}()},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
 \code{\link{simple_ellipse}()},
+\code{\link{subset_systemfonts}()},
+\code{\link{venndir_label_style}()},
 \code{\link{venndir_to_df}()}
 }
 \concept{venndir internal}

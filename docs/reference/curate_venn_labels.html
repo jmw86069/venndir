@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">curate_venn_labels</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sign"</span>, <span class="st">"color"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sign"</span>, <span class="st">"color"</span>, <span class="st">"hide_singlet"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  curate_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unicode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  blend_preset <span class="op">=</span> <span class="st">"ryb"</span>,</span>
@@ -63,9 +63,13 @@
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p><code>character</code> string where <code>type="sign"</code> will curate
-<code>x</code> into directional sign, and <code>type="color"</code> will curate
-<code>x</code> into corresponding directional color.</p></dd>
+<dd><p><code>character</code> string, default 'type'.</p><ul><li><p><code>type="sign"</code> will curate <code>x</code> to sign</p></li>
+<li><p><code>type="color"</code> will curate <code>x</code> to color</p></li>
+<li><p><code>type="hide_singlet"</code> will indicate whether to hide singlet values,
+intended for values such as "agreement" which are not useful
+to display for singlet (single group) count values.</p></li>
+<li><p><code>type="all"</code> will return all the above as <code>data.frame</code>.</p></li>
+</ul></dd>
 
 
 <dt id="arg-curate-df">curate_df<a class="anchor" aria-label="anchor" href="#arg-curate-df"></a></dt>
@@ -104,7 +108,9 @@ which is not intended.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>vector</code> of labels or colors, based upon argument <code>type</code>.</p>
+    <p><code>vector</code> of labels or colors, based upon argument <code>type</code>,
+or when <code>type="all"</code> it returns <code>data.frame</code> with rows for each
+entry in <code>x</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -137,6 +143,7 @@ afterwards.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other venndir advanced:
+<code><a href="Venndir-class.html">Venndir-class</a></code>,
 <code><a href="get_venndir_curate_df.html">get_venndir_curate_df</a>()</code>,
 <code><a href="modify_venndir_overlap.html">modify_venndir_overlap</a>()</code>,
 <code><a href="nudge_venndir_label.html">nudge_venndir_label</a>()</code></p></div>
@@ -144,9 +151,7 @@ afterwards.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"warn"</span><span class="op">=</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span>; <span class="co"># make them stop</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">venn_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0 1 0 -1"</span>, <span class="st">"1 -1"</span>, <span class="st">"1 1 1"</span>, <span class="st">"mixed"</span>, <span class="st">"agreement"</span>, <span class="st">"1 1 0 0"</span><span class="op">)</span>;</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">venn_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0 1 0 -1"</span>, <span class="st">"1 -1"</span>, <span class="st">"1 1 1"</span>, <span class="st">"mixed"</span>, <span class="st">"agreement"</span>, <span class="st">"1 1 0 0"</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"sign"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "-↑-↓" "↑↓"   "↑↑↑"  "X"    "="    "↑↑--"</span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"sign"</span>, unicode<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -155,10 +160,19 @@ afterwards.</p>
 <span class="r-in"><span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"color"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#9E4497FF" "#9E4497FF" "#B22222FF" "#737373FF" "#1874CDFF" "#B22222FF"</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"all"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   sign     color hide_singlet</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -↑-↓ #9E4497FF        FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   ↑↓ #9E4497FF        FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  ↑↑↑ #B22222FF        FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    X #737373FF        FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    = #1874CDFF         TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 ↑↑-- #B22222FF        FALSE</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/printDebug.html" class="external-link">printDebug</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"sign"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   collapse<span class="op">=</span><span class="st">", "</span>,</span></span>
 <span class="r-in"><span>   fgText<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">curate_venn_labels</span><span class="op">(</span><span class="va">venn_labels</span>, <span class="st">"color"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">01:26:42</span>) 16May2025:   <span style="color: #AF5FAF;">-↑-↓</span>, <span style="color: #AF5FAF;">↑↓</span>, <span style="color: #D75F5F;">↑↑↑</span>, <span style="color: #6C6C6C;">X</span>, <span style="color: #0087D7;">=</span>, <span style="color: #D75F5F;">↑↑--</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ##  (<span style="color: #00FFFF; font-weight: bold;">17:37:05</span>) 26May2025:   <span style="color: #AF5FAF;">-↑-↓</span>, <span style="color: #AF5FAF;">↑↓</span>, <span style="color: #D75F5F;">↑↑↑</span>, <span style="color: #6C6C6C;">X</span>, <span style="color: #0087D7;">=</span>, <span style="color: #D75F5F;">↑↑--</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

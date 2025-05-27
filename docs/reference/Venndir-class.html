@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,38 +120,64 @@ expansion, such as plot title.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other JamPolygon:
-<code><a href="JamPolygon-class.html">JamPolygon-class</a></code>,
-<code><a href="JamPolygon-methods.html">[,JamPolygon-method</a></code>,
-<code><a href="add_orientation_JamPolygon.html">add_orientation_JamPolygon</a>()</code>,
-<code><a href="area_JamPolygon.html">area_JamPolygon</a>()</code>,
-<code><a href="bbox_JamPolygon.html">bbox_JamPolygon</a>()</code>,
-<code><a href="buffer_JamPolygon.html">buffer_JamPolygon</a>()</code>,
-<code><a href="check_JamPolygon.html">check_JamPolygon</a>()</code>,
-<code><a href="check_Venndir.html">check_Venndir</a>()</code>,
-<code><a href="eulerr_to_JamPolygon.html">eulerr_to_JamPolygon</a>()</code>,
-<code><a href="farthest_point_JamPolygon.html">farthest_point_JamPolygon</a>()</code>,
-<code><a href="find_venn_overlaps_JamPolygon.html">find_venn_overlaps_JamPolygon</a>()</code>,
-<code><a href="has_point_in_JamPolygon.html">has_point_in_JamPolygon</a>()</code>,
-<code><a href="intersect_JamPolygon.html">intersect_JamPolygon</a>()</code>,
-<code><a href="label_fill_JamPolygon.html">label_fill_JamPolygon</a>()</code>,
-<code><a href="label_outside_JamPolygon.html">label_outside_JamPolygon</a>()</code>,
-<code><a href="label_segment_JamPolygon.html">label_segment_JamPolygon</a>()</code>,
-<code><a href="labelr_JamPolygon.html">labelr_JamPolygon</a>()</code>,
-<code><a href="minus_JamPolygon.html">minus_JamPolygon</a>()</code>,
-<code><a href="nearest_point_JamPolygon.html">nearest_point_JamPolygon</a>()</code>,
-<code><a href="nudge_JamPolygon.html">nudge_JamPolygon</a>()</code>,
-<code><a href="plot.JamPolygon.html">plot.JamPolygon</a>()</code>,
-<code><a href="point_in_JamPolygon.html">point_in_JamPolygon</a>()</code>,
-<code><a href="polyclip_to_JamPolygon.html">polyclip_to_JamPolygon</a>()</code>,
-<code><a href="polygon_circles.html">polygon_circles</a>()</code>,
-<code><a href="polygon_ellipses.html">polygon_ellipses</a>()</code>,
-<code><a href="sample_JamPolygon.html">sample_JamPolygon</a>()</code>,
-<code><a href="split_JamPolygon.html">split_JamPolygon</a>()</code>,
-<code><a href="union_JamPolygon.html">union_JamPolygon</a>()</code>,
-<code><a href="update_JamPolygon.html">update_JamPolygon</a>()</code></p></div>
+    <div class="dont-index"><p>Other venndir advanced:
+<code><a href="curate_venn_labels.html">curate_venn_labels</a>()</code>,
+<code><a href="get_venndir_curate_df.html">get_venndir_curate_df</a>()</code>,
+<code><a href="modify_venndir_overlap.html">modify_venndir_overlap</a>()</code>,
+<code><a href="nudge_venndir_label.html">nudge_venndir_label</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">2</span>, do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># default print for Venndir gives a concise summary</span></span></span>
+<span class="r-in"><span><span class="va">v</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class: Venndir</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> slots: 'jps', 'label_df', 'setlist', 'metadata'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of sets: 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of polygons: 2 sets, 3 overlaps</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> overlap_type: 'concordance'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sets:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   set_name setlist_labels legend_labels set_colors size</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    set_A          set_A         set_A    #EEC12E   32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    set_B          set_B         set_B    #D54848   16</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># example with overlap which is not shown</span></span></span>
+<span class="r-in"><span><span class="va">overlaps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>set_A<span class="op">=</span><span class="fl">187</span>, set_B<span class="op">=</span><span class="fl">146</span>, set_C<span class="op">=</span><span class="fl">499</span>,</span></span>
+<span class="r-in"><span>   `set_A&amp;set_B`<span class="op">=</span><span class="fl">1</span>,</span></span>
+<span class="r-in"><span>   `set_A&amp;set_C`<span class="op">=</span><span class="fl">181</span>,</span></span>
+<span class="r-in"><span>   `set_B&amp;set_C`<span class="op">=</span><span class="fl">219</span>,</span></span>
+<span class="r-in"><span>   `set_A&amp;set_B&amp;set_C`<span class="op">=</span><span class="fl">20</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">setlist_o</span> <span class="op">&lt;-</span> <span class="fu"><a href="counts2setlist.html">counts2setlist</a></span><span class="op">(</span><span class="va">overlaps</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">v3</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist_o</span>, proportional<span class="op">=</span><span class="cn">TRUE</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># the print includes '1 overlap cannot be displayed'</span></span></span>
+<span class="r-in"><span><span class="va">v3</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class: Venndir</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> slots: 'jps', 'label_df', 'setlist', 'metadata'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of sets: 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of polygons: 3 sets, 7 overlaps</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> overlap_type: 'overlap'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 overlap cannot be displayed:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> * `set_A&amp;set_B`=1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sets:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   set_name setlist_labels legend_labels set_colors size</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    set_A          set_A         set_A    #EEC12E  389</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    set_B          set_B         set_B    #D54848  386</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    set_C          set_C         set_C    #9F8DFF  919</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the warnings(v3) also contain the overlaps not displayed</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the overlap names can be extracted directly</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the counts for each overlap are also available</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> numeric(0)</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

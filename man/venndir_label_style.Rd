@@ -33,6 +33,9 @@ venndir_label_style(
 )
 }
 \arguments{
+\item{venndir_output}{\code{Venndir} object as returned by \code{venndir()}
+or \code{render_venndir()}.}
+
 \item{show_labels}{\code{character} string to describe which count labels
 to display, and where. The presence of each letter enables each
 label, and UPPERCASE places the label outside the Venn diagram,
@@ -127,16 +130,38 @@ as \code{make_color_contrast()}.}
 venndir label style
 }
 \details{
-This function applies a label style to \code{venndir()} output,
+This internal function applies a label style to \code{venndir()} output,
 overwriting the existing label style as necessary.
 
-This function adjusts the label text color for contrast with
+The label text color is adjusted to optimize visual contrast via
 \code{make_color_contrast()}, which is useful when positioning
 the label on top of dark or bright colors. If the label
-is positioned outside the \code{sp} polygons, the text is assumed
-to be on a white background, using argument \code{bg}.
+is positioned outside the disgram, the text is assumed
+to be on a white background, but a custom background color can
+be defined using argument \code{bg}.
 }
-\concept{venndir internal
+\examples{
+v <- venndir(make_venn_test(), do_plot=FALSE)
+v2 <- venndir_label_style(v, label_style="shaded box")
+plot(v2)
 
-@param venndir_output \code{Venndir} object as returned by \code{venndir()}
-or \code{render_venndir()}.}
+v3 <- venndir_label_style(v2, label_style="lite box")
+plot(v3)
+}
+\seealso{
+Other venndir internal: 
+\code{\link{assemble_venndir_label}()},
+\code{\link{check_systemfonts_family}()},
+\code{\link{expand_range}()},
+\code{\link{get_venn_polygon_shapes}()},
+\code{\link{hexsticker_venndir}()},
+\code{\link{make_color_contrast}()},
+\code{\link{make_venn_combn_df}()},
+\code{\link{match_list}()},
+\code{\link{print_color_df}()},
+\code{\link{shrink_df}()},
+\code{\link{simple_ellipse}()},
+\code{\link{subset_systemfonts}()},
+\code{\link{venndir_to_df}()}
+}
+\concept{venndir internal}

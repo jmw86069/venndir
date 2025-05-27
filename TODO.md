@@ -1,24 +1,95 @@
 # TODO for venndir
 
+## 25may2025
+
+* Add hexsticker.
+* Consider temporary port of `blend_colors()` until colorjam is on CRAN.
+* Consider showing optional overlap label for overlap sections,
+e.g. assigning LETTERS to each overlap. Idea from DTheofilatos.
+* DONE. Consider adding legend to `textvenn()` as a formal argument.
+* DONE. Hide singlets as needed in `textvenn()`, consistent with `venndir()`.
+* Consider method to customize item label positions.
+
+   * Current idea: store item x,y coordinates in `label_df` and
+   re-use when already pre-defined. It would allow manual adjustment
+   as a stopgap option.
+
+* Prep for Bioconductor
+
+   * Minimize dependencies. Current heavy: marquee, data.table, colorjam
+   Try: `pkgnet::CreatePackageReport("venndir")`
+   * Consider remove or refactor `shrink_df()` the only need for data.table.
+   * Run checks, remove all warnings
+
+* Consider custom segment color. Too difficult to see currently.
+
+## Non-essential 25may2025
+
+* Pie-in-the-sky: Prototype a ggplot2 implementation?
+
+   * Major driver might be using ggrepel for improved label placement,
+   except marquee cannot yet be used with ggrepel. (Might be WIP.)
+   * See ggplot2 Layer Explorer:
+   https://yjunechoe.github.io/ggplot2-layer-explorer/
+   * Build prototype ggplot2 Geom/Stat methods for JamPolygon object
+   * Motivates moving JamPolygons into a separate package
+
+* Pie-in-the-sky: Consider venndir-shinyapp
+
+   * Deploy live webR/shiny app to allow user intervention,
+   Directly inspired by the "ggplot2-layer-explorer" shiny app.
+   * Some type of data import - user-typed counts, or file, etc.
+   * Consider deploying to shinyapps.io as live demo.
+
+* Consider updating the plot layout so the legend is in a fixed region,
+thus preventing overlap with the venndir polygons and labels.
+* Consider making it easier to use patchwork with venndir plot output.
+* Consider replacing `gridExtra::tableGrob()` with `gt`, then use marquee.
+* Consider summarizing font usage techniques
+
+   * `grDevices::embedGlyphs()` to embed font into a PDF file, see
+   https://www.stat.auckland.ac.nz/~paul/Reports/Typography/glyphs/glyphs.html
+   * Unicode characters, colored text, etc.
+
+## 20may2025
+
+* PARTIAL. Warn for overlaps not shown in proportional diagrams.
+
+   * `warnings()` works for `Venndir` objects, printing missing overlaps.
+   * `print()` for `Venndir` also includes overlaps not shown when present.
+   * TODO: Consider method to add warning to a figure. Could be documented
+   as a howto without providing a specific function.
+
+## 19may2025
+
+* DONE. (for now) Review item label use by marquee.
+
+   * Consider how to use contrasting color for item labels.
+   * Revisit how and when to use {.rel.1 text} and {.color text} to permit
+   other markdown.
+
+* Consider method to allow duplicate labels in different sections
+with `venn_meme()`, which could be useful as blanks for example.
+
 ## 15may2025
 
-* Debug warning on `assemble_venndir_label()` examples.
-* Add more examples of gene expression data to the vignette,
+* DONE. Debug warning on `assemble_venndir_label()` examples.
+* DONE. Add more examples of gene expression data to the vignette,
 at least one example using DESeq2.
 
 ## 01may2025
 
-* Fix issue with disappearing text when the font size is too small,
+* PARTIAL. Fix issue with disappearing text when the font size is too small,
 seems specific to "sans" font, perhaps systemfonts?
 
    * Consider changing default font back to "Arial"
    * Posted issue to marquee for review.
 
-* Fix item labels converted to single-line with marquee.
+* DONE. Fix item labels converted to single-line with marquee.
 
    * DONE. However, now fix issue with huge whitespace padding between lines.
 
-* Consider exposing other options for item labeling:
+* Consider *item labeling* options:
    
       * `lineheight`, other marquee style attributes:
       `background`, `padding`, `border`, `border_size`, `border_radius`,

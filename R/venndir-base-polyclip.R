@@ -1069,8 +1069,18 @@ venndir <- function
       setlist=setlist,
       metadata=metadata)
 
-   # add warning_list to vo
+   # Add warning_list to vo
    vo <- get_venndir_label_warning_list(vo);
+   # Consider printing the warning here
+   if (FALSE) {
+      warn_df <- metadata(vo)$warn_df;
+      if (length(warn_df) > 0 &&
+            inherits(warn_df, "data.frame") &&
+            nrow(warn_df) > 0) {
+         jamba::printDebug("warn_df:");
+         print(warn_df);# debug
+      }
+   }
 
    ## venndir_label_style()
    #
@@ -1208,13 +1218,13 @@ venndir <- function
 
 #' Internal function to define warning label for missing Venn overlaps
 #' 
-#' @returns when input is `data.frame`, returns `list` with:
-#'    * `"warning_df"` `data.frame`
-#'    * `"warning_text"` single line `character` string
-#'    * `"warning_label"`, multi-line `character` string
-#'    
-#'    Otherwise if input is `Venndir` it returns `Venndir` with metadata
-#'    that includes `"warning_list"`.
+#' Internal function to define warning label for missing Venn overlaps
+#' 
+#' @returns `data.frame` when input is `data.frame`, or `Venndir` with
+#'    metadata entry `"warn_df"` with input `Venndir`.
+#'    The `data.frame` has columns 'overlap_set' and 'venn_counts',
+#'    for each Venn overlap that is not displayed, and the Venn count
+#'    for each overlap.
 #' 
 #' @noRd
 get_venndir_label_warning_list <- function
@@ -1249,29 +1259,11 @@ get_venndir_label_warning_list <- function
       warn_df <- data.frame(check.names=FALSE,
          overlap_set=label_df$overlap_set[warn_rows],
          venn_counts=label_df$venn_counts[warn_rows])
-      warn_labels <- paste0("`",
-         warn_df$overlap_set,
-         "`=",
-         warn_df$venn_counts);
-      warning_base <- paste0(
-         ifelse(sum(warn_rows) > 1,
-            "These overlap counts",
-            "This overlap count"),
-         " cannot be displayed:");
-      warning_text <- paste(warning_base,
-         jamba::cPaste(warn_labels, sep=", "));
-      warning_label <- paste0(warning_base,
-         "\n",
-         jamba::cPaste(warn_labels,
-            sep="; "));
    }
-   warning_list <- list(warning_df=warn_df,
-      warning_text=warning_text,
-      warning_label=warning_label)
    if (length(vo) > 0) {
-      metadata(vo)$warning_list <- warning_list;
+      metadata(vo)$warn_df <- warn_df;
       return(vo);
    }
-   return(warning_list);
+   return(warn_df);
 }
 

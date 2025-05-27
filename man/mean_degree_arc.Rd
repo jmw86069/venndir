@@ -35,11 +35,11 @@ steps <- sort(steps);
 x <- cumsum(steps);
 x;
 
-opar <- par("mfrow"=c(2, 3));
-on.exit(par(opar));
-mean_degree_arc(x, do_plot=TRUE);
-mean_degree_arc(x, use_median=TRUE, do_plot=TRUE);
-mean_degree_arc(x, use_range=TRUE, do_plot=TRUE);
+withr::with_par(list("mfrow"=c(2, 3)), {
+   mean_degree_arc(x, do_plot=TRUE);
+   mean_degree_arc(x, use_median=TRUE, do_plot=TRUE);
+   mean_degree_arc(x, use_range=TRUE, do_plot=TRUE);
+})
 
 x <- x + 235;
 mean_degree_arc(x, do_plot=TRUE);

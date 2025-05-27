@@ -382,11 +382,11 @@ diff_degrees <- function
 #' x <- cumsum(steps);
 #' x;
 #' 
-#' opar <- par("mfrow"=c(2, 3));
-#' on.exit(par(opar));
-#' mean_degree_arc(x, do_plot=TRUE);
-#' mean_degree_arc(x, use_median=TRUE, do_plot=TRUE);
-#' mean_degree_arc(x, use_range=TRUE, do_plot=TRUE);
+#' withr::with_par(list("mfrow"=c(2, 3)), {
+#'    mean_degree_arc(x, do_plot=TRUE);
+#'    mean_degree_arc(x, use_median=TRUE, do_plot=TRUE);
+#'    mean_degree_arc(x, use_range=TRUE, do_plot=TRUE);
+#' })
 #' 
 #' x <- x + 235;
 #' mean_degree_arc(x, do_plot=TRUE);
@@ -443,69 +443,70 @@ mean_degree_arc <- function
       step_degrees2 <- c(seq(from=head(x, 1), to=tail(x, 1), by=5), tail(x, 1));
       x2 <- cos(jamba::deg2rad(step_degrees2));
       y2 <- sin(jamba::deg2rad(step_degrees2));
-      opar <- par(lend="square",
-         ljoin="mitre",
-         mar=c(1,1,1,1));
-      on.exit(par(opar));
-      plot(x=x1,
-         y=y1,
-         bty="n",
-         xaxt="n",
-         yaxt="n",
-         type="l",
-         asp=1);
-      lines(x=x2,
-         y=y2,
-         col="navy",
-         lwd=4);
-      arrows(x0=tail(x2, 2)[1],
-         y0=tail(y2, 2)[1],
-         x1=tail(x2, 2)[2],
-         y1=tail(y2, 2)[2],
-         col="navy",
-         lwd=4)
-      points(x=x1[label_degrees],
-         y=y1[label_degrees],
-         pch=20)
-      for (i in label_degrees) {
-         text(x=x1[i],
-            y=y1[i],
-            labels=step_degrees[i],
-            adj=unlist(label_adj[i,c("adjx","adjy")]))
-      }
-      for (i in seq_along(x)) {
-         x1 <- cos(jamba::deg2rad(x[i]));
-         y1 <- sin(jamba::deg2rad(x[i]));
+      withr::with_par(list(
+         mar=c(1,1,1,1),
+         lend="butt",
+         ljoin="mitre"), {
+         plot(x=x1,
+            y=y1,
+            bty="n",
+            xaxt="n",
+            yaxt="n",
+            type="l",
+            asp=1);
+         lines(x=x2,
+            y=y2,
+            col="navy",
+            lwd=4);
+         arrows(x0=tail(x2, 2)[1],
+            y0=tail(y2, 2)[1],
+            x1=tail(x2, 2)[2],
+            y1=tail(y2, 2)[2],
+            col="navy",
+            lwd=4)
+         points(x=x1[label_degrees],
+            y=y1[label_degrees],
+            pch=20)
+         for (i in label_degrees) {
+            text(x=x1[i],
+               y=y1[i],
+               labels=step_degrees[i],
+               adj=unlist(label_adj[i,c("adjx","adjy")]))
+         }
+         for (i in seq_along(x)) {
+            x1 <- cos(jamba::deg2rad(x[i]));
+            y1 <- sin(jamba::deg2rad(x[i]));
+            arrows(x0=0,
+               y0=0,
+               x1=x1,
+               y1=y1,
+               col="darkorange",
+               length=0.2,
+               lwd=2)
+         }
+         x1 <- cos(jamba::deg2rad(degrees));
+         y1 <- sin(jamba::deg2rad(degrees));
          arrows(x0=0,
             y0=0,
             x1=x1,
             y1=y1,
-            col="darkorange",
-            length=0.2,
-            lwd=2)
-      }
-      x1 <- cos(jamba::deg2rad(degrees));
-      y1 <- sin(jamba::deg2rad(degrees));
-      arrows(x0=0,
-         y0=0,
-         x1=x1,
-         y1=y1,
-         col="red",
-         lwd=6);
-      jamba::drawLabels(x=0,
-         y=-0.4,
-         valign=1,
-         labelCex=1.5,
-         boxColor="#DDAA77DD",
-         txt=paste0("mean_degree_arc()",
-            ifelse(use_range,
-               paste0("\nuse_range=", use_range),
-               ""),
-            ifelse(use_median,
-               paste0("\nuse_median=", use_median),
-               "")
+            col="red",
+            lwd=6);
+         jamba::drawLabels(x=0,
+            y=-0.4,
+            # valign=1,
+            labelCex=1.5,
+            boxColor="#DDAA77DD",
+            txt=paste0("mean_degree_arc()",
+               ifelse(use_range,
+                  paste0("\nuse_range=", use_range),
+                  ""),
+               ifelse(use_median,
+                  paste0("\nuse_median=", use_median),
+                  "")
+            )
          )
-      )
+      })
    }
    return(degrees);
 }
@@ -535,26 +536,27 @@ display_angles <- function
          expand=1);
       x1 <- cos(jamba::deg2rad(step_degrees));
       y1 <- sin(jamba::deg2rad(step_degrees));
-      opar <- par(lend="square",
-         ljoin="mitre",
-         mar=c(1,1,1,1));
-      on.exit(par(opar));
-      plot(x=x1,
-         y=y1,
-         bty="n",
-         xaxt="n",
-         yaxt="n",
-         type="l",
-         asp=1);
-      points(x=x1[label_degrees],
-         y=y1[label_degrees],
-         pch=20)
-      for (i in label_degrees) {
-         text(x=x1[i],
-            y=y1[i],
-            labels=step_degrees[i],
-            adj=unlist(label_adj[i,c("adjx","adjy")]))
-      }
+      withr::with_par(list(
+         mar=c(1,1,1,1),
+         lend="butt",
+         ljoin="mitre"), {
+         plot(x=x1,
+            y=y1,
+            bty="n",
+            xaxt="n",
+            yaxt="n",
+            type="l",
+            asp=1);
+         points(x=x1[label_degrees],
+            y=y1[label_degrees],
+            pch=20)
+         for (i in label_degrees) {
+            text(x=x1[i],
+               y=y1[i],
+               labels=step_degrees[i],
+               adj=unlist(label_adj[i,c("adjx","adjy")]))
+         }
+      })
    }
    # draw arrow for each angle in x
    col <- rep(col, length.out=length(x));

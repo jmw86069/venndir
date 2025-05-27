@@ -119,7 +119,32 @@ check_Venndir <- function
 #' * **metadata**: `list` with optional metadata, intended for future
 #'    expansion, such as plot title.
 #' 
-#' @family JamPolygon
+#' @family venndir advanced
+#' 
+#' @examples
+#' v <- venndir(make_venn_test(100, 2, do_signed=TRUE), do_plot=FALSE)
+#' # default print for Venndir gives a concise summary
+#' v
+#' 
+#' # example with overlap which is not shown
+#' overlaps <- c(set_A=187, set_B=146, set_C=499,
+#'    `set_A&set_B`=1,
+#'    `set_A&set_C`=181,
+#'    `set_B&set_C`=219,
+#'    `set_A&set_B&set_C`=20);
+#' setlist_o <- counts2setlist(overlaps)
+#' v3 <- venndir(setlist_o, proportional=TRUE, do_plot=FALSE)
+#' # the print includes '1 overlap cannot be displayed'
+#' v3
+#' 
+#' # the warnings(v3) also contain the overlaps not displayed
+#' warnings(v3)
+#' 
+#' # the overlap names can be extracted directly
+#' as.character(warnings(v3))
+#' 
+#' # the counts for each overlap are also available
+#' as.numeric(names(warnings(v3)))
 #' 
 setClass("Venndir",
    slots=c(
@@ -247,9 +272,35 @@ setMethod("show", "Venndir",
          }
       }
       
+      ## warnings
+      warn_df <- object@metadata$warn_df;
+      nmax_warn <- 4;
+      if (inherits(warn_df, "data.frame") && nrow(warn_df) > 0) {
+         k <- head(seq_len(nrow(warn_df)), nmax_warn)
+         use_warning_text <- paste0(
+            paste0(nrow(warn_df), " overlap", ifelse(nrow(warn_df) > 1, "s", ""),
+               " cannot be displayed:"),
+            paste0(collapse="",
+               paste0("\n* `", warn_df$overlap_set[k],
+                  "`=", warn_df$venn_counts[k])))
+         if (nrow(warn_df) > nmax_warn) {
+            use_warning_text <- paste0(use_warning_text, "\n",
+               paste0("* (", jamba::formatInt(nrow(warn_df) - nmax_warn),
+                  " more warning",
+                  ifelse(nrow(warn_df) > nmax_warn, "s", ""),
+                  ")"))
+            #
+         }
+      } else {
+         warn_df <- NULL;
+      }
+      
+      ## put it together
       summary_v <- c(
          paste0("class: Venndir"),
-         paste0("slots: ", paste(slotNames(object), collapse=", ")),
+         paste0("slots: ", paste(
+            paste0("'", slotNames(object), "'"),
+            collapse=", ")),
          paste0("number of sets: ", sets_num),
          paste0("number of polygons: ", #sum(ct_polys),
             "", ct_polys_set, " sets, ", ct_polys_ol, " overlaps")
@@ -262,7 +313,11 @@ setMethod("show", "Venndir",
          summary_v <- c(summary_v,
             paste0("Main title: '", main, "'"))
       }
-      summary_v <- c(summary_v, "");
+      if (length(warn_df) > 0) {
+         summary_v <- c(summary_v,
+            use_warning_text)
+      }
+      summary_v <- c(summary_v, "sets:", "");
       summary_text <- jamba::cPaste(summary_v, sep="\n")
       cat(summary_text, sep="");
       print(setdf);
@@ -434,6 +489,44 @@ setMethod("im",
    signature(x="Venndir"),
    function(x) {
       sl <- setlist(x);
-      slim <- list2im_value(sl);
+      if (length(names(sl[[1]])) > 0) {
+         slim <- list2im_value(sl);
+      } else {
+         slim <- list2im_opt(sl);
+      }
       slim
    })
+
+# if (!isGeneric("warnings")) {
+setGeneric("warnings")
+# }
+setMethod("warnings",
+   signature=c(...="Venndir"),
+   definition=function(...) {
+      xl <- list(...)
+      x <- xl[[1]];
+      warn_df <- x@metadata$warn_df;
+      if (nrow(warn_df) == 0) {
+         return(structure(list(), class="warnings"))
+      }
+      # optionally limit number of entries
+      k <- seq_len(nrow(warn_df));
+      overlap_text <- paste0(warn_df$overlap_set);
+      warn_text <- paste0("`",
+         warn_df$overlap_set, "`=",
+         warn_df$venn_counts);
+      warn_names <- rep("Venndir overlap not shown.", length(k));
+      
+      # one style
+      use_warning_text <- as.list(warn_text);
+      names(use_warning_text) <- warn_names;
+
+      # another style
+      use_warning_text <- as.list(overlap_text);
+      names(use_warning_text) <- warn_df$venn_counts;
+      
+      return(structure(
+         use_warning_text,
+         class="warnings"))
+   }
+)

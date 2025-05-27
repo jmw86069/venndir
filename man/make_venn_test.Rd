@@ -13,6 +13,7 @@ make_venn_test(
   max_size = ceiling(n_items/2),
   items = NULL,
   sizes = NULL,
+  set_names = NULL,
   seed = 123,
   item_prefix = "item_",
   ...

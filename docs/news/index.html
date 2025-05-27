@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,50 @@
       <small>Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.53.900" id="venndir-0053900">venndir 0.0.53.900<a class="anchor" aria-label="anchor" href="#venndir-0053900"></a></h2>
+<ul><li>Added Enhances: hexSticker, ggplot2</li>
+<li>Added Imports: withr</li>
+</ul><div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-53-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-53-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/textvenn.html">textvenn()</a></code></p>
+<ul><li>Now hides values like agreement, for singlet overlap counts</li>
+<li>New argument <code>template</code> with options for “wide” and “tall”, consistent with <code><a href="../reference/venndir.html">venndir()</a></code>
+</li>
+<li>New argument <code>draw_legend=FALSE</code> to print text table legend.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/make_venn_test.html">make_venn_test()</a></code></p>
+<ul><li>New argument <code>set_names</code> to make it easier to define custom names.</li>
+<li>Names are handled slightly differently, using <code>set_names</code> then <code>names(sizes)</code>, then assigning <code>"set_A"</code> using LETTERS.</li>
+</ul></li>
+<li>
+<p><code>Venndir-class</code></p>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method now includes “overlaps not shown” when applicable.</li>
+<li>new generic <code><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings()</a></code> to list “overlaps not shown” when applicable.</li>
+<li>metadata entry <code>"warn_df"</code> contains a <code>data.frame</code> when there are overlap counts that cannot be shown on the venndir plot. It occurs sometimes with proportional Euler diagrams with 3 or more sets.</li>
+<li>
+<code>im()</code> generic method handles unsigned and signed data.</li>
+</ul></li>
+<li>
+<p><code>JamPolygon-class</code></p>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow()</a></code>, <code><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol()</a></code> more correctly defined without causing warning.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-0-53-900">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-0-53-900"></a></h3>
+<p>Some helper functions to navigate fonts from systemfonts.</p>
+<ul><li>
+<code><a href="../reference/subset_systemfonts.html">subset_systemfonts()</a></code> convenience function to navigate the fonts available to systemfonts and therefore marquee. Adds option to display the search results. Also filters out “problem fonts” not recognized by the Freetype API used by ‘systemfonts’.</li>
+<li>
+<code><a href="../reference/check_systemfonts_family.html">check_systemfonts_family()</a></code> is the utility function that checks for ‘systemfonts’ Freetype compatibility.</li>
+<li>
+<code><a href="../reference/hexsticker_venndir.html">hexsticker_venndir()</a></code> simple utility function to create the hexsticker. It has a few preset ‘inspirations’ in development.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.52.900" id="venndir-0052900">venndir 0.0.52.900<a class="anchor" aria-label="anchor" href="#venndir-0052900"></a></h2>
 <ul><li>Removed dependency: vwline</li>

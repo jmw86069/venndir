@@ -1163,9 +1163,7 @@ setMethod("names<-",
 ## descriptors
 #
 # nrow()
-if (!isGeneric("nrow")) {
-   setGeneric("nrow", function(x) standardGeneric("nrow"))
-}
+setGeneric("nrow", function(x) standardGeneric("nrow"))
 setMethod("nrow",
    signature=c(x="JamPolygon"),
    definition=function(x) {
@@ -1181,7 +1179,6 @@ setMethod("nrow",
 #    nrow(x@polygons)
 # }
 if (!isGeneric("length")) {
-   # setGeneric("length", function(x) standardGeneric("length"))
    setGeneric("length")
 }
 setMethod("length",
@@ -1193,7 +1190,6 @@ setMethod("length",
 # lengths()
 # - describes the number of internal polygons per polygon
 if (!isGeneric("lengths")) {
-   # setGeneric("lengths", function(x, use.names) standardGeneric("lengths"))
    setGeneric("lengths")
 }
 setMethod("lengths",
@@ -1212,11 +1208,8 @@ setMethod("lengths",
       ilengths;
    }
 )
-# ncol()
-if (!isGeneric("ncol")) {
-   # setGeneric("ncol", function(x) standardGeneric("ncol"))
-   setGeneric("ncol")
-}
+
+setGeneric("ncol", function(x) standardGeneric("ncol"))
 setMethod("ncol",
    signature=c(x="JamPolygon"),
    definition=function(x) {

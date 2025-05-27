@@ -1,7 +1,7 @@
 
 #' Render venndir output
 #' 
-#' Render venndir output
+#' Render venndir output, default plot for a Venndir object
 #' 
 #' 
 #' ## About fonts and unicode symbols
@@ -25,55 +25,57 @@
 #' fonts to be used with PNG and PDF output formats.
 #' 
 #' 
-#' ## Additional options
+#' ## Additional custom options
 #' 
 #' Several options are passed through `...` (ellipses) to internal
 #' functions, documented below:
 #' 
-#' * `L_threshold` is passed to `make_color_contrast()` and controls
-#' the _L_uminance at which text is either dark or light.
-#' * `text_grob_type` is passed to `assemble_venndir_labels()` and controls
-#' the text `grid` graphical object (grob) type used.
-#' Note that `"marquee"` requires the `marquee` package, which implicitly
-#' requires R-4.3 or newer, though somehow that is not a formal dependency.
-#' R-4.3 adds glyph rendering, which is required by `marquee`.
+#' * '`L_threshold`' is passed to `make_color_contrast()` to control
+#' the Luminance at which text is either dark or light. If dark text
+#' is shown on a dark background, set `L_threshold=55` or below the default 65.
 #' 
-#'    * `text_grob_type="textGrob"` (default) uses `grid::textGrob()`
-#'    which only handles text, and no markdown. It is also fastest.
+#' * '`text_grob_type`' is passed to `assemble_venndir_labels()` to control
+#' the type of `grid` graphical object (grob).
+#' 
+#'    * `text_grob_type="marquee"` (default) uses `marquee::marquee_grob()`.
+#'    Its rendering of Unicode is outstanding, and is the future of R font
+#'    rendering. It is not 100% compatible with all device outputs.
+#'    Its main feature is using `systemfonts` to substitute missing glyphs
+#'    to use another font, for example it always finds Unicode
+#'    upArrow/downArrow and other Unicode symbols.
+#'    It also handles CommonMark markdown, images, bullets, but not HTML.
+#'    * `text_grob_type="textGrob"` uses `grid::textGrob()`, which is the
+#'    grid default. It does not handle markdown syntax, and no special handling
+#'    of Unicode characters. It is the fastest rendering option.
 #'    * `text_grob_type="richtext_grob"` uses `gridtext::richtext_grob()`,
-#'    and requires the `gridtext` package.
-#'    It handles a subset of markdown (bold, italics, but not bullets),
-#'    and a subset of HTML markup such as inline CSS styles.
-#'    It sometimes produces visual glitches, where whitespace between
-#'    words can be inconsistent, otherwise it would have been the default.
-#'    * `text_grob_type="marquee"` uses `marquee::marquee_grob()`, which
-#'    requires the `marquee` package. It may rarely cause a full R crash
-#'    on MacOS, apparently due to font handling subsystems, otherwise it
-#'    would have been the default. Its rendering of Unicode is outstanding,
-#'    since it uses `systemfonts` to substitute any missing glyphs per font,
-#'    for example the upArrow/downArrow symbols.
-#'    It handles full markdown, including bullets, but not tables, nor HTML.
-#'    It does not support table format, through version 0.1.0, however.
+#'    which requires the `gridtext` package. This approach will be removed,
+#'    and is kept as a fallback option until marquee is more fully tested.
+#'    It recognizes markdown, and some limited HTML.
 #' 
-#' * `fontfamilies` is passed to `assemble_venndir_label()`, as a `list`
-#' with three named elements: `"overlap"`, `"count"`, `"signed"`.
+#' * '`fontfamilies`' is passed to `assemble_venndir_label()`, as a `list`
+#' with three named elements: `"overlap"`, `"count"`, `"signed"`
 #' 
-#'    * The fontfamily can be customized for each element, which may be
-#'    useful for a custom font for the overlap label, and a different font
-#'    (e.g. one that contains upArrow/downArrow unicode characters) for
-#'    the count and signed count labels.
-#'    * The custom font is also accepted by `venndir_legender()` for
-#'    consistency.
+#'    * It allows a custom font to be used for each type of label.
+#'    It may be useful to use a light font or narrow font for signed labels,
+#'    for example.
+#'    * The custom font is also recognized by `venndir_legender()` for
+#'    consistency, for example a custom count font is used for count labels
+#'    in the legend.
 #' 
 #' * `outerborder`,`outerborder.lwd`,`innerborder`,`innerborder.lwd`,
-#' `border`,`border.lwd` - these arguments are passed to `plot.JamPolygon()`
-#' and override internal values when defined. They can be used to produce
-#' interesting visual variations of the Venn diagram. For example:
+#' `border`,`border.lwd`
 #' 
-#'    * `outerborder.lwd=0, innerborder.lwd=0, border="white", border.lwd=3`
-#'    will use a white border.
-#'    * `outerborder.lwd=0, innerborder.lwd=4, border="white", border.lwd=1`
-#'    will use a wide internal border, and thin white line between overlaps.
+#'    * These arguments are passed to `plot.JamPolygon()`
+#'    and override internal values when defined.
+#'    They can produce interesting effects.
+#'    * The innerborder is drawn only on the inside edge of each polygon.
+#'    * The outerborder is drawn only on the outside edge of each polygon.
+#'    * The border is drawn on the border edge itself - and for Venndir
+#'    objects by default is typically not drawn.
+#' 
+#'    * Use white borders: `outerborder=NA, innerborder="white"`
+#'    * Use wide internal border, thin white line:
+#'    `outerborder=NA, innerborder.lwd=4, border="white", border.lwd=1`
 #' 
 #' @family venndir core
 #' 
@@ -876,6 +878,7 @@ render_venndir <- function
          names(item_buffer) <- uos;
       }
       # jamba::printDebug("unique(items_dfs$overlap_set): ", unique(items_dfs$overlap_set));
+      # jamba::printDebug("middle(items_dfs, 20): ");print(jamba::middle(items_dfs, 20));# debug
       items_dfs <- split(items_dfs,
          factor(items_dfs$overlap_set,
             levels=unique(items_dfs$overlap_set)));
@@ -884,6 +887,9 @@ render_venndir <- function
 
       #for (items_df1 in items_dfs) {
       itemlabels_list <- lapply(items_dfs, function(items_df1){
+         items_df1$rownum <- seq_len(nrow(items_df1));
+         # jamba::printDebug("middle(items_df1, 20): ");# debug
+         # print(jamba::middle(items_df1, 20));# debug
          useos <- as.character(head(items_df1$overlap_set, 1))
          use_item_buffer <- item_buffer[useos]
          items_list <- items_df1$items;
@@ -970,7 +976,8 @@ render_venndir <- function
          }
          # add overlap label to items_df
          lpf$items_df$overlap_set <- head(items_df1$overlap_set, 1);
-         # jamba::printDebug("lpf$items_df:");print(lpf$items_df);
+         # lpf$items_df$rownum <- rep(items_df1$rownum, lengths(items_df1$items));
+         # jamba::printDebug("lpf$items_df:");print(head(lpf$items_df, 10));# debug
          lpf;
       });
       if (TRUE %in% verbose) {
@@ -1323,16 +1330,40 @@ render_venndir <- function
                paste0("rel.", irel),
                size=marquee::relative(irel))
          }
-         # jamba::printDebug("head(itemlabels_df$text):");print(head(itemlabels_df$text));# debug
-         new_item_text <- paste0(
-            "{", paste0(".rel.", rel_fontsize), " ",
-            "{", itemlabels_df$color, " ",
-            # itemlabels_df$text,
-            gsub("([^ ])\n", "\\1  \n",
-               gsub('<br>|<br/>', '  \n', itemlabels_df$text)),
-            "}", "}")
-         # new_item_text <- gsub("([^ ])\n", "\\1\n",
-         #    gsub('<br>|<br/>', '  \n', itemlabels_df$text))
+         # Todo: Fix multi-line entries, each line needs its own span
+         add_inline_color <- TRUE;
+         if (add_inline_color) {
+            use_text <- itemlabels_df$text;
+            use_text <- gsub('<br>|<br/>', "\n", use_text)
+            # use_text <- gsub("\n\n", "\n~!!~", use_text)
+            use_text <- gsub("\n", "~!!~", use_text)
+            use_text <- gsub("([^ \n]|^)\n", "\\1  \n",
+               use_text)
+            use_texts <- NULL;
+            k <- seq_along(use_text)
+            if (any(grepl("~!!~", use_text))) {
+               # split by line, yadda yadda
+               use_texts <- strsplit(use_text, "~!!~")
+               use_text <- unlist(use_texts);
+               k <- rep(k, lengths(use_texts));
+            }
+            new_item_text <- paste0(
+               "{", paste0(".rel.", rel_fontsize[k]), " ",
+               "{", itemlabels_df$color[k], " ",
+               use_text,
+               "}", "}")
+            if (length(use_texts) > 0) {
+               new_item_text <- unname(jamba::cPaste(sep="  \n",
+                  split(new_item_text, k)))
+            }
+         } else {
+            new_item_text <- paste0(
+               "{", paste0(".rel.", rel_fontsize), " ",
+               gsub("([^ \n]|^)\n", "\\1  \n",
+                  gsub('<br>|<br/>', '  \n', itemlabels_df$text)),
+               "}"
+               )
+         }
          # jamba::printDebug("head(new_item_text):");print(head(new_item_text));# debug
          text_grob <- marquee::marquee_grob(
             text=new_item_text,
@@ -1594,17 +1625,17 @@ render_venndir <- function
 
    # print warning when some overlap counts are hidden
    # todo: consider displaying message on the plot
-   if (length(metadata(vo_new)$warning_list$warning_label) > 0) {
+   warn_df <- metadata(vo_new)$warn_df;
+   if (length(warn_df) > 0 &&
+         inherits(warn_df, "data.frame") &&
+         nrow(warn_df) > 0) {
       # jamba::printDebug("warning_label exists");
-      nhid <- nrow(metadata(vo_new)$warning_list$warning_df);
+      nhid <- nrow(warn_df);
       if (TRUE %in% plot_warning) {
-         if (nhid > 1) {
-            jamba::printDebug("Warning: ",
-               nhid, " overlap counts are hidden.");
-         } else {
-            jamba::printDebug("Warning: ",
-               "1 overlap count is hidden.");
-         }
+         jamba::printDebug("Warning: ",
+            nhid, " overlap count",
+            ifelse(nhid > 1, "s are", " is"),
+            " hidden.");
       }
    }
    

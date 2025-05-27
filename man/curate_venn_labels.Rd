@@ -6,7 +6,7 @@
 \usage{
 curate_venn_labels(
   x,
-  type = c("sign", "color"),
+  type = c("sign", "color", "hide_singlet", "all"),
   curate_df = NULL,
   unicode = TRUE,
   blend_preset = "ryb",
@@ -17,9 +17,15 @@ curate_venn_labels(
 \arguments{
 \item{x}{\code{vector} of overlap labels.}
 
-\item{type}{\code{character} string where \code{type="sign"} will curate
-\code{x} into directional sign, and \code{type="color"} will curate
-\code{x} into corresponding directional color.}
+\item{type}{\code{character} string, default 'type'.
+\itemize{
+\item \code{type="sign"} will curate \code{x} to sign
+\item \code{type="color"} will curate \code{x} to color
+\item \code{type="hide_singlet"} will indicate whether to hide singlet values,
+intended for values such as "agreement" which are not useful
+to display for singlet (single group) count values.
+\item \code{type="all"} will return all the above as \code{data.frame}.
+}}
 
 \item{curate_df}{\code{data.frame} or \code{NULL} with optional curation
 rules. The input is coerced to \code{data.frame} if necessary.
@@ -48,7 +54,9 @@ which is not intended.}
 \item{...}{additional arguments are ignored.}
 }
 \value{
-\code{vector} of labels or colors, based upon argument \code{type}.
+\code{vector} of labels or colors, based upon argument \code{type},
+or when \code{type="all"} it returns \code{data.frame} with rows for each
+entry in \code{x}.
 }
 \description{
 Curate Venn labels
@@ -90,13 +98,13 @@ to include whitespace. Any leading/trailing whitespace will be removed
 afterwards.
 }
 \examples{
-options("warn"=-1); # make them stop
-
 venn_labels <- c("0 1 0 -1", "1 -1", "1 1 1", "mixed", "agreement", "1 1 0 0");
 (curate_venn_labels(venn_labels, "sign"))
 (curate_venn_labels(venn_labels, "sign", unicode=FALSE))
 
 (curate_venn_labels(venn_labels, "color"))
+
+(curate_venn_labels(venn_labels, "all"))
 
 jamba::printDebug(as.list(curate_venn_labels(venn_labels, "sign")),
    collapse=", ",
@@ -105,6 +113,7 @@ jamba::printDebug(as.list(curate_venn_labels(venn_labels, "sign")),
 }
 \seealso{
 Other venndir advanced: 
+\code{\link{Venndir-class}},
 \code{\link{get_venndir_curate_df}()},
 \code{\link{modify_venndir_overlap}()},
 \code{\link{nudge_venndir_label}()}

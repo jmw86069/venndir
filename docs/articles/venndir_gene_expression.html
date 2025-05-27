@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ generate test data, just to create a Venn diagram.</p>
 <span>  sizes<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">500</span>, <span class="fl">200</span><span class="op">)</span>,</span>
 <span>  do_signed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>, overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/generic_1-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/generic_1-1.png" alt="Venndir default example showing signed counts, usingoverlap type 'agreement'." width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="venndir-with-limma-results">Venndir with limma results<a class="anchor" aria-label="anchor" href="#venndir-with-limma-results"></a>
@@ -193,7 +193,7 @@ argument: <code>sets=c(1, 2)</code></p>
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
 <span>   <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">fit2decide</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_3a-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_3a-1.png" alt="Venndir using input in the form of a signed incidence matrix, values are -1, 0, or +1." width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="signed-set-list">Signed set list<a class="anchor" aria-label="anchor" href="#signed-set-list"></a>
@@ -205,7 +205,7 @@ using <code><a href="../reference/im_value2list.html">im_value2list()</a></code>
 <span>   <span class="va">limmalist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/im_value2list.html">im_value2list</a></span><span class="op">(</span><span class="va">fit2decide</span><span class="op">)</span>;</span>
 <span>   <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_3-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_3-1.png" alt="Venndir using a signed setlist as input, after converting the signed incidence matrix to a signed setlist." width="960"></p>
 <p>A few features are noticeable:</p>
 <ol style="list-style-type: decimal">
 <li><p>The <code>limma</code> contrasts <code>"ML - MS"</code> and
@@ -250,7 +250,7 @@ these are more visually interesting.</p>
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">do_limma</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">limmalist</span>, sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, proportional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_3p-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_3p-1.png" alt="Venndir figure with 'proportional=TRUE' which produces a proportional Euler diagram. Signed counts are displayed beside the main overlap counts by default." width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="customizing-the-labels">Customizing the labels<a class="anchor" aria-label="anchor" href="#customizing-the-labels"></a>
@@ -268,7 +268,11 @@ third controls the signed count labels.</p>
 <span>      font_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
 <span>      template<span class="op">=</span><span class="st">"tall"</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_3p_tall-1.png" width="960"></p>
+<p>&lt;img
+src=“/Users/jamesward/Projects/Ward/venndir/docs/articles/venndir_gene_expression_files/figure-html/limma_3p_tall-1.png”
+alt=“Venndir figure shown as a proportional Euler diagram as before,
+except using ‘template=“tall”’ which arranges signed counts below the
+main counts.” width=“960” /&gt;</p>
 </div>
 <div class="section level3">
 <h3 id="overlap_typeagreement">overlap_type=“agreement”<a class="anchor" aria-label="anchor" href="#overlap_typeagreement"></a>
@@ -288,7 +292,11 @@ second comparison.</p>
 <span>      template<span class="op">=</span><span class="st">"tall"</span>,</span>
 <span>      overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_4-1.png" width="960"></p>
+<p>&lt;img
+src=“/Users/jamesward/Projects/Ward/venndir/docs/articles/venndir_gene_expression_files/figure-html/limma_4-1.png”
+alt=“Venndir figure shown as a proportional Euler diagram, with the
+option ‘overlap_type=“agreement”’ which summarizes the signed overlaps
+as agreeing, or disagreeing in direction.” width=“960” /&gt;</p>
 </div>
 <div class="section level3">
 <h3 id="overlap_typeeach">overlap_type=“each”<a class="anchor" aria-label="anchor" href="#overlap_typeeach"></a>
@@ -303,7 +311,13 @@ can sometimes be challenging to label clearly.</p>
 <span>      template<span class="op">=</span><span class="st">"tall"</span>,</span>
 <span>      overlap_type<span class="op">=</span><span class="st">"each"</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_5-1.png" width="960"></p>
+<p>&lt;img
+src=“/Users/jamesward/Projects/Ward/venndir/docs/articles/venndir_gene_expression_files/figure-html/limma_5-1.png”
+alt=“Venndir figure shown as a proportional Euler diagram, with the
+option ‘overlap_type=“each”’ which tabulates the signed counts for each
+combination of up and down directions. Again the option
+‘template=“tall”’ is used, to arrange signed counts below the main
+overlap counts.” width=“960” /&gt;</p>
 </div>
 </div>
 <div class="section level2">
@@ -332,7 +346,7 @@ the number of hits.</p>
 <span>      fontfamily<span class="op">=</span><span class="st">"ArialNarrow"</span>,</span>
 <span>      show_items<span class="op">=</span><span class="st">"sign item"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_6-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_6-1.png" alt="Venndir figure showing item labels filled inside each corresponding overlap region. Labels include the arrow indication direction, beside each item label. Labels are also colored based upon direction. The labels indicate Illumina probe names, since the statistical analysis involved probes, and not specific genes measured by the probes." width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="gene-labels">Gene labels<a class="anchor" aria-label="anchor" href="#gene-labels"></a>
@@ -368,7 +382,7 @@ will be retained, using the majority direction.</p>
 <span>      show_labels<span class="op">=</span><span class="st">"Ni"</span>,</span>
 <span>      show_items<span class="op">=</span><span class="st">"sign item"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_6g-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_6g-1.png" alt="Venndir figure showing item labels which now use the gene symbol, after converting Illumina probe names to the measured genes. Because multiple probes may measure the same gene, the conversion utilizes a helper function: 'im_collapse()'." width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="arrow-labels">Arrow labels<a class="anchor" aria-label="anchor" href="#arrow-labels"></a>
@@ -389,7 +403,7 @@ associated with each direction.</p>
 <span>      item_degrees<span class="op">=</span><span class="fl">7</span>,</span>
 <span>      max_items<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_6s-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_6s-1.png" alt="Venndir figure showing a proportional Euler diagram, including item labels in each overlap region. The item labels now only show the directional arrow, not the label itself, in order to indicate the proportion of directions observed. The count labels are placed outside the overlap regions, connected by a line segment." width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -430,7 +444,12 @@ contrast (3) may be written <code>"A - B"</code> or
 <span>      sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span>      overlap_type<span class="op">=</span><span class="st">"agreement"</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_0-1.png" width="960"></p>
+<p>&lt;img
+src=“/Users/jamesward/Projects/Ward/venndir/docs/articles/venndir_gene_expression_files/figure-html/venn_compare_0-1.png”
+alt=“Venndir 3-way figure showing counts with
+‘overlap_type=“agreement”’. Each set represents the hits from one
+statistical contrast, after filtering by P-value and log fold change.”
+width=“960” /&gt;</p>
 <p>There are a few potential scenarios:</p>
 <ol style="list-style-type: decimal">
 <li>Treatment A does not affect the same genes as B. Few overlaps.</li>
@@ -448,7 +467,7 @@ logic.</p>
 <span>      overlap_set<span class="op">=</span><span class="st">"A - B"</span><span class="op">)</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">v2</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AB-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AB-1.png" alt="Venndir figure shown as in the previous figure, except with one overlap region highlighted using yellow fill color, and a wide orange inner border. The highlighted region represents contrast 'A - B', and the hits which are unique to this comparison. The highlighting helps emphasize this region for discussion." width="960"></p>
 <p>These <strong>46</strong> hits are different between A and B, but are
 not independently different when comparing A to C, nor B to C. What does
 that mean?</p>
@@ -471,7 +490,7 @@ would appear in the section <strong>214</strong>.</p>
 <span>      overlap_set<span class="op">=</span><span class="st">"A - C&amp;A - B"</span><span class="op">)</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_AB-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_AB-1.png" alt="Venndir figure as in the previous figure, this time highlighting one overlap region between 'A - C' and 'A - B', with 214 shared hits which are all concordant in direction. The other set represents the contrast 'B - C', and therefore hits in the highlighted region can only be concordant in direction." width="960"></p>
 <ul>
 <li>
 <p>These <strong>214</strong> hits are “distinctively A”, in that
@@ -495,7 +514,7 @@ require changes between <code>"A - B"</code> which are also not
 <span>      overlap_set<span class="op">=</span><span class="st">"B - C&amp;A - B"</span><span class="op">)</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">v4</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_BC_AB-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/venn_compare_BC_AB-1.png" alt="Venndir figure as in the previous figure, highlighting another overlap region between 'B - C' and 'A - B', with 126 hits which are all discordant in direction. Again, due to the organization of this three-way Venn diagram, hits in this overlap region can only be discordant in direction." width="960"></p>
 <ul>
 <li>These <strong>126</strong> hits are “distinctively B”, completely
 analogous to the “distinctively A” example above.</li>
@@ -510,7 +529,7 @@ in <code>"A - B"</code>.</p>
 <span>      overlap_set<span class="op">=</span><span class="st">"A - C&amp;B - C"</span><span class="op">)</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">v5</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_BC-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_BC-1.png" alt="Venndir figure as in the previous figure, showing the overlap between 'A - C' and 'B - C', with 726 genes which are all concordant in direction. In this overlap region, hits may be concordant or discordant, and the observation of entirely concordant hits is a finding." width="960"></p>
 <ul>
 <li>These <strong>726</strong> hits are shared by A and B compared with
 Control. The key question is whether the hits are concordant. This
@@ -551,7 +570,7 @@ effects, for example disease and treatment.</li>
 <span>      overlap_set<span class="op">=</span><span class="st">"A - C&amp;B - C&amp;A - B"</span><span class="op">)</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">v6</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_BC_AC-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_BC_AC-1.png" alt="Venndir figure as in the previous figure, highlighting the three-way overlap between 'A - C', 'B - C', and 'A - B', and showing 13 shared hits in all three contrasts. This overlap region is not expected to have any particular concordance, and is difficult to interpret without reviewing the underlying data." width="960"></p>
 <p>In my opinion, the concordance here is not useful to interpret. It
 may be interesting to display <code>overlap_type="each"</code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -564,7 +583,15 @@ may be interesting to display <code>overlap_type="each"</code>.</p>
 <span>      overlap_set<span class="op">=</span><span class="st">"A - C&amp;B - C&amp;A - B"</span><span class="op">)</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">v6each</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/venn_compare_AC_BC_AC_each-1.png" width="960"></p>
+<p>&lt;img
+src=“/Users/jamesward/Projects/Ward/venndir/docs/articles/venndir_gene_expression_files/figure-html/venn_compare_AC_BC_AC_each-1.png”
+alt=“Venndir figure as in the previous figure, highlighting the
+three-way overlap between ‘A - C’, ‘B - C’, and ‘A - B’. This figure
+uses ‘overlap_type=“each”’ which shows each combination of up and down.
+All 13 hits are concordant in the first two contrasts, and only 3 hits
+are discordant in the third contrast. The pattern up-up-down suggests
+that the effects are shared in A and B compared to C, and that the
+magnitude in B is significantly greated in B.” width=“960” /&gt;</p>
 <ul>
 <li>
 <p>This plot is mainly useful when A and B have concordant effects
@@ -676,7 +703,7 @@ example is purely to demonstrate the mechanics of the process.</p>
 <span>      template<span class="op">=</span><span class="st">"tall"</span>,</span>
 <span>      sets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/deseq2_3a-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/deseq2_3a-1.png" alt="Venndir proportional Euler diagram using statistical hits from DESeq2 analysis. The vast majority of hits shared in these two contrasts are concordant, 1358 hits are up in both, 1360 hits are down in both, and only 25 hits have discordant direction." width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="compare-limma-to-deseq2">Compare limma to DESeq2<a class="anchor" aria-label="anchor" href="#compare-limma-to-deseq2"></a>
@@ -696,7 +723,7 @@ does perform fairly well.</p>
 <span>      <span class="co"># alpha_by_counts=TRUE,</span></span>
 <span>      template<span class="op">=</span><span class="st">"tall"</span><span class="op">)</span>;</span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="venndir_gene_expression_files/figure-html/limma_deseq2_1-1.png" width="960"></p>
+<p><img src="venndir_gene_expression_files/figure-html/limma_deseq2_1-1.png" alt="Four-way Venndir diagram comparing limma results to DESeq2 results. Hits from the same contrast are shared at a high level across the two methods, as anticipated, in fact the region with the most probes is the four-way overlap, which suggests great agreement in the two contrasts, and the two methodologies." width="960"></p>
 <p>Quick notes:</p>
 <ul>
 <li>Notice there are more similarities within the same contrast (1,223

@@ -7,7 +7,9 @@
 textvenn(
   setlist,
   sets = seq_along(setlist),
-  overlap_type = c("concordance", "overlap", "each", "agreement"),
+  overlap_type = c("detect", "concordance", "overlap", "each", "agreement"),
+  template = c("wide", "tall"),
+  draw_legend = FALSE,
   set_colors = NULL,
   spacing = 5,
   padding = 1,
@@ -35,6 +37,20 @@ incidence \code{matrix} with values \code{c(0, 1)} or \code{c(FALSE, TRUE)}, or
 pull out a subset of the list elements. This subset is useful
 because the set colors are defined for the full \code{setlist},
 which allows the subset of colors to be consistent for each set.}
+
+\item{overlap_type}{\code{character} passed to \code{signed_overlaps()}, default
+'detect' will show 'concordance' when provided signed list, otherwise
+it shows 'overlap' with only the counts.}
+
+\item{template}{\code{character} string, default 'wide' indicatiing the
+placement of signed counts.
+\itemize{
+\item 'wide' - places signed counts beside total overlap counts
+\item 'tall' - places signed counts below total overlap counts
+}}
+
+\item{draw_legend}{\code{logical} default FALSE, whether to print a text
+legend table below the text venn output.}
 
 \item{set_colors}{\code{NULL} or \code{character} \code{vector} that contains
 R-compatible colors. When \code{set_colors} is \code{NULL}, categorical
@@ -94,7 +110,7 @@ on an R console.
 }
 \examples{
 # for this purpose, set lightMode=TRUE to ensure darker text
-options(jam.lightMode=TRUE)
+withr::with_options(list(jam.lightMode=TRUE), {
 
 # generate test data
 setlist <- make_venn_test(n_items=100, do_signed=TRUE)
@@ -109,7 +125,7 @@ textvenn(setlist, sets=c(1,2), overlap_type="overlap")
 textvenn(setlist, sets=c(1,2,3), overlap_type="each")
 
 # larger number of items
-setlist <- make_venn_test(n_items=1000000, sizes=200000, do_signed=TRUE)
+setlist <- make_venn_test(n_items=1000000, n_sets=4, sizes=200000, do_signed=TRUE)
 # text Venn with directionality
 textvenn(setlist, sets=c(1,4), "agreement")
 
@@ -121,6 +137,7 @@ venndir_legender(textvenn(setlist, sets=c(1,2,4), overlap_type="overlap"),
    combine_size=FALSE,
    legend_style="data.frame")
 
+})
 }
 \seealso{
 Other venndir core: 

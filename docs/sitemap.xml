@@ -19,6 +19,7 @@
 <url><loc>https://jmw86069.github.io/venndir/reference/buffer_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/check_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/check_Venndir.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/check_systemfonts_family.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/collapse_im.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/counts2setlist.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/curate_venn_labels.html</loc></url>
@@ -32,6 +33,7 @@
 <url><loc>https://jmw86069.github.io/venndir/reference/get_venn_polygon_shapes.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/get_venndir_curate_df.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/has_point_in_JamPolygon.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/hexsticker_venndir.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/im2list.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/im_value2list.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/index.html</loc></url>
@@ -69,6 +71,7 @@
 <url><loc>https://jmw86069.github.io/venndir/reference/simple_ellipse.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/split_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/spread_degrees.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/subset_systemfonts.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/textvenn.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/three_point_angle.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/to_basic.GeomRichText.html</loc></url>

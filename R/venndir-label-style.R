@@ -4,18 +4,19 @@
 #' 
 #' venndir label style
 #' 
-#' This function applies a label style to `venndir()` output,
+#' This internal function applies a label style to `venndir()` output,
 #' overwriting the existing label style as necessary.
 #' 
-#' This function adjusts the label text color for contrast with
+#' The label text color is adjusted to optimize visual contrast via
 #' `make_color_contrast()`, which is useful when positioning
 #' the label on top of dark or bright colors. If the label
-#' is positioned outside the `sp` polygons, the text is assumed
-#' to be on a white background, using argument `bg`.
+#' is positioned outside the disgram, the text is assumed
+#' to be on a white background, but a custom background color can
+#' be defined using argument `bg`.
 #' 
 #' @family venndir internal
 #'  
-#'  @param venndir_output `Venndir` object as returned by `venndir()`
+#' @param venndir_output `Venndir` object as returned by `venndir()`
 #'     or `render_venndir()`.
 #' @param show_labels `character` string to describe which count labels
 #'    to display, and where. The presence of each letter enables each
@@ -38,7 +39,6 @@
 #'    * _i_tems: "i" only, by default hidden. When enabled, item labels
 #'    defined by `show_items` are spread across the specific Venn overlap
 #'    region.
-#' @param label_preset DEPRECATED in favor of `show_labels`.
 #' @param label_style `character` string indicating the style of label
 #'    to display. The values `"basic","none","shaded","lite","fill"`
 #'    style the label background fill, while presence of `"box"` in
@@ -52,6 +52,7 @@
 #' @param bg `character` color used as the background color of the
 #'    figure, used with outside labels to determine whether the text
 #'    should be light or dark for proper visual contrast.
+#' @param label_preset DEPRECATED in favor of `show_labels`.
 #' @param set,overlap,percent,count,signed,items DEPRECATED in favor
 #'    of `show_labels`.
 #' @param percent_delim `character` string used only when both count
@@ -89,6 +90,13 @@
 #' @param ... additional arguments are passed to internal functions such
 #'    as `make_color_contrast()`.
 #' 
+#' @examples
+#' v <- venndir(make_venn_test(), do_plot=FALSE)
+#' v2 <- venndir_label_style(v, label_style="shaded box")
+#' plot(v2)
+#' 
+#' v3 <- venndir_label_style(v2, label_style="lite box")
+#' plot(v3)
 #' @export
 venndir_label_style <- function
 (venndir_output,

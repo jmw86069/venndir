@@ -1,3 +1,55 @@
+# venndir 0.0.53.900
+
+* Added Enhances: hexSticker, ggplot2
+* Added Imports: withr
+* Added figure alt text to gene expression vignette.
+
+## changes to existing functions
+
+* `textvenn()`
+
+   * Now hides values for singlet overlap counts as defined by
+   `curate_venn_labels()`.
+   * New argument `template` with options for "wide" and "tall",
+   consistent with `venndir()`
+   * New argument `draw_legend=FALSE` to print text table legend.
+
+* `make_venn_test()`
+
+   * New argument `set_names` to make it easier to define custom names.
+   * Names are handled slightly differently, using `set_names` then
+   `names(sizes)`, then assigning `"set_A"` using LETTERS.
+
+* `curate_venn_labels()`
+
+   * New arg `type="all"` returns three columns: 'sign', 'color', 'hide_singlet'
+
+* `Venndir-class`
+
+   * `print()` method now includes "overlaps not shown" when applicable.
+   * new generic `warnings()` to list "overlaps not shown" when applicable.
+   * metadata entry `"warn_df"` contains a `data.frame` when there are
+   overlap counts that cannot be shown on the venndir plot. It occurs
+   sometimes with proportional Euler diagrams with 3 or more sets.
+   * `im()` generic method handles unsigned and signed data.
+
+* `JamPolygon-class`
+
+   * `nrow()`, `ncol()` more correctly defined without causing warning.
+
+## New functions
+
+Some helper functions to navigate fonts from systemfonts.
+
+* `subset_systemfonts()` convenience function to navigate the fonts
+available to systemfonts and therefore marquee. Adds option to display
+the search results. Also filters out "problem fonts" not recognized
+by the Freetype API used by 'systemfonts'.
+* `check_systemfonts_family()` is the utility function that checks
+for 'systemfonts' Freetype compatibility.
+* `hexsticker_venndir()` simple utility function to create the
+hexsticker. It has a few preset 'inspirations' in development.
+
 # venndir 0.0.52.900
 
 * Removed dependency: vwline

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,23 +39,90 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_25may2025">25may2025<a class="anchor" aria-label="anchor" href="#id_25may2025"></a></h2>
+<ul><li><p>Add hexsticker.</p></li>
+<li><p>Consider temporary port of <code>blend_colors()</code> until colorjam is on CRAN.</p></li>
+<li><p>Consider showing optional overlap label for overlap sections, e.g. assigning LETTERS to each overlap. Idea from DTheofilatos.</p></li>
+<li><p>DONE. Consider adding legend to <code><a href="reference/textvenn.html">textvenn()</a></code> as a formal argument.</p></li>
+<li><p>DONE. Hide singlets as needed in <code><a href="reference/textvenn.html">textvenn()</a></code>, consistent with <code><a href="reference/venndir.html">venndir()</a></code>.</p></li>
+<li>
+<p>Consider method to customize item label positions.</p>
+<ul><li>Current idea: store item x,y coordinates in <code>label_df</code> and re-use when already pre-defined. It would allow manual adjustment as a stopgap option.</li>
+</ul></li>
+<li>
+<p>Prep for Bioconductor</p>
+<ul><li>Minimize dependencies. Current heavy: marquee, data.table, colorjam Try: <code>pkgnet::CreatePackageReport("venndir")</code>
+</li>
+<li>Consider remove or refactor <code><a href="reference/shrink_df.html">shrink_df()</a></code> the only need for data.table.</li>
+<li>Run checks, remove all warnings</li>
+</ul></li>
+<li><p>Consider custom segment color. Too difficult to see currently.</p></li>
+</ul></div>
+<div class="section level2">
+<h2 id="non-essential-25may2025">Non-essential 25may2025<a class="anchor" aria-label="anchor" href="#non-essential-25may2025"></a></h2>
+<ul><li>
+<p>Pie-in-the-sky: Prototype a ggplot2 implementation?</p>
+<ul><li>Major driver might be using ggrepel for improved label placement, except marquee cannot yet be used with ggrepel. (Might be WIP.)</li>
+<li>See ggplot2 Layer Explorer: <a href="https://yjunechoe.github.io/ggplot2-layer-explorer/" class="external-link uri">https://yjunechoe.github.io/ggplot2-layer-explorer/</a>
+</li>
+<li>Build prototype ggplot2 Geom/Stat methods for JamPolygon object</li>
+<li>Motivates moving JamPolygons into a separate package</li>
+</ul></li>
+<li>
+<p>Pie-in-the-sky: Consider venndir-shinyapp</p>
+<ul><li>Deploy live webR/shiny app to allow user intervention, Directly inspired by the “ggplot2-layer-explorer” shiny app.</li>
+<li>Some type of data import - user-typed counts, or file, etc.</li>
+<li>Consider deploying to shinyapps.io as live demo.</li>
+</ul></li>
+<li><p>Consider updating the plot layout so the legend is in a fixed region, thus preventing overlap with the venndir polygons and labels.</p></li>
+<li><p>Consider making it easier to use patchwork with venndir plot output.</p></li>
+<li><p>Consider replacing <code><a href="https://rdrr.io/pkg/gridExtra/man/tableGrob.html" class="external-link">gridExtra::tableGrob()</a></code> with <code>gt</code>, then use marquee.</p></li>
+<li>
+<p>Consider summarizing font usage techniques</p>
+<ul><li>
+<code><a href="https://rdrr.io/r/grDevices/embedFonts.html" class="external-link">grDevices::embedGlyphs()</a></code> to embed font into a PDF file, see <a href="https://www.stat.auckland.ac.nz/~paul/Reports/Typography/glyphs/glyphs.html" class="external-link uri">https://www.stat.auckland.ac.nz/~paul/Reports/Typography/glyphs/glyphs.html</a>
+</li>
+<li>Unicode characters, colored text, etc.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_20may2025">20may2025<a class="anchor" aria-label="anchor" href="#id_20may2025"></a></h2>
+<ul><li>
+<p>PARTIAL. Warn for overlaps not shown in proportional diagrams.</p>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings()</a></code> works for <code>Venndir</code> objects, printing missing overlaps.</li>
+<li>
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> for <code>Venndir</code> also includes overlaps not shown when present.</li>
+<li>TODO: Consider method to add warning to a figure. Could be documented as a howto without providing a specific function.</li>
+</ul></li>
+</ul></div>
+<div class="section level2">
+<h2 id="id_19may2025">19may2025<a class="anchor" aria-label="anchor" href="#id_19may2025"></a></h2>
+<ul><li>
+<p>DONE. (for now) Review item label use by marquee.</p>
+<ul><li>Consider how to use contrasting color for item labels.</li>
+<li>Revisit how and when to use {.rel.1 text} and {.color text} to permit other markdown.</li>
+</ul></li>
+<li><p>Consider method to allow duplicate labels in different sections with <code><a href="reference/venn_meme.html">venn_meme()</a></code>, which could be useful as blanks for example.</p></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_15may2025">15may2025<a class="anchor" aria-label="anchor" href="#id_15may2025"></a></h2>
-<ul><li>Debug warning on <code><a href="reference/assemble_venndir_label.html">assemble_venndir_label()</a></code> examples.</li>
-<li>Add more examples of gene expression data to the vignette, at least one example using DESeq2.</li>
+<ul><li>DONE. Debug warning on <code><a href="reference/assemble_venndir_label.html">assemble_venndir_label()</a></code> examples.</li>
+<li>DONE. Add more examples of gene expression data to the vignette, at least one example using DESeq2.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="id_01may2025">01may2025<a class="anchor" aria-label="anchor" href="#id_01may2025"></a></h2>
 <ul><li>
-<p>Fix issue with disappearing text when the font size is too small, seems specific to “sans” font, perhaps systemfonts?</p>
+<p>PARTIAL. Fix issue with disappearing text when the font size is too small, seems specific to “sans” font, perhaps systemfonts?</p>
 <ul><li>Consider changing default font back to “Arial”</li>
 <li>Posted issue to marquee for review.</li>
 </ul></li>
 <li>
-<p>Fix item labels converted to single-line with marquee.</p>
+<p>DONE. Fix item labels converted to single-line with marquee.</p>
 <ul><li>DONE. However, now fix issue with huge whitespace padding between lines.</li>
 </ul></li>
 <li>
-<p>Consider exposing other options for item labeling:</p>
+<p>Consider <em>item labeling</em> options:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">*</span> <span class="st">`</span><span class="at">lineheight</span><span class="st">`</span>, other marquee style attributes<span class="sc">:</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="st">`</span><span class="at">background</span><span class="st">`</span>, <span class="st">`</span><span class="at">padding</span><span class="st">`</span>, <span class="st">`</span><span class="at">border</span><span class="st">`</span>, <span class="st">`</span><span class="at">border_size</span><span class="st">`</span>, <span class="st">`</span><span class="at">border_radius</span><span class="st">`</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="st">`</span><span class="at">outline</span><span class="st">`</span>, <span class="st">`</span><span class="at">outline_width</span><span class="st">`</span> <span class="sc">-</span> interesting option similar to shadowText</span>

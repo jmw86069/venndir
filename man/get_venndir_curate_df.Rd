@@ -55,6 +55,7 @@ get_venndir_curate_df(unicode=TRUE, curate_df=my_curate_df)
 }
 \seealso{
 Other venndir advanced: 
+\code{\link{Venndir-class}},
 \code{\link{curate_venn_labels}()},
 \code{\link{modify_venndir_overlap}()},
 \code{\link{nudge_venndir_label}()}

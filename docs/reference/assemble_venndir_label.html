@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.52.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -212,27 +212,29 @@ values: "plain", "bold", "italic", "bold.italic"</p></li>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other venndir internal:
+<code><a href="check_systemfonts_family.html">check_systemfonts_family</a>()</code>,
 <code><a href="expand_range.html">expand_range</a>()</code>,
 <code><a href="get_venn_polygon_shapes.html">get_venn_polygon_shapes</a>()</code>,
+<code><a href="hexsticker_venndir.html">hexsticker_venndir</a>()</code>,
 <code><a href="make_color_contrast.html">make_color_contrast</a>()</code>,
 <code><a href="make_venn_combn_df.html">make_venn_combn_df</a>()</code>,
 <code><a href="match_list.html">match_list</a>()</code>,
 <code><a href="print_color_df.html">print_color_df</a>()</code>,
 <code><a href="shrink_df.html">shrink_df</a>()</code>,
 <code><a href="simple_ellipse.html">simple_ellipse</a>()</code>,
+<code><a href="subset_systemfonts.html">subset_systemfonts</a>()</code>,
+<code><a href="venndir_label_style.html">venndir_label_style</a>()</code>,
 <code><a href="venndir_to_df.html">venndir_to_df</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.options.html" class="external-link">pdf.options</a></span><span class="op">(</span>encoding<span class="op">=</span><span class="st">"ISOLatin1.enc"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">vl</span> <span class="op">&lt;-</span> <span class="fu">assemble_venndir_label</span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">vl</span> <span class="op">&lt;-</span> <span class="fu">assemble_venndir_label</span><span class="op">(</span></span></span>
 <span class="r-in"><span>   signed_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u2191\u2191 15"</span>,</span></span>
 <span class="r-in"><span>      <span class="st">"\u2193\u2193 23"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   debug<span class="op">=</span><span class="st">"overlap"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="assemble_venndir_label-1.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.options.html" class="external-link">pdf.options</a></span><span class="op">(</span>encoding<span class="op">=</span><span class="st">"ISOLatin2.enc"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">vl</span> <span class="op">&lt;-</span> <span class="fu">assemble_venndir_label</span><span class="op">(</span></span></span>
 <span class="r-in"><span>   overlap_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u2191\u2191 15"</span>,</span></span>
 <span class="r-in"><span>      <span class="st">"\u2193\u2193 23"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span></span>
@@ -266,13 +268,10 @@ values: "plain", "bold", "italic", "bold.italic"</p></li>
 <span class="r-in"><span>   signed_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u2191\u2191 15"</span>,</span></span>
 <span class="r-in"><span>      <span class="st">"\u2191\u2193 8"</span>,</span></span>
 <span class="r-in"><span>      <span class="st">"\u2193\u2193 23"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   fontcolors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>signed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red3"</span>, <span class="st">"darkorchid"</span>, <span class="st">"dodgerblue3"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   fontcolors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>count<span class="op">=</span><span class="st">"black"</span>, signed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red3"</span>, <span class="st">"darkorchid"</span>, <span class="st">"dodgerblue3"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   count_labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"46"</span>, <span class="st">"12%"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   overlap_labels<span class="op">=</span><span class="st">"Set Name Goes Here"</span>,</span></span>
 <span class="r-in"><span>   debug<span class="op">=</span><span class="st">"overlap"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'x' is NULL so the result will be NULL</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'x' is NULL so the result will be NULL</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'x' is NULL so the result will be NULL</span>
 <span class="r-plt img"><img src="assemble_venndir_label-6.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">vl6</span> <span class="op">&lt;-</span> <span class="fu">assemble_venndir_label</span><span class="op">(</span></span></span>
@@ -307,8 +306,6 @@ values: "plain", "bold", "italic", "bold.italic"</p></li>
 <span class="r-in"><span>   pch<span class="op">=</span><span class="fl">3</span>,</span></span>
 <span class="r-in"><span>   gp<span class="op">=</span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>cex<span class="op">=</span><span class="fl">0.8</span>, lwd<span class="op">=</span><span class="fl">2</span>, col<span class="op">=</span><span class="st">"darkorange"</span><span class="op">)</span><span class="op">)</span>;</span></span>
 <span class="r-plt img"><img src="assemble_venndir_label-8.png" alt="" width="768" height="768"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.options.html" class="external-link">pdf.options</a></span><span class="op">(</span>encoding<span class="op">=</span><span class="st">"ISOLatin1.enc"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

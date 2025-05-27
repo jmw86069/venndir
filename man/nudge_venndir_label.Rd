@@ -126,6 +126,7 @@ render_venndir(vo2c)
 }
 \seealso{
 Other venndir advanced: 
+\code{\link{Venndir-class}},
 \code{\link{curate_venn_labels}()},
 \code{\link{get_venndir_curate_df}()},
 \code{\link{modify_venndir_overlap}()}

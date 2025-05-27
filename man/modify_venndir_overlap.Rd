@@ -247,11 +247,13 @@ render_venndir(vo4h2way, main="Two-way overlaps only")
 }
 \seealso{
 Other venndir advanced: 
+\code{\link{Venndir-class}},
 \code{\link{curate_venn_labels}()},
 \code{\link{get_venndir_curate_df}()},
 \code{\link{nudge_venndir_label}()}
 
 Other venndir advanced: 
+\code{\link{Venndir-class}},
 \code{\link{curate_venn_labels}()},
 \code{\link{get_venndir_curate_df}()},
 \code{\link{nudge_venndir_label}()}

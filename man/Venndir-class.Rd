@@ -90,36 +90,37 @@ That said, \code{setlist} can be an empty \code{list()}.
 expansion, such as plot title.
 }
 }
-\seealso{
-Other JamPolygon: 
-\code{\link{JamPolygon-class}},
-\code{\link{[,JamPolygon-method}},
-\code{\link{add_orientation_JamPolygon}()},
-\code{\link{area_JamPolygon}()},
-\code{\link{bbox_JamPolygon}()},
-\code{\link{buffer_JamPolygon}()},
-\code{\link{check_JamPolygon}()},
-\code{\link{check_Venndir}()},
-\code{\link{eulerr_to_JamPolygon}()},
-\code{\link{farthest_point_JamPolygon}()},
-\code{\link{find_venn_overlaps_JamPolygon}()},
-\code{\link{has_point_in_JamPolygon}()},
-\code{\link{intersect_JamPolygon}()},
-\code{\link{label_fill_JamPolygon}()},
-\code{\link{label_outside_JamPolygon}()},
-\code{\link{label_segment_JamPolygon}()},
-\code{\link{labelr_JamPolygon}()},
-\code{\link{minus_JamPolygon}()},
-\code{\link{nearest_point_JamPolygon}()},
-\code{\link{nudge_JamPolygon}()},
-\code{\link{plot.JamPolygon}()},
-\code{\link{point_in_JamPolygon}()},
-\code{\link{polyclip_to_JamPolygon}()},
-\code{\link{polygon_circles}()},
-\code{\link{polygon_ellipses}()},
-\code{\link{sample_JamPolygon}()},
-\code{\link{split_JamPolygon}()},
-\code{\link{union_JamPolygon}()},
-\code{\link{update_JamPolygon}()}
+\examples{
+v <- venndir(make_venn_test(100, 2, do_signed=TRUE), do_plot=FALSE)
+# default print for Venndir gives a concise summary
+v
+
+# example with overlap which is not shown
+overlaps <- c(set_A=187, set_B=146, set_C=499,
+   `set_A&set_B`=1,
+   `set_A&set_C`=181,
+   `set_B&set_C`=219,
+   `set_A&set_B&set_C`=20);
+setlist_o <- counts2setlist(overlaps)
+v3 <- venndir(setlist_o, proportional=TRUE, do_plot=FALSE)
+# the print includes '1 overlap cannot be displayed'
+v3
+
+# the warnings(v3) also contain the overlaps not displayed
+warnings(v3)
+
+# the overlap names can be extracted directly
+as.character(warnings(v3))
+
+# the counts for each overlap are also available
+as.numeric(names(warnings(v3)))
+
 }
-\concept{JamPolygon}
+\seealso{
+Other venndir advanced: 
+\code{\link{curate_venn_labels}()},
+\code{\link{get_venndir_curate_df}()},
+\code{\link{modify_venndir_overlap}()},
+\code{\link{nudge_venndir_label}()}
+}
+\concept{venndir advanced}

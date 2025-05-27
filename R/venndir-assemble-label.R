@@ -41,13 +41,11 @@
 #' @family venndir internal
 #' 
 #' @examples
-#' pdf.options(encoding="ISOLatin1.enc")
 #' vl <- assemble_venndir_label(
 #'    signed_labels=c("\u2191\u2191 15",
 #'       "\u2193\u2193 23"),
 #'    debug="overlap")
 #' 
-#' pdf.options(encoding="ISOLatin2.enc")
 #' vl <- assemble_venndir_label(
 #'    overlap_labels=c("\u2191\u2191 15",
 #'       "\u2193\u2193 23")[1],
@@ -77,7 +75,7 @@
 #'    signed_labels=c("\u2191\u2191 15",
 #'       "\u2191\u2193 8",
 #'       "\u2193\u2193 23"),
-#'    fontcolors=list(signed=c("red3", "darkorchid", "dodgerblue3")),
+#'    fontcolors=list(count="black", signed=c("red3", "darkorchid", "dodgerblue3")),
 #'    count_labels=c("46", "12%"),
 #'    overlap_labels="Set Name Goes Here",
 #'    debug="overlap")
@@ -112,8 +110,6 @@
 #'    y=grid::unit(c(0.50, 0.25), "snpc"),
 #'    pch=3,
 #'    gp=grid::gpar(cex=0.8, lwd=2, col="darkorange"));
-#' 
-#' pdf.options(encoding="ISOLatin1.enc")
 #' 
 #' @param x,y `grid::unit`, default NULL, indicating optional placement
 #'    of labels. When defined, a viewport is defined for the label so
@@ -237,34 +233,28 @@ assemble_venndir_label <- function
       text_grob_type <- "textGrob";
    }
    
-   ## check ecclectic mix of things that causes R crash
-   # - R-4.4.1 or lower/older
-   # - MacOS operating system
-   # - fonts with whitespace in the font file path
-   # - potentially check fonts in use, risky because fallback font
-   #   from `systemfonts` might still select a forbidden font and cause crash.
-   #   See: fontfamily="Kailasa", no whitespace but caused a crash.
-   #   - systemfonts::match_fonts("Kailasa", italic=TRUE, weight=600)
-   #     returns "Avenir Next.ttc"
-   #     In fact, every different weight returns a different/random font
-   #     with italic=TRUE.
-   ## This code is disabled but kept for future utility
-   if (FALSE && "marquee" %in% text_grob_type) {
-      older_than_R442 <- (compareVersion("4.4.2",
-         paste(R.version$major, R.version$minor, sep=".")) == 1);
-      is_macos <- grepl("^darwin", R.version$os);
-      all_fms <- unique(unlist(fontfamilies));
-      # check all font files
-      sfdf <- systemfonts::system_fonts();
-      any_path_whitespace <- any(grepl(" ", sfdf$path));
-      if (older_than_R442 && is_macos && any_path_whitespace) {
-         # change to textGrob
-         warning(paste0("Changed text_grob_type 'marquee' to ",
-            "'textGrob' to avoid potential crash: R<4.42; MacOS; ",
-            " and font path with whitespace."));
-         text_grob_type <- "textGrob";
+   # fill in partial custom options
+   avdf <- formals(assemble_venndir_label)
+   fill_opts <- function(x, name, avdf) {
+      #
+      if (length(x) == 0) {
+         x <- eval(avdf[[name]])
+      } else if (!all(names(eval(avdf[[name]])) %in% names(x))) {
+         if (!is.list(x)) {
+            x <- as.list(x);
+         }
+         addn <- setdiff(names(eval(avdf[[name]])), names(x));
+         x[addn] <- avdf[[name]][addn];
       }
+      x
    }
+   fontfamilies <- fill_opts(fontfamilies, "fontfamilies", avdf);
+   fontsizes <- fill_opts(fontsizes, "fontsizes", avdf);
+   fontfaces <- fill_opts(fontfaces, "fontfaces", avdf);
+   fontcolors <- fill_opts(fontcolors, "fontcolors", avdf);
+   label_spacing <- fill_opts(label_spacing, "label_spacing", avdf);
+   label_padding <- fill_opts(label_padding, "label_padding", avdf);
+
    if ("gridtext" %in% text_grob_type) {
       text_grob_type <- "richtext_grob";
    }

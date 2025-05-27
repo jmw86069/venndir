@@ -47,7 +47,7 @@ workflows.
 The `venndir::make_venn_test()` function is useful to
 generate test data, just to create a Venn diagram.
 
-```{r generic_1}
+```{r generic_1, fig.alt="Venndir default example showing signed counts, usingoverlap type 'agreement'."}
 setlist <- make_venn_test(2500, 3,
   sizes=c(400, 500, 200),
   do_signed=TRUE)
@@ -153,7 +153,7 @@ automatically converted to a signed `list`.
 For simplicity, we will show only the first two contrasts,
 using argument: `sets=c(1, 2)`
 
-```{r limma_3a}
+```{r limma_3a, fig.alt="Venndir using input in the form of a signed incidence matrix, values are -1, 0, or +1."}
 if (do_limma) {
    venndir(fit2decide, sets=c(1, 2));
 }
@@ -164,7 +164,7 @@ if (do_limma) {
 The signed incidence matrix can be converted to a signed
 set list using `im_value2list()`.
 
-```{r limma_3}
+```{r limma_3, fig.alt="Venndir using a signed setlist as input, after converting the signed incidence matrix to a signed setlist."}
 if (do_limma) {
    limmalist <- im_value2list(fit2decide);
    venndir(limmalist, sets=c(1, 2));
@@ -202,7 +202,7 @@ is a Euler diagram.
 For this diagram, we plot `sets=c(1, 3)` mostly
 because these are more visually interesting.
 
-```{r limma_3p}
+```{r limma_3p, fig.alt="Venndir figure with 'proportional=TRUE' which produces a proportional Euler diagram. Signed counts are displayed beside the main overlap counts by default."}
 if (do_limma) {
   venndir(limmalist, sets=c(1, 3), proportional=TRUE);
 }
@@ -218,7 +218,7 @@ the second value in `font_cex=c(1.2, 1.5, 0.8)`. The first value
 controls the set label, the second controls the main count label,
 the third controls the signed count labels.
 
-```{r limma_3p_tall}
+```{r limma_3p_tall, fig.alt="Venndir figure shown as a proportional Euler diagram as before, except using 'template=\"tall\"' which arranges signed counts below the main counts."}
 if (do_limma) {
    venndir(limmalist, sets=c(1, 3), proportional=TRUE,
       font_cex=c(1, 1.5, 0.8),
@@ -237,7 +237,7 @@ and these comparisons, this result is expected.
 The group `"LP"` is the test group in the first comparison,
 and `"LP"` is the control group in the second comparison.
 
-```{r limma_4}
+```{r limma_4, fig.alt="Venndir figure shown as a proportional Euler diagram, with the option 'overlap_type=\"agreement\"' which summarizes the signed overlaps as agreeing, or disagreeing in direction."}
 if (do_limma) {
    venndir(limmalist, sets=c(2, 3), proportional=TRUE,
       font_cex=c(1, 1.5, 0.8),
@@ -252,7 +252,7 @@ The argument `overlap_type="each"` will display counts for each
 combination of up and down. This option gives the most detail, but
 can sometimes be challenging to label clearly.
 
-```{r limma_5}
+```{r limma_5, fig.alt="Venndir figure shown as a proportional Euler diagram, with the option 'overlap_type=\"each\"' which tabulates the signed counts for each combination of up and down directions. Again the option 'template=\"tall\"' is used, to arrange signed counts below the main overlap counts."}
 if (do_limma) {
    venndir(limmalist, sets=c(2, 3),
       font_cex=c(1, 1.5, 0.8),
@@ -272,7 +272,7 @@ to reduce the number of hits.
 
 ## Sign Item label
 
-```{r limma_6}
+```{r limma_6, fig.alt="Venndir figure showing item labels filled inside each corresponding overlap region. Labels include the arrow indication direction, beside each item label. Labels are also colored based upon direction. The labels indicate Illumina probe names, since the statistical analysis involved probes, and not specific genes measured by the probes."}
 if (do_limma) {
    # increase stringency of statistical filtering
    fit2decide2 <- decideTests(fit2,
@@ -303,7 +303,7 @@ which is a fancy way of saying "Make it per-gene".
 The method prioritizes non-zero values, so that any evidence of a hit
 will be retained, using the majority direction.
 
-```{r limma_6g}
+```{r limma_6g, fig.alt="Venndir figure showing item labels which now use the gene symbol, after converting Illumina probe names to the measured genes. Because multiple probes may measure the same gene, the conversion utilizes a helper function: 'im_collapse()'."}
 if (do_limma) {
    # filter for non-zero values
    fit2decide2g <- subset(fit2decide2, rowSums(abs(fit2decide2)) > 0)
@@ -334,7 +334,7 @@ polygon with the color associated with each direction.
 
 Use argument: `show_items="sign"`
 
-```{r limma_6s}
+```{r limma_6s, fig.alt="Venndir figure showing a proportional Euler diagram, including item labels in each overlap region. The item labels now only show the directional arrow, not the label itself, in order to indicate the proportion of directions observed. The count labels are placed outside the overlap regions, connected by a line segment."}
 if (do_limma) {
    vo6s <- venndir(fit2decide2,
       sets=c(1, 2),
@@ -377,7 +377,7 @@ potentially much more informative. Note that the contrast (3)
 may be written `"A - B"` or `"B - A"`, and the order
 affects the directionality.
 
-```{r venn_compare_0}
+```{r venn_compare_0, fig.alt="Venndir 3-way figure showing counts with 'overlap_type=\"agreement\"'. Each set represents the hits from one statistical contrast, after filtering by P-value and log fold change."}
 if (do_limma) {
    fit2decide1 <- decideTests(fit2,
       p.value=1e-3,
@@ -406,7 +406,7 @@ This is contrast (3) above: `"A - B"`
 We'll use the Venndir highlight feature to walk
 through the logic.
 
-```{r venn_compare_AB}
+```{r venn_compare_AB, fig.alt="Venndir figure shown as in the previous figure, except with one overlap region highlighted using yellow fill color, and a wide orange inner border. The highlighted region represents contrast 'A - B', and the hits which are unique to this comparison. The highlighting helps emphasize this region for discussion."}
 if (do_limma) {
    v2 <- venndir::highlight_venndir_overlap(v,
       overlap_set="A - B")
@@ -431,7 +431,7 @@ those for `"A - C"` or `"B - C"` simply because they are **only**
 hits when comparing A and B directly. If they were changes also seen in
 `"A - C"` they would appear in the section **214**.
 
-```{r venn_compare_AC_AB}
+```{r venn_compare_AC_AB, fig.alt="Venndir figure as in the previous figure, this time highlighting one overlap region between 'A - C' and 'A - B', with 214 shared hits which are all concordant in direction. The other set represents the contrast 'B - C', and therefore hits in the highlighted region can only be concordant in direction."}
 if (do_limma) {
    v3 <- venndir::highlight_venndir_overlap(v,
       overlap_set="A - C&A - B")
@@ -450,7 +450,7 @@ and `"A - B"`. There are two explanations for concordance or discordance here:
    changes between `"A - B"` which are also not `"B - C"` changes.
 
 
-```{r venn_compare_BC_AB}
+```{r venn_compare_BC_AB, fig.alt="Venndir figure as in the previous figure, highlighting another overlap region between 'B - C' and 'A - B', with 126 hits which are all discordant in direction. Again, due to the organization of this three-way Venn diagram, hits in this overlap region can only be discordant in direction."}
 if (do_limma) {
    v4 <- venndir::highlight_venndir_overlap(v,
       overlap_set="B - C&A - B")
@@ -466,7 +466,7 @@ however, this effect is due to the order of the comparisons. "B" is
 the test group in `"B - C"`, but "B" is the control group in `"A - B"`.
 
 
-```{r venn_compare_AC_BC}
+```{r venn_compare_AC_BC, fig.alt="Venndir figure as in the previous figure, showing the overlap between 'A - C' and 'B - C', with 726 genes which are all concordant in direction. In this overlap region, hits may be concordant or discordant, and the observation of entirely concordant hits is a finding."}
 if (do_limma) {
    v5 <- venndir::highlight_venndir_overlap(v,
       overlap_set="A - C&B - C")
@@ -498,7 +498,7 @@ There are two conceptual results:
    for example disease and treatment.
 
 
-```{r venn_compare_AC_BC_AC}
+```{r venn_compare_AC_BC_AC, fig.alt="Venndir figure as in the previous figure, highlighting the three-way overlap between 'A - C', 'B - C', and 'A - B', and showing 13 shared hits in all three contrasts. This overlap region is not expected to have any particular concordance, and is difficult to interpret without reviewing the underlying data."}
 if (do_limma) {
    v6 <- venndir::highlight_venndir_overlap(v,
       overlap_set="A - C&B - C&A - B")
@@ -509,7 +509,7 @@ if (do_limma) {
 In my opinion, the concordance here is not useful to interpret.
 It may be interesting to display `overlap_type="each"`.
 
-```{r venn_compare_AC_BC_AC_each}
+```{r venn_compare_AC_BC_AC_each, fig.alt="Venndir figure as in the previous figure, highlighting the three-way overlap between 'A - C', 'B - C', and 'A - B'. This figure uses 'overlap_type=\"each\"' which shows each combination of up and down. All 13 hits are concordant in the first two contrasts, and only 3 hits are discordant in the third contrast. The pattern up-up-down suggests that the effects are shared in A and B compared to C, and that the magnitude in B is significantly greated in B."}
 if (do_limma) {
    veach <- venndir(fit2decide1,
       do_plot=FALSE,
@@ -604,7 +604,7 @@ if (do_limma) {
 
 ## DESeq2 hits
 
-```{r deseq2_3a}
+```{r deseq2_3a, fig.alt="Venndir proportional Euler diagram using statistical hits from DESeq2 analysis. The vast majority of hits shared in these two contrasts are concordant, 1358 hits are up in both, 1360 hits are down in both, and only 25 hits have discordant direction."}
 if (do_deseq2) {
    venndir(res_hits,
       proportional=TRUE,
@@ -621,7 +621,7 @@ only for educational purposes, and is not generally
 recommended for array data otherwise.
 That said, it does perform fairly well.
 
-```{r limma_deseq2_1}
+```{r limma_deseq2_1, fig.alt="Four-way Venndir diagram comparing limma results to DESeq2 results. Hits from the same contrast are shared at a high level across the two methods, as anticipated, in fact the region with the most probes is the four-way overlap, which suggests great agreement in the two contrasts, and the two methodologies."}
 if (do_deseq2) {
    use_list <- c(
       limmalist[1:2],

@@ -112,6 +112,7 @@ make_venn_test <- function
  max_size=ceiling(n_items / 2),
  items=NULL,
  sizes=NULL,
+ set_names=NULL,
  seed=123,
  item_prefix="item_",
  ...)
@@ -130,18 +131,23 @@ make_venn_test <- function
       sizes <- rep(sizes,
          length.out=n_sets);
    }
+   if (length(set_names) == 0) {
+      #
+   }
 
    # define set names
-   if (length(names(sizes)) == 0) {
-      set_names <- paste0("set_",
-         jamba::colNum2excelName(seq_len(n_sets)));
-      if (length(sizes) > 0) {
-         names(sizes) <- set_names;
+   if (length(set_names) == 0) {
+      if (length(names(sizes)) == 0) {
+         set_names <- paste0("set_",
+            jamba::colNum2excelName(seq_len(n_sets)));
+      } else {
+         set_names <- names(sizes);
       }
-   } else {
-      # make sure names are unique
-      names(sizes) <- jamba::makeNames(names(sizes));
-      set_names <- names(sizes);
+   }
+   if (any(set_names %in% c("", NA)) || any(duplicated(set_names))) {
+      set_names <- jamba::makeNames(
+         jamba::rmNA(naValue="set", set_names),
+         suffix="_")
    }
 
    # define sizes upfront so they are reproducible by seed
@@ -153,6 +159,8 @@ make_venn_test <- function
                length.out=80)));
          n <- sample(sample_seq, 1);
       });
+   } else {
+      names(sizes) <- set_names;
    }
    
    # define set_list items so they are reproducible by seed

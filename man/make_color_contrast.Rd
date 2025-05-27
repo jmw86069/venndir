@@ -55,13 +55,17 @@ make_color_contrast(x, y, do_plot=TRUE, C_floor=140);
 \seealso{
 Other venndir internal: 
 \code{\link{assemble_venndir_label}()},
+\code{\link{check_systemfonts_family}()},
 \code{\link{expand_range}()},
 \code{\link{get_venn_polygon_shapes}()},
+\code{\link{hexsticker_venndir}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{match_list}()},
 \code{\link{print_color_df}()},
 \code{\link{shrink_df}()},
 \code{\link{simple_ellipse}()},
+\code{\link{subset_systemfonts}()},
+\code{\link{venndir_label_style}()},
 \code{\link{venndir_to_df}()}
 }
 \concept{venndir internal}
