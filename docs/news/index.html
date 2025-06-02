@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,14 +37,50 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.54.900" id="venndir-0054900">venndir 0.0.54.900<a class="anchor" aria-label="anchor" href="#venndir-0054900"></a></h2>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-54-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-54-900"></a></h3>
+<ul><li><p><code><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings()</a></code> generic function is now exported.</p></li>
+<li><p><code><a href="../reference/check_systemfonts_family.html">check_systemfonts_family()</a></code> added argument <code>path</code> with optional full path to specific font file.</p></li>
+<li><p>Added tests for <code><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings()</a></code> on <code>Venndir</code> object.</p></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>Fixed some issues with outside label placement with proportional output.</li>
+<li>Improved logic for ref_polygon, used internally to label singlet sets which are fully enclosed in another set.</li>
+<li>Removed slot names from print object summary, not necessary.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>Improved label groupings by ref_polygon, edge cases. In future, set labels can be independent of the “overlap count set label” - possibly allowing set size to be displayed with the outer label, and have a separate label with unique counts for the same set. It is confusing visually, so for now the labels are intended to mean the “Venn overlap label”, therefore ‘set_A’ implies “items unique to set_A”.</li>
+<li>Improved default center for 2-way Venn, biasing labels toward the top rather than left-right.</li>
+<li>Make line segments slightly darker and wider to be more clearly visible.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/label_outside_JamPolygon.html">label_outside_JamPolygon()</a></code></p>
+<ul><li>New argument <code>do_plot</code> for optional visual summary of label positions.</li>
+<li>New argument <code>snap_y_percent=5</code> will snap y-axis positions when multiple labels have a value within this percentage of the plot dimensions, used to align labels.</li>
+<li>Added internal trick to ensure set labels sort top-to-bottom before overlap labels for the same set, instead of clockwise, improving the left-right symmetry.</li>
+</ul></li>
+<li><p><code><a href="../reference/subset_systemfonts.html">subset_systemfonts()</a></code> - added more help text.</p></li>
+<li><p><code><a href="../reference/check_systemfonts_family.html">check_systemfonts_family()</a></code> new argument <code>debug</code> to print error when suppressed internally, new argument <code>path</code> for optional full filename.</p></li>
+<li><p><code><a href="../reference/degrees_to_adj.html">degrees_to_adj()</a></code> - new argument <code>do_fractional=TRUE</code> with improved sliding placement of the label instead of snapping to the nearest 45 degree angle.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-54-900">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-54-900"></a></h3>
+<ul><li>
+<code><a href="../reference/spread_degrees.html">spread_degrees()</a></code> - Fixed conditional filter causing it to spread angles instead of using <code>min_degrees</code>. Fixed rare edge case with proportional labels appearing to be wrongly positioned.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.53.900" id="venndir-0053900">venndir 0.0.53.900<a class="anchor" aria-label="anchor" href="#venndir-0053900"></a></h2>
 <ul><li>Added Enhances: hexSticker, ggplot2</li>
 <li>Added Imports: withr</li>
+<li>Added figure alt text to gene expression vignette.</li>
 </ul><div class="section level3">
 <h3 id="changes-to-existing-functions-0-0-53-900">changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-53-900"></a></h3>
 <ul><li>
 <p><code><a href="../reference/textvenn.html">textvenn()</a></code></p>
-<ul><li>Now hides values like agreement, for singlet overlap counts</li>
+<ul><li>Now hides values for singlet overlap counts as defined by <code><a href="../reference/curate_venn_labels.html">curate_venn_labels()</a></code>.</li>
 <li>New argument <code>template</code> with options for “wide” and “tall”, consistent with <code><a href="../reference/venndir.html">venndir()</a></code>
 </li>
 <li>New argument <code>draw_legend=FALSE</code> to print text table legend.</li>
@@ -53,6 +89,10 @@
 <p><code><a href="../reference/make_venn_test.html">make_venn_test()</a></code></p>
 <ul><li>New argument <code>set_names</code> to make it easier to define custom names.</li>
 <li>Names are handled slightly differently, using <code>set_names</code> then <code>names(sizes)</code>, then assigning <code>"set_A"</code> using LETTERS.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/curate_venn_labels.html">curate_venn_labels()</a></code></p>
+<ul><li>New arg <code>type="all"</code> returns three columns: ‘sign’, ‘color’, ‘hide_singlet’</li>
 </ul></li>
 <li>
 <p><code>Venndir-class</code></p>
@@ -312,7 +352,7 @@ The exception is when displaying items with only the “sign”, in that case th
 <ul><li>
 <code>show()</code> to summarize the contents</li>
 <li>
-<code><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata()</a></code> and <code>metadata&lt;-</code>
+<code>metadata()</code> and <code>metadata&lt;-</code>
 </li>
 <li>
 <code>setlist()</code> - returns the original setlist</li>

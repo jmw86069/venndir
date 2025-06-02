@@ -13,8 +13,11 @@
 #' @param center `numeric` vector or matrix with two values indicating
 #'    the center position. When `center=NULL` then the center is
 #'    determined using a method defined by `center_method`.
-#' @param distance `numeric` value indicating the absolute coordinate
-#'    distance away from the perimiter of `jp` to place labels.
+#' @param buffer `numeric` buffer, default -0.1, inside the polygon
+#'    used to draw a line segment connecting the label to the appropriate
+#'    polygon.
+#' @param distance `numeric` value, default 0.1, indicating the
+#'    distance from the perimiter of `jp` to place labels.
 #'    This value is the `buffer` for `buffer_JamPolygon()`.
 #' @param center_method `character` string indicating the method to
 #'    determine the `center`:
@@ -22,31 +25,60 @@
 #'    of all the polygon label positions;
 #'    * `"bbox"` uses the mean x,y
 #'    coordinate of the bounding box that encompasses the polygons.
-#'    
+#' 
 #'    The effect
 #'    is to extend outer labels radially around this center point.
 #'    Using the mean label position with `center_method="label"`
 #'    is helpful because it ensures labels are extended in all directions
 #'    even when most labels are in one upper or lower section of
 #'    the `sp` polygons.
+#' @param min_degrees `numeric`, default 15, minimum degrees spacing
+#'    to impose between label positions, oriented around the center.
+#'    When there are more labels than can be divided, the threshold
+#'    is automatically lowered proportionally.
+#' @param relative `logical` whether distance and buffer are relative
+#'    to plot dimensions, default TRUE.
+#' @param y_snap_percent `numeric` percent of the plot dimensions
+#'    used to decide whether to "snap" two labels to the same y-axis value.
+#'    Default 5 means any labels within 5 percent of the plot dimensions
+#'    of one or more other labels will use the mean y-axis value,
+#'    thereby helping align labels by height where appropriate.
+#' @param seed `numeric` used to set the random seed for reproducibility,
+#'    via `set.seed()`. Default is 123.
+#' @param debug `logical` whether to print detailed debug information.
+#' @param do_plot `logical` whether to create a plot with the input `jp`
+#'    and corresponding labels and line segments assigned to `which_jp`.
+#'    Default is FALSE.
+#' @param verbose `logical` whether to print verbose output.
+#' @param ... additional arguments are ignored.
+#' 
+#' 
+#' @examples
+#' v <- venndir(make_venn_test(n_sets=3), do_plot=FALSE)
+#' jps <- v@jps
+#' 
+#' # plot visual summary
+#' label_outside_JamPolygon(jps, do_plot=TRUE)
 #' 
 #' @export
 label_outside_JamPolygon <- function
 (jp,
  which_jp=NULL,
  center=NULL,
- buffer=0.1,
+ buffer=-0.1,
+ distance=0.1,
  center_method=c("bbox",
     "label"),
  vector_method=c("label",
     "farthest"),
  segment_method=c("nearest",
     "vector"),
- distance=0.1,
  min_degrees=15,
  relative=TRUE,
+ y_snap_percent=5,
  seed=123,
  debug=FALSE,
+ do_plot=FALSE,
  verbose=FALSE,
  ...)
 {
@@ -58,17 +90,6 @@ label_outside_JamPolygon <- function
       #    length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
       # }))
       which_jp <- seq_len(length(jp));
-      # jamba::printDebug("which_jp: ", which_jp);# debug
-   } else {
-      # use only those entries with polygon coordinates
-      ## 0.0.34.900 - do not subset which_jp so the function can always return
-      ## coordinates in the order requested, and for all entries provided,
-      ## even when an entry is empty
-      # which_jp_sub <- sapply(which_jp, function(ijp){
-      #    length(jamba::rmNA(unlist(jp@polygons$x[[ijp]]))) > 0
-      # })
-      # jamba::printDebug("table(which_jp_sub): ");print(table(which_jp_sub));# debug
-      # which_jp <- which_jp[which_jp_sub];
       # jamba::printDebug("which_jp: ", which_jp);# debug
    }
    
@@ -171,37 +192,66 @@ label_outside_JamPolygon <- function
          # print(center);
          xymax <- farthest_point_JamPolygon(center, ijp);
       } else if ("label" %in% vector_method) {
-         xymax <- labelr_JamPolygon(ijp);
+         # from center to the polygon label position
+         if (all(c("label_x", "label_y") %in% colnames(ijp)) &&
+               !is.na(ijp@polygons$label_x) &&
+               !is.na(ijp@polygons$label_y) ) {
+            # re-use label position stored in jp
+            xymax <- matrix(ncol=2,
+               c(ijp@polygons$label_x, ijp@polygons$label_y));
+            colnames(xymax) <- c("x", "y");
+            rownames(xymax) <- rownames(ijp);
+         } else {
+            # calculate label position
+            xymax <- labelr_JamPolygon(ijp);
+         }
       }
       # Todo: Consider check if xymax == center
       xymax;
    }));
-   # jamba::printDebug("polyref_xy:");print(polyref_xy);# debug
    rownames(polyref_xy) <- names(jp)[which_jp];
+   # jamba::printDebug("polyref_xy:");print(polyref_xy);# debug
 
    # iterate multiple polygons to find angles
-   angles1 <- sapply(which_jp, function(iwhich){
+   angles_df <- jamba::rbindList(lapply(which_jp, function(iwhich){
       iname <- names(jp)[iwhich];
       xymax <- polyref_xy[iname, , drop=FALSE];
       # get reference position
-      x1 <- c(center[1, 1], xymax[1, 1]);
-      y1 <- c(center[1, 2], xymax[1, 2]);
-      
+      x1 <- c(center[1, "x"], xymax[1, "x"]);
+      y1 <- c(center[1, "y"], xymax[1, "y"]);
+      # clever trick to sort set/overlap names top-bottom not clockwise
+      if (grepl("[|]set$", iname[1])) {
+         y1[1] <- y1[1] - 1e-4;
+         # y1[1] <- y1[1] + 1e-4;
+      } else {
+         # jamba::printDebug("iname:", iname);# debug
+      }
+
       # add a small random value to prevent identical angles
       angle <- jamba::rad2deg(
          atan2(y=diff(y1), x=diff(x1)) + 
             rnorm(1) * 1e-6) %% 360;
-      return(angle);
-   });
-   names(angles1) <- names(jp)[which_jp];
-   # jamba::printDebug("angles1:");print(angles1);# debug
-   
+      angle_df <- data.frame(check.names=FALSE,
+         row.names=iname,
+         iname=iname,
+         xdiff=diff(x1),
+         ydiff=diff(y1),
+         angle=angle)
+      return(angle_df);
+   }));
+   angles_df <- jamba::mixedSortDF(angles_df,
+      byCols=c("-ydiff", "-angle", "iname"))
+   # jamba::printDebug("angles_df:");print(angles_df);# debug
+   angles1 <- jamba::nameVector(angles_df[, c("angle", "iname"), drop=FALSE]);
+
    # logic here to spread out angles too close to each other
    angles <- angles1;
    not_na <- !is.na(angles1);
    angles[not_na] <- spread_degrees(angles1[not_na],
       min_degrees=min_degrees);
-   names(angles) <- names(jp)[which_jp];
+   # names(angles) <- names(jp)[which_jp];
+   angles_df$new_angle <- angles;
+   # jamba::printDebug("angles_df:");print(angles_df);# debug
    # jamba::printDebug("angles:");# debug
    # print(data.frame(angles_in=round(angles1), angles_out=round(angles)));# debug
    
@@ -318,6 +368,74 @@ label_outside_JamPolygon <- function
    }
    
    names(segmentxy_list) <- names(jp)[which_jp];
+   
+   # optional "snap" y-label to mean value
+   label_ys <- jamba::rbindList(lapply(segmentxy_list, function(segmentxy){
+      segmentxy["label", , drop=FALSE]
+   }))
+   rownames(label_ys) <- names(segmentxy_list);
+   row_set <- jamba::nameVectorN(segmentxy_list);
+   for (i in seq_len(nrow(label_ys))) {
+      idiff <- abs(label_ys[i, "y"] - label_ys[, "y"]);
+      idiff_low <- which((idiff / bbox_max * 100) <= y_snap_percent);
+      row_set[idiff_low] <- row_set[head(idiff_low, 1)];
+   }
+   if (any(duplicated(row_set))) {
+      row_set_dupes <- names(jamba::tcount(row_set, 2));
+      for (row_set_dupe in row_set_dupes) {
+         ivals <- names(row_set)[row_set %in% row_set_dupe];
+         new_y <- mean(label_ys[ivals, "y"], na.rm=TRUE);
+         for (ival in ivals) {
+            segmentxy_list[[ival]]["label", "y"] <- new_y;
+         }
+      }
+   }
+
+   # optional plot
+   if (TRUE %in% do_plot) {
+      # basic plot of polygons
+      j6 <- plot(jp,
+         xlim=expand_range(jpbox["x", ], expand_fraction=0.5),
+         ylim=expand_range(jpbox["y", ], expand_fraction=0.5));
+      vp <- attr(j6, "viewport");
+      adjx <- attr(j6, "adjx");
+      adjy <- attr(j6, "adjy");
+      for (i in seq_along(segmentxy_list)) {
+         xy <- segmentxy_list[[i]];
+         pchv <- c(border=20, label=4)
+         if (all(!is.na(xy[, "x"]))) {
+            gp <- grid::pointsGrob(
+               x=adjx(xy[,"x"]),
+               y=adjy(xy[,"y"]),
+               default.units="snpc", vp=vp,
+               pch=pchv[rownames(xy)],
+               gp=grid::gpar(col="red", cex=0.3))
+            grid::grid.draw(gp)
+            gl <- grid::linesGrob(
+               x=adjx(xy[,"x"]),
+               y=adjy(xy[,"y"]),
+               default.units="snpc", vp=vp,
+               gp=grid::gpar(col="indianred1"))
+            grid::grid.draw(gl)
+            gt <- grid::textGrob(
+               x=adjx(xy["label", "x"]),
+               y=adjy(xy["label", "y"]),
+               label=names(segmentxy_list)[i],
+               default.units="snpc", vp=vp,
+               gp=grid::gpar(col="red3"))
+            grid::grid.draw(gt)
+         }
+      }
+      # Add the center
+      gc <- grid::pointsGrob(
+         x=adjx(center[1]),
+         y=adjy(center[2]),
+         default.units="snpc", vp=vp,
+         pch=5,
+         gp=grid::gpar(col="red", cex=0.3))
+      grid::grid.draw(gc)
+      
+   }
    
    return(invisible(segmentxy_list));
 }

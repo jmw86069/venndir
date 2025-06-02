@@ -157,7 +157,7 @@ details.
 
 ``` r
 venndir(setlist_dir, overlap_type="each",
-   font_cex=c(1.5, 1.5, 1),
+   font_cex=c(1.5, 1.5, 0.8),
    main='overlap_type="each"')
 ```
 
@@ -512,14 +512,13 @@ venn_meme(bix,
 
 <img src="man/figures/README-venn_meme_bix-1.png" alt="Venn meme showing three Venn circles, Stats, Computer Science, and Biology, as they relate to Bioinformatics as the intersection of all three." width="100%" />
 
-You can provide a list of vectors, for example this fun example
-comparing two cars:
+You can provide a list of vectors, for example comparing two cars:
 
 ``` r
 meme_list <- list(
-   `Car A`=c("leather seats", "SUV", "hardtop", "20mpg"),
-   `Car B`=c("cloth seats", "sedan", "sunroof", "40mpg"),
-   `Car A&Car B`=c("power locks", "power windows", "trunk storage"))
+   `SUV`=c("leather seats", "SUV", "hardtop", "20mpg"),
+   `Sedan`=c("cloth seats", "sedan", "sunroof", "40mpg"),
+   `SUV&Sedan`=c("power locks", "power windows", "trunk storage"))
 
 venn_meme(meme_list,
    proportional=TRUE,
@@ -528,6 +527,7 @@ venn_meme(meme_list,
    show_labels="Ni",
    set_colors=c("orange", "firebrick3"),
    item_buffer=0.2,
+   segment_distance=0.01,
    xyratio=2)
 ```
 

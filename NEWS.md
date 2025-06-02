@@ -1,3 +1,53 @@
+# venndir 0.0.54.900
+
+## changes to existing functions
+
+* `warnings()` generic function is now exported.
+* `check_systemfonts_family()` added argument `path` with optional
+full path to specific font file.
+* Added tests for `warnings()` on `Venndir` object.
+* `venndir()`
+
+   * Fixed some issues with outside label placement with proportional output.
+   * Improved logic for ref_polygon, used internally to label singlet sets
+   which are fully enclosed in another set.
+   * Removed slot names from print object summary, not necessary.
+
+* `render_venndir()` 
+
+   * Improved label groupings by ref_polygon, edge cases. In future, set
+   labels can be independent of the "overlap count set label" - possibly
+   allowing set size to be displayed with the outer label, and have
+   a separate label with unique counts for the same set.
+   It is confusing visually, so for now the labels are intended to mean
+   the "Venn overlap label", therefore 'set_A' implies "items unique to set_A".
+   * Improved default center for 2-way Venn, biasing labels toward the top
+   rather than left-right.
+   * Make line segments slightly darker and wider to be more clearly visible.
+   
+* `label_outside_JamPolygon()`
+
+   * New argument `do_plot` for optional visual summary of label positions.
+   * New argument `snap_y_percent=5` will snap y-axis positions when
+   multiple labels have a value within this percentage of the plot dimensions,
+   used to align labels.
+   * Added internal trick to ensure set labels sort top-to-bottom before
+   overlap labels for the same set, instead of clockwise, improving
+   the left-right symmetry.
+
+* `subset_systemfonts()` - added more help text.
+* `check_systemfonts_family()` new argument `debug` to print error
+when suppressed internally, new argument `path` for optional full filename.
+* `degrees_to_adj()` - new argument `do_fractional=TRUE` with improved
+sliding placement of the label instead of snapping to the nearest 45 degree
+angle.
+
+## Bug fixes
+
+* `spread_degrees()` - Fixed conditional filter causing it to spread angles
+instead of using `min_degrees`. Fixed rare edge case with proportional labels
+appearing to be wrongly positioned.
+
 # venndir 0.0.53.900
 
 * Added Enhances: hexSticker, ggplot2

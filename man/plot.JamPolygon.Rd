@@ -228,13 +228,15 @@ jpxout <- plot(jpx);
 vp <- attr(jpxout, "viewport");
 adjx <- attr(jpxout, "adjx");
 adjy <- attr(jpxout, "adjy");
-grid::grid.path(x=adjx(c(4, 5, 5, 4) + 0.5),
-   y=adjy(c(3, 3, 4, 4)),
+
+# grob inside the hole of polygon1
+grid::grid.path(x=adjx(c(2.1, 2.9, 2.9, 2.1)),
+   y=adjy(c(2.1, 2.1, 2.9, 2.9)),
    vp=vp,
    gp=grid::gpar(fill="purple", col="red1", lwd=2),
    default.units="snpc")
-grid::grid.text(x=adjx(5), y=adjy(3.5),
-   label="new grob",
+grid::grid.text(x=adjx(2.5), y=adjy(2.5),
+   label="new\ngrob",
    vp=vp,
    gp=grid::gpar(col="yellow", fontsize=20),
    default.units="snpc")

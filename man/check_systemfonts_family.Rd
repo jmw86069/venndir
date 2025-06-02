@@ -2,14 +2,24 @@
 % Please edit documentation in R/venndir-systemfonts.R
 \name{check_systemfonts_family}
 \alias{check_systemfonts_family}
-\title{Check systemfonts family for valid freetype access}
+\title{Check systemfonts family for freetype compatibility}
 \usage{
-check_systemfonts_family(family = "Arial", ...)
+check_systemfonts_family(family = "Arial", path = NULL, debug = FALSE, ...)
 }
 \arguments{
-\item{family}{\code{character} vector with font family names}
+\item{family}{\code{character} vector with font family names.}
 
-\item{...}{additional arguments are ignored.}
+\item{path}{\code{character}, default NULL, with optional file path to
+one or more specific font files. When provided, the 'family' argument
+is ignored.}
+
+\item{debug}{\code{logical} whether to print any error message, default is FALSE.}
+
+\item{...}{additional arguments are passed to \code{systemfonts::font_info()},
+which may be useful to specify arguments such as: \code{italic=TRUE},
+\code{weight="bold"}, or \code{width="condensed"} for example.
+Alternatively, argument \code{path} can be used to point to a specific
+font file, thereby circumventing family and style.}
 }
 \value{
 \code{integer} vector with the number of valid font info rows
@@ -17,12 +27,32 @@ returned by \code{systemfonts::font_info()}, for each entry provided
 in \code{family}.
 }
 \description{
-Check systemfonts family for valid freetype access
+Check systemfonts family for freetype compatibility
+}
+\details{
+This function simply checks whether the systemfonts API for freetype
+recognizes a font file being valid, given a font family value.
+The main purpose is to avoid trying to use a font family which
+would may produce an error, since it may terminate the R session.
+
+It is thin a wrapper for \code{systemfonts::font_info()}.
+
+When a font 'fails' it causes an error that can be reviewed with argument
+\code{debug=TRUE}. The error is usually this format:
+
+\code{"Failed to open font file (/font/path/family.ttf) with freetype error 6"}
+
+The error originates from the freetype API, and means the file is not
+usable by that API. It sometimes happens when a font file has a newer
+format than is recognized by the freetype API.
 }
 \examples{
 check_systemfonts_family(c("Noto Sans Syriac", "Skia", "PingFang TC", "Arial"))
 
 check_systemfonts_family(c("Arial", "Arial"))
+
+xpaths <- subset_systemfonts(grepl("Helvetica", family), trim_path=FALSE)$path
+check_systemfonts_family(xpaths[1])
 
 }
 \seealso{

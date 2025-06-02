@@ -1,19 +1,8 @@
 # TODO for venndir
 
-## 25may2025
+## 02jun2025
 
 * Add hexsticker.
-* Consider temporary port of `blend_colors()` until colorjam is on CRAN.
-* Consider showing optional overlap label for overlap sections,
-e.g. assigning LETTERS to each overlap. Idea from DTheofilatos.
-* DONE. Consider adding legend to `textvenn()` as a formal argument.
-* DONE. Hide singlets as needed in `textvenn()`, consistent with `venndir()`.
-* Consider method to customize item label positions.
-
-   * Current idea: store item x,y coordinates in `label_df` and
-   re-use when already pre-defined. It would allow manual adjustment
-   as a stopgap option.
-
 * Prep for Bioconductor
 
    * Minimize dependencies. Current heavy: marquee, data.table, colorjam
@@ -21,7 +10,32 @@ e.g. assigning LETTERS to each overlap. Idea from DTheofilatos.
    * Consider remove or refactor `shrink_df()` the only need for data.table.
    * Run checks, remove all warnings
 
-* Consider custom segment color. Too difficult to see currently.
+* Consider new `show_labels` options
+
+   * "T" for Total count per group, Dimitris for example used "Set A (1,234)",
+   it would be required outside the Venn diagram by definition.
+   * "J" for Jaccard overlap?
+   * "Z" for directional z-score? For example: `(agree - disagree)/sqrt(n)`
+
+## 25may2025
+
+* Consider temporary port of `blend_colors()` until colorjam is on CRAN.
+* Consider showing optional overlap label for overlap sections,
+e.g. assigning LETTERS to each overlap. Idea from DTheofilatos.
+* DONE. Consider adding legend to `textvenn()` as a formal argument.
+* DONE. Hide singlets as needed in `textvenn()`, consistent with `venndir()`.
+* PARTIAL, made it darker. Consider custom segment color. Difficult to see.
+* DONE. Consider reviewing polygon outside label placement.
+
+   * DONE. Add "snap_y_fraction" to snap Y-values for labels within threshold.
+   * DONE. Update the "adj" method to apply fractional adj for angular segments.
+
+* Consider option in future to re-array outside labels.
+* Consider method to customize item label positions.
+
+   * Current idea: store item x,y coordinates in `label_df` and
+   re-use when already pre-defined. It would allow manual adjustment
+   as a stopgap option.
 
 ## Non-essential 25may2025
 
@@ -106,9 +120,8 @@ seems specific to "sans" font, perhaps systemfonts?
 
 ## 12apr2025
 
-* Signed labeling: Hide concordance/agreement for singlets,
+* DONE. Signed labeling: Hide concordance/agreement for singlets,
 improve method to curate signs.
-
 * DONE. Require marquee>=1.0.0 in order to avoid the rare R crash on MacOS when
 using fonts whose font file path includes a space.
 * MOSTLY COMPLETE. Consider transitioning all text grobs to use types:
@@ -121,12 +134,10 @@ using fonts whose font file path includes a space.
 * DONE. Consider wrapper for `marquee::marquee_grob()` as drop-in
 replacement for `grid::textGrob()`, specifically to use with
 `gridExtra::tableGrob()`
-* Migrate item text rendering to permit marquee, deprecating gridtext.
+* PARTIAL. Migrate item text rendering to permit marquee, deprecating gridtext.
 
 ## 04apr2025
 
-* Consider new `show_labels` option "T" for Total count per group,
-Dimitris for example used "Set A (1,234)"
 * DONE. Consider dependency `marquee(>=1.0.0)`
 
    * It requires `freetype2` (libfreetype) which may not be available

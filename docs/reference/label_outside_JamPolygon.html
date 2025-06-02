@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,15 +47,17 @@
 <span>  <span class="va">jp</span>,</span>
 <span>  which_jp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  buffer <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  buffer <span class="op">=</span> <span class="op">-</span><span class="fl">0.1</span>,</span>
+<span>  distance <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  center_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bbox"</span>, <span class="st">"label"</span><span class="op">)</span>,</span>
 <span>  vector_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"farthest"</span><span class="op">)</span>,</span>
 <span>  segment_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nearest"</span>, <span class="st">"vector"</span><span class="op">)</span>,</span>
-<span>  distance <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  min_degrees <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  relative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  y_snap_percent <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  do_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -82,6 +84,18 @@ the center position. When <code>center=NULL</code> then the center is
 determined using a method defined by <code>center_method</code>.</p></dd>
 
 
+<dt id="arg-buffer">buffer<a class="anchor" aria-label="anchor" href="#arg-buffer"></a></dt>
+<dd><p><code>numeric</code> buffer, default -0.1, inside the polygon
+used to draw a line segment connecting the label to the appropriate
+polygon.</p></dd>
+
+
+<dt id="arg-distance">distance<a class="anchor" aria-label="anchor" href="#arg-distance"></a></dt>
+<dd><p><code>numeric</code> value, default 0.1, indicating the
+distance from the perimiter of <code>jp</code> to place labels.
+This value is the <code>buffer</code> for <code><a href="buffer_JamPolygon.html">buffer_JamPolygon()</a></code>.</p></dd>
+
+
 <dt id="arg-center-method">center_method<a class="anchor" aria-label="anchor" href="#arg-center-method"></a></dt>
 <dd><p><code>character</code> string indicating the method to
 determine the <code>center</code>:</p><ul><li><p><code>"label"</code> uses the mean x,y coordinate
@@ -96,10 +110,47 @@ even when most labels are in one upper or lower section of
 the <code>sp</code> polygons.</p></dd>
 
 
-<dt id="arg-distance">distance<a class="anchor" aria-label="anchor" href="#arg-distance"></a></dt>
-<dd><p><code>numeric</code> value indicating the absolute coordinate
-distance away from the perimiter of <code>jp</code> to place labels.
-This value is the <code>buffer</code> for <code><a href="buffer_JamPolygon.html">buffer_JamPolygon()</a></code>.</p></dd>
+<dt id="arg-min-degrees">min_degrees<a class="anchor" aria-label="anchor" href="#arg-min-degrees"></a></dt>
+<dd><p><code>numeric</code>, default 15, minimum degrees spacing
+to impose between label positions, oriented around the center.
+When there are more labels than can be divided, the threshold
+is automatically lowered proportionally.</p></dd>
+
+
+<dt id="arg-relative">relative<a class="anchor" aria-label="anchor" href="#arg-relative"></a></dt>
+<dd><p><code>logical</code> whether distance and buffer are relative
+to plot dimensions, default TRUE.</p></dd>
+
+
+<dt id="arg-y-snap-percent">y_snap_percent<a class="anchor" aria-label="anchor" href="#arg-y-snap-percent"></a></dt>
+<dd><p><code>numeric</code> percent of the plot dimensions
+used to decide whether to "snap" two labels to the same y-axis value.
+Default 5 means any labels within 5 percent of the plot dimensions
+of one or more other labels will use the mean y-axis value,
+thereby helping align labels by height where appropriate.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p><code>numeric</code> used to set the random seed for reproducibility,
+via <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code>. Default is 123.</p></dd>
+
+
+<dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
+<dd><p><code>logical</code> whether to print detailed debug information.</p></dd>
+
+
+<dt id="arg-do-plot">do_plot<a class="anchor" aria-label="anchor" href="#arg-do-plot"></a></dt>
+<dd><p><code>logical</code> whether to create a plot with the input <code>jp</code>
+and corresponding labels and line segments assigned to <code>which_jp</code>.
+Default is FALSE.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p><code>logical</code> whether to print verbose output.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>additional arguments are ignored.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -135,6 +186,17 @@ This value is the <code>buffer</code> for <code><a href="buffer_JamPolygon.html"
 <code><a href="update_JamPolygon.html">update_JamPolygon</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="venndir.html">venndir</a></span><span class="op">(</span><span class="fu"><a href="make_venn_test.html">make_venn_test</a></span><span class="op">(</span>n_sets<span class="op">=</span><span class="fl">3</span><span class="op">)</span>, do_plot<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">jps</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">@</span><span class="va">jps</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot visual summary</span></span></span>
+<span class="r-in"><span><span class="fu">label_outside_JamPolygon</span><span class="op">(</span><span class="va">jps</span>, do_plot<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="label_outside_JamPolygon-1.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

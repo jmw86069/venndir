@@ -274,9 +274,13 @@ setMethod("show", "Venndir",
       
       ## warnings
       warn_df <- object@metadata$warn_df;
-      nmax_warn <- 4;
+      nmax_warn <- 3;
       if (inherits(warn_df, "data.frame") && nrow(warn_df) > 0) {
-         k <- head(seq_len(nrow(warn_df)), nmax_warn)
+         if (nrow(warn_df) > (nmax_warn + 1)) {
+            k <- head(seq_len(nrow(warn_df)), nmax_warn)
+         } else {
+            k <- seq_len(nrow(warn_df))
+         }
          use_warning_text <- paste0(
             paste0(nrow(warn_df), " overlap", ifelse(nrow(warn_df) > 1, "s", ""),
                " cannot be displayed:"),
@@ -286,9 +290,7 @@ setMethod("show", "Venndir",
          if (nrow(warn_df) > nmax_warn) {
             use_warning_text <- paste0(use_warning_text, "\n",
                paste0("* (", jamba::formatInt(nrow(warn_df) - nmax_warn),
-                  " more warning",
-                  ifelse(nrow(warn_df) > nmax_warn, "s", ""),
-                  ")"))
+                  " more warnings)"))
             #
          }
       } else {
@@ -298,9 +300,10 @@ setMethod("show", "Venndir",
       ## put it together
       summary_v <- c(
          paste0("class: Venndir"),
-         paste0("slots: ", paste(
-            paste0("'", slotNames(object), "'"),
-            collapse=", ")),
+         # paste0("slots: ", paste(
+         #    paste0("'", slotNames(object), "'"),
+         #    collapse=", ")),
+         # sets(3): Set_A, Set_B, Set_C
          paste0("number of sets: ", sets_num),
          paste0("number of polygons: ", #sum(ct_polys),
             "", ct_polys_set, " sets, ", ct_polys_ol, " overlaps")
@@ -326,8 +329,9 @@ setMethod("show", "Venndir",
 )
 
 # if (!isGeneric("metadata")) {
-   setGeneric("metadata", function(x, ...) standardGeneric("metadata"))
+setGeneric("metadata", function(x, ...) standardGeneric("metadata"))
 # }
+
 #' Return metadata for a Venndir object
 #' 
 #' @docType methods
@@ -500,6 +504,13 @@ setMethod("im",
 # if (!isGeneric("warnings")) {
 setGeneric("warnings")
 # }
+
+#' Print warnings in a Venndir object for overlaps which may be hidden.
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
 setMethod("warnings",
    signature=c(...="Venndir"),
    definition=function(...) {
@@ -517,16 +528,37 @@ setMethod("warnings",
          warn_df$venn_counts);
       warn_names <- rep("Venndir overlap not shown.", length(k));
       
-      # one style
-      use_warning_text <- as.list(warn_text);
-      names(use_warning_text) <- warn_names;
-
-      # another style
-      use_warning_text <- as.list(overlap_text);
-      names(use_warning_text) <- warn_df$venn_counts;
+      if (FALSE) {
+         # Warning message:
+         # In "`set_A&set_C`=2" : Venndir overlap not shown.
+         #
+         # as.character(warnings(v))
+         # [1] "`set_A&set_C`=2"
+         use_warning_text <- as.list(warn_text);
+         names(use_warning_text) <- warn_names;
+      } else if (FALSE) {
+         # Warning message:
+         # In "Venndir overlap not shown." : `set_A&set_C`=2
+         #
+         # names(warnings(v))
+         # [1] "`set_A&set_C`=2"
+         use_warning_text <- as.list(warn_names);
+         names(use_warning_text) <- warn_text;
+      } else {
+         # Warning message:
+         # In "set_A&set_C" : 2
+         #
+         # names(warnings(v))
+         # [1] "2"
+         # as.character(warnings(v))
+         # [1] "set_A&set_C"
+         use_warning_text <- as.list(overlap_text);
+         names(use_warning_text) <- warn_df$venn_counts;
+      }
       
-      return(structure(
+      warn_struct <- structure(
          use_warning_text,
-         class="warnings"))
+         class="warnings");
+      return(warn_struct)
    }
 )

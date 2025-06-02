@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,7 +133,6 @@ expansion, such as plot title.</p></li>
 <span class="r-in"><span><span class="co"># default print for Venndir gives a concise summary</span></span></span>
 <span class="r-in"><span><span class="va">v</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class: Venndir</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> slots: 'jps', 'label_df', 'setlist', 'metadata'</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of sets: 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of polygons: 2 sets, 3 overlaps</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> overlap_type: 'concordance'</span>
@@ -153,7 +152,6 @@ expansion, such as plot title.</p></li>
 <span class="r-in"><span><span class="co"># the print includes '1 overlap cannot be displayed'</span></span></span>
 <span class="r-in"><span><span class="va">v3</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class: Venndir</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> slots: 'jps', 'label_df', 'setlist', 'metadata'</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of sets: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of polygons: 3 sets, 7 overlaps</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> overlap_type: 'overlap'</span>
@@ -167,14 +165,16 @@ expansion, such as plot title.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the warnings(v3) also contain the overlaps not displayed</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Warning message:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> In "set_A&amp;set_B" : 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the overlap names can be extracted directly</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "set_A&amp;set_B"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the counts for each overlap are also available</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/warnings.html" class="external-link">warnings</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> numeric(0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -174,7 +174,7 @@ Thus, <code>concordance=0</code> means there are the same number that agree as d
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist_dir</span>, overlap_type<span class="op">=</span><span class="st">"each"</span>,</span>
-<span>   font_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>   font_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
 <span>   main<span class="op">=</span><span class="st">'overlap_type="each"'</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-venndir_each-1.png" alt="Venn diagram showing directional counts, summarized using 'each'." width="100%"></p>
 <p>This option shows the count for each combination.</p>
@@ -422,12 +422,12 @@ Here is a simple example:</p>
 <span>   outerborder.lwd<span class="op">=</span><span class="fl">0</span>,</span>
 <span>   innerborder<span class="op">=</span><span class="st">"white"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-venn_meme_bix-1.png" alt="Venn meme showing three Venn circles, Stats, Computer Science, and Biology, as they relate to Bioinformatics as the intersection of all three." width="100%"></p>
-<p>You can provide a list of vectors, for example this fun example comparing two cars:</p>
+<p>You can provide a list of vectors, for example comparing two cars:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">meme_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>   `Car A`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"leather seats"</span>, <span class="st">"SUV"</span>, <span class="st">"hardtop"</span>, <span class="st">"20mpg"</span><span class="op">)</span>,</span>
-<span>   `Car B`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cloth seats"</span>, <span class="st">"sedan"</span>, <span class="st">"sunroof"</span>, <span class="st">"40mpg"</span><span class="op">)</span>,</span>
-<span>   `Car A&amp;Car B`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"power locks"</span>, <span class="st">"power windows"</span>, <span class="st">"trunk storage"</span><span class="op">)</span><span class="op">)</span></span>
+<span>   `SUV`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"leather seats"</span>, <span class="st">"SUV"</span>, <span class="st">"hardtop"</span>, <span class="st">"20mpg"</span><span class="op">)</span>,</span>
+<span>   `Sedan`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cloth seats"</span>, <span class="st">"sedan"</span>, <span class="st">"sunroof"</span>, <span class="st">"40mpg"</span><span class="op">)</span>,</span>
+<span>   `SUV&amp;Sedan`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"power locks"</span>, <span class="st">"power windows"</span>, <span class="st">"trunk storage"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/venn_meme.html">venn_meme</a></span><span class="op">(</span><span class="va">meme_list</span>,</span>
 <span>   proportional<span class="op">=</span><span class="cn">TRUE</span>,</span>
@@ -436,6 +436,7 @@ Here is a simple example:</p>
 <span>   show_labels<span class="op">=</span><span class="st">"Ni"</span>,</span>
 <span>   set_colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"orange"</span>, <span class="st">"firebrick3"</span><span class="op">)</span>,</span>
 <span>   item_buffer<span class="op">=</span><span class="fl">0.2</span>,</span>
+<span>   segment_distance<span class="op">=</span><span class="fl">0.01</span>,</span>
 <span>   xyratio<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-venn_meme-1.png" alt="Venn meme comparing attributes of two cars, with labels shown in unique and shared sections of the Venn diagram." width="100%"></p>
 </div>

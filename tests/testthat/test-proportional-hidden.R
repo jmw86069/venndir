@@ -22,8 +22,8 @@ test_that("proportional_hidden", {
       show_labels="ncs",
       set_colors=c("firebrick2", "dodgerblue", "#9999AA"))
    testnames <- c("A", "B", "C", "A&B", "A&C", "B&C", "A&B&C")
-   exp_count <- c("inside", "none")[c(1, 1, 1, 2, 1, 1, 1)]
-   # expect "count" column to have "none" in the correct position
+   exp_count <- c("inside", NA)[c(1, 1, 1, 2, 1, 1, 1)]
+   # expect "count" column to have NA in the correct position
    testthat::expect_equal(
       vn@label_df[testnames, "count"],
       exp_count)
@@ -54,9 +54,9 @@ test_that("proportional_hidden", {
       "A.1", "A.-1", "B.1", "B.-1", "C.1", "C.-1",
       "A&B.1 -1", "A&C.1 -1", "A&C.-1 1", "B&C.1 -1", "B&C.-1 1",
       "A&B&C.1 -1 1", "A&B&C.-1 1 -1")
-   exp_count_s <- c("inside", "none")[c(1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   exp_count_s <- c("inside", NA)[c(1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
       2, 1, 1, 1, 1, 1, 1)]
-   # expect "count" column to have "none" in the correct position
+   # expect "count" column to have NA in the correct position
    testthat::expect_equal(
       vns@label_df[testnames_s, "count"],
       exp_count_s)

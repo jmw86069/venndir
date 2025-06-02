@@ -9,7 +9,8 @@ degrees_to_adj(
   top = 90,
   clockwise = FALSE,
   expand = 0,
-  bias_side = 3,
+  do_fractional = TRUE,
+  bias_side = 1,
   bias_height = 1,
   plot_ranges = FALSE,
   ...
@@ -28,6 +29,21 @@ increases in clockwise direction}
 value. For example \code{expand=0.5} will expand the adjust
 value 50\%.}
 
+\item{do_fractional}{\code{logical} whether to adjust fractional
+values along the outer edge, default TRUE.
+When FALSE, it "snaps" the label to either a right angle,
+or exact 45-degree angle relative to the incoming line segment.}
+
+\item{bias_height, bias_side}{\code{numeric} values used only when
+\code{do_fractional=FALSE}, which expands the range of degree angles
+where a label is pushed to a 45-degree angle.
+For example, when \code{bias_side=2}
+the range of degrees on the left and right side are more
+likely to result in labels with 45-degree adjustment.}
+
+\item{plot_ranges}{\code{logical} whether to plot a visual with the
+angular cutoffs which define the adjustment.}
+
 \item{...}{additional arguments are ignored}
 }
 \description{
@@ -39,22 +55,44 @@ for text plotting, which arranges text relative
 to the angle in degrees.
 }
 \examples{
-degrees <- seq(from=1, to=360, by=15);
+degrees <- seq(from=1, to=360, by=10);
 x <- cos(jamba::deg2rad(degrees));
 y <- sin(jamba::deg2rad(degrees));
-adjdf <- degrees_to_adj(degrees);
-adjdf1 <- degrees_to_adj(degrees, bias_side=1, bias_height=1);
+
+adjdfF <- degrees_to_adj(degrees, do_fractional=TRUE);
 plot(x, y,
+   main="Sliding edge adjustment.",
+   pch=20, asp=1,
+   xlim=c(-1.3, 1.3),
+   ylim=c(-1.3, 1.3));
+jamba::drawLabels(txt=seq_along(degrees),
+   x=x, y=y, labelCex=0.8, boxColor="gold",
+   adjX=adjdfF[,1], adjY=adjdfF[,2])
+
+adjdf1 <- degrees_to_adj(degrees, do_fractional=FALSE, bias_side=1);
+plot(x, y,
+   main="Snap to nearest 45-degree angle adjustment.",
    pch=20, asp=1,
    xlim=c(-1.3, 1.3),
    ylim=c(-1.3, 1.3));
 jamba::drawLabels(txt=seq_along(degrees),
    x=x, y=y, labelCex=0.8,
    adjX=adjdf1[,1], adjY=adjdf1[,2])
+
+adjdf <- degrees_to_adj(degrees, bias_side=3, do_fractional=FALSE);
+plot(x, y,
+   main="Snap to 45-degree with custom bias.",
+   pch=20, asp=1,
+   xlim=c(-1.3, 1.3),
+   ylim=c(-1.3, 1.3));
 jamba::drawLabels(txt=seq_along(degrees),
    x=x, y=y, labelCex=0.8, boxColor="gold",
    adjX=adjdf[,1], adjY=adjdf[,2])
+
+adjdf <- degrees_to_adj(degrees, bias_side=3,
+   expand=c(1, 1), do_fractional=FALSE);
 plot(x, y,
+   main="Example using base text()",
    pch=20, asp=1, cex=0.4, col="red",
    xlim=c(-1.3, 1.3),
    ylim=c(-1.3, 1.3));

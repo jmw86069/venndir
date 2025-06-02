@@ -47,6 +47,9 @@ degrees2 <- sample(degrees);
 degrees2
 spread_degrees(degrees2);
 
+degrees3 <- c(0, 5, 10, 15)
+spread_degrees(degrees3, min_degrees=25)
+
 }
 \seealso{
 Other venndir geometry: 

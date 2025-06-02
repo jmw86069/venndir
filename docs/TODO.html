@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,13 @@
 <li><p>Consider showing optional overlap label for overlap sections, e.g. assigning LETTERS to each overlap. Idea from DTheofilatos.</p></li>
 <li><p>DONE. Consider adding legend to <code><a href="reference/textvenn.html">textvenn()</a></code> as a formal argument.</p></li>
 <li><p>DONE. Hide singlets as needed in <code><a href="reference/textvenn.html">textvenn()</a></code>, consistent with <code><a href="reference/venndir.html">venndir()</a></code>.</p></li>
+<li><p>PARTIAL, made it darker. Consider custom segment color. Difficult to see.</p></li>
+<li>
+<p>DONE. Consider reviewing polygon outside label placement.</p>
+<ul><li>DONE. Add “snap_y_fraction” to snap Y-values for labels within threshold.</li>
+<li>DONE. Update the “adj” method to apply fractional adj for angular segments.</li>
+</ul></li>
+<li><p>Consider option in future to re-array outside labels.</p></li>
 <li>
 <p>Consider method to customize item label positions.</p>
 <ul><li>Current idea: store item x,y coordinates in <code>label_df</code> and re-use when already pre-defined. It would allow manual adjustment as a stopgap option.</li>
@@ -56,7 +63,6 @@
 <li>Consider remove or refactor <code><a href="reference/shrink_df.html">shrink_df()</a></code> the only need for data.table.</li>
 <li>Run checks, remove all warnings</li>
 </ul></li>
-<li><p>Consider custom segment color. Too difficult to see currently.</p></li>
 </ul></div>
 <div class="section level2">
 <h2 id="non-essential-25may2025">Non-essential 25may2025<a class="anchor" aria-label="anchor" href="#non-essential-25may2025"></a></h2>

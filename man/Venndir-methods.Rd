@@ -13,6 +13,7 @@
 \alias{overlapdf,Venndir-method}
 \alias{signed_counts,Venndir-method}
 \alias{im,Venndir-method}
+\alias{warnings,Venndir-method}
 \title{Plot Venndir object}
 \usage{
 \S4method{plot}{Venndir,ANY}(x, y, ...)
@@ -36,6 +37,8 @@
 \S4method{signed_counts}{Venndir}(x)
 
 \S4method{im}{Venndir}(x)
+
+\S4method{warnings}{Venndir}(...)
 }
 \value{
 \code{Venndir} object, invisibly.

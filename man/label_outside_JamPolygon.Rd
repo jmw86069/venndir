@@ -8,15 +8,17 @@ label_outside_JamPolygon(
   jp,
   which_jp = NULL,
   center = NULL,
-  buffer = 0.1,
+  buffer = -0.1,
+  distance = 0.1,
   center_method = c("bbox", "label"),
   vector_method = c("label", "farthest"),
   segment_method = c("nearest", "vector"),
-  distance = 0.1,
   min_degrees = 15,
   relative = TRUE,
+  y_snap_percent = 5,
   seed = 123,
   debug = FALSE,
+  do_plot = FALSE,
   verbose = FALSE,
   ...
 )
@@ -32,6 +34,14 @@ all the polygons in \code{jp} will be analyzed in sequence.}
 \item{center}{\code{numeric} vector or matrix with two values indicating
 the center position. When \code{center=NULL} then the center is
 determined using a method defined by \code{center_method}.}
+
+\item{buffer}{\code{numeric} buffer, default -0.1, inside the polygon
+used to draw a line segment connecting the label to the appropriate
+polygon.}
+
+\item{distance}{\code{numeric} value, default 0.1, indicating the
+distance from the perimiter of \code{jp} to place labels.
+This value is the \code{buffer} for \code{buffer_JamPolygon()}.}
 
 \item{center_method}{\code{character} string indicating the method to
 determine the \code{center}:
@@ -49,12 +59,43 @@ is helpful because it ensures labels are extended in all directions
 even when most labels are in one upper or lower section of
 the \code{sp} polygons.}
 
-\item{distance}{\code{numeric} value indicating the absolute coordinate
-distance away from the perimiter of \code{jp} to place labels.
-This value is the \code{buffer} for \code{buffer_JamPolygon()}.}
+\item{min_degrees}{\code{numeric}, default 15, minimum degrees spacing
+to impose between label positions, oriented around the center.
+When there are more labels than can be divided, the threshold
+is automatically lowered proportionally.}
+
+\item{relative}{\code{logical} whether distance and buffer are relative
+to plot dimensions, default TRUE.}
+
+\item{y_snap_percent}{\code{numeric} percent of the plot dimensions
+used to decide whether to "snap" two labels to the same y-axis value.
+Default 5 means any labels within 5 percent of the plot dimensions
+of one or more other labels will use the mean y-axis value,
+thereby helping align labels by height where appropriate.}
+
+\item{seed}{\code{numeric} used to set the random seed for reproducibility,
+via \code{set.seed()}. Default is 123.}
+
+\item{debug}{\code{logical} whether to print detailed debug information.}
+
+\item{do_plot}{\code{logical} whether to create a plot with the input \code{jp}
+and corresponding labels and line segments assigned to \code{which_jp}.
+Default is FALSE.}
+
+\item{verbose}{\code{logical} whether to print verbose output.}
+
+\item{...}{additional arguments are ignored.}
 }
 \description{
 Position labels outside JamPolygon
+}
+\examples{
+v <- venndir(make_venn_test(n_sets=3), do_plot=FALSE)
+jps <- v@jps
+
+# plot visual summary
+label_outside_JamPolygon(jps, do_plot=TRUE)
+
 }
 \seealso{
 Other JamPolygon: 

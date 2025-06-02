@@ -153,7 +153,7 @@ This approach is effective at conveying direction, without too many details.
 
 ```{r venndir_each, fig.alt="Venn diagram showing directional counts, summarized using 'each'."}
 venndir(setlist_dir, overlap_type="each",
-   font_cex=c(1.5, 1.5, 1),
+   font_cex=c(1.5, 1.5, 0.8),
    main='overlap_type="each"')
 ```
 
@@ -441,14 +441,13 @@ venn_meme(bix,
    innerborder="white")
 ```
 
-You can provide a list of vectors, for example this fun example
-comparing two cars:
+You can provide a list of vectors, for example comparing two cars:
 
 ```{r venn_meme, fig.alt="Venn meme comparing attributes of two cars, with labels shown in unique and shared sections of the Venn diagram."}
 meme_list <- list(
-   `Car A`=c("leather seats", "SUV", "hardtop", "20mpg"),
-   `Car B`=c("cloth seats", "sedan", "sunroof", "40mpg"),
-   `Car A&Car B`=c("power locks", "power windows", "trunk storage"))
+   `SUV`=c("leather seats", "SUV", "hardtop", "20mpg"),
+   `Sedan`=c("cloth seats", "sedan", "sunroof", "40mpg"),
+   `SUV&Sedan`=c("power locks", "power windows", "trunk storage"))
 
 venn_meme(meme_list,
    proportional=TRUE,
@@ -457,6 +456,7 @@ venn_meme(meme_list,
    show_labels="Ni",
    set_colors=c("orange", "firebrick3"),
    item_buffer=0.2,
+   segment_distance=0.01,
    xyratio=2)
 ```
 

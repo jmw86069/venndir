@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.53.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,8 @@
 <span>  top <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  clockwise <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  expand <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  bias_side <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  do_fractional <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bias_side <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bias_height <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  plot_ranges <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -79,6 +80,27 @@ value. For example <code>expand=0.5</code> will expand the adjust
 value 50%.</p></dd>
 
 
+<dt id="arg-do-fractional">do_fractional<a class="anchor" aria-label="anchor" href="#arg-do-fractional"></a></dt>
+<dd><p><code>logical</code> whether to adjust fractional
+values along the outer edge, default TRUE.
+When FALSE, it "snaps" the label to either a right angle,
+or exact 45-degree angle relative to the incoming line segment.</p></dd>
+
+
+<dt id="arg-bias-height-bias-side">bias_height, bias_side<a class="anchor" aria-label="anchor" href="#arg-bias-height-bias-side"></a></dt>
+<dd><p><code>numeric</code> values used only when
+<code>do_fractional=FALSE</code>, which expands the range of degree angles
+where a label is pushed to a 45-degree angle.
+For example, when <code>bias_side=2</code>
+the range of degrees on the left and right side are more
+likely to result in labels with 45-degree adjustment.</p></dd>
+
+
+<dt id="arg-plot-ranges">plot_ranges<a class="anchor" aria-label="anchor" href="#arg-plot-ranges"></a></dt>
+<dd><p><code>logical</code> whether to plot a visual with the
+angular cutoffs which define the adjustment.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments are ignored</p></dd>
 
@@ -103,23 +125,47 @@ to the angle in degrees.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">degrees</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from<span class="op">=</span><span class="fl">1</span>, to<span class="op">=</span><span class="fl">360</span>, by<span class="op">=</span><span class="fl">15</span><span class="op">)</span>;</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">degrees</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from<span class="op">=</span><span class="fl">1</span>, to<span class="op">=</span><span class="fl">360</span>, by<span class="op">=</span><span class="fl">10</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/deg2rad.html" class="external-link">deg2rad</a></span><span class="op">(</span><span class="va">degrees</span><span class="op">)</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/deg2rad.html" class="external-link">deg2rad</a></span><span class="op">(</span><span class="va">degrees</span><span class="op">)</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="va">adjdf</span> <span class="op">&lt;-</span> <span class="fu">degrees_to_adj</span><span class="op">(</span><span class="va">degrees</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="va">adjdf1</span> <span class="op">&lt;-</span> <span class="fu">degrees_to_adj</span><span class="op">(</span><span class="va">degrees</span>, bias_side<span class="op">=</span><span class="fl">1</span>, bias_height<span class="op">=</span><span class="fl">1</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">adjdfF</span> <span class="op">&lt;-</span> <span class="fu">degrees_to_adj</span><span class="op">(</span><span class="va">degrees</span>, do_fractional<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>,</span></span>
+<span class="r-in"><span>   main<span class="op">=</span><span class="st">"Sliding edge adjustment."</span>,</span></span>
+<span class="r-in"><span>   pch<span class="op">=</span><span class="fl">20</span>, asp<span class="op">=</span><span class="fl">1</span>,</span></span>
+<span class="r-in"><span>   xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/drawLabels.html" class="external-link">drawLabels</a></span><span class="op">(</span>txt<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">degrees</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, labelCex<span class="op">=</span><span class="fl">0.8</span>, boxColor<span class="op">=</span><span class="st">"gold"</span>,</span></span>
+<span class="r-in"><span>   adjX<span class="op">=</span><span class="va">adjdfF</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, adjY<span class="op">=</span><span class="va">adjdfF</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="degrees_to_adj-1.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">adjdf1</span> <span class="op">&lt;-</span> <span class="fu">degrees_to_adj</span><span class="op">(</span><span class="va">degrees</span>, do_fractional<span class="op">=</span><span class="cn">FALSE</span>, bias_side<span class="op">=</span><span class="fl">1</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>,</span></span>
+<span class="r-in"><span>   main<span class="op">=</span><span class="st">"Snap to nearest 45-degree angle adjustment."</span>,</span></span>
 <span class="r-in"><span>   pch<span class="op">=</span><span class="fl">20</span>, asp<span class="op">=</span><span class="fl">1</span>,</span></span>
 <span class="r-in"><span>   xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/drawLabels.html" class="external-link">drawLabels</a></span><span class="op">(</span>txt<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">degrees</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, labelCex<span class="op">=</span><span class="fl">0.8</span>,</span></span>
 <span class="r-in"><span>   adjX<span class="op">=</span><span class="va">adjdf1</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, adjY<span class="op">=</span><span class="va">adjdf1</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="degrees_to_adj-2.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">adjdf</span> <span class="op">&lt;-</span> <span class="fu">degrees_to_adj</span><span class="op">(</span><span class="va">degrees</span>, bias_side<span class="op">=</span><span class="fl">3</span>, do_fractional<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>,</span></span>
+<span class="r-in"><span>   main<span class="op">=</span><span class="st">"Snap to 45-degree with custom bias."</span>,</span></span>
+<span class="r-in"><span>   pch<span class="op">=</span><span class="fl">20</span>, asp<span class="op">=</span><span class="fl">1</span>,</span></span>
+<span class="r-in"><span>   xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu">jamba</span><span class="fu">::</span><span class="fu"><a href="https://jmw86069.github.io/jamba/reference/drawLabels.html" class="external-link">drawLabels</a></span><span class="op">(</span>txt<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">degrees</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, labelCex<span class="op">=</span><span class="fl">0.8</span>, boxColor<span class="op">=</span><span class="st">"gold"</span>,</span></span>
 <span class="r-in"><span>   adjX<span class="op">=</span><span class="va">adjdf</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, adjY<span class="op">=</span><span class="va">adjdf</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="degrees_to_adj-1.png" alt="" width="768" height="768"></span>
+<span class="r-plt img"><img src="degrees_to_adj-3.png" alt="" width="768" height="768"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">adjdf</span> <span class="op">&lt;-</span> <span class="fu">degrees_to_adj</span><span class="op">(</span><span class="va">degrees</span>, bias_side<span class="op">=</span><span class="fl">3</span>,</span></span>
+<span class="r-in"><span>   expand<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, do_fractional<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>;</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>,</span></span>
+<span class="r-in"><span>   main<span class="op">=</span><span class="st">"Example using base text()"</span>,</span></span>
 <span class="r-in"><span>   pch<span class="op">=</span><span class="fl">20</span>, asp<span class="op">=</span><span class="fl">1</span>, cex<span class="op">=</span><span class="fl">0.4</span>, col<span class="op">=</span><span class="st">"red"</span>,</span></span>
 <span class="r-in"><span>   xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span>;</span></span>
@@ -128,7 +174,7 @@ to the angle in degrees.</p>
 <span class="r-in"><span>      x<span class="op">=</span><span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, y<span class="op">=</span><span class="va">y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>      adj<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">adjdf</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-plt img"><img src="degrees_to_adj-2.png" alt="" width="768" height="768"></span>
+<span class="r-plt img"><img src="degrees_to_adj-4.png" alt="" width="768" height="768"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

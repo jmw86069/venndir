@@ -862,15 +862,24 @@ assemble_venndir_label <- function
       # jamba::printDebug("gw (pt):");print(grid::convertUnit(gw, "pt"));# debug
       x1 <- x;
       y1 <- y;
-      if ("left" %in% just) {
-         x <- x + gw * 0.5;
-      } else if ("right" %in% just) {
-         x <- x - gw * 0.5;
+      # 0.0.54.900 - handle numeric just
+      if (inherits(just, "list")) {
+         just <- unlist(unname(just));
       }
-      if ("top" %in% just) {
-         y <- y - gh * 0.5;
-      } else if ("bottom" %in% just) {
-         y <- y + gh * 0.5;
+      if (is.numeric(unlist(just))) {
+         x <- x - gw * (just[1] - 0.5);
+         y <- y - gh * (just[2] - 0.5);
+      } else {
+         if ("left" %in% just) {
+            x <- x + gw * 0.5;
+         } else if ("right" %in% just) {
+            x <- x - gw * 0.5;
+         }
+         if ("top" %in% just) {
+            y <- y - gh * 0.5;
+         } else if ("bottom" %in% just) {
+            y <- y + gh * 0.5;
+         }
       }
       xy_vp <- grid::viewport(x=x, y=y)
       

@@ -220,6 +220,12 @@ render_venndir <- function
    if ("list" %in% class(venndir_output) && "vo" %in% names(venndir_output)) {
       venndir_output <- venndir_output$vo;
    }
+   
+   # ignore debug="gridtext" when gridtext is not installed
+   if ("gridtext" %in% debug &&
+         !requireNamespace("gridtext", quietly=TRUE)) {
+      debug <- setdiff(debug, "gridtext");
+   }
    metadata <- list();
    if ("Venndir" %in% class(venndir_output)) {
       venn_jp <- venndir_output@jps;
@@ -368,6 +374,11 @@ render_venndir <- function
    # show_items <- head(show_items, 1);
    item_style <- match.arg(item_style,
       choices=c("default", "marquee", "text", "gridtext"));
+   # if 'gridtext' is chosen but not installed, use 'default' as fallback
+   if ("gridtext" %in% item_style &&
+         !requireNamespace("gridtext", quietly=TRUE)) {
+      item_style <- "default";
+   }
 
    # validate other args
    if (length(expand_fraction) == 0) {
@@ -1457,17 +1468,23 @@ render_venndir <- function
          # jamba::printDebug("head(gdf, 10):");print(head(gdf, 10));# debug
          
          # split gdf rows by groups of labels
+         # 0.0.54.900 - use ref_polygon for grouping labels
+         # note that if overlap label is ever shown itself, we cannot combine
          new_childNames <- paste0(
-            gdf$overlap_set, ":",
+            # gdf$overlap_set, ":",
+            gdf$ref_polygon, ":",
             gdf$type, ":",
             gsub("(count|overlap)_", "\\1:", gdf$location), ":",
             gdf$roworder, ":",
             gdf$label_df_rowname);
+         # 0.0.54.900 - use ref_polygon for grouping labels
          new_childNames <- paste0(
-            gdf$overlap_set, ":",
+            # gdf$overlap_set, ":",
+            gdf$ref_polygon, ":",
             gsub("^.*(count|overlap)_", "", gdf$location), ":")
          gdf_list <- split(gdf,
             factor(new_childNames, levels=unique(new_childNames)));
+         # jamba::printDebug("gdf_list:");print(gdf_list);# debug
          # default args
          default_fontcolors <- eval(formals(assemble_venndir_label)$fontcolors)
          default_fontsizes <- eval(formals(assemble_venndir_label)$fontsizes)
@@ -1524,12 +1541,15 @@ render_venndir <- function
                   line_degree <- jamba::rad2deg(
                      atan2(y=diff(isegment_df$y[1+c(1,0)]),
                         x=diff(isegment_df$x[1+c(1,0)])))
-                  use_adj <- degrees_to_adj(line_degree);
-                  use_just <- as.character(use_adj);
-                  use_just[1] <- ifelse(use_adj[1] == 0.5, "center",
-                     ifelse(use_adj[1] == 1, "right", "left"))
-                  use_just[2] <- ifelse(use_adj[2] == 0.5, "center",
-                     ifelse(use_adj[2] == 1, "top", "bottom"))
+                  use_adj <- degrees_to_adj(line_degree, ...);
+                  use_just <- as.vector(use_adj[1, ]);
+                  if (FALSE) {
+                     use_just <- as.character(use_adj);
+                     use_just[1] <- ifelse(use_adj[1] == 0.5, "center",
+                        ifelse(use_adj[1] == 1, "right", "left"))
+                     use_just[2] <- ifelse(use_adj[2] == 0.5, "center",
+                        ifelse(use_adj[2] == 1, "top", "bottom"))
+                  }
                }
                
             }
@@ -1593,6 +1613,11 @@ render_venndir <- function
          y1=segment_df2$y,
          color=segment_df1$color,
          lwd=ifelse(segment_df1$lwd == 0, 1, segment_df1$lwd)));
+      
+      # make segment somewhat darker
+      segment_wide$color <- jamba::makeColorDarker(segment_wide$color,
+         darkFactor=1.2)
+      
       # create segments grob
       segments_grob <- grid::segmentsGrob(
          x0=adjx(segment_wide$x0),
@@ -1601,7 +1626,7 @@ render_venndir <- function
          y1=adjy(segment_wide$y1),
          default.units="snpc",
          gp=grid::gpar(col=segment_wide$color,
-            lwd=segment_wide$lwd),
+            lwd=ceiling(segment_wide$lwd)),
          vp=jp_viewport);
       ## do not draw here
       # grid::grid.draw(segments_grob);

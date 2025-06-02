@@ -42,7 +42,7 @@ venndir(
   sign_count_delim = " ",
   padding = c(3, 2),
   r = 2,
-  center = c(0, -0.15),
+  center = c(0, 0),
   segment_distance = 0.05,
   segment_buffer = -0.1,
   show_segments = TRUE,
@@ -311,7 +311,7 @@ rectangle corners for labels. Only visible when \code{label_preset}
 includes a background fill ("lite", "shaded", "fill"), or "box".}
 
 \item{center}{\code{numeric} coordinates relative to the plot bounding box,
-default \code{c(0, -0.15)} uses a center point in the middle (x=0)
+default \code{c(0, 0)} uses a center point in the middle (x=0)
 and slightly down (y=-0.15) from the plot center.
 It is used to place labels outside the diagram.
 In short, labels are placed by drawing a line from this center point,

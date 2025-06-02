@@ -16,6 +16,13 @@
 #' 
 #' @family venndir geometry
 #' 
+#' @param degrees `numeric` vector of angles in degrees, expected
+#'    to range from `0` to `360`. Values are fit to the range `c(0, 360)`
+#'    using `degrees %% 360`.
+#' @param min_degrees `numeric` indicating the minimum angle in degrees
+#'    to allow between adjacent angles.
+#' @param ... additional arguments are ignored.
+#' 
 #' @examples
 #' degrees <- c(5, 10, 15, 100, 105, 110, 200, 300, 358);
 #' degrees
@@ -25,12 +32,8 @@
 #' degrees2
 #' spread_degrees(degrees2);
 #' 
-#' @param degrees `numeric` vector of angles in degrees, expected
-#'    to range from `0` to `360`. Values are fit to the range `c(0, 360)`
-#'    using `degrees %% 360`.
-#' @param min_degrees `numeric` indicating the minimum angle in degrees
-#'    to allow between adjacent angles.
-#' @param ... additional arguments are ignored.
+#' degrees3 <- c(0, 5, 10, 15)
+#' spread_degrees(degrees3, min_degrees=25)
 #' 
 #' @export
 spread_degrees <- function
@@ -104,7 +107,10 @@ spread_degrees <- function
    
    # if all angles are less than min_degrees, evenly space all angles
    #ddf$abs_diff <- ddf$diff %% 360;
-   if (all(abs(ddf$diff) < (min_degrees / 1.01))) {
+   # if (all(abs(ddf$diff) < (min_degrees / 1.01))) {
+   if (all((ddf$diff %% 360) < (min_degrees / 1.01))) {
+      # jamba::printDebug("ddf:");print(ddf);# debug
+      # return(ddf);
       if (verbose) {
          jamba::printDebug("spread_degrees(): ",
             "spreading all angles equally");
@@ -517,6 +523,15 @@ mean_degree_arc <- function
 #' 
 #' @family venndir geometry
 #' 
+#' @param x `numeric` angles in degrees
+#' @param add `logical` whether to add to an existing plot, default FALSE.
+#' @param col `character` R color to use for arrows, default 'darkorange'.
+#' @param lwd `numeric` line width, default 2.
+#' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' display_angles(jamba::nameVector(c(10, 45, 90, 225)))
+#' 
 #' @export
 display_angles <- function
 (x,
@@ -599,25 +614,59 @@ display_angles <- function
 #' @param expand `numeric` value intended to expand the adjust
 #'    value. For example `expand=0.5` will expand the adjust
 #'    value 50%.
+#' @param do_fractional `logical` whether to adjust fractional
+#'    values along the outer edge, default TRUE.
+#'    When FALSE, it "snaps" the label to either a right angle,
+#'    or exact 45-degree angle relative to the incoming line segment.
+#' @param bias_height,bias_side `numeric` values used only when
+#'    `do_fractional=FALSE`, which expands the range of degree angles
+#'    where a label is pushed to a 45-degree angle.
+#'    For example, when `bias_side=2`
+#'    the range of degrees on the left and right side are more
+#'    likely to result in labels with 45-degree adjustment.
+#' @param plot_ranges `logical` whether to plot a visual with the
+#'    angular cutoffs which define the adjustment.
 #' @param ... additional arguments are ignored
 #' 
 #' @examples
-#' degrees <- seq(from=1, to=360, by=15);
+#' degrees <- seq(from=1, to=360, by=10);
 #' x <- cos(jamba::deg2rad(degrees));
 #' y <- sin(jamba::deg2rad(degrees));
-#' adjdf <- degrees_to_adj(degrees);
-#' adjdf1 <- degrees_to_adj(degrees, bias_side=1, bias_height=1);
+#' 
+#' adjdfF <- degrees_to_adj(degrees, do_fractional=TRUE);
 #' plot(x, y,
+#'    main="Sliding edge adjustment.",
+#'    pch=20, asp=1,
+#'    xlim=c(-1.3, 1.3),
+#'    ylim=c(-1.3, 1.3));
+#' jamba::drawLabels(txt=seq_along(degrees),
+#'    x=x, y=y, labelCex=0.8, boxColor="gold",
+#'    adjX=adjdfF[,1], adjY=adjdfF[,2])
+#' 
+#' adjdf1 <- degrees_to_adj(degrees, do_fractional=FALSE, bias_side=1);
+#' plot(x, y,
+#'    main="Snap to nearest 45-degree angle adjustment.",
 #'    pch=20, asp=1,
 #'    xlim=c(-1.3, 1.3),
 #'    ylim=c(-1.3, 1.3));
 #' jamba::drawLabels(txt=seq_along(degrees),
 #'    x=x, y=y, labelCex=0.8,
 #'    adjX=adjdf1[,1], adjY=adjdf1[,2])
+#' 
+#' adjdf <- degrees_to_adj(degrees, bias_side=3, do_fractional=FALSE);
+#' plot(x, y,
+#'    main="Snap to 45-degree with custom bias.",
+#'    pch=20, asp=1,
+#'    xlim=c(-1.3, 1.3),
+#'    ylim=c(-1.3, 1.3));
 #' jamba::drawLabels(txt=seq_along(degrees),
 #'    x=x, y=y, labelCex=0.8, boxColor="gold",
 #'    adjX=adjdf[,1], adjY=adjdf[,2])
+#' 
+#' adjdf <- degrees_to_adj(degrees, bias_side=3,
+#'    expand=c(1, 1), do_fractional=FALSE);
 #' plot(x, y,
+#'    main="Example using base text()",
 #'    pch=20, asp=1, cex=0.4, col="red",
 #'    xlim=c(-1.3, 1.3),
 #'    ylim=c(-1.3, 1.3));
@@ -633,7 +682,8 @@ degrees_to_adj <- function
  top=90,
  clockwise=FALSE,
  expand=0,
- bias_side=3,
+ do_fractional=TRUE,
+ bias_side=1,
  bias_height=1,
  plot_ranges=FALSE,
  ...)
@@ -650,14 +700,23 @@ degrees_to_adj <- function
       degrees <- -degrees1;
    }
    degrees <- degrees %% 360;
-   degreebreaks <- seq(from=-45/2,
-      to=360 + 45/2,
-      by=45);
+   if (do_fractional) {
+      degreebreaks <- seq(from=0,
+         to=360 + 45,
+         by=45);
+      bias_height <- 1;
+      bias_side <- 1;
+   } else {
+      degreebreaks <- seq(from=-45/2,
+         to=360 + 45/2,
+         by=45);
+   }
+   # jamba::printDebug("degreebreaks:");print(degreebreaks);# debug
    if (bias_side != 1 || bias_height != 1) {
-      lr <- c(3,4, 7, 8);
-      tb <- c(1,2, 5,6, 9, 10);
-      bias_side <- 3;
-      bias_height <- 3;
+      lr <- c(3,4, 7,8);
+      tb <- c(1,2, 5,6, 9,10);
+      # bias_side <- 3;
+      # bias_height <- 3;
       xbreaks <- cos(jamba::deg2rad(degreebreaks));
       ybreaks <- sin(jamba::deg2rad(degreebreaks));
       xbreaks[tb] <- cos(jamba::deg2rad(degreebreaks[tb])) * bias_height;
@@ -671,6 +730,10 @@ degrees_to_adj <- function
          display_angles(unique(degreebreaks_out), col="darkorange", lwd=5, add=FALSE);
       }
       degreebreaks <- degreebreaks_out;
+   } else {
+      if (plot_ranges) {
+         display_angles(unique(degreebreaks), col="darkorange", lwd=5, add=FALSE);
+      }
    }
    if (1 == 2) {
       degreecuts <- jamba::nameVector(
@@ -682,27 +745,68 @@ degrees_to_adj <- function
       display_angles(degreecuts, add=TRUE, col="transparent")
    }
    
-   degreecut <- cut(degrees,
-      degreebreaks,
-      labels=c("right", "topright", "top",
-         "topleft", "left", "bottomleft",
-         "bottom", "bottomright", "right"));
-   degreeset <- as.character(degreecut);
-   adjx <- ifelse(grepl("right", degreeset),
-      0,
-      ifelse(grepl("left", degreeset),
-         1,
-         0.5));
+   if (do_fractional) {
+      degreecut <- cut(degrees,
+         degreebreaks,
+         labels=c("right", "top", "top",
+            "left", "left", "bottom",
+            "bottom", "right", "right"));
+      degreeset <- as.character(degreecut);
+      rads <- jamba::deg2rad(degrees);
+      names(rads) <- round(degrees)
+      adjx <- 1 - round(digits=2, jamba::noiseFloor(
+         cos(rads) / sqrt(1/2),
+         minimum=-1, ceiling=1) / 2 + 0.5);
+      adjy <- 1 - round(digits=2, jamba::noiseFloor(
+         sin(rads) / sqrt(1/2),
+         minimum=-1, ceiling=1) / 2 + 0.5);
+      adjx1 <- ifelse(grepl("right", degreeset),
+         0,
+         ifelse(grepl("left", degreeset),
+            1,
+            0.5));
+      adjy1 <- ifelse(grepl("top", degreeset),
+         0,
+         ifelse(grepl("bottom", degreeset),
+            1,
+            0.5));
+      adj_df <- data.frame(check.names=FALSE,
+         row.names=as.character(seq_along(degrees)),
+         degrees=degrees,
+         degreeset=degreeset,
+         adjx=adjx,
+         adjy=adjy,
+         adjx1=adjx1,
+         adjy1=adjy1)
+      # print(adj_df);# debug
+      # expand <- c(0, 0);
+      # adjx <- adjx1;
+      # adjy <- adjy1;
+   } else {
+      degreecut <- cut(degrees,
+         degreebreaks,
+         labels=c("right", "topright", "top",
+            "topleft", "left", "bottomleft",
+            "bottom", "bottomright", "right"));
+      degreeset <- as.character(degreecut);
+      adjx <- ifelse(grepl("right", degreeset),
+         0,
+         ifelse(grepl("left", degreeset),
+            1,
+            0.5));
+      adjy <- ifelse(grepl("top", degreeset),
+         0,
+         ifelse(grepl("bottom", degreeset),
+            1,
+            0.5));
+   }
+   # optionally expand beyond the point
    if (expand[1] != 0) {
       adjx <- (adjx - 0.5) * (1 + expand[1]) + 0.5;
    }
-   adjy <- ifelse(grepl("top", degreeset),
-      0,
-      ifelse(grepl("bottom", degreeset),
-         1,
-         0.5));
    if (expand[2] != 0) {
       adjy <- (adjy - 0.5) * (1 + expand[2]) + 0.5;
    }
-   data.frame(adjx=adjx, adjy=adjy);
+   # data.frame(adjx=adjx, adjy=adjy, row.names="1");
+   data.frame(adjx=adjx, adjy=adjy, row.names=seq_len(length(adjx)));
 }

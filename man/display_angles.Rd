@@ -6,8 +6,23 @@
 \usage{
 display_angles(x, add = FALSE, col = "darkorange", lwd = 2, ...)
 }
+\arguments{
+\item{x}{\code{numeric} angles in degrees}
+
+\item{add}{\code{logical} whether to add to an existing plot, default FALSE.}
+
+\item{col}{\code{character} R color to use for arrows, default 'darkorange'.}
+
+\item{lwd}{\code{numeric} line width, default 2.}
+
+\item{...}{additional arguments are ignored.}
+}
 \description{
 Display degree angles around a unit circle
+}
+\examples{
+display_angles(jamba::nameVector(c(10, 45, 90, 225)))
+
 }
 \seealso{
 Other venndir geometry: 

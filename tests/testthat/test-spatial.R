@@ -6,7 +6,7 @@ test_that("degrees_to_adj", {
    df <- data.frame(adjx=c(0, 0.5, 1, 0.5, 0),
       adjy=c(0.5, 0, 0.5, 1, 0.5));
    expect_equal(
-      degrees_to_adj(c(0, 90, 180, 270, 361)),
+      degrees_to_adj(c(0, 90, 180, 270, 361), do_fractional=FALSE),
       df)
 })
 

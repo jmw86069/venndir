@@ -268,7 +268,7 @@
 #'    rectangle corners for labels. Only visible when `label_preset`
 #'    includes a background fill ("lite", "shaded", "fill"), or "box".
 #' @param center `numeric` coordinates relative to the plot bounding box,
-#'    default `c(0, -0.15)` uses a center point in the middle (x=0)
+#'    default `c(0, 0)` uses a center point in the middle (x=0)
 #'    and slightly down (y=-0.15) from the plot center.
 #'    It is used to place labels outside the diagram.
 #'    In short, labels are placed by drawing a line from this center point,
@@ -411,7 +411,7 @@ venndir <- function
  sign_count_delim=" ",
  padding=c(3, 2),
  r=2,
- center=c(0, -0.15),
+ center=c(0, 0),
  segment_distance=0.05,
  segment_buffer=-0.1,
  show_segments=TRUE,
@@ -696,7 +696,11 @@ venndir <- function
       length(unique(jamba::rmNA(ix1))) == 0
    }) * 1;
    whichset <- sapply(unique(venn_jps@polygons$label), function(ilab){
-      ilabdf <- subset(venn_jps@polygons, grepl(paste0("(^|&)", ilab, "($|&)"), label))
+      ilabdf <- subset(venn_jps@polygons,
+         # non-overlap single set can point to overlap if necessary
+         (!grepl("&", ilab) & grepl(paste0("(^|&)", ilab, "($|&)"), label)) |
+         # however a multi-set overlap must only point to itself
+         ilab == name)
       if (nrow(ilabdf) == 0) {
          return(NA)
       }
@@ -746,45 +750,133 @@ venndir <- function
          jamba::printDebug("venndir(): ",
             "started label_outside_JamPolygon()");
       }
-      # ploxy is named by names(use_whichset) - which are non-NA polygon rows
+      # ploxy is named by names(get_outside_labels)
+      # contains outer label position, inner buffer line segment position
+      get_outside_labels1 <- which(lengths(venn_jps@polygons$x) > 0);
+      get_outside_labels <- (match(venn_jps@polygons$ref_polygon,
+         names(venn_jps)))[get_outside_labels1];
+      names(get_outside_labels) <- rownames(venn_jps@polygons)[
+         get_outside_labels1];
+      # jamba::printDebug("get_outside_labels:");print(get_outside_labels);# debug
+      
+      # special case correction for center
+      if (length(sets) == 2 &&
+            # any(c(TRUE, FALSE) %in% proportional) &&
+            all(center == 0)) {
+         center <- c(0, -0.2);
+      }
+      
+      use_jps <- venn_jps[get_outside_labels];
+      names(use_jps) <- names(get_outside_labels);
       ploxy <- label_outside_JamPolygon(
-         # jp=venn_jps[whichset, ],
-         jp=venn_jps[use_whichset, ],
-         which_jp=seq_along(use_whichset),
+         # jp=venn_jps[get_outside_labels],
+         jp=use_jps,
          distance=segment_distance,
          center=center,
-         # center_method="label",
+         # center_method="bbox",
          verbose=verbose,
-         buffer=-0.9,
+         # do_plot=TRUE,
+         # buffer=-0.6,
          ...)
-      names(ploxy) <- names(use_whichset);
+      # jamba::printDebug("names(ploxy):");print(names(ploxy));# debug
+      # jamba::printDebug("(ploxy)[c(1, 3, 5)]:");print((ploxy)[c(1, 3, 5)]);# debug
+      kc <- c("name", "venn_name", "label",
+         "label_x", "label_y", "x_label", "y_label",
+         "x_outside", "y_outside",
+         "is_empty", "ref_polygon_num", "ref_polygon")
+      kc1 <- intersect(kc, colnames(venn_jps@polygons))
+      # jamba::printDebug("venn_jps@polygons[, kc1]:");print(venn_jps@polygons[, kc1]);# debug
+      # names(ploxy) <- names(use_whichset);
       if (verbose) {
          jamba::printDebug("venndir(): ",
             "completed label_outside_JamPolygon()");
       }
-      venn_jps@polygons$x_offset <- 0;
-      venn_jps@polygons$y_offset <- 0;
-      # ploxy_match <- match(venn_jps@polygons$label,
-      #    venn_jps@polygons$label[whichset]);
-      ploxy_match <- match(venn_jps@polygons$label, names(ploxy));
-      # jamba::printDebug("whichset:");print(whichset);# debug
-      # jamba::printDebug("ploxy:");print(ploxy);# debug
-      # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
-      # jamba::printDebug("ploxy_match:", ploxy_match);# debug
-      ploxy_label_x <- sapply(ploxy, function(ixy){ixy["border", 1]});
-      ploxy_label_y <- sapply(ploxy, function(ixy){ixy["border", 2]});
-      ploxy_outside_x <- sapply(ploxy, function(ixy){ixy["label", 1]});
-      ploxy_outside_y <- sapply(ploxy, function(ixy){ixy["label", 2]});
-      # jamba::printDebug("ploxy_label_x:", ploxy_label_x);
-      # jamba::printDebug("ploxy_outside_x:", ploxy_outside_x);
+      # Reminder:
+      # label_x,label_y is used by JamPolygon as internal label position
+      # x_label,y_label is not used? it is expected in venndir_label_style()
+      # outside_x,outside_y is the outside label actual coordinate
+      # x_offset,y_offset is the offset from label_x,label_y for outside labels
+      #
+      # could probably add
+      # segment_x,segment_y to prevent having to re-calculate the line segment?
+      venn_jps@polygons$x_offset <- NA_integer_;
+      venn_jps@polygons$y_offset <- NA_integer_;
       
-      # define other label coordinates
-      venn_jps@polygons$x_label <- ploxy_label_x[ploxy_match];
-      venn_jps@polygons$y_label <- ploxy_label_y[ploxy_match];
-      venn_jps@polygons$x_outside <- ploxy_outside_x[ploxy_match];
-      venn_jps@polygons$y_outside <- ploxy_outside_y[ploxy_match];
-      venn_jps@polygons$x_offset <- venn_jps@polygons$x_outside - venn_jps@polygons$x_label;
-      venn_jps@polygons$y_offset <- venn_jps@polygons$y_outside - venn_jps@polygons$y_label;
+      # define outside position
+      # ploxy_match <- match(venn_jps@polygons$label, names(ploxy));
+      ploxy_outside_x <- sapply(ploxy, function(ixy){ixy["label", "x"]});
+      ploxy_outside_y <- sapply(ploxy, function(ixy){ixy["label", "y"]});
+      ploxy_segment_x <- sapply(ploxy, function(ixy){ixy["border", "x"]});
+      ploxy_segment_y <- sapply(ploxy, function(ixy){ixy["border", "y"]});
+      match_outside <- match(names(ploxy), names(venn_jps));
+      # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
+      # jamba::printDebug("names(venn_jps):");print(names(venn_jps));# debug
+      # jamba::printDebug("match_outside:");print(match_outside);# debug
+
+      if (!"x_outside" %in% colnames(venn_jps@polygons)) {
+         venn_jps@polygons$x_outside <- NA_integer_;
+      }
+      if (!"y_outside" %in% colnames(venn_jps@polygons)) {
+         venn_jps@polygons$y_outside <- NA_integer_;
+      }
+      venn_jps@polygons$x_outside[match_outside] <- ploxy_outside_x;
+      venn_jps@polygons$y_outside[match_outside] <- ploxy_outside_y;
+      
+      if (!"segment_x" %in% colnames(venn_jps@polygons)) {
+         venn_jps@polygons$segment_x <- NA_integer_;
+      }
+      if (!"segment_y" %in% colnames(venn_jps@polygons)) {
+         venn_jps@polygons$segment_y <- NA_integer_;
+      }
+      venn_jps@polygons$segment_x[match_outside] <- ploxy_segment_x;
+      venn_jps@polygons$segment_y[match_outside] <- ploxy_segment_y;
+      
+      if (!"x_label" %in% colnames(venn_jps@polygons)) {
+         venn_jps@polygons$x_label <- NA_integer_;
+      }
+      if (!"y_label" %in% colnames(venn_jps@polygons)) {
+         venn_jps@polygons$y_label <- NA_integer_;
+      }
+      venn_jps@polygons$x_label[match_outside] <- ploxy_segment_x;
+      venn_jps@polygons$y_label[match_outside] <- ploxy_segment_y;
+      
+      # re-define inside label position using ref_polygon
+      ref_match <- match(venn_jps@polygons$ref_polygon, venn_jps@polygons$name)
+      # jamba::printDebug("ref_match:");print(ref_match);# debug
+      venn_jps@polygons$label_x <- venn_jps@polygons$label_x[ref_match];
+      venn_jps@polygons$label_y <- venn_jps@polygons$label_y[ref_match];
+
+      # calculate offset by (outside-inside)
+      venn_jps@polygons$x_offset <- venn_jps@polygons$x_outside - venn_jps@polygons$label_x;
+      venn_jps@polygons$y_offset <- venn_jps@polygons$y_outside - venn_jps@polygons$label_y;
+      
+      # I don't think we need any of this junk
+      if (FALSE) {
+         ploxy_match <- match(venn_jps@polygons$ref_polygon, names(ploxy));
+         # jamba::printDebug("whichset:");print(whichset);# debug
+         # jamba::printDebug("ploxy:");print(ploxy);# debug
+         # jamba::printDebug("venn_jps@polygons:");print(venn_jps@polygons);# debug
+         # jamba::printDebug("ploxy_match:");print(ploxy_match);# debug
+         
+         ploxy_label_x <- sapply(ploxy, function(ixy){ixy["border", "x"]});
+         ploxy_label_y <- sapply(ploxy, function(ixy){ixy["border", "y"]});
+         # jamba::printDebug("ploxy_label_x:");print(ploxy_label_x);# debug
+         # jamba::printDebug("ploxy_outside_x:", ploxy_outside_x);# debug
+         
+         # define other label coordinates
+         #
+         venn_jps@polygons$x_label <- ploxy_label_x[venn_jps@polygons$ref_polygon];
+         venn_jps@polygons$y_label <- ploxy_label_y[venn_jps@polygons$ref_polygon];
+         # venn_jps@polygons$x_label <- ploxy_label_x[ploxy_match];
+         # venn_jps@polygons$y_label <- ploxy_label_y[ploxy_match];
+         
+         #
+         venn_jps@polygons$x_outside <- ploxy_outside_x[ploxy_match];
+         venn_jps@polygons$y_outside <- ploxy_outside_y[ploxy_match];
+         # jamba::printDebug("venn_jps@polygons[, kc]:");print(venn_jps@polygons[, kc]);# debug
+         venn_jps@polygons$x_offset <- venn_jps@polygons$x_outside - venn_jps@polygons$x_label;
+         venn_jps@polygons$y_offset <- venn_jps@polygons$y_outside - venn_jps@polygons$y_label;
+      }
       
       # define label positioning relative to the coordinate point
       ## 0.0.47.900 - vjust/hjust no longer used

@@ -178,9 +178,25 @@ subset_systemfonts <- function
 }
 
 
-#' Check systemfonts family for valid freetype access
+#' Check systemfonts family for freetype compatibility
 #' 
-#' Check systemfonts family for valid freetype access
+#' Check systemfonts family for freetype compatibility
+#' 
+#' This function simply checks whether the systemfonts API for freetype
+#' recognizes a font file being valid, given a font family value.
+#' The main purpose is to avoid trying to use a font family which
+#' would may produce an error, since it may terminate the R session.
+#' 
+#' It is thin a wrapper for `systemfonts::font_info()`.
+#' 
+#' When a font 'fails' it causes an error that can be reviewed with argument
+#' `debug=TRUE`. The error is usually this format:
+#' 
+#' `"Failed to open font file (/font/path/family.ttf) with freetype error 6"`
+#' 
+#' The error originates from the freetype API, and means the file is not
+#' usable by that API. It sometimes happens when a font file has a newer
+#' format than is recognized by the freetype API.
 #' 
 #' @family venndir internal
 #'
@@ -188,26 +204,52 @@ subset_systemfonts <- function
 #'    returned by `systemfonts::font_info()`, for each entry provided
 #'    in `family`.
 #' 
-#' @param family `character` vector with font family names
-#' @param ... additional arguments are ignored.
+#' @param family `character` vector with font family names.
+#' @param path `character`, default NULL, with optional file path to
+#'    one or more specific font files. When provided, the 'family' argument
+#'    is ignored.
+#' @param debug `logical` whether to print any error message, default is FALSE.
+#' @param ... additional arguments are passed to `systemfonts::font_info()`,
+#'    which may be useful to specify arguments such as: `italic=TRUE`,
+#'    `weight="bold"`, or `width="condensed"` for example.
+#'    Alternatively, argument `path` can be used to point to a specific
+#'    font file, thereby circumventing family and style.
 #' 
 #' @examples
 #' check_systemfonts_family(c("Noto Sans Syriac", "Skia", "PingFang TC", "Arial"))
 #' 
 #' check_systemfonts_family(c("Arial", "Arial"))
 #' 
+#' xpaths <- subset_systemfonts(grepl("Helvetica", family), trim_path=FALSE)$path
+#' check_systemfonts_family(xpaths[1])
+#' 
 #' @export
 check_systemfonts_family <- function
 (family="Arial",
+ path=NULL,
+ debug=FALSE,
  ...)
 {
    #
+   if (length(path) > 0) {
+      family <- path
+   }
    f <- unique(family);
+   
    fcheck <- sapply(f, function(i){
-      tryCatch({nrow(systemfonts::font_info(i))},
-         error=function(e){
-            0
-         })
+      tryCatch({
+         if (length(path) > 0) {
+            xout <- systemfonts::font_info(path=i, ...)
+         } else {
+            xout <- systemfonts::font_info(i, ...)
+         }
+         nrow(xout)
+      }, error=function(e){
+         if (TRUE %in% debug) {
+            print(e)
+         }
+         0
+      })
    })
    fcheck[family]
 }
