@@ -167,8 +167,9 @@ hexsticker_venndir <- function
    
    use_xyratio <- xyratio + 0;
    
+   v4tempobject <- NULL;
    if (use_meme) {
-      v4 <- venn_meme(venn_labels,
+      v4tempobject <- venn_meme(venn_labels,
          set_colors=set_colors,
          xyratio=xyratio,
          fontfamily=fontfamily,
@@ -182,7 +183,7 @@ hexsticker_venndir <- function
          do_plot=FALSE,
          ...)
    } else {
-      v4 <- venndir(setlist,
+      v4tempobject <- venndir(setlist,
          show_labels="ncs",
          set_colors=set_colors,
          # proportional=TRUE,
@@ -192,9 +193,9 @@ hexsticker_venndir <- function
          do_plot=FALSE)
    }
    # add white background fill
-   v4@jps@polygons[seq_along(setlist(v4)), "fill"] <- bg
+   v4tempobject@jps@polygons[seq_along(setlist(v4tempobject)), "fill"] <- bg
    
-   assign("v4", value=v4, envir=use_env);
+   assign("v4tempobject", value=v4tempobject, envir=use_env);
    assign("expand_fraction", value=expand_fraction, envir=use_env);
    assign("innerborder.lwd", value=innerborder.lwd, envir=use_env);
    assign("outerborder.lwd", value=outerborder.lwd, envir=use_env);
@@ -217,7 +218,7 @@ hexsticker_venndir <- function
    if (length(use_plot) > 0) {
       v4_plot <- use_plot;
    } else {
-      v4_plot <- ~render_venndir(v4,
+      v4_plot <- ~render_venndir(v4tempobject,
          xyratio=2.5,
          innerborder.lwd=innerborder.lwd,
          outerborder.lwd=outerborder.lwd,

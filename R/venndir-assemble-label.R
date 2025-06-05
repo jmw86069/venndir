@@ -554,7 +554,8 @@ assemble_venndir_label <- function
                   align="center"
                ),
                hjust="center-ink",
-               vjust="center-ink");
+               vjust="center")
+               # vjust="center-ink");
          } else if ("richtext_grob" %in% text_grob_type) {
             if (verbose) {
                jamba::printDebug("assemble_venndir_label(): ",

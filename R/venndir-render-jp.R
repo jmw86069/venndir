@@ -1243,50 +1243,7 @@ render_venndir <- function
       jamba::printDebug("render_venndir): ",
          "Created jps grobs.");
    }
-   
-   ############################################
-   # Plot title
-   if (length(main) > 0 && any(nchar(main) > 0)) {
-      main <- gsub("\n", "<br>", main);
-      main <- jamba::cPaste(main, sep="<br>\n");
-      nlines <- length(strsplit(main, "<br>")[[1]])
-      #
-      if ("gridtext" %in% debug) {
-         main_grob <- gridtext::richtext_grob(
-            text=main,
-            x=0.5,
-            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
-            default.units="snpc",
-            gp=grid::gpar(
-               # col=itemlabels_df$color,
-               fontsize=16 * font_cex[1]),
-            r=grid::unit(c(0, 0, 0, 0), "pt"),
-            padding=grid::unit(c(0, 0, 0, 0), "pt"),
-            margin=grid::unit(c(0, 0, 0, 0), "pt"),
-            vp=jp_viewport,
-            hjust=0.5,
-            vjust=1);
-      } else if (jamba::check_pkg_installed("marquee")) {
-         main_grob <- marquee::marquee_grob(
-            text=main,
-            ignore_html=TRUE,
-            name="venndir_main",
-            x=0.5,
-            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
-            default.units="snpc",
-            style=marquee::classic_style(
-               base_size=16 * font_cex[1],
-               body_font=fontfamily,
-               # weight="bold",
-               align="center"
-            ),
-            vp=jp_viewport,
-            hjust="center",
-            vjust="top");
-      }
-      jp_grobList$main_title <- main_grob;
-   }
-   
+
    ############################################
    # Item labels
    # draw using text()
@@ -1381,7 +1338,7 @@ render_venndir <- function
             force_body_margin=TRUE,
             width=NA,
             ignore_html=TRUE,
-            name="venndir_main",
+            name="venndir_items",
             x=adjx(itemlabels_df$x),
             y=adjy(itemlabels_df$y),
             default.units="snpc",
@@ -1663,7 +1620,8 @@ render_venndir <- function
             " hidden.");
       }
    }
-   
+
+   ########################################   
    # venndir legender
    if (TRUE %in% draw_legend) {
       ## Todo: Consider returning grobs from this function also
@@ -1686,6 +1644,50 @@ render_venndir <- function
       jp_grobList$legend <- legend_grob;
    }
 
+   ############################################
+   # Plot title
+   if (length(main) > 0 && any(nchar(main) > 0)) {
+      # main <- gsub("\n", "<br>", main);
+      main <- gsub("<br>", "  \n", main);
+      main <- jamba::cPaste(main, sep="  \n");
+      nlines <- length(strsplit(main, "\n")[[1]])
+      #
+      if ("gridtext" %in% debug) {
+         main_grob <- gridtext::richtext_grob(
+            text=main,
+            x=0.5,
+            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
+            default.units="snpc",
+            gp=grid::gpar(
+               # col=itemlabels_df$color,
+               fontsize=16 * font_cex[1]),
+            r=grid::unit(c(0, 0, 0, 0), "pt"),
+            padding=grid::unit(c(0, 0, 0, 0), "pt"),
+            margin=grid::unit(c(0, 0, 0, 0), "pt"),
+            vp=jp_viewport,
+            hjust=0.5,
+            vjust=1);
+      } else if (jamba::check_pkg_installed("marquee")) {
+         main_grob <- marquee::marquee_grob(
+            text=main,
+            ignore_html=TRUE,
+            name="venndir_main",
+            x=0.5,
+            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
+            default.units="snpc",
+            style=marquee::classic_style(
+               base_size=16 * font_cex[1],
+               body_font=fontfamily,
+               # weight="bold",
+               align="center"
+            ),
+            vp=jp_viewport,
+            hjust="center",
+            vjust="top");
+      }
+      jp_grobList$main_title <- main_grob;
+   }
+   
    ## Assemble into gTree
    venndir_gtree <- grid::grobTree(
       do.call(grid::gList, jp_grobList),

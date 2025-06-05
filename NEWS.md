@@ -1,3 +1,28 @@
+# venndir 0.0.55.900
+
+Work in progress through 04jun2025, most updates were discovered
+while writing the detailed Venndir E-book.
+
+## Bug fixes
+
+* `venndir_legender()`
+
+   * fixed bug that did not utilize metadata
+   * changed default `x="bottomright"` to be consistent with `venndir()`
+
+`legend_signed` to persist this option from the Venndir object.
+* `render_venndir()` fixed bug that prevented items and plot title
+from both being displayed, caused by duplicated grid grob name. Ha.
+Nonetheless, plot title is now added last to the `grob_list` so it
+is rendered after all other grobs.
+* `hexsticker_venndir()` fixed obscure bug using internal environment,
+which somehow prioritized `globalenv()` instead.
+* `venndir_assemble_label()` fixed very miniscule visual glitch by
+using `vjust="center"` instead of `"center-ink"` which otherwise caused
+labels not to be aligned vertically (by height) when only one label had
+hanging character "g".
+* `overlaplist2setlist()` adjusted for more robust use of signed input.
+
 # venndir 0.0.54.900
 
 ## changes to existing functions

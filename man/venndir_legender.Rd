@@ -7,7 +7,7 @@
 venndir_legender(
   venndir_output = NULL,
   setlist = NULL,
-  x = "bottomleft",
+  x = "bottomright",
   set_colors = NULL,
   legend_style = c("grid", "data.frame"),
   unicode = TRUE,
@@ -110,7 +110,7 @@ This option is only used when \code{legend_total=TRUE}.
 as a text label, as when \code{show_labels} include \code{"p"} or \code{"P"}.
 }}
 
-\item{legend_signed}{\code{logical} default FALSE, whether to include
+\item{legend_signed}{\code{logical} default NULL, whether to include
 signed counts in the legend.
 \itemize{
 \item When set to \code{NULL} it displays signed counts only when available,

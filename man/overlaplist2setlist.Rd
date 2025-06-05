@@ -41,7 +41,7 @@ Ideally, use \code{setlist()} to obtain to actual input setlist from
 the \code{Venndir} object.
 }
 \examples{
-# example from eulerr::euler()
+# example from venn_meme()
 av_overlap_list <- list(
    AV="BATMAN<br>VILLAIN",
    ML="MOUNTAIN<br>LION",
@@ -55,25 +55,21 @@ setlist <- overlaplist2setlist(av_overlap_list);
 
 # Venn diagram
 venndir(setlist,
-   show_items="item",
-   label_preset="items",
-   item_degrees=0,
-   item_cex=rep(c(2, 1.6, 1.35, 1.5), c(3, 1, 2, 1)),
-   item_buffer=-0.95)
+   item_cex_factor=0.7,
+   show_labels="i")
 
 # Proportional Venn (Euler) diagram
 venndir(setlist,
-   show_items="item",
-   label_preset="items",
-   item_degrees=0,
-   item_buffer=-0.95,
-   proportional=TRUE)
+   proportional=TRUE,
+   item_cex_factor=0.7,
+   show_labels="i")
 
 # test interconversion: setlist to venndir to overlaplist to setlist
 setlist2 <- make_venn_test(100, 3, do_signed=TRUE);
 vo <- venndir(setlist2, do_plot=FALSE, overlap_type="each")
 ollist <- overlaplist(vo)
 setlist2b <- overlaplist2setlist(ollist)
+
 # all should be TRUE:
 sapply(names(setlist2b), function(i){
    all(setlist2[[i]] == setlist2b[[i]][names(setlist2[[i]])])

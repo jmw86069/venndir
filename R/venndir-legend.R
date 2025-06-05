@@ -70,7 +70,7 @@
 #'    This option is only used when `legend_total=TRUE`.
 #'    * When set to `NULL` it will display percentage only when present
 #'    as a text label, as when `show_labels` include `"p"` or `"P"`.
-#' @param legend_signed `logical` default FALSE, whether to include
+#' @param legend_signed `logical` default NULL, whether to include
 #'    signed counts in the legend.
 #'    * When set to `NULL` it displays signed counts only when available,
 #'    which requires: `overlap_type` is not "overlap", and
@@ -289,7 +289,7 @@
 venndir_legender <- function
 (venndir_output=NULL, 
  setlist=NULL,
- x="bottomleft", 
+ x="bottomright", 
  set_colors=NULL,
  legend_style=c("grid",
     "data.frame"),
@@ -369,6 +369,11 @@ venndir_legender <- function
             # consider warning that it will be overwritten
          }
          setlist <- venndir_output@setlist;
+         if (length(legend_signed) == 0) {
+            if ("legend_signed" %in% names(metadata(venndir_output))) {
+               legend_signed <- metadata(venndir_output)$legend_signed;
+            }
+         }
       } else {
          stop(paste0("When supplied, venndir_output must be ",
             "'Venndir', or 'list', or 'data.frame'"));
@@ -410,7 +415,7 @@ venndir_legender <- function
          }
       }
    }
-   
+
    # detect default legend_signed
    if (length(legend_signed) == 0) {
       if (length(venndir_output) > 0) {
