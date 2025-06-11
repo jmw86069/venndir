@@ -355,7 +355,24 @@ re-implemented after the version 0.0.30.900 update.}
 \item{rotate_degrees}{\code{numeric} value in degrees, allowing rotation
 of the Venn diagram. Not yet re-implemented after version 0.0.30.900.}
 
-\item{...}{additional arguments are passed to \code{render_venndir()}.}
+\item{...}{additional arguments are passed to internal functions,
+notably:
+\itemize{
+\item \code{render_venndir()} for plot arguments.
+\item \code{signed_overlaps()} for \code{keep_item_order} when displaying item
+labels, otherwise items are sorted per overlap subset.
+\item \code{get_venn_polygon_shapes()} for \code{seed} for \code{eulerr::euler()} diagrams
+when \code{proportional=TRUE}. Ultimately \code{'...'} is also passed
+through to \code{eulerr::euler()}, which has potential for custom
+optimization.
+Also see \code{eulerr::eulerr_options()} for an alternative method
+to customize the Euler optimization.
+\item \code{colorjam::rainbowJam()} for categorical color definition, see
+\code{preset} for color wheel options: 'dichromat2', 'ryb2', 'ryb',
+'rgb2', 'rgb'
+\item \code{find_venn_overlaps_JamPolygon()} for \code{blend_preset} which may
+offer different blending styles for Venn overlaps.
+}}
 }
 \value{
 \code{Venndir} object with slots:

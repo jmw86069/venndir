@@ -11,10 +11,19 @@ while writing the detailed Venndir E-book.
    * changed default `x="bottomright"` to be consistent with `venndir()`
 
 `legend_signed` to persist this option from the Venndir object.
-* `render_venndir()` fixed bug that prevented items and plot title
-from both being displayed, caused by duplicated grid grob name. Ha.
-Nonetheless, plot title is now added last to the `grob_list` so it
-is rendered after all other grobs.
+* `render_venndir()`
+
+   * fixed bug that prevented items and plot title from both being displayed,
+   caused by duplicated grid grob name. Ha.
+   Plot title is now added last to the `grob_list` so it
+   is rendered after all other grobs.
+   * Fixed longstanding "bug" feature request by Dr. Theofilatos causing
+   fully-internal set labels to be grouped together with the overlap count
+   when placed outside. Now there are two labels, only when the set-only
+   label cannot point to a set-only overlap region.
+   This is an area of ongoing consideration, how best to place labels
+   in these specific scenarios.
+
 * `hexsticker_venndir()` fixed obscure bug using internal environment,
 which somehow prioritized `globalenv()` instead.
 * `venndir_assemble_label()` fixed very miniscule visual glitch by
@@ -22,6 +31,23 @@ using `vjust="center"` instead of `"center-ink"` which otherwise caused
 labels not to be aligned vertically (by height) when only one label had
 hanging character "g".
 * `overlaplist2setlist()` adjusted for more robust use of signed input.
+
+## Updates to existing functions
+
+* `venndir()` and `render_venndir()`
+
+   * When drawn, the returned object includes attributes 'adjx', 'adjy'
+   which are necessary to add other grid elements to the same coordinate space.
+   * Key change in behavior: Outside set names and outside counts are
+   grouped together only when the set and counts both refer to
+   set-specific region. Otherwise counts are displayed separately, to
+   avoid "A 5" implying there are 5 items in "set A" rather than 5 items
+   in the overlap of "A" with whatever other set subsumes "A".
+   `venndir(counts2setlist(c(B=5, "A&B"=3)), show_labels="NC", proportional=TRUE)`
+
+* `get_venn_polygon_shapes()` new argument `seed` to help `eulerr::euler()`
+output be consistent. Use `seed=NULL` for randomness.
+It can be passed via `venndir()` using `'...'` ellipses.
 
 # venndir 0.0.54.900
 

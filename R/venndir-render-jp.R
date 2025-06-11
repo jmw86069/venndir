@@ -1045,6 +1045,7 @@ render_venndir <- function
          label_df$overlap_fontsize[setmatchupdate] <- venn_jp@polygons$fontsize[setmatch[setmatchupdate]];
       }
       # gdf is the expanded data.frame of label coordinates
+      # jamba::printDebug("label_df pre-gdf:");print(label_df);# debug
       gdf <- data.frame(
          check.names=FALSE,
          stringsAsFactors=FALSE,
@@ -1227,7 +1228,7 @@ render_venndir <- function
       ylim=jp_yrange,
       show_labels=FALSE,
       do_draw=FALSE, # experimental
-      do_pop_viewport=TRUE,
+      do_pop_viewport=TRUE, # do_pop_viewport,do_viewport,do_newpage FALSE due to do_draw=FALSE
       ...);
       # do_pop_viewport=FALSE);
    # on.exit(grid::popViewport());
@@ -1422,30 +1423,57 @@ render_venndir <- function
       if (nrow(gdf) > 0) {
          # 0.0.36.900 - use a list
          gdf$roworder <- seq_len(nrow(gdf));
-         # jamba::printDebug("head(gdf, 10):");print(head(gdf, 10));# debug
          
          # split gdf rows by groups of labels
-         # 0.0.54.900 - use ref_polygon for grouping labels
-         # note that if overlap label is ever shown itself, we cannot combine
+         if (FALSE) {
+            # pre-0.0.54.900 - use overlap_set for grouping labels
+            # note that if overlap label is ever shown itself, we cannot combine
+            new_childNames <- paste0(
+               gdf$overlap_set, ":",
+               # gdf$ref_polygon, ":",
+               gdf$type, ":",
+               gsub("(count|overlap)_", "\\1:", gdf$location), ":",
+               gdf$roworder, ":",
+               gdf$label_df_rowname);
+            # 0.0.54.900 - use ref_polygon for grouping labels
+            new_childNames <- paste0(
+               # gdf$overlap_set, ":",
+               gdf$ref_polygon, ":",
+               gsub("^.*(count|overlap)_", "", gdf$location), ":")
+         }
+         # 0.0.55.900 - use ref_polygon,x,y coords for grouping
          new_childNames <- paste0(
-            # gdf$overlap_set, ":",
             gdf$ref_polygon, ":",
-            gdf$type, ":",
-            gsub("(count|overlap)_", "\\1:", gdf$location), ":",
-            gdf$roworder, ":",
-            gdf$label_df_rowname);
-         # 0.0.54.900 - use ref_polygon for grouping labels
-         new_childNames <- paste0(
-            # gdf$overlap_set, ":",
-            gdf$ref_polygon, ":",
+            round(gdf$x, digits=3), ":", round(gdf$y, digits=3), ":",
             gsub("^.*(count|overlap)_", "", gdf$location), ":")
+         gdf$label_group <- new_childNames;
+         # jamba::printDebug("head(gdf, 20):");print(head(gdf, 20));# debug
+         
+         # 0.0.55.900 - intermediate check for consistent coordinates
+         # for (icn in unique(new_childNames)) {
+         #    igdf_rows <- which(new_childNames %in% icn)
+         #    # ensure all x,y coords are identical per label group?
+         #    gdf[igdf_rows, "x"] <- head(gdf[igdf_rows, "x"], 1)
+         #    gdf[igdf_rows, "y"] <- head(gdf[igdf_rows, "y"], 1)
+         # }
+
          gdf_list <- split(gdf,
             factor(new_childNames, levels=unique(new_childNames)));
-         # jamba::printDebug("gdf_list:");print(gdf_list);# debug
+
+         # make segment_df$match_group so it uses consistent grouping logic
+         if (length(segment_df) > 0) {
+            segment_k <- rep(seq(from=1, to=nrow(segment_df), by=2), each=2);
+            segment_df$match_group <- paste0(segment_df$group, ":",
+               round(segment_df$x[segment_k], digits=3), ":",
+               round(segment_df$y[segment_k], digits=3), ":")
+            # jamba::printDebug("segment_df:");print(segment_df);# debug
+         }
+
          # default args
-         default_fontcolors <- eval(formals(assemble_venndir_label)$fontcolors)
-         default_fontsizes <- eval(formals(assemble_venndir_label)$fontsizes)
-         default_fontfamilies <- eval(formals(assemble_venndir_label)$fontfamilies)
+         avlf <- formals(assemble_venndir_label);
+         default_fontcolors <- eval(avlf$fontcolors)
+         default_fontsizes <- eval(avlf$fontsizes)
+         default_fontfamilies <- eval(avlf$fontfamilies)
          # iterate label groups
          g_labels_list <- lapply(jamba::nameVectorN(gdf_list), function(igdfname){
             igdf <- gdf_list[[igdfname]];
@@ -1492,8 +1520,12 @@ render_venndir <- function
                # determine segment angle, use ref_polygon for fully
                # internal sets that draw segment to internal overlap polygon
                igdfname_ref <- head(igdf$ref_polygon, 1);
+               # pre-0.0.55.900
+               # isegment_df <- unique(subset(segment_df,
+               #    group %in% gsub(":.+", "", igdfname_ref)));
+               # 0.0.55.900
                isegment_df <- unique(subset(segment_df,
-                  group %in% gsub(":.+", "", igdfname_ref)));
+                  match_group %in% gsub(":outside:", ":", igdfname)));
                if (nrow(isegment_df) == 2) {
                   line_degree <- jamba::rad2deg(
                      atan2(y=diff(isegment_df$y[1+c(1,0)]),
@@ -1688,6 +1720,7 @@ render_venndir <- function
       jp_grobList$main_title <- main_grob;
    }
    
+   ############################################
    ## Assemble into gTree
    venndir_gtree <- grid::grobTree(
       do.call(grid::gList, jp_grobList),
@@ -1696,6 +1729,8 @@ render_venndir <- function
    attr(vo_new, "gtree") <- venndir_gtree;
    attr(vo_new, "grob_list") <- jp_grobList;
    attr(vo_new, "viewport") <- jp_viewport;
+   attr(vo_new, "adjx") <- adjx;
+   attr(vo_new, "adjy") <- adjy;
    
    ## Draw the rest of the owl
    if (TRUE %in% do_draw) {
@@ -1704,7 +1739,6 @@ render_venndir <- function
       }
       grid::grid.draw(venndir_gtree);
    }
-
    # return Venndir object
    return(invisible(vo_new));
 }

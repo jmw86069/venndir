@@ -27,6 +27,7 @@ assemble_venndir_label(
   frame_border = "#44444477",
   frame_fill = "#FDDD6644",
   text_grob_type = c("marquee", "textGrob", "gridtext", "richtext_grob"),
+  use_devoid = getOption("use_devoid", TRUE),
   debug = FALSE,
   verbose = FALSE,
   ...
@@ -104,6 +105,11 @@ inconsistent spacing between words.
 alternative for markdown support, however some graphics devices show
 inconsistent spacing between words.
 }}
+
+\item{use_devoid}{\code{logical} whether to open temporary \code{devoid::void_dev()}
+device to prevent opening a new device or advancing the page of
+an existing open device. Default \code{getOption("use_devoid", TRUE)}.
+This option is experimental in 0.0.55.900 under testing.}
 
 \item{debug}{\code{character} default FALSE, indicating whether to run
 one of the debug modes used for testing:

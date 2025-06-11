@@ -45,7 +45,18 @@
 #'    for the entire set of shapes. This argument is intended to
 #'    change the overall orientation, for example so that certain
 #'    sets are at the top.
-#' @param ... additional arguments are ignored.
+#' @param return_type `character` with only one permitted value 'JamPolygon',
+#'    and only present for brief backward compatibility.
+#' @param seed `numeric` default 123, passed to `set.seed()` when calling
+#'    `eulerr::euler()`. When `NULL` it is not set, which permits fully
+#'    random output.
+#' @param ... additional arguments are passed to internal functions,
+#'    notably `eulerr::euler()` which offers detailed options for
+#'    optimization of the returned Euler shapes. Note that for two sets,
+#'    optimization is mostly irrelevant, but three shapes, and/or ellipse
+#'    shapes, optimization could be adjusted.
+#'    Also see `eulerr::eulerr_options()` for an alternative method
+#'    to customize the Euler optimization.
 #' 
 #' @examples
 #' counts <- c(A=1, B=2, `A&B`=3, C=4)
@@ -68,6 +79,7 @@ get_venn_polygon_shapes <- function
  circle_nudge=NULL,
  rotate_degrees=0,
  return_type=c("JamPolygon"),
+ seed=123,
  ...)
 {
    # validate return_type
@@ -150,7 +162,10 @@ get_venn_polygon_shapes <- function
             ...);
       }
    } else if (jamba::check_pkg_installed("eulerr")) {
-      eu <- eulerr::euler(counts,
+      if (length(seed) == 1) {
+         set.seed(seed);
+      }
+      eu <- eulerr::euler(combinations=counts,
          ...);
       # test for any identical circles/ellipses, potential methods:
       # * test identical polygons, after rounding coordinates

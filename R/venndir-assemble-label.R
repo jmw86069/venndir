@@ -168,6 +168,10 @@
 #'    * `"richtext_grob"` (deprecated) uses `gridtext::richtext_grob()` -
 #'    alternative for markdown support, however some graphics devices show
 #'    inconsistent spacing between words.
+#' @param use_devoid `logical` whether to open temporary `devoid::void_dev()`
+#'    device to prevent opening a new device or advancing the page of
+#'    an existing open device. Default `getOption("use_devoid", TRUE)`.
+#'    This option is experimental in 0.0.55.900 under testing.
 #' @param debug `character` default FALSE, indicating whether to run
 #'    one of the debug modes used for testing:
 #'    * `"overlap"` will display the label at the center of the plot.
@@ -218,6 +222,7 @@ assemble_venndir_label <- function
     "textGrob",
     "gridtext",
     "richtext_grob"),
+ use_devoid=getOption("use_devoid", TRUE),
  debug=FALSE,
  verbose=FALSE,
  ...)
@@ -237,14 +242,18 @@ assemble_venndir_label <- function
    avdf <- formals(assemble_venndir_label)
    fill_opts <- function(x, name, avdf) {
       #
+      xdefault <- eval(avdf[[name]]);
       if (length(x) == 0) {
-         x <- eval(avdf[[name]])
+         x <- xdefault
       } else if (!all(names(eval(avdf[[name]])) %in% names(x))) {
          if (!is.list(x)) {
             x <- as.list(x);
+            if (length(names(x)) == 0 && length(x) <= length(xdefault)) {
+               names(x) <- head(names(xdefault), length(x))
+            }
          }
-         addn <- setdiff(names(eval(avdf[[name]])), names(x));
-         x[addn] <- avdf[[name]][addn];
+         addn <- setdiff(names(xdefault), names(x));
+         x[addn] <- xdefault[addn];
       }
       x
    }
@@ -282,6 +291,26 @@ assemble_venndir_label <- function
       signed_grobs=2,
       count_grobs=2,
       overlap_grobs=2)
+   
+   #################################################################
+   # Temporary devoid device so width=NA works with marquee_grob()
+   if (TRUE %in% use_devoid) {
+      if (requireNamespace("devoid", quietly=TRUE)) {
+         dev1 <- dev.list();
+         devoid::void_dev();
+         dev2 <- dev.list();
+         devVOID <- setdiff(dev2, dev1)
+         on.exit(expr={
+            tryCatch({
+               dev.off(which=devVOID)
+            }, error=function(e){
+               # bleh
+            })
+         },
+            add=TRUE,
+            after=FALSE)
+      }
+   }
    
    ####################################
    # Assemble signed count labels
@@ -409,7 +438,9 @@ assemble_venndir_label <- function
       sn <- length(count_labels);
       for (i in seq_along(count_labels)) {
          fs <- rep(fontsizes$count, length.out=sn)[[i]];
+         # jamba::printDebug("fontfaces:");print(fontfaces);# debug
          ff <- rep(fontfaces$count, length.out=sn)[[i]];
+         # jamba::printDebug("ff:");print(ff);# debug
          fc <- rep(fontcolors$count, length.out=sn)[[i]];
          fm <- rep(fontfamilies$count, length.out=sn)[[i]];
          if (length(fs) == 0) {
@@ -437,7 +468,6 @@ assemble_venndir_label <- function
                text=count_labels[[i]],
                ignore_html=TRUE,
                width=NA,
-               # y=grid::unit(1, "snpc") - grid::unit(0.25, "char"),
                y=grid::unit(0.5, "npc"),
                x=grid::unit(0.5, "npc"),
                default.units="snpc",
@@ -448,7 +478,7 @@ assemble_venndir_label <- function
                   italic=fi,
                   weight=fweight,
                   color=fc,
-                  # background="gold",
+                  # background="gold", # for debug
                   margin=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
                      grid::unit(-1*kk, "pt"),
@@ -542,7 +572,7 @@ assemble_venndir_label <- function
                   weight=fweight,
                   # weight="normal",
                   color=fc,
-                  # background="gold", # optional for debug
+                  # background="gold", # for debug
                   margin=marquee::trbl(grid::unit(-1*kk, "pt"),
                      grid::unit(0, "pt"),
                      grid::unit(-1*kk, "pt"),
@@ -554,8 +584,9 @@ assemble_venndir_label <- function
                   align="center"
                ),
                hjust="center-ink",
-               vjust="center")
-               # vjust="center-ink");
+               vjust="center-ink");
+               # hjust="center",
+               # vjust="center")
          } else if ("richtext_grob" %in% text_grob_type) {
             if (verbose) {
                jamba::printDebug("assemble_venndir_label(): ",
@@ -583,7 +614,6 @@ assemble_venndir_label <- function
          overlap_grobs[[i]] <- grob_overlap1;
       }
    }
-   
    # if empty, there were no labels, return NULL
    if (length(signed_grobs) == 0 &&
          length(count_grobs) == 0 &&

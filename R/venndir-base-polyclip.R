@@ -300,7 +300,22 @@
 #'    re-implemented after the version 0.0.30.900 update.
 #' @param rotate_degrees `numeric` value in degrees, allowing rotation
 #'    of the Venn diagram. Not yet re-implemented after version 0.0.30.900.
-#' @param ... additional arguments are passed to `render_venndir()`.
+#' @param ... additional arguments are passed to internal functions,
+#'    notably:
+#'    * `render_venndir()` for plot arguments.
+#'    * `signed_overlaps()` for `keep_item_order` when displaying item
+#'    labels, otherwise items are sorted per overlap subset.
+#'    * `get_venn_polygon_shapes()` for `seed` for `eulerr::euler()` diagrams
+#'    when `proportional=TRUE`. Ultimately `'...'` is also passed
+#'    through to `eulerr::euler()`, which has potential for custom
+#'    optimization.
+#'    Also see `eulerr::eulerr_options()` for an alternative method
+#'    to customize the Euler optimization.
+#'    * `colorjam::rainbowJam()` for categorical color definition, see
+#'    `preset` for color wheel options: 'dichromat2', 'ryb2', 'ryb',
+#'    'rgb2', 'rgb'
+#'    * `find_venn_overlaps_JamPolygon()` for `blend_preset` which may
+#'    offer different blending styles for Venn overlaps.
 #' 
 #' @family venndir core
 #' 
@@ -1273,14 +1288,17 @@ venndir <- function
       #label_df <- gg@label_df;
       # retlist$rv_label_df <- gg@label_df;
       # retlist$gg <- gg;
-      if ("gtree" %in% names(attributes(gg))) {
-         attr(vo, "gtree") <- attr(gg, "gtree")
-      }
-      if ("grob_list" %in% names(attributes(gg))) {
-         attr(vo, "grob_list") <- attr(gg, "grob_list")
-      }
-      if ("viewport" %in% names(attributes(gg))) {
-         attr(vo, "viewport") <- attr(gg, "viewport")
+      
+      # carry over some useful grid plot components
+      keep_attrs <- c("gtree",
+         "grob_list",
+         "viewport",
+         "adjx",
+         "adjy");
+      for (keep_attr in keep_attrs) {
+         if (keep_attr %in% names(attributes(gg))) {
+            attr(vo, keep_attr) <- attr(gg, keep_attr)
+         }
       }
    }
    # return Venndir object

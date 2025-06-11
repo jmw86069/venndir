@@ -692,13 +692,6 @@ plot.JamPolygon <- function
          setNames(list(path_grob), grobname));
    }
    
-   # polygon inner border (experimental)
-   # lwd_pts <- 5;
-   # npts <- length(coords_df$x);
-   # use_w <- vwline::widthSpec(list(
-   #    left=grid::unit(rep(lwd_pts, npts), "pt"),
-   #    right=grid::unit(rep(0, npts), "pt")), default.units="pt");
-
    # Split calls to render each polygon in series
    if (TRUE) {
       # use orientation for each polygon

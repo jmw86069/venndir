@@ -42,6 +42,7 @@ marquee_text_grob <- function
  x=0.5,
  y=0.5,
  default.units="npc",
+ use_devoid=getOption("use_devoid", TRUE),
  ...)
 {
    #
@@ -78,6 +79,27 @@ marquee_text_grob <- function
       align=use_align)
       # ...)
       # align="left")
+   
+   #################################################################
+   # Temporary devoid device so width=NA works with marquee_grob()
+   if (TRUE %in% use_devoid) {
+      devVOID <- NULL;
+      if (requireNamespace("devoid", quietly=TRUE)) {
+         dev1 <- dev.list();
+         devoid::void_dev();
+         dev2 <- dev.list();
+         devVOID <- setdiff(dev2, dev1)
+         on.exit(expr={
+            tryCatch({
+               dev.off(which=devVOID)
+            }, error=function(e){
+               # bleh
+            })
+            },
+            add=TRUE,
+            after=FALSE)
+      }
+   }
    
    # create grob
    mg <- marquee::marquee_grob(

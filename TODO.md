@@ -3,19 +3,55 @@
 ## 02jun2025
 
 * Add hexsticker.
+* Consider adding `fontfamilies` to metadata.
+* Consider some mechanism for `render_venndir()` to re-use its
+own output instead of re-creating. E.g. if `gtree` exists, just render it?
+* Improve default plot range to include outer label coordinates when defined.
+It's embarrassing to have labels above the plot that are cropped by default.
+* Consider a 'style' or 'venndir.theme' type object? Something to wrap up
+all the different default options into one neat little object.
+* DONE. Fix bug: segment pointing to blank label
+
+   * `venndir(counts2setlist(c(B=5, "A&B"=3)), show_labels="NC", proportional=TRUE)`
+   * DONE. Related to label grouping with set name pointing to inside overlap.
+   The count label is also now displayed separately.
+   It may become a user-defined option later, to control whether
+   to combine set and count labels.
+
 * Prep for Bioconductor
 
    * Minimize dependencies. Current heavy: marquee, data.table, colorjam
    Try: `pkgnet::CreatePackageReport("venndir")`
+   * Consider pushing colorjam to CRAN for a short term release.
    * Consider remove or refactor `shrink_df()` the only need for data.table.
    * Run checks, remove all warnings
 
+* Consider sorting sign based upon the order each direction appears in
+`curate_df`.
 * Consider new `show_labels` options
 
    * "T" for Total count per group, Dimitris for example used "Set A (1,234)",
-   it would be required outside the Venn diagram by definition.
+   it would be required outside the Venn diagram by definition, and
+   would only be displayed together with the set name. It may need to use
+   some kind of glue template like '{n} items'.
    * "J" for Jaccard overlap?
    * "Z" for directional z-score? For example: `(agree - disagree)/sqrt(n)`
+   * "Q" for Q-value (or P-value, but 'P' is already assigned to 'Percentage'
+   so 'Q' is a reasonable alternative). How to define P-value is unclear.
+
+* Consider integration with Upset plot capabilities
+
+   * UpSetR, or ComplexHeatmap Upset functions for customizations.
+
+* Future JamPolygon enhancements:
+
+   * Add ability to draw points, lines. E.g. JamLines, JamPoints,
+   or just a flag in jp@polygons that says "points" or "lines" so it
+   would not render a filled path. Then optional columns 'pch', 'cex'.
+   * easier method to "add grob" to an existing figure.
+   Current method is clunky, requiring adjx()/adjy() and vp.
+   * Consider: `get_grid_info()` to extract "all the things"?"
+
 
 ## 25may2025
 

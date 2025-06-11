@@ -26,13 +26,5 @@
 <text x='347.75' y='294.88' style='font-size: 12.00px; fill: #CD0000; font-family: sans;' textLength='28.69px' lengthAdjust='spacingAndGlyphs'>↑↑ 15</text>
 <text x='347.75' y='305.98' style='font-size: 12.00px; fill: #1874CD; font-family: sans;' textLength='45.37px' lengthAdjust='spacingAndGlyphs'>↓↓ 2,234</text>
 <text x='347.75' y='317.07' style='font-size: 12.00px; fill: #8C8C8C; font-family: sans;' textLength='67.38px' lengthAdjust='spacingAndGlyphs'>textGrob P,q</text>
-<polygon points='304.87,319.90 415.13,319.90 415.01,319.90 415.47,319.88 415.92,319.79 416.34,319.63 416.74,319.40 417.09,319.11 417.39,318.77 417.64,318.39 417.82,317.97 417.92,317.52 417.96,317.07 417.96,317.07 417.96,258.93 417.96,258.93 417.92,258.48 417.82,258.03 417.64,257.61 417.39,257.23 417.09,256.89 416.74,256.60 416.34,256.37 415.92,256.21 415.47,256.12 415.13,256.10 304.87,256.10 305.21,256.12 304.76,256.10 304.31,256.15 303.87,256.28 303.46,256.48 303.08,256.74 302.75,257.05 302.48,257.42 302.27,257.82 302.12,258.25 302.05,258.70 302.04,258.93 302.04,317.07 302.05,316.84 302.05,317.30 302.12,317.75 302.27,318.18 302.48,318.58 302.75,318.95 303.08,319.26 303.46,319.52 303.87,319.72 304.31,319.85 304.76,319.90 ' style='stroke-width: 0.75; stroke: #444444; stroke-opacity: 0.47; fill: #FDDD66; fill-opacity: 0.27;' />
-<text x='360.00' y='269.94' text-anchor='middle' style='font-size: 16.00px; font-weight: bold; font-family: sans;' textLength='71.16px' lengthAdjust='spacingAndGlyphs'>Set Name</text>
-<text x='360.00' y='283.79' text-anchor='middle' style='font-size: 16.00px; font-weight: bold; font-family: sans;' textLength='86.29px' lengthAdjust='spacingAndGlyphs'>sub, caption</text>
-<text x='324.89' y='301.80' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='40.04px' lengthAdjust='spacingAndGlyphs'>1,234</text>
-<text x='324.89' y='312.90' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-style: italic; font-family: sans;' textLength='24.02px' lengthAdjust='spacingAndGlyphs'>12%</text>
-<text x='347.75' y='294.88' style='font-size: 12.00px; fill: #CD0000; font-family: sans;' textLength='28.69px' lengthAdjust='spacingAndGlyphs'>↑↑ 15</text>
-<text x='347.75' y='305.98' style='font-size: 12.00px; fill: #1874CD; font-family: sans;' textLength='45.37px' lengthAdjust='spacingAndGlyphs'>↓↓ 2,234</text>
-<text x='347.75' y='317.07' style='font-size: 12.00px; fill: #8C8C8C; font-family: sans;' textLength='67.38px' lengthAdjust='spacingAndGlyphs'>textGrob P,q</text>
 </g>
 </svg>

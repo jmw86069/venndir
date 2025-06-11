@@ -12,6 +12,7 @@ get_venn_polygon_shapes(
   circle_nudge = NULL,
   rotate_degrees = 0,
   return_type = c("JamPolygon"),
+  seed = 123,
   ...
 )
 }
@@ -44,7 +45,20 @@ for the entire set of shapes. This argument is intended to
 change the overall orientation, for example so that certain
 sets are at the top.}
 
-\item{...}{additional arguments are ignored.}
+\item{return_type}{\code{character} with only one permitted value 'JamPolygon',
+and only present for brief backward compatibility.}
+
+\item{seed}{\code{numeric} default 123, passed to \code{set.seed()} when calling
+\code{eulerr::euler()}. When \code{NULL} it is not set, which permits fully
+random output.}
+
+\item{...}{additional arguments are passed to internal functions,
+notably \code{eulerr::euler()} which offers detailed options for
+optimization of the returned Euler shapes. Note that for two sets,
+optimization is mostly irrelevant, but three shapes, and/or ellipse
+shapes, optimization could be adjusted.
+Also see \code{eulerr::eulerr_options()} for an alternative method
+to customize the Euler optimization.}
 }
 \value{
 \code{JamPolygon} representing Venn or Euler circles,
