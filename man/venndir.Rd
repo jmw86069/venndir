@@ -21,7 +21,7 @@ venndir(
   show_items = c(NA, "none", "sign item", "sign", "item"),
   max_items = 3000,
   show_zero = FALSE,
-  font_cex = c(1, 1, 0.7),
+  font_cex = c(1, 1, 0.75),
   fontfamily = "Arial",
   show_label = NA,
   display_counts = TRUE,
@@ -167,39 +167,55 @@ count zero label is displayed, otherwise no count label is shown.}
 \item{font_cex}{\code{numeric} vector recycled and applied in order:
 \enumerate{
 \item Set label
-\item Overlap count label
-\item Signed count label
+\item Count label
+\item Signed count label(s)
 }
 
-The default \code{c(1, 1, 0.7)} defines the signed count label slightly
+The base font size is \code{16} points, so the defaults become 16, 16, 12
+for set, count, and signed count labels, respectively.
+The default \code{c(1, 1, 0.75)} defines the signed count label slightly
 smaller than other labels.
 \itemize{
-\item When one value is provided, it is multiplied by \code{c(1, 1, 0.7)} to
-adjust font sizes altogether, keeping relative sizes.
-\item When two values are provided, they are multiplied by \code{c(1, 1, 0.7)}
-using the second value twice.
-\item When three values are provided, they are used as-is without change.
+\item When one value is provided, it is multiplied by \code{c(1, 1, 0.75)} so
+the proportional values are all adjusted together.
+\item When two or more values are provided, the second value is used twice,
+to generate a vector with three values. This vector is
+multiplied by \code{c(1, 1, 0.75)}. The purpose is to allow adjusting
+the set font independently, or the counts independently, while keeping
+the relative size between Count and Signed count.
+\item When three values are provided, they are used as-is without change,
+which is the ideal way to define specific font sizes. For example,
+\code{c(1, 1, 1)} will use the same 16-point font for all labels.
 }}
 
 \item{fontfamily}{\code{character} string to define the fontfamily.
 Default is "sans" because it should get mapped to a supported font
-for each graphics device.
-The \code{fontfamily} must match a recognized font for the given output
-device, and this font must be capable of producing UTF-8 / Unicode
-characters, in order to print up arrow and down arrow.
-You may review \code{systemfonts::system_fonts()} for a listing of fonts
-recognized by \code{ragg} devices, which seems to have the best
-overall font capabilities.
-When it does not work, either use \code{unicode=FALSE}, or check the
-output from \code{Sys.getlocale()} to ensure the setting is capable
-of using UTF-8 (for example "C" may not be sufficient).
-Using the package \code{ragg} appears to be more consistently successful
-for rasterized output than base R output, for example:
-\code{ragg::agg_png()}, \code{ragg::agg_tiff()}, \code{ragg::agg_jpeg()}
-produce substantially higher quality output, and with more successful
-usage of system fonts, than \code{png()}, \code{tiff()}, and \code{jpeg()}.
-Similarly, for PDF output, consider \code{cairo_pdf()} or
-\code{Cairo::CairoPDF()} instead of using \code{pdf()}.}
+for each graphics device, and any missing glyphs such as the Unicode
+upArrow and downArrow should be substituted with a suitable
+font with those glyphs.
+The \code{fontfamily} must match a font 'family' recognized by systemfonts.
+Use \code{subset_systemfonts()} to review values in column 'family',
+or \code{systemfonts::font_info()} to inspect possible font substitutions
+based upon weight, style, or other typography. These substitutions
+can be controlled in advanced, see \code{systemfonts::font_fallback()}
+and related functions to define substitutions upfront as needed.
+
+In some circumstances, either the font or substitution is not compatible
+with PDF output, which tends to produce blank labels, presumably
+when the font encoded in the PDF is not available to the PDF viewer.
+You may check \code{grDevices::pdfFonts()} for more information.
+A potential workaround is to embed the glyphs or fonts using
+\code{grDevices::embedGlyphs()} or \code{grDevices::embedFonts()}.
+
+The \code{ragg} devices, and \code{svglite} device, have the best \code{systemfonts}
+support. RStudio works best with ragg output, which can be set with
+RStudio Options->General->Graphics then set 'Backend' to use 'AGG'.
+For ragg, try \code{ragg::agg_png()}, \code{ragg::agg_tiff()}, \code{ragg::agg_jpeg()}.
+For PDF, try \code{cairo_pdf()} or \code{Cairo::CairoPDF()}.
+
+The extreme fallback is to set \code{unicode=FALSE}, thereby avoiding
+Unicode arrows. Further, use \code{fontfaces} and set all values to 'plain'
+to avoid using bold fonts.}
 
 \item{poly_alpha}{\code{numeric} (default 0.6) value between 0 and 1, for
 alpha transparency of the polygon fill color.

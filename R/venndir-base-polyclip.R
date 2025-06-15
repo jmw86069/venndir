@@ -155,35 +155,51 @@
 #'    count zero label is displayed, otherwise no count label is shown.
 #' @param font_cex `numeric` vector recycled and applied in order:
 #'    1. Set label
-#'    2. Overlap count label
-#'    3. Signed count label
+#'    2. Count label
+#'    3. Signed count label(s)
 #'    
-#'    The default `c(1, 1, 0.7)` defines the signed count label slightly
+#'    The base font size is `16` points, so the defaults become 16, 16, 12
+#'    for set, count, and signed count labels, respectively.
+#'    The default `c(1, 1, 0.75)` defines the signed count label slightly
 #'    smaller than other labels.
-#'    * When one value is provided, it is multiplied by `c(1, 1, 0.7)` to
-#'    adjust font sizes altogether, keeping relative sizes.
-#'    * When two values are provided, they are multiplied by `c(1, 1, 0.7)`
-#'    using the second value twice.
-#'    * When three values are provided, they are used as-is without change.
+#'    * When one value is provided, it is multiplied by `c(1, 1, 0.75)` so
+#'    the proportional values are all adjusted together.
+#'    * When two or more values are provided, the second value is used twice,
+#'    to generate a vector with three values. This vector is
+#'    multiplied by `c(1, 1, 0.75)`. The purpose is to allow adjusting
+#'    the set font independently, or the counts independently, while keeping
+#'    the relative size between Count and Signed count.
+#'    * When three values are provided, they are used as-is without change,
+#'    which is the ideal way to define specific font sizes. For example,
+#'    `c(1, 1, 1)` will use the same 16-point font for all labels.
 #' @param fontfamily `character` string to define the fontfamily.
 #'    Default is "sans" because it should get mapped to a supported font
-#'    for each graphics device.
-#'    The `fontfamily` must match a recognized font for the given output
-#'    device, and this font must be capable of producing UTF-8 / Unicode
-#'    characters, in order to print up arrow and down arrow.
-#'    You may review `systemfonts::system_fonts()` for a listing of fonts
-#'    recognized by `ragg` devices, which seems to have the best
-#'    overall font capabilities.
-#'    When it does not work, either use `unicode=FALSE`, or check the
-#'    output from `Sys.getlocale()` to ensure the setting is capable
-#'    of using UTF-8 (for example "C" may not be sufficient).
-#'    Using the package `ragg` appears to be more consistently successful
-#'    for rasterized output than base R output, for example:
-#'    `ragg::agg_png()`, `ragg::agg_tiff()`, `ragg::agg_jpeg()`
-#'    produce substantially higher quality output, and with more successful
-#'    usage of system fonts, than `png()`, `tiff()`, and `jpeg()`.
-#'    Similarly, for PDF output, consider `cairo_pdf()` or
-#'    `Cairo::CairoPDF()` instead of using `pdf()`.
+#'    for each graphics device, and any missing glyphs such as the Unicode
+#'    upArrow and downArrow should be substituted with a suitable
+#'    font with those glyphs.
+#'    The `fontfamily` must match a font 'family' recognized by systemfonts.
+#'    Use `subset_systemfonts()` to review values in column 'family',
+#'    or `systemfonts::font_info()` to inspect possible font substitutions
+#'    based upon weight, style, or other typography. These substitutions
+#'    can be controlled in advanced, see `systemfonts::font_fallback()`
+#'    and related functions to define substitutions upfront as needed.
+#'    
+#'    In some circumstances, either the font or substitution is not compatible
+#'    with PDF output, which tends to produce blank labels, presumably
+#'    when the font encoded in the PDF is not available to the PDF viewer.
+#'    You may check `grDevices::pdfFonts()` for more information.
+#'    A potential workaround is to embed the glyphs or fonts using
+#'    `grDevices::embedGlyphs()` or `grDevices::embedFonts()`.
+#'    
+#'    The `ragg` devices, and `svglite` device, have the best `systemfonts`
+#'    support. RStudio works best with ragg output, which can be set with
+#'    RStudio Options->General->Graphics then set 'Backend' to use 'AGG'.
+#'    For ragg, try `ragg::agg_png()`, `ragg::agg_tiff()`, `ragg::agg_jpeg()`.
+#'    For PDF, try `cairo_pdf()` or `Cairo::CairoPDF()`.
+#'    
+#'    The extreme fallback is to set `unicode=FALSE`, thereby avoiding
+#'    Unicode arrows. Further, use `fontfaces` and set all values to 'plain'
+#'    to avoid using bold fonts.
 #' @param poly_alpha `numeric` (default 0.6) value between 0 and 1, for
 #'    alpha transparency of the polygon fill color.
 #'    This value is ignored when `alpha_by_counts=TRUE`.
@@ -395,7 +411,7 @@ venndir <- function
     "item"),
  max_items=3000,
  show_zero=FALSE,
- font_cex=c(1, 1, 0.7),
+ font_cex=c(1, 1, 0.75),
  fontfamily="Arial",
  # show_set=c("main", "all", "none"),
  show_label=NA,
@@ -468,19 +484,20 @@ venndir <- function
    
    # validate font_cex input
    if (length(font_cex) == 0) {
-      font_cex <- c(1, 1, 0.7);
+      font_cex <- c(1, 1, 0.75);
    }
    if (length(font_cex) > 3) {
       font_cex <- head(font_cex, 3);
    }
    if (length(font_cex) == 1) {
-      font_cex <- c(1, 1, 0.7) * font_cex[1];
+      font_cex <- c(1, 1, 0.75) * font_cex[1];
    }
    if (length(font_cex) == 2) {
-      font_cex <- c(1, 1, 0.7) * font_cex[c(1, 2, 2)];
+      font_cex <- c(1, 1, 0.75) * font_cex[c(1, 2, 2)];
    }
    # global adjustment to the default condition
-   font_cex <- font_cex * 1.2;
+   base_fontsize <- 16;
+   # font_cex <- font_cex * 1.2;
 
    # accept incidence matrix input
    if (inherits(setlist, "matrix")) {
@@ -1049,7 +1066,7 @@ venndir <- function
             darkFactor=border_dark_factor,
             sFactor=border_s_factor)))
    # define label font size
-   venn_jps@polygons$fontsize <- 14 * head(font_cex, 1);
+   venn_jps@polygons$fontsize <- base_fontsize * head(font_cex, 1);
    
    # venn_jps@polygons$alpha <- poly_alpha;
 
@@ -1089,7 +1106,9 @@ venndir <- function
       # halign=c(main_halign, signed_halign),
       rot=rep(0, label_n),
       color=unlist(c(label_color_main, gbase_colors)),
-      fontsize=rep(c(14 * font_cex[2], 14 * font_cex[3]),
+      fontsize=rep(
+         c(base_fontsize * font_cex[2],
+            base_fontsize * font_cex[3]),
          c(length(main_x), length(signed_x))),
       border=c(label_border_main, label_border_signed),
       lty=rep(1, label_n),

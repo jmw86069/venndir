@@ -3,7 +3,23 @@
 Work in progress through 04jun2025, most updates were discovered
 while writing the detailed Venndir E-book.
 
+## Notable changes to default behavior
+
+* `venndir()`
+
+   * Default internal base font size changed to `16` from `16.8`.
+   The `16.8` was the awkward result of previous `14 * 1.2` when enough
+   people suggested making the default a little larger.
+   * Default `font_cex` changed to `c(1, 1, 0.75)` from `c(1, 1, 0.7)`,
+   mostly so the default font size would become `c(16, 16, 12)`.
+   The 16 and 12 are natural, common font sizes, more easily matched
+   with other figures for consistency.
+
 ## Bug fixes
+
+* `plot.JamPolygon()`
+
+   * `'label.color'` is properly recognized for label colors.
 
 * `venndir_legender()`
 
@@ -23,6 +39,10 @@ while writing the detailed Venndir E-book.
    label cannot point to a set-only overlap region.
    This is an area of ongoing consideration, how best to place labels
    in these specific scenarios.
+* `modify_venndir_overlap()`
+
+   * Repaired ability to move a specific label outside, fixed blank
+   values for x_offset,y_offset as required to place labels outside.
 
 * `hexsticker_venndir()` fixed obscure bug using internal environment,
 which somehow prioritized `globalenv()` instead.

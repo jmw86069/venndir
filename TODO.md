@@ -1,5 +1,28 @@
 # TODO for venndir
 
+## 12jun2025
+
+* Add `describe_venndir_overlap()` to complement `modify_venndir_overlap()`.
+
+   * For example, it is not easy to see the `fontsize` already applied.
+   * This function would return the values already defined in the `Venndir`.
+
+* DONE. Need ability to move one label outside or inside.
+* `render_venndir()` and `modify_venndir_overlap()`  review attributes
+not being customized, low priority for now: label.padding, label.lwd,
+label.lty, label.r, border.lty.
+* Spot check `venndir()` how it populates `x_offset`,`y_offset` into
+`label_df`. It might not be filling everything in as expected.
+* PARTIAL. Add `svglite::svglite()` adaptation for `vdiffr` tests.
+Interim tests show only subpixel differences.
+* Seriously just refactor `venndir_label_style()`
+
+   * It should essentially ignore everything but `show_labels` which should
+   also become a trusted column in `label_df`.
+   * The style preset could also become a column, attached to rows.
+   * Consider option for inside/outside labels to have different styles.
+
+
 ## 02jun2025
 
 * Add hexsticker.

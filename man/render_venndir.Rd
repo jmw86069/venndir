@@ -168,23 +168,32 @@ There are pre-defined label styles.
 
 \item{fontfamily}{\code{character} string to define the fontfamily.
 Default is "sans" because it should get mapped to a supported font
-for each graphics device.
-The \code{fontfamily} must match a recognized font for the given output
-device, and this font must be capable of producing UTF-8 / Unicode
-characters, in order to print up arrow and down arrow.
-You may review \code{systemfonts::system_fonts()} for a listing of fonts
-recognized by \code{ragg} devices, which seems to have the best
-overall font capabilities.
-When it does not work, either use \code{unicode=FALSE}, or check the
-output from \code{Sys.getlocale()} to ensure the setting is capable
-of using UTF-8 (for example "C" may not be sufficient).
-Using the package \code{ragg} appears to be more consistently successful
-for rasterized output than base R output, for example:
-\code{ragg::agg_png()}, \code{ragg::agg_tiff()}, \code{ragg::agg_jpeg()}
-produce substantially higher quality output, and with more successful
-usage of system fonts, than \code{png()}, \code{tiff()}, and \code{jpeg()}.
-Similarly, for PDF output, consider \code{cairo_pdf()} or
-\code{Cairo::CairoPDF()} instead of using \code{pdf()}.}
+for each graphics device, and any missing glyphs such as the Unicode
+upArrow and downArrow should be substituted with a suitable
+font with those glyphs.
+The \code{fontfamily} must match a font 'family' recognized by systemfonts.
+Use \code{subset_systemfonts()} to review values in column 'family',
+or \code{systemfonts::font_info()} to inspect possible font substitutions
+based upon weight, style, or other typography. These substitutions
+can be controlled in advanced, see \code{systemfonts::font_fallback()}
+and related functions to define substitutions upfront as needed.
+
+In some circumstances, either the font or substitution is not compatible
+with PDF output, which tends to produce blank labels, presumably
+when the font encoded in the PDF is not available to the PDF viewer.
+You may check \code{grDevices::pdfFonts()} for more information.
+A potential workaround is to embed the glyphs or fonts using
+\code{grDevices::embedGlyphs()} or \code{grDevices::embedFonts()}.
+
+The \code{ragg} devices, and \code{svglite} device, have the best \code{systemfonts}
+support. RStudio works best with ragg output, which can be set with
+RStudio Options->General->Graphics then set 'Backend' to use 'AGG'.
+For ragg, try \code{ragg::agg_png()}, \code{ragg::agg_tiff()}, \code{ragg::agg_jpeg()}.
+For PDF, try \code{cairo_pdf()} or \code{Cairo::CairoPDF()}.
+
+The extreme fallback is to set \code{unicode=FALSE}, thereby avoiding
+Unicode arrows. Further, use \code{fontfaces} and set all values to 'plain'
+to avoid using bold fonts.}
 
 \item{inside_percent_threshold}{\code{numeric} (default 0) indicating the
 percent area that a Venn overlap region must contain in order

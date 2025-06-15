@@ -183,25 +183,14 @@ Partially complete.
 \item Convert \code{grid} rendering to generate graphical objects (grobs)
 which can be optionally rendered, or returned as a \code{gTree}.
 Mostly complete.
-\item Continue debugging the \code{vwline} graphical glitches which are
-apparent when rendering outer borders.
-Complete.
-See \link{https://github.com/pmur002/vwline/issues/2}.
-\itemize{
-\item Current recommendation is to render outer border after the inner
-border, and with outer border at least the same or larger width
-as the inner border. Otherwise, for acute angles, inner border may
-exceed the outer border because of its line width. However, if the
-outer border is drawn afterward, it will fully cover the inner border.
-With sufficiently small inner border width, the graphical glitch may
-not be apparent.
-}
 \item Consider allowing labels for each multi-part polygon.
 Low priotity.
 \item Consider drawing optional x- and y-axis, although both could be added
-using \code{grid} functions.
+using \code{grid} functions. Key option would be to transform \code{adjx()},
+\code{adjy()} to represent actual numeric values instead of \code{'snpc'}
+coordinates.
 Low priority.
-\item Consider using different approach than \code{"snpc"} to enforce aspect
+\item Consider using different approach than \code{'snpc'} to enforce aspect
 ratio, for example ggplot2 uses \code{respect=TRUE} then leaves the x/y axis
 ranges intact. Making that change would affect other venndir functions
 that may assume scaled units are between 0 and 1.

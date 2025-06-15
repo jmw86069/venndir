@@ -58,6 +58,10 @@ when two Venn polygons are adjacent.
 \item \code{fontsize} - \code{numeric} value applied to \code{jps} and \code{label_df}. When
 there are multiple labels, values are assigned in order. Usually:
 main count, then signed count(s).
+\item \code{label.count} - applied to \code{'label_df'} column \code{'count'} which
+defines visibility or placement for each count label, with values
+'inside', 'outside', or 'none'. This value is useful to move
+a single overlap count label inside or outside the Venndir region.
 \item \code{label.border},\code{label.fill},\code{label.lwd},\code{label.lty} -
 applied to slot \code{"label_df"} columns \code{"border"}, \code{"fill"}, \code{"lwd"}, and
 \code{"lty"} respectively. They control the optional label border,fill,lwd,lty

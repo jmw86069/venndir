@@ -45,6 +45,10 @@
 #'    * `fontsize` - `numeric` value applied to `jps` and `label_df`. When
 #'    there are multiple labels, values are assigned in order. Usually:
 #'    main count, then signed count(s).
+#'    * `label.count` - applied to `'label_df'` column `'count'` which
+#'    defines visibility or placement for each count label, with values
+#'    'inside', 'outside', or 'none'. This value is useful to move
+#'    a single overlap count label inside or outside the Venndir region.
 #'    * `label.border`,`label.fill`,`label.lwd`,`label.lty` -
 #'    applied to slot `"label_df"` columns `"border"`, `"fill"`, `"lwd"`, and
 #'    `"lty"` respectively. They control the optional label border,fill,lwd,lty
@@ -252,6 +256,8 @@ modify_venndir_overlap <- function
       label.fill=NA,
       label.lwd=1,
       label.lty=1,
+      label.count="default",
+      label.overlap="default",
       label.padding=3,
       label.padding_unit="pt",
       label.r=3,
@@ -259,6 +265,7 @@ modify_venndir_overlap <- function
    # consider: border,fill,lty,lwd - for the label box
    # populate params values
    for (iparam in names(params_label)) {
+      # remove the "label." prefix
       iparam2 <- gsub("^label[.]", "", iparam);
       if (!iparam %in% names(params)) {
          # if not user-defined, use what exists
@@ -269,6 +276,22 @@ modify_venndir_overlap <- function
             params[[iparam]] <- params_jps[[iparam]];
          }
       }
+      # post-hoc check:
+      # - count='outside' or overlap='outside' and
+      # - x_offset,y_offset are both NA or 0 on the same rows, they lack offset
+      if (any(c("overlap", "count") %in% iparam2) &&
+            "outside" %in% params[[iparam]] &&
+            any(venndir_output@label_df[rows_label, "x_offset"] %in% c(0, NA) &
+               venndir_output@label_df[rows_label, "y_offset"] %in% c(0, NA))) {
+         # special case
+         # jamba::printDebug("Special case to fix x_offset,y_offset");# debug
+         xyo <- c("x_offset", "y_offset");
+         use_xyo <- head(
+            venndir_output@jps@polygons[rows_jps, xyo, drop=FALSE], 1);
+         # update label_df
+         venndir_output@label_df[rows_label, xyo] <- use_xyo;
+      }
+
       # apply the value to label_df
       venndir_output@label_df[rows_label, iparam2] <- rep(params[[iparam]],
          length.out=length(rows_label));

@@ -604,7 +604,7 @@ render_venndir <- function
          naValue=0);
       label_df$y_offset <- jamba::rmNA(label_df$y_offset,
          naValue=0);
-      
+
       # define show_label and show_items for each label_df row
       if (length(show_label) == 0) {
          show_label <- NA;
@@ -748,8 +748,9 @@ render_venndir <- function
          
          # Determine if any offset labels require line segment
          has_offset <- label_outside &
-            (label_df$x_offset != 0 | label_df$y_offset != 0);
-         #
+            (!label_df$x_offset %in% c(0, NA) |
+             !label_df$y_offset %in% c(0, NA));
+
          # Todo: Deal with has_offset, for now set to FALSE
          # jamba::printDebug("label_outside:");print(table(label_outside));
          # jamba::printDebug("has_offset:");print(table(has_offset));

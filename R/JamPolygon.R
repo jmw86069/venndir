@@ -243,25 +243,14 @@ setMethod("plot",
 #' 2. Convert `grid` rendering to generate graphical objects (grobs)
 #' which can be optionally rendered, or returned as a `gTree`.
 #' Mostly complete.
-#' 3. Continue debugging the `vwline` graphical glitches which are
-#' apparent when rendering outer borders.
-#' Complete.
-#' See [https://github.com/pmur002/vwline/issues/2].
-#' 
-#'    * Current recommendation is to render outer border after the inner
-#'    border, and with outer border at least the same or larger width
-#'    as the inner border. Otherwise, for acute angles, inner border may
-#'    exceed the outer border because of its line width. However, if the
-#'    outer border is drawn afterward, it will fully cover the inner border.
-#'    With sufficiently small inner border width, the graphical glitch may
-#'    not be apparent.
-#' 
-#' 4. Consider allowing labels for each multi-part polygon.
+#' 3. Consider allowing labels for each multi-part polygon.
 #' Low priotity.
-#' 5. Consider drawing optional x- and y-axis, although both could be added
-#' using `grid` functions.
+#' 4. Consider drawing optional x- and y-axis, although both could be added
+#' using `grid` functions. Key option would be to transform `adjx()`,
+#' `adjy()` to represent actual numeric values instead of `'snpc'`
+#' coordinates.
 #' Low priority.
-#' 6. Consider using different approach than `"snpc"` to enforce aspect
+#' 5. Consider using different approach than `'snpc'` to enforce aspect
 #' ratio, for example ggplot2 uses `respect=TRUE` then leaves the x/y axis
 #' ranges intact. Making that change would affect other venndir functions
 #' that may assume scaled units are between 0 and 1.
@@ -510,6 +499,7 @@ plot.JamPolygon <- function
    # - for now we assume all are defined via colnames(jp@polygons)
    opt_args <- c("fill",
       "label",
+      "label_color",
       "outerborder",
       "outerborder.lwd",
       "outerborder.lty",
@@ -972,6 +962,7 @@ plot.JamPolygon <- function
             # grobname <- "label";# old style
             grobname <- paste0(irowname, ":textGrob:",
                "labels"); # rowname:grob:labels
+            # jamba::printDebug("gp_values:");print(gp_values);# debug
             text_grob <- grid::textGrob(
                x=adjx(unlist(df$label_x)[which_label]),
                y=adjy(unlist(df$label_y)[which_label]),
