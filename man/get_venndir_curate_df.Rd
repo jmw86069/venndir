@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-curate-df.R
 \name{get_venndir_curate_df}
 \alias{get_venndir_curate_df}
-\title{Define venndir curate data.frame}
+\title{Define Venndir sign and symbol curation}
 \usage{
 get_venndir_curate_df(unicode = TRUE, use_color = TRUE, curate_df = NULL, ...)
 }
@@ -32,7 +32,7 @@ has no meaning when there is only one set involved.
 }
 }
 \description{
-Define venndir curate data.frame
+Define Venndir 'curate_df' data for custom signs and symbols
 }
 \details{
 This function defines the \code{data.frame} used for the argument
@@ -54,10 +54,7 @@ my_curate_df <- data.frame(from="1", sign="^", color="red")
 get_venndir_curate_df(unicode=TRUE, curate_df=my_curate_df)
 }
 \seealso{
-Other venndir advanced: 
-\code{\link{Venndir-class}},
-\code{\link{curate_venn_labels}()},
-\code{\link{modify_venndir_overlap}()},
-\code{\link{nudge_venndir_label}()}
+Other venndir signs: 
+\code{\link{curate_venn_labels}()}
 }
-\concept{venndir advanced}
+\concept{venndir signs}

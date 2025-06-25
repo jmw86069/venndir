@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-render-jp.R
 \name{render_venndir}
 \alias{render_venndir}
-\title{Render venndir output}
+\title{Render venndir output, Venndir generic plot()}
 \usage{
 render_venndir(
   venndir_output = NULL,
@@ -31,6 +31,7 @@ render_venndir(
   draw_legend = NULL,
   legend_x = "bottomright",
   legend_font_cex = NULL,
+  draw_footnotes = NULL,
   show_label = NA,
   display_counts = TRUE,
   do_newpage = TRUE,
@@ -250,6 +251,10 @@ the position of the legend.}
 
 \item{legend_font_cex}{\code{numeric} scalar to adjust the legend font size.}
 
+\item{draw_footnotes}{\code{logical} (default NULL) indicating whether to draw
+footnotes if they exist in the 'metadata' slot, calling
+\code{render_venndir_footnotes()}.}
+
 \item{do_newpage}{\code{logical} (default TRUE) indicating whether to call
 \code{grid::grid.newpage()}. This option allows the figure to be rendered
 inside an active display device, or active \code{grid::viewport}.
@@ -282,7 +287,7 @@ for the graphical objects, specifically the use of coordinate
 }
 }
 \description{
-Render venndir output, default plot for a Venndir object
+Render venndir output, generic plot function for a Venndir object
 }
 \details{
 \subsection{About fonts and unicode symbols}{
@@ -362,12 +367,8 @@ objects by default is typically not drawn.
 }
 \seealso{
 Other venndir core: 
-\code{\link{make_venn_test}()},
-\code{\link{plot,Venndir,ANY-method}},
-\code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
 \code{\link{venn_meme}()},
-\code{\link{venndir}()},
-\code{\link{venndir_legender}()}
+\code{\link{venndir}()}
 }
 \concept{venndir core}

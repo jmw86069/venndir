@@ -1,37 +1,52 @@
 destination: docs
 figures:
+  dev: ragg::agg_png
   fig.height: 8
   fig.width: 8
+  dev.args:
+    background: "white"
 template:
   bootstrap: 5
   bootswatch: cosmo
 url: https://jmw86069.github.io/venndir
 reference:
-- title: venndir Core Functions
-  desc: Core functions for venndir
+- title: Venndir Core Functions
+  desc: Primary functions to use
   contents:
   - has_concept("venndir core")
-- title: Import and Conversion Functions
-  desc: Functions to help import and convert data
+- title: Venndir Supporting Functions
+  desc: Additional short list of Venndir functions
+  contents:
+  - has_concept("venndir support")
+- title: Venndir Importer - Exporter Functions
+  desc: Functions to import, export, and convert data formats
   contents:
   - has_concept("venndir conversion")
-- title: venndir Advanced Functions
+- title: Venndir S4 Object
+  desc: S4 generic functions
+  contents:
+  - has_concept("venndir s4")
+- title: Venndir Custom Signs
+  desc: Functions to customize directional signs and symbols
+  contents:
+  - has_concept("venndir signs")
+- title: Venndir Advanced Functions
   desc: Internal venndir advanced functions
   contents:
   - has_concept("venndir advanced")
+- title: Venndir Internal Functions
+  desc: Venndir internal processing functions
+  contents:
+  - has_concept("venndir internal")
+- title: Venndir Geometric Functions
+  desc: Simple geometric calculations
+  contents:
+  - has_concept("venndir geometry")
 - title: JamPolygon object and functions
   desc: Mostly internal functions for JamPolygon objects
   contents:
   - has_concept("JamPolygon")
-- title: venndir Geometric Functions
-  desc: Simple geometric calculations
-  contents:
-  - has_concept("venndir geometry")
-- title: venndir Internal Functions
-  desc: Venndir internal processing functions
-  contents:
-  - has_concept("venndir internal")
-- title: venndir plotly functions (experimental)
-  desc: Experimental plotly compatibility
+- title: Venndir Plotly functions (experimental)
+  desc: Plotly compatibility for ggtext (defunct)
   contents:
   - has_concept("venndir plotly")

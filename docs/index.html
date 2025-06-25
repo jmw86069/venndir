@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Directional Venn diagrams • venndir</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -13,6 +18,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Directional Venn diagrams">
 <meta name="description" content="Venn and proportional Euler diagrams that may also indicate directionality of the items involved. Venn overlaps may include text or item labels. Venn circles, overlap regions, and fonts can be customized.">
 <meta property="og:description" content="Venn and proportional Euler diagrams that may also indicate directionality of the items involved. Venn overlaps may include text or item labels. Venn circles, overlap regions, and fonts can be customized.">
+<meta property="og:image" content="https://jmw86069.github.io/venndir/logo.svg">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.54.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.56.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,8 +59,11 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="venndir">venndir<a class="anchor" aria-label="anchor" href="#venndir"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.svg" class="logo" alt=""><h1 id="venndir-">venndir 
+<a class="anchor" aria-label="anchor" href="#venndir-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 <!-- badges: end -->
 <p>The <code>venndir</code> package provides Venn directional diagrams, that can optionally display item labels inside the overlap regions.</p>
@@ -264,36 +273,37 @@ Thus, <code>concordance=0</code> means there are the same number that agree as d
 <p>The letters:</p>
 <ul>
 <li>
-<strong>N</strong> = the set name</li>
+<strong>N</strong>: set name</li>
 <li>
-<strong>C</strong> = the overlap count</li>
+<strong>C</strong>: overlap count</li>
 <li>
-<strong>S</strong> = the signed overlap count(s)</li>
+<strong>S</strong>: signed overlap count</li>
 <li>
-<strong>i</strong> = the overlapping items</li>
+<strong>i</strong>: items</li>
+<li>
+<strong>p</strong>: percentage of the total items</li>
 </ul>
 <p>Guidance:</p>
 <ul>
-<li>The default: <code>show_labels="Ncs"</code> will show _N_ame outside, _c_ounts inside. When _s_igned labels are shown, they also appear inside. Signed labels are not shown when <code>overlap_type="overlap"</code>.</li>
+<li>Default: <code>show_labels="Ncs"</code> will show <em>N</em>ame outside, <em>c</em>ounts inside. When <em>s</em>igned sets are provided, the signed counts also appear inside.</li>
 <li>Display all labels inside: <code>show_labels="ncs"</code>
 </li>
-<li>It works best to have the _c_ounts and _s_igned counts together, usually inside.</li>
-<li>To display items, <code>show_labels="Ni"</code> is recommended, to show _N_ame outside, and _i_tems inside. You can still use <code>show_items="sign item"</code> so that each item label will include the direction.</li>
-<li>When displaying items, the counts and signed counts are automatically moved outside. (There isn’t a great way to place item labels around the count labels. Maybe in future.)</li>
+<li>It works best to have the <em>c</em>ounts and <em>s</em>igned counts together, usually inside.</li>
+<li>To display items, <code>show_labels="Ni"</code> is recommended, to show <em>N</em>ame outside, and <em>i</em>tems inside.</li>
 </ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">setlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_venn_test.html">make_venn_test</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">vo4</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
-<span>   show_labels<span class="op">=</span><span class="st">"ncs"</span>,</span>
+<span>   show_labels<span class="op">=</span><span class="st">"ncsp"</span>,</span>
 <span>   main<span class="op">=</span><span class="st">"Set labels are placed inside."</span>,</span>
 <span>   inside_percent_threshold<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-label_preset_1-1.png" alt="Venn diagram showing set label placement inside the Venn circles" width="100%"></p>
-<p>Hide line segments with <code>show_segments=FALSE</code></p>
+<p>Hide line segments with <code>show_segments=FALSE</code>.<br>
+Show percentages by adding “p”.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vo4l</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/venndir.html">venndir</a></span><span class="op">(</span><span class="va">setlist</span>,</span>
-<span>   show_labels<span class="op">=</span><span class="st">"Ncs"</span>,</span>
+<span>   show_labels<span class="op">=</span><span class="st">"Ncsp"</span>,</span>
 <span>   show_segments<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>   main<span class="op">=</span><span class="st">"Set labels are outside, with hidden line segments."</span>,</span>
 <span>   inside_percent_threshold<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-label_preset_1l-1.png" alt="Venn diagram with set labels outside the Venn circles, and line segments are hidden." width="100%"></p>
 </div>
@@ -310,8 +320,9 @@ Thus, <code>concordance=0</code> means there are the same number that agree as d
 <p><img src="reference/figures/README-highlights-1.png" alt="Venn diagram with a specific overlap highlighted with yellow fill color." width="100%"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vo4h</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/modify_venndir_overlap.html">highlight_venndir_overlap</a></span><span class="op">(</span><span class="va">vo4l</span>,</span>
-<span>   overlap_set<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"set_B"</span>, <span class="va">vo4l</span><span class="op">@</span><span class="va">jps</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">venn_name</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/render_venndir.html">render_venndir</a></span><span class="op">(</span><span class="va">vo4h</span>, main<span class="op">=</span><span class="st">"All overlaps **set_B** and not **set_D**"</span><span class="op">)</span></span></code></pre></div>
+<span>   overlap_set<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"set_C"</span>, value<span class="op">=</span><span class="cn">TRUE</span>, invert<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"set_B"</span>, <span class="va">vo4l</span><span class="op">@</span><span class="va">jps</span><span class="op">@</span><span class="va">polygons</span><span class="op">$</span><span class="va">venn_name</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/render_venndir.html">render_venndir</a></span><span class="op">(</span><span class="va">vo4h</span>, main<span class="op">=</span><span class="st">"Highlight **set_B**, not **set_C**."</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-highlights_2-1.png" alt="Venn diagram with all overlaps involving set B highlighted with yellow fill color." width="100%"></p>
 </div>
 <div class="section level2">
@@ -422,23 +433,6 @@ Here is a simple example:</p>
 <span>   outerborder.lwd<span class="op">=</span><span class="fl">0</span>,</span>
 <span>   innerborder<span class="op">=</span><span class="st">"white"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-venn_meme_bix-1.png" alt="Venn meme showing three Venn circles, Stats, Computer Science, and Biology, as they relate to Bioinformatics as the intersection of all three." width="100%"></p>
-<p>You can provide a list of vectors, for example comparing two cars:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">meme_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>   `SUV`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"leather seats"</span>, <span class="st">"SUV"</span>, <span class="st">"hardtop"</span>, <span class="st">"20mpg"</span><span class="op">)</span>,</span>
-<span>   `Sedan`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cloth seats"</span>, <span class="st">"sedan"</span>, <span class="st">"sunroof"</span>, <span class="st">"40mpg"</span><span class="op">)</span>,</span>
-<span>   `SUV&amp;Sedan`<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"power locks"</span>, <span class="st">"power windows"</span>, <span class="st">"trunk storage"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/venn_meme.html">venn_meme</a></span><span class="op">(</span><span class="va">meme_list</span>,</span>
-<span>   proportional<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>   innerborder<span class="op">=</span><span class="cn">NA</span>, outerborder.lwd<span class="op">=</span><span class="fl">1</span>, outerborder<span class="op">=</span><span class="st">"white"</span>,</span>
-<span>   item_cex<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.7</span>, <span class="fl">1.8</span>, <span class="fl">1.8</span><span class="op">)</span>,</span>
-<span>   show_labels<span class="op">=</span><span class="st">"Ni"</span>,</span>
-<span>   set_colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"orange"</span>, <span class="st">"firebrick3"</span><span class="op">)</span>,</span>
-<span>   item_buffer<span class="op">=</span><span class="fl">0.2</span>,</span>
-<span>   segment_distance<span class="op">=</span><span class="fl">0.01</span>,</span>
-<span>   xyratio<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-venn_meme-1.png" alt="Venn meme comparing attributes of two cars, with labels shown in unique and shared sections of the Venn diagram." width="100%"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

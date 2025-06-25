@@ -21,19 +21,52 @@
 #'    using `degrees %% 360`.
 #' @param min_degrees `numeric` indicating the minimum angle in degrees
 #'    to allow between adjacent angles.
+#' @param iteration,max_iterations `numeric` used internally to iteratively
+#'    confirm that angles are spread by `min_degrees`.
+#' @param use_colors `character` optional colors to use when `do_plot=TRUE`,
+#'    default NULL assigns color by groups of angles, the applies a
+#'    light-to-dark color gradient.
+#' @param do_plot `logical` whether to plot a visual with the output,
+#'    default FALSE.
+#' @param verbose `logical` indicating whether to print verbose output.
+#'    Values 2 or 3 will print progressively more information.
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
 #' degrees <- c(5, 10, 15, 100, 105, 110, 200, 300, 358);
 #' degrees
-#' spread_degrees(degrees);
+#' use_colors <- colorjam::rainbowJam(length(degrees))
+#' withr::with_par(list(mfrow=c(2, 2)), {
+#' spread_degrees(degrees, min_degrees=0,
+#'    do_plot=TRUE, use_colors=use_colors)
+#' spread_degrees(degrees,
+#'    do_plot=TRUE, use_colors=use_colors)
+#' spread_degrees(degrees, min_degrees=20,
+#'    do_plot=TRUE, use_colors=use_colors)
+#' spread_degrees(degrees, min_degrees=30,
+#'    do_plot=TRUE, use_colors=use_colors)
+#' })
 #' 
 #' degrees2 <- sample(degrees);
 #' degrees2
 #' spread_degrees(degrees2);
 #' 
-#' degrees3 <- c(0, 5, 10, 15)
-#' spread_degrees(degrees3, min_degrees=25)
+#' degrees3 <- c(0, 5, 6, 10, 15, 50)
+#' names(degrees3) <- LETTERS[1:6];
+#' colors3 <- colorjam::rainbowJam(6)
+#' withr::with_par(list(mfrow=c(2, 2)), {
+#' spread_degrees(degrees3, min_degrees=2,
+#'    use_colors=colors3, do_plot=TRUE)
+#' 
+#' spread_degrees(degrees3, min_degrees=6,
+#'    use_colors=colors3, do_plot=TRUE)
+#' 
+#' spread_degrees(degrees3, min_degrees=25,
+#'    use_colors=colors3, do_plot=TRUE)
+#' 
+#' spread_degrees(degrees3, min_degrees=45,
+#'    use_colors=colors3, do_plot=TRUE)
+#' })
 #' 
 #' @export
 spread_degrees <- function
@@ -41,6 +74,8 @@ spread_degrees <- function
  min_degrees=10,
  iteration=1,
  max_iterations=20,
+ use_colors=NULL,
+ do_plot=FALSE,
  verbose=FALSE,
  ...)
 {
@@ -48,21 +83,74 @@ spread_degrees <- function
       jamba::printDebug("spread_degrees(): ",
          "iteration:", iteration);
    }
-   if (length(degrees) == 1) {
-      return(degrees);
-   }
-
-   if ("data.frame" %in% class(degrees)) {
+   input_was_df <- FALSE;
+   if (inherits(degrees, "data.frame")) {
+      input_was_df <- TRUE;
       ddf <- degrees;
       degrees <- ddf$degrees;
    } else {
+      # idx is the input order
       ddf <- data.frame(degrees,
-         order=seq_along(degrees))
+         idx=seq_along(degrees))
+         # order=seq_along(degrees))
+      ddfg <- assign_degree_groups(ddf$degrees,
+         min_degrees=min_degrees);
+      ddf$group <- ddfg$group;
+      ddf$order <- 0;
+      for (igroup in unique(ddf$group)) {
+         k <- which(ddf$group %in% igroup);
+         if (length(k) == 1) {
+            ddf$order[k] <- 1;
+         } else {
+            ddf$order[k] <- make_degrees_clockwise(ddf$degrees[k])$idx;
+         }
+      }
+      ddf2 <- jamba::mixedSortDF(ddf, byCols=c("group", "order", "idx"));
+      ddf2$order <- seq_len(nrow(ddf2));
+      ddf <- jamba::mixedSortDF(ddf2, byCols=c("idx"));
    }
+   
+   # debug plot function
+   spread_plot <- function() {
+      if (length(use_colors) >= length(degrees)) {
+         use_colors <- head(use_colors, length(degrees))
+      } else {
+         use_colors <- jamba::color2gradient(dex=2/3,
+            colorjam::group2colors(ddf$group));
+      }
+      use_degrees <- jamba::nameVector(ddf$degrees,
+         rownames(ddf));
+      # jamba::printDebug("use_degrees:");print(use_degrees);# debug
+      display_angles(use_degrees,
+         # col=colorjam::rainbowJam(nrow(ddf)),
+         col=use_colors,
+         lwd=ifelse(ddf$degrees == degrees,
+            2,
+            4));
+      title(main=paste0("min_degrees=", format(min_degrees, digits=1)),
+         line=3);
+   }
+   
+   if (length(degrees) == 1) {
+      if (TRUE %in% do_plot && iteration == 1) {
+         spread_plot()
+      }
+      if (input_was_df) {
+         return(ddf)
+      }
+      return(degrees);
+   }
+
    if (iteration > max_iterations) {
       if (verbose) {
          jamba::printDebug("spread_degrees(): ",
             "Hit max_iterations:", max_iterations);
+      }
+      if (TRUE %in% do_plot && iteration == 1) {
+         spread_plot()
+      }
+      if (input_was_df) {
+         return(ddf)
       }
       return(degrees);
    }
@@ -75,42 +163,40 @@ spread_degrees <- function
       }
    }
    
+   
+   digits <- 4;
+   # round min_degrees to 4 digits to prevent evil rounding errors?
+   # min_degrees <- round(min_degrees, digits=digits);
+   
+   # 0.0.56.900 - repair large gaps
+   new_ddf <- assign_degree_groups(ddf$degrees,
+      min_degrees=min_degrees);
+   new_cols <- c("degrees", "diff", "diff_pre", "diff_post", "group")
+   ddf[, new_cols] <- new_ddf[, new_cols, drop=FALSE];
    if (verbose > 2) {
       jamba::printDebug("spread_degrees(): ",
-         "ddf start:");
+         "ddf groups:");
       print(ddf);
    }
-   
-   ddf$degrees <- ddf$degrees %% 360;
-   ddf <- jamba::mixedSortDF(ddf, byCols="degrees");
-   if (!"degree_order" %in% colnames(ddf)) {
-      ddf$degree_order <- seq_len(nrow(ddf));
-   }
-   digits <- 4;
-   ddf$diff <- round(
-      diff_degrees(c(ddf$degrees,
-         head(ddf$degrees, 1))),
-      digits=digits);
-   
-   # round min_degrees to 3 digits to prevent evil rounding errors
-   min_degrees <- round(min_degrees,
-      digits=digits);
-   
-   # if no angles are less the min_degrees, return input unchanged
-   if (!any(abs(ddf$diff) < min_degrees)) {
+
+   # if no duplicate group then angles are already spread
+   if (!any(duplicated(ddf$group))) {
       if (verbose) {
          jamba::printDebug("spread_degrees(): ",
             "all angles meet min_degrees=", min_degrees);
+      }
+      if (TRUE %in% do_plot && iteration == 1) {
+         spread_plot()
+      }
+      if (input_was_df) {
+         return(ddf)
       }
       return(degrees);
    }
    
    # if all angles are less than min_degrees, evenly space all angles
-   #ddf$abs_diff <- ddf$diff %% 360;
-   # if (all(abs(ddf$diff) < (min_degrees / 1.01))) {
-   if (all((ddf$diff %% 360) < (min_degrees / 1.01))) {
-      # jamba::printDebug("ddf:");print(ddf);# debug
-      # return(ddf);
+   if ((nrow(ddf) * min_degrees) > 360) {
+      # more items than could fit into 360 degrees by min_degrees steps
       if (verbose) {
          jamba::printDebug("spread_degrees(): ",
             "spreading all angles equally");
@@ -120,63 +206,37 @@ spread_degrees <- function
             to=ddf$degrees[1] + 360,
             length.out=length(ddf$degrees) + 1),
          length(ddf$degrees)) %% 360;
-      ddf <- jamba::mixedSortDF(ddf,
-         byCols=c("degree_order"));
-      ddf$degrees <- seqdegree;
+      # assign values with the same magnitude order
+      ddf$degrees <- seqdegree[order(ddf$degrees)]
+      # ddf <- jamba::mixedSortDF(ddf,
+      #    byCols=c("degree_order"));
+      # ddf$degrees <- seqdegree;
       ddf <- jamba::mixedSortDF(ddf,
          byCols=c("order"));
+      if (TRUE %in% do_plot && iteration == 1) {
+         spread_plot()
+      }
+      if (input_was_df) {
+         return(ddf)
+      }
       return(ddf$degrees);
    }
 
-   find_contiguous_degrees <- function(xdiff, min_degrees) {
-      xdf <- data.frame(diff=xdiff);
-      xdf$fix <- abs(xdf$diff) < (min_degrees);
-      fixrle <- rle(xdf$fix);
-      xdf$set <- rep(seq_along(fixrle$values),
-         fixrle$lengths)
-      # if the last row is part of a set, join with the first row
-      if (head(xdf$fix, 1) && tail(xdf$fix, 1)) {
-         newset <- xdf[nrow(xdf),"set"];
-         xdf[xdf$set %in% 1, "set"] <- newset;
-      }
-      tfrows <- which(
-         c(tail(xdf$fix, 1), head(xdf$fix, -1)) & 
-            xdf$fix %in% FALSE);
-      xdf[tfrows,"set"] <- c(tail(xdf$set, 1), head(xdf$set, -1))[tfrows]
-      #xdf$fix1 <- xdf$fix;
-      xdf[tfrows,"fix"] <- TRUE;
-      xdf;
-   }
-   # use slightly smaller degree angle threshold to flag rows to spread
-   fcd <- find_contiguous_degrees(ddf$diff, min_degrees / 1.01);
-   # use slightly larger degree angle threshold
-   # to include neighboring rows in this process
-   fcd2 <- find_contiguous_degrees(ddf$diff, min_degrees * 1.01);
-   ddf$fix <- fcd$fix;
-   ddf$set <- fcd$set;
-   ddf$fix2 <- fcd2$fix;
-   ddf$set2 <- fcd2$set;
-   set2_use <- unique(subset(ddf, fix)$set2)
-   
-   # subset rows to be adjusted
-   #ddfsub <- subset(ddf, fix);
-   ddfsub <- subset(ddf, set2 %in% set2_use);
-   
-   if (verbose > 2) {
+   group_use <- names(jamba::tcount(ddf$group, 2));
+   if (verbose) {
       jamba::printDebug("spread_degrees(): ",
-         "ddf:");
-      print(ddf);
-      jamba::printDebug("spread_degrees(): ",
-         "ddfsub:");
-      print(ddfsub);
+         "group_use:", group_use);
    }
-   
+
    # spread each group of angles
+   max_iterations <- 2;
    ddf$degrees1 <- ddf$degrees;
-   for (idf in split(ddfsub, ddfsub$set2)) {
-      if (verbose > 2) {
+   for (igroup in group_use) {
+      idf <- subset(ddf, group %in% igroup);
+      if (verbose > 1) {
          jamba::printDebug("spread_degrees(): ",
-            "idf:");
+            "igroup: ", igroup,
+            ", idf:");
          print(idf);
       }
       idf$diff_degrees <- diff_degrees(c(
@@ -185,7 +245,9 @@ spread_degrees <- function
       idf$diff_sign <- sign(idf$diff_degrees);
       idf <- jamba::mixedSortDF(idf,
          byCols=c("diff_sign", "degrees"))
-      meandegree <- mean_degree_arc(idf$degrees,
+      # 0.0.56.900 - improve arc calculation
+      clockwise_degrees <- make_degrees_clockwise(idf$degrees)
+      meandegree <- mean_degree_arc(clockwise_degrees$x,
          use_median=FALSE,
          use_range=FALSE);
       idf <- jamba::mixedSortDF(idf,
@@ -198,54 +260,76 @@ spread_degrees <- function
       }
       startoffset <- meandegree - (nrow(idf) - 1) * min_degrees / 2;
       seqdegree <- seq(startoffset,
-         by=min_degrees,
+         by=min_degrees * 1.00,
          length=nrow(idf));
       #seqdegree <- sort(seqdegree %% 360);
-      ddf[match(idf$order, ddf$order),"degrees"] <- seqdegree;
+      ddf[match(idf$order, ddf$order), "degrees"] <- seqdegree;
       if (verbose > 2) {
          jamba::printDebug("spread_degrees(): ",
             "new ddfsub:");
          print(ddf[match(idf$order, ddf$order),,drop=FALSE]);
       }
    }
+   ddf <- jamba::mixedSortDF(ddf, byCols=c("degrees", "order"));
+   ddf$new_diff <- diff_degrees(c(tail(ddf$degrees, 1), ddf$degrees));
    ddf <- jamba::mixedSortDF(ddf, byCols="order");
    
-   # repeat
+   # repeat as needed
    if (verbose > 2) {
       jamba::printDebug("spread_degrees(): ",
          "ddf end:");
       print(ddf);
    }
-   if (verbose > 1) {
-      if (iteration == 1) {
-         display_angles(ddf$degrees1,
-            col=colorjam::rainbowJam(nrow(ddf)),
-            lwd=ifelse(ddf$degrees == ddf$degrees1,
-               2,
-               4));
-         title(main=paste0("Iteration ", iteration - 1), line=2.5);
+
+   # repair group order
+   # - within group, sort by order (the arc order)
+   # - then sort by idx which is the original input order
+   new_ddf <- ddf;
+   dupe_groups <- names(jamba::tcount(new_ddf$group,2));
+   for (dupe_group in dupe_groups) {
+      k <- which(new_ddf$group %in% dupe_group);
+      new_ddf[k, ]
+      new_ddf$degrees[k] <- make_degrees_clockwise(new_ddf$degrees[k])$x;
+   }
+   ddf <- jamba::mixedSortDF(new_ddf, byCols=c("idx"))
+
+   if (iteration < (max_iterations + 1) &&
+         any(round(ddf$new_diff, digits=1) < round(min_degrees / 1.02, digits=1))) {
+      if (verbose > 2) {
+         jamba::printDebug("spread_degrees(): ",
+            "next iteration: ", iteration + 1);
       }
-      display_angles(ddf$degrees,
-         col=colorjam::rainbowJam(nrow(ddf)),
-         lwd=ifelse(ddf$degrees == ddf$degrees1,
-            2,
-            4));
-      title(main=paste0("Iteration ", iteration), line=2.5);
+      # new_degrees <- spread_degrees(ddf$degrees,
+      new_ddf <- spread_degrees(ddf,
+         min_degrees=min_degrees,
+         iteration=iteration + 1,
+         max_iterations=max_iterations,
+         verbose=verbose)
+      
+      # repair group order
+      new_ddf <- jamba::mixedSortDF(new_ddf, byCols=c("order"))
+
+      dupe_groups <- names(jamba::tcount(new_ddf$group,2));
+      for (dupe_group in dupe_groups) {
+         k <- which(new_ddf$group %in% dupe_group);
+         new_ddf[k, ]
+         new_ddf$degrees[k] <- make_degrees_clockwise(new_ddf$degrees[k])$x;
+      }
+      ddf <- jamba::mixedSortDF(new_ddf, byCols=c("idx"))
+   } else {
+      # new_degrees <- ddf$degrees %% 360;
+      ddf$degrees <- ddf$degrees %% 360;
    }
-   if (!"original_order" %in% colnames(ddf)) {
-      ddf$original_order <- ddf$order;
+   
+   if (TRUE %in% do_plot && iteration == 1) {
+      spread_plot()
    }
-   ddf_keep <- c("degrees",
-      "order",
-      "degree_order",
-      "original_order");
-   degrees <- spread_degrees(
-      degrees=ddf[,ddf_keep,drop=FALSE],
-      min_degrees=min_degrees,
-      iteration=iteration + 1,
-      max_iterations=max_iterations,
-      verbose=verbose);
-   return(degrees);
+   if (input_was_df) {
+      return(ddf)
+   }
+   ddf3 <- data.frame(input=degrees, jamba::mixedSortDF(ddf, byCols="idx"))
+   # jamba::printDebug("ddf3:");print(ddf3);# debug
+   return(ddf$degrees);
 }
 
 #' Mean angle in degrees
@@ -371,6 +455,11 @@ diff_degrees <- function
 #' that the arc does not cover more than 360 degrees, and for angles
 #' whose numeric values are increasing.
 #' 
+#' The specific purpose is to enable supplying two angles like c(12, 45)
+#' to imply the arc "from 12 to 45 degrees", for which the mean is 28.5.
+#' Or one could supply c(45, 12) and imply "from 45, around 360,
+#' back to 12 degrees" and the mean of this large arc would be 208.5.
+#' 
 #' @family venndir geometry
 #' 
 #' @param x `numeric` vector of angles in degrees.
@@ -379,6 +468,7 @@ diff_degrees <- function
 #'    uses the first and last angular values.
 #' @param use_median `logical` indicating whether to use `median()`
 #'    instead of `mean()`, included here for convenience.
+#' @param do_plot `logical` whether to plot the result, default FALSE.
 #' @param ... additional arguments are ignored.
 #' 
 #' @examples
@@ -412,6 +502,17 @@ mean_degree_arc <- function
       attr(degrees, "radius") <- 1;
    } else {
       x <- x %% 360;
+      # 0.0.56.900 - considered, and rejected, correcting for >180 degree gap
+      if (FALSE) {
+         x <- sort(x);
+         xdiff <- diff(c(tail(x, 1), x));
+         if (any(xdiff > 180)) {
+            xwhich <- which(xdiff > 180);
+            xseq <- seq(from=xwhich, to=length(x));
+            x[xseq] <- x[xseq] - 360;
+            x <- sort(x);
+         }
+      }
       degree_diff <- diff_degrees(x);
       num_diff <- diff(x);
       if (any(num_diff < 0)) {

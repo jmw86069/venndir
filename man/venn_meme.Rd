@@ -256,12 +256,8 @@ vo <- venndir::venn_meme(x=item_list,
 }
 \seealso{
 Other venndir core: 
-\code{\link{make_venn_test}()},
-\code{\link{plot,Venndir,ANY-method}},
 \code{\link{render_venndir}()},
-\code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
-\code{\link{venndir}()},
-\code{\link{venndir_legender}()}
+\code{\link{venndir}()}
 }
 \concept{venndir core}

@@ -78,7 +78,6 @@ sapply(names(setlist2b), function(i){
 }
 \seealso{
 Other venndir conversion: 
-\code{\link{collapse_im}()},
 \code{\link{counts2setlist}()},
 \code{\link{im2list}()},
 \code{\link{im_value2list}()},

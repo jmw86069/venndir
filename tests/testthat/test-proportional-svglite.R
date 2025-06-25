@@ -22,7 +22,8 @@ test_that("venn_fonts_svglite", {
          fontfamily="Optima", font_cex=2, legend_font_cex=1.5,
          proportional=FALSE, do_plot=TRUE, center_method="label")
    }
-   if (jamba::check_pkg_installed("vdiffr")) {
+   if (jamba::check_pkg_installed("vdiffr") &&
+         requireNamespace("svglite", quietly=TRUE)) {
       vdiffr::expect_doppelganger("Venn 3-way, Optima, venndir()",
          run_venndir3_font,
          writer=write_svg_with_svglite)
@@ -42,7 +43,8 @@ test_that("venn_fontfamilies_svglite", {
          fontfamily="Optima", font_cex=2, legend_font_cex=1.5,
          proportional=FALSE, do_plot=TRUE, center_method="label")
    }
-   if (jamba::check_pkg_installed("vdiffr")) {
+   if (jamba::check_pkg_installed("vdiffr") &&
+         requireNamespace("svglite", quietly=TRUE)) {
       vdiffr::expect_doppelganger("Venn 3-way, fontfamilies, venndir()",
          run_venndir3_font,
          writer=write_svg_with_svglite)

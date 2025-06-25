@@ -2,6 +2,30 @@
 
 ## 12jun2025
 
+* Add labels to `display_angles()` output?
+* Consider options for item labels: outline text, fill/border around labels.
+Older versions of venndir used "lite box" style item labels for clarity.
+* DONE. Consider how to handle "Hidden overlaps"
+
+   * DONE. Indicate with footnote-style icon? warning: "\u26A0", footnote
+   dagger "\u2020", double-dagger "\u2021", info sign "\u24D8",
+   reference mark "\u203B".
+   * DONE. `has_footnotes()`, `footnotes()`
+
+* Debug `venndir()` outside labels, specific edge case with proportional 4-way,
+shape="ellipse", and labels pointing to polygons with multiple parts.
+They sometimes point to the "far" part.
+
+   * Outside labels are not associated with a segment point, but are
+   defined one anyway. Maybe we should store and use the segment point?
+
+* DONE.Debug `label_outside_JamPolygon()` angles again.
+* DONE. Confirm `render_venndir()` is not placing item labels twice.
+* New argument `marquee_style` to allow optional `marquee::style` object.
+* DONE. Fix bug with `curate_df` not using custom signs in the legend.
+* `highlight_venndir_overlap()` add easy way to update 'label.count'.
+* `make_color_contrast()` - consider improving Luminance when flipping
+white/black so the output is black/white and not darkgrey/lightgrey.
 * Add `describe_venndir_overlap()` to complement `modify_venndir_overlap()`.
 
    * For example, it is not easy to see the `fontsize` already applied.

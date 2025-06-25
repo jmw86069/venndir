@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-to-df.R
 \name{venndir_to_df}
 \alias{venndir_to_df}
-\title{Convert venndir output to data.frame}
+\title{Convert venndir output to data.frame (experimental)}
 \usage{
 venndir_to_df(
   venndir_out,
@@ -59,7 +59,7 @@ argument \code{return_type}.
 }
 \description{
 Convert venndir output to data.frame or kable format
-for visual review.
+for visual review, experimental.
 }
 \details{
 \subsection{Todo:}{
@@ -93,14 +93,15 @@ kdf3
 \seealso{
 Other venndir internal: 
 \code{\link{assemble_venndir_label}()},
+\code{\link{assign_degree_groups}()},
 \code{\link{check_systemfonts_family}()},
 \code{\link{expand_range}()},
 \code{\link{get_venn_polygon_shapes}()},
-\code{\link{hexsticker_venndir}()},
-\code{\link{make_color_contrast}()},
+\code{\link{make_degrees_clockwise}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{match_list}()},
 \code{\link{print_color_df}()},
+\code{\link{render_venndir_footnotes}()},
 \code{\link{shrink_df}()},
 \code{\link{simple_ellipse}()},
 \code{\link{subset_systemfonts}()},

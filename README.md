@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# venndir
+# venndir <a href="https://jmw86069.github.io/venndir"><img src="man/figures/logo.png" align="right" height="120" alt="venndir website" /></a>
 
 <!-- badges: start -->
 
@@ -263,44 +263,40 @@ label.
 
 The letters:
 
-- **N** = the set name
-- **C** = the overlap count
-- **S** = the signed overlap count(s)
-- **i** = the overlapping items
+- **N**: set name
+- **C**: overlap count
+- **S**: signed overlap count
+- **i**: items
+- **p**: percentage of the total items
 
 Guidance:
 
-- The default: `show_labels="Ncs"` will show \_N_ame outside, \_c_ounts
-  inside. When \_s_igned labels are shown, they also appear inside.
-  Signed labels are not shown when `overlap_type="overlap"`.
+- Default: `show_labels="Ncs"` will show *N*ame outside, *c*ounts
+  inside. When *s*igned sets are provided, the signed counts also appear
+  inside.
 - Display all labels inside: `show_labels="ncs"`
-- It works best to have the \_c_ounts and \_s_igned counts together,
+- It works best to have the *c*ounts and *s*igned counts together,
   usually inside.
-- To display items, `show_labels="Ni"` is recommended, to show \_N_ame
-  outside, and \_i_tems inside. You can still use
-  `show_items="sign item"` so that each item label will include the
-  direction.
-- When displaying items, the counts and signed counts are automatically
-  moved outside. (There isn’t a great way to place item labels around
-  the count labels. Maybe in future.)
+- To display items, `show_labels="Ni"` is recommended, to show *N*ame
+  outside, and *i*tems inside.
 
 ``` r
 setlist <- make_venn_test(1000, 3)
 vo4 <- venndir(setlist,
-   show_labels="ncs",
+   show_labels="ncsp",
    main="Set labels are placed inside.",
    inside_percent_threshold=0)
 ```
 
 <img src="man/figures/README-label_preset_1-1.png" alt="Venn diagram showing set label placement inside the Venn circles" width="100%" />
 
-Hide line segments with `show_segments=FALSE`
+Hide line segments with `show_segments=FALSE`.  
+Show percentages by adding “p”.
 
 ``` r
 vo4l <- venndir(setlist,
-   show_labels="Ncs",
+   show_labels="Ncsp",
    show_segments=FALSE,
-   main="Set labels are outside, with hidden line segments.",
    inside_percent_threshold=0)
 ```
 
@@ -323,8 +319,9 @@ render_venndir(vo4h, main="Highlight for **set_A&set_B**")
 
 ``` r
 vo4h <- highlight_venndir_overlap(vo4l,
-   overlap_set=unique(grep("set_B", vo4l@jps@polygons$venn_name, value=TRUE)))
-render_venndir(vo4h, main="All overlaps **set_B** and not **set_D**")
+   overlap_set=grep("set_C", value=TRUE, invert=TRUE,
+      unique(grep("set_B", vo4l@jps@polygons$venn_name, value=TRUE))))
+render_venndir(vo4h, main="Highlight **set_B**, not **set_C**.")
 ```
 
 <img src="man/figures/README-highlights_2-1.png" alt="Venn diagram with all overlaps involving set B highlighted with yellow fill color." width="100%" />
@@ -511,24 +508,3 @@ venn_meme(bix,
 ```
 
 <img src="man/figures/README-venn_meme_bix-1.png" alt="Venn meme showing three Venn circles, Stats, Computer Science, and Biology, as they relate to Bioinformatics as the intersection of all three." width="100%" />
-
-You can provide a list of vectors, for example comparing two cars:
-
-``` r
-meme_list <- list(
-   `SUV`=c("leather seats", "SUV", "hardtop", "20mpg"),
-   `Sedan`=c("cloth seats", "sedan", "sunroof", "40mpg"),
-   `SUV&Sedan`=c("power locks", "power windows", "trunk storage"))
-
-venn_meme(meme_list,
-   proportional=TRUE,
-   innerborder=NA, outerborder.lwd=1, outerborder="white",
-   item_cex=c(1.7, 1.8, 1.8),
-   show_labels="Ni",
-   set_colors=c("orange", "firebrick3"),
-   item_buffer=0.2,
-   segment_distance=0.01,
-   xyratio=2)
-```
-
-<img src="man/figures/README-venn_meme-1.png" alt="Venn meme comparing attributes of two cars, with labels shown in unique and shared sections of the Venn diagram." width="100%" />

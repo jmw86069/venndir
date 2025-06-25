@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-curate.R
 \name{curate_venn_labels}
 \alias{curate_venn_labels}
-\title{Curate Venn labels}
+\title{Curate Venn signs and symbols}
 \usage{
 curate_venn_labels(
   x,
@@ -59,7 +59,7 @@ or when \code{type="all"} it returns \code{data.frame} with rows for each
 entry in \code{x}.
 }
 \description{
-Curate Venn labels
+Curate Venn signs and symbols
 }
 \details{
 This venndir utility function is used to convert a basic
@@ -112,10 +112,7 @@ jamba::printDebug(as.list(curate_venn_labels(venn_labels, "sign")),
 
 }
 \seealso{
-Other venndir advanced: 
-\code{\link{Venndir-class}},
-\code{\link{get_venndir_curate_df}()},
-\code{\link{modify_venndir_overlap}()},
-\code{\link{nudge_venndir_label}()}
+Other venndir signs: 
+\code{\link{get_venndir_curate_df}()}
 }
-\concept{venndir advanced}
+\concept{venndir signs}

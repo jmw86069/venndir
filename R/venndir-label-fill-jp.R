@@ -260,7 +260,7 @@ label_fill_JamPolygon <- function
          darkFactor=df,
          sFactor=sf)
    }
-   
+
    # adjust buffer based upon number of labels 
    if (TRUE %in% apply_n_scale) {
       if (length(ref_jp) > 0) {

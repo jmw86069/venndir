@@ -1,7 +1,7 @@
 
-#' Render venndir output
+#' Render venndir output, Venndir generic plot()
 #' 
-#' Render venndir output, default plot for a Venndir object
+#' Render venndir output, generic plot function for a Venndir object
 #' 
 #' 
 #' ## About fonts and unicode symbols
@@ -150,6 +150,9 @@
 #' @param legend_x `character` passed to `venndir_legender()` to customize
 #'    the position of the legend.
 #' @param legend_font_cex `numeric` scalar to adjust the legend font size.
+#' @param draw_footnotes `logical` (default NULL) indicating whether to draw
+#'    footnotes if they exist in the 'metadata' slot, calling
+#'    `render_venndir_footnotes()`.
 #' @param do_draw `logical` indicating whether to call `grid::grid.draw()`.
 #'    The `grid` graphical objects are returned in attributes:
 #'    "gtree", "grob_list", "viewport", and can be drawn separately.
@@ -207,6 +210,7 @@ render_venndir <- function
  draw_legend=NULL,
  legend_x="bottomright",
  legend_font_cex=NULL,
+ draw_footnotes=NULL,
  show_label=NA,
  display_counts=TRUE,
  do_newpage=TRUE,
@@ -305,6 +309,20 @@ render_venndir <- function
          }
       } else {
          draw_legend <- TRUE;
+      }
+   }
+   # draw_footnotes
+   if (length(draw_footnotes) > 0) {
+      draw_footnotes <- head(as.logical(draw_footnotes), 1);
+   } else {
+      if ("draw_footnotes" %in% names(metadata)) {
+         if (length(metadata$draw_footnotes) == 0) {
+            draw_footnotes <- TRUE
+         } else {
+            draw_footnotes <- head(as.logical(metadata$draw_footnotes), 1);
+         }
+      } else {
+         draw_footnotes <- TRUE;
       }
    }
    # legend_font_cex
@@ -494,9 +512,9 @@ render_venndir <- function
 
             # update here in case area fails, it will use this crude item_cex
             new_item_cex <- item_cex * so_cex * so_area_adj * item_cex_factor;
-            # apply noise floor
+            ## apply noise floor - limits the maximum practical item_cex
             floor_item_cex <- jamba::noiseFloor(new_item_cex,
-               ceiling=4,
+               ceiling=50,
                floor=0.2)
             if (verbose > 1 || TRUE %in% debug) {
                jamba::printDebug("item label size calculations:");
@@ -504,7 +522,6 @@ render_venndir <- function
                   so_counts, n_per_area_fracmax, so_cex,
                   item_cex, new_item_cex, floor_item_cex));# debug
             }
-            # jamba::printDebug("so_area_adj:", so_area_adj, ", so_cex: ", so_cex);# debug
             item_cex <- floor_item_cex;
 
             if (FALSE) {
@@ -555,7 +572,7 @@ render_venndir <- function
          }
       }
       metadata$item_cex <- item_cex;
-      # jamba::printDebug("item_cex: ", item_cex);# debug2
+      # jamba::printDebug("item_cex: ", item_cex);# debug
       
       ## Fill any missing optional colnames with defaults
       label_df_defaults <- list(
@@ -761,10 +778,10 @@ render_venndir <- function
          if (any(show_label & has_offset)) {
             use_offset <- (show_label & has_offset);
             # use_offset <- (show_label & has_offset & label_df$venn_counts > 0);
-            # jamba::printDebug("use_offset rows in label_df:");print(subset(label_df, use_offset));# debug
             offset_sets <- label_df$overlap_set[use_offset];
             # jamba::printDebug("offset_sets: ");print(offset_sets);# debug
-            offset_ref_polygon <- venn_jp@polygons$ref_polygon[match(offset_sets, rownames(venn_jp@polygons))]
+            offset_ref_polygon <- venn_jp@polygons$ref_polygon[
+               match(offset_sets, rownames(venn_jp@polygons))];
             names(offset_ref_polygon) <- offset_sets;
             # jamba::printDebug("offset_ref_polygon: ");print(offset_ref_polygon);# debug
             sp_index <- match(offset_ref_polygon, rownames(venn_jp@polygons))
@@ -777,12 +794,17 @@ render_venndir <- function
             use_polygons <- use_jp@polygons;
             use_polygons$rownum <- seq_len(nrow(use_polygons));
             use_polygons$nsets <- lengths(strsplit(use_polygons$name, "&"));
-            use_polygons <- jamba::mixedSortDF(use_polygons, byCols=c("type", "nsets"));
+            use_polygons <- jamba::mixedSortDF(use_polygons,
+               byCols=c("type", "nsets"));
             ## define best available polygon to label
             
             sp_index0 <- sapply(offset_sets, function(iset1){
+               # 0.0.56.900 - add escapes to support inline styles "{.style text}"
+               esc_iset1 <- gsub("([\\^*])", "\\\\\\1", iset1)
+               esc_iset1 <- gsub("([(){}.+$])", "[\\1]", esc_iset1)
                # jamba::printDebug("paste0(\"(^|&)\", iset1, \"($|&)\"):");print(paste0("(^|&)", iset1, "($|&)"));# debug
-               kset1 <- head(grep(paste0("(^|&)", iset1, "($|&)"),
+               # jamba::printDebug("paste0(\"(^|&)\", esc_iset1, \"($|&)\"):");print(paste0("(^|&)", esc_iset1, "($|&)"));# debug
+               kset1 <- head(grep(paste0("(^|&)", esc_iset1, "($|&)"),
                   use_polygons$label), 1)
                iset2 <- use_polygons$rownum[kset1];
                iset2
@@ -1005,6 +1027,7 @@ render_venndir <- function
       # jamba::printDebug("ssdim(itemlabels_list):");print(jamba::ssdim(itemlabels_list));# debug
       # jamba::printDebug("dim(itemlabels_df):");print(dim(itemlabels_df));# debug
       # jamba::printDebug("middle(itemlabels_df):");print(jamba::middle(itemlabels_df));# debug
+      # jamba::printDebug(unique(itemlabels_df$color), unique(itemlabels_df$color));# debug
       itemlabels_jp <- NULL;
    }
    
@@ -1258,7 +1281,8 @@ render_venndir <- function
       # adjust label color to contrast with the polygon fill color
       new_item_color <- make_color_contrast(x=itemlabels_df$color,
          L_threshold=63,
-         y=itemlabels_df$fill)
+         y=itemlabels_df$fill,
+         ...)
       itemlabels_df$color <- new_item_color;
       # jamba::printDebug("middle(itemlabels_df):");print(jamba::middle(itemlabels_df));
       #
@@ -1271,47 +1295,72 @@ render_venndir <- function
             item_style <- "gridtext";
          }
       }
-      if (any(c("default", "marquee") %in% item_style) || "marquee" %in% debug) {
-         # use marquee by default
-         # substitute style for each label
+      if (any(c("default", "marquee") %in% item_style) ||
+            "marquee" %in% debug) {
+         ## use marquee by default
+         ## substitute style for each label
+         # '{.color label}'
+         ## 0.0.56.900 - recognize tags to prevent styling:
+         # '![Caption](image)'
          # new_item_text <- paste0("{",
          #    itemlabels_df$color, " ",
          #    itemlabels_df$text, "}")
          # print("items marquee_grob");# debug
          # define styles
          min_fontsize <- min(itemlabels_df$fontsize);
-         item_style <- marquee::classic_style(
+         item_mstyle <- marquee::classic_style(
             base_size=min_fontsize,
             lineheight=0.9,
+            body_font=fontfamily,
+            align="center")
+         ## placeholder styling below:
             # outline="white", outline_width=2,
             # background="palegoldenrod",
             # border="black", border_size=marquee::trbl(1, 1, 1, 1), border_radius=3,
             # padding=marquee::trbl(1, 3, 1, 3),
-            body_font=fontfamily,
-            align="center")
-            # align="left")
+         if (length(venndir_output@metadata[["marquee_styles"]]) > 0) {
+            item_mstyle <- combine_marquee_styles(
+               mss=item_mstyle,
+               msl=venndir_output@metadata[["marquee_styles"]],
+               ...)
+         }
          
          rel_fontsize <- round(itemlabels_df$fontsize / min_fontsize, digits=2);
          rel_fontsizeu <- jamba::nameVector(unique(rel_fontsize));
-         # Todo: Fix marquee style
-         for (irel in unique(rel_fontsize)) {
-            item_style <- marquee::modify_style(
-               x=item_style,
+         
+         ## 0.0.56.900 - no need to add rel.1 - also avoids re-styling
+         ## when jitter_cex=0
+         add_rel_sizes <- setdiff(rel_fontsize, 1.0);
+         for (irel in add_rel_sizes) {
+            item_mstyle <- marquee::modify_style(
+               x=item_mstyle,
                paste0("rel.", irel),
                size=marquee::relative(irel))
          }
-         # Todo: Fix multi-line entries, each line needs its own span
+         
+         ## 0.0.56.900 - recognize image tag fields
+         text_is_img <- grepl("^[!][[].*][(].+[)]$", itemlabels_df$text);
+
+         ## In progress: handle multi-line entries, each line on its own span
          add_inline_color <- TRUE;
          if (add_inline_color) {
             use_text <- itemlabels_df$text;
+            
+            # replace HTML <br> with newline "\n"
             use_text <- gsub('<br>|<br/>', "\n", use_text)
+            
+            # replace newline "\n" with placeholder "~!!~"
             # use_text <- gsub("\n\n", "\n~!!~", use_text)
             use_text <- gsub("\n", "~!!~", use_text)
-            use_text <- gsub("([^ \n]|^)\n", "\\1  \n",
-               use_text)
+            
+            ## enforce "  \n" at line ends to force marquee line breaks
+            # use_text <- gsub("([^ \n]|^)\n", "\\1  \n", use_text)
+            
+            ## split multi-line entries into lines to apply span to each
             use_texts <- NULL;
-            k <- seq_along(use_text)
-            if (any(grepl("~!!~", use_text))) {
+            k <- seq_along(use_text);
+            use_text_multi <- grepl("~!!~", use_text);
+            if (any(use_text_multi)) {
                # split by line, yadda yadda
                use_texts <- strsplit(use_text, "~!!~")
                use_text <- unlist(use_texts);
@@ -1334,7 +1383,14 @@ render_venndir <- function
                "}"
                )
          }
-         # jamba::printDebug("head(new_item_text):");print(head(new_item_text));# debug
+         ## consider reverting images so they are not sized relative to text,
+         ## except that seems to break viewport during rendering.
+         if (FALSE && any(text_is_img)) {
+            new_item_text[text_is_img] <- paste0("{.body ", as.character(
+               itemlabels_df$text[text_is_img]), "}");
+         }
+         # jamba::printDebug("new_item_text:");print(new_item_text);# debug
+         
          text_grob <- marquee::marquee_grob(
             text=new_item_text,
             force_body_margin=TRUE,
@@ -1345,7 +1401,7 @@ render_venndir <- function
             y=adjy(itemlabels_df$y),
             default.units="snpc",
             angle=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
-            style=item_style,
+            style=item_mstyle,
             vp=jp_viewport,
             hjust="center-ink",
             vjust="center-ink");
@@ -1559,6 +1615,7 @@ render_venndir <- function
                frame_fill=head(igdf$box_fill, 1),
                frame_border=head(igdf$border_col, 1),
                template=template,
+               marquee_styles=venndir_output@metadata[["marquee_styles"]],
                ...
             )
             if ("frameGrob" %in% debug) {
@@ -1677,6 +1734,20 @@ render_venndir <- function
       jp_grobList$legend <- legend_grob;
    }
 
+   ########################################   
+   # venndir footnotes
+   if (TRUE %in% draw_footnotes) {
+      footnote_grob <- render_venndir_footnotes(
+         venndir_output=vo_new,
+         draw_footnote=FALSE,
+         vp=jp_viewport,
+         fontfamily=fontfamily,
+         ...)
+      if (length(footnote_grob) > 0) {
+         jp_grobList$footnote <- footnote_grob;
+      }
+   }
+   
    ############################################
    # Plot title
    if (length(main) > 0 && any(nchar(main) > 0)) {
@@ -1701,19 +1772,29 @@ render_venndir <- function
             hjust=0.5,
             vjust=1);
       } else if (jamba::check_pkg_installed("marquee")) {
+         main_style <- marquee::classic_style(
+            base_size=16 * font_cex[1],
+            body_font=fontfamily,
+            # weight="bold",
+            align="center"
+         );
+         # optional user-defined inline styles
+         marquee_styles <- venndir_output@metadata[["marquee_styles"]];
+         if (length(marquee_styles) > 0) {
+            main_style <- combine_marquee_styles(
+               mss=main_style,
+               msl=marquee_styles,
+               ...)
+         }
          main_grob <- marquee::marquee_grob(
             text=main,
             ignore_html=TRUE,
             name="venndir_main",
             x=0.5,
+            # width=NA, # necessary if border,fill are applied, also devoid
             y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
             default.units="snpc",
-            style=marquee::classic_style(
-               base_size=16 * font_cex[1],
-               body_font=fontfamily,
-               # weight="bold",
-               align="center"
-            ),
+            style=main_style,
             vp=jp_viewport,
             hjust="center",
             vjust="top");

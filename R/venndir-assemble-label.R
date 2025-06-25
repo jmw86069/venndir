@@ -168,6 +168,17 @@
 #'    * `"richtext_grob"` (deprecated) uses `gridtext::richtext_grob()` -
 #'    alternative for markdown support, however some graphics devices show
 #'    inconsistent spacing between words.
+#' @param marquee_styles `marquee_style_set`, default is NULL.
+#'    It is used when `text_grob_type="marquee"` which is default.
+#'    When provided, it is combined
+#'    with `marquee::classic_style()` generated using other arguments:
+#'    fontsizes, fontfamily, fontfamilies, fontfaces, etc.
+#'    
+#'    It is mainly intended to define inline styles to
+#'    use with inline labels. For example, syntax "{.tag Some Text}"
+#'    would apply the inline style 'tag' to "Some Text".
+#'    It can be used to change the font family, increase/decrease the
+#'    font size.
 #' @param use_devoid `logical` whether to open temporary `devoid::void_dev()`
 #'    device to prevent opening a new device or advancing the page of
 #'    an existing open device. Default `getOption("use_devoid", TRUE)`.
@@ -222,6 +233,7 @@ assemble_venndir_label <- function
     "textGrob",
     "gridtext",
     "richtext_grob"),
+ marquee_styles=NULL,
  use_devoid=getOption("use_devoid", TRUE),
  debug=FALSE,
  verbose=FALSE,
@@ -297,7 +309,8 @@ assemble_venndir_label <- function
    if (TRUE %in% use_devoid) {
       if (requireNamespace("devoid", quietly=TRUE)) {
          dev1 <- dev.list();
-         devoid::void_dev();
+         # devoid::void_dev();
+         pdf(NULL); # attempt pdf(NULL) as drop-in replacement
          dev2 <- dev.list();
          devVOID <- setdiff(dev2, dev1)
          on.exit(expr={
@@ -378,6 +391,29 @@ assemble_venndir_label <- function
                signed_vjust <- paste0(signed_vjust, "-ink");
             }
             kk <- 2 * fs / 12;
+            signed_style <- marquee::classic_style(
+               base_size=fs,
+               body_font=fm,
+               italic=fi,
+               weight=fweight,
+               color=fc,
+               margin=marquee::trbl(grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt"),
+                  grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt")),
+               padding=marquee::trbl(grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt"),
+                  grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt")),
+               align="left");
+            # optional user-defined inline styles
+            if (length(marquee_styles) > 0) {
+               item_style <- combine_marquee_styles(
+                  mss=signed_style,
+                  msl=marquee_styles,
+                  ...)
+            }
+            
             grob_sign1 <- marquee::marquee_grob(
                text=signed_labels[[i]],
                ignore_html=TRUE,
@@ -386,21 +422,7 @@ assemble_venndir_label <- function
                x=grid::unit(signed_x, "npc"),
                default.units="snpc",
                force_body_margin=TRUE,
-               style=marquee::classic_style(
-                  base_size=fs,
-                  body_font=fm,
-                  italic=fi,
-                  weight=fweight,
-                  color=fc,
-                  margin=marquee::trbl(grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt"),
-                     grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt")),
-                  padding=marquee::trbl(grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt"),
-                     grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt")),
-                  align="left"),
+               style=signed_style,
                hjust=signed_hjust,
                vjust=signed_vjust);
             # grid::grid.draw(grob_sign1);# debug
@@ -464,6 +486,32 @@ assemble_venndir_label <- function
             fi <- grepl("italic", ff);
             fweight <- gsub("italic|[.]", "", gsub("plain", "normal", ff));
             kk <- 1 * fs / 12;
+            
+            count_style <- marquee::classic_style(
+               base_size=fs,
+               body_font=fm,
+               italic=fi,
+               weight=fweight,
+               color=fc,
+               # background="gold", # for debug
+               margin=marquee::trbl(grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt"),
+                  grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt")),
+               padding=marquee::trbl(grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt"),
+                  grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt")),
+               align="center"
+            );
+            # optional user-defined inline styles
+            if (length(marquee_styles) > 0) {
+               count_style <- combine_marquee_styles(
+                  mss=count_style,
+                  msl=marquee_styles,
+                  ...)
+            }
+            
             grob_count1 <- marquee::marquee_grob(
                text=count_labels[[i]],
                ignore_html=TRUE,
@@ -472,23 +520,7 @@ assemble_venndir_label <- function
                x=grid::unit(0.5, "npc"),
                default.units="snpc",
                force_body_margin=TRUE,
-               style=marquee::classic_style(
-                  base_size=fs,
-                  body_font=fm,
-                  italic=fi,
-                  weight=fweight,
-                  color=fc,
-                  # background="gold", # for debug
-                  margin=marquee::trbl(grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt"),
-                     grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt")),
-                  padding=marquee::trbl(grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt"),
-                     grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt")),
-                  align="center"
-               ),
+               style=count_style,
                hjust="center-ink",
                vjust="center-ink");
          } else if ("richtext_grob" %in% text_grob_type) {
@@ -556,6 +588,33 @@ assemble_venndir_label <- function
             fi <- grepl("italic", ff);
             fweight <- gsub("italic|[.]", "", gsub("plain", "normal", ff));
             kk <- fs / 12;
+            
+            overlap_style <- marquee::classic_style(
+               base_size=fs,
+               body_font=fm,
+               italic=fi,
+               weight=fweight,
+               # weight="normal",
+               color=fc,
+               # background="gold", # for debug
+               margin=marquee::trbl(grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt"),
+                  grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt")),
+               padding=marquee::trbl(grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt"),
+                  grid::unit(-1*kk, "pt"),
+                  grid::unit(0, "pt")),
+               align="center"
+            );
+            # optional user-defined inline styles
+            if (length(marquee_styles) > 0) {
+               overlap_style <- combine_marquee_styles(
+                  mss=overlap_style,
+                  msl=marquee_styles,
+                  ...)
+            }
+            
             grob_overlap1 <- marquee::marquee_grob(
                text=gsub("\n", "\n\n", overlap_labels[[i]]),
                ignore_html=TRUE,
@@ -565,24 +624,7 @@ assemble_venndir_label <- function
                x=grid::unit(0.5, "npc"),
                default.units="snpc",
                force_body_margin=TRUE,
-               style=marquee::classic_style(
-                  base_size=fs,
-                  body_font=fm,
-                  italic=fi,
-                  weight=fweight,
-                  # weight="normal",
-                  color=fc,
-                  # background="gold", # for debug
-                  margin=marquee::trbl(grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt"),
-                     grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt")),
-                  padding=marquee::trbl(grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt"),
-                     grid::unit(-1*kk, "pt"),
-                     grid::unit(0, "pt")),
-                  align="center"
-               ),
+               style=overlap_style,
                hjust="center-ink",
                vjust="center-ink");
                # hjust="center",

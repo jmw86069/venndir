@@ -15,6 +15,7 @@ venndir(
   legend_signed = NULL,
   legend_font_cex = 1,
   proportional = FALSE,
+  draw_footnotes = TRUE,
   show_labels = "Ncs",
   main = NULL,
   return_items = TRUE,
@@ -30,6 +31,7 @@ venndir(
   label_style = c("basic", "fill", "shaded", "shaded_box", "lite", "lite_box"),
   label_preset = "none",
   template = c("wide", "tall"),
+  marquee_styles = NULL,
   unicode = TRUE,
   big.mark = ",",
   curate_df = NULL,
@@ -110,6 +112,14 @@ Proportional circles are not guaranteed to represent all possible
 overlaps. Proportional circles are determined by calling
 \code{eulerr::eulerr()}.
 Use \code{shape="ellipse"} for \code{eulerr()} to provide elliptical shapes.}
+
+\item{draw_footnotes}{\code{logical} passed to \code{render_venndir_footnotes()},
+default TRUE, and stored in the \code{Venndir} metadata.
+When TRUE, footnotes will be drawn if the exist in the 'metadata'
+slot of the Venndir object, which occurs only when there are
+overlaps which cannot be displayed due to the polygon geometry.
+Note that '...' ellipses are passed to \code{render_venndir_footnotes()}
+for arguments such as \code{footnote_style} and other customizations.}
 
 \item{show_labels}{\code{character} string to define the labels to display,
 and where they should be displayed.
@@ -257,6 +267,16 @@ counts, center-justified.
 This option is recommended for large numbers (where there are 1000
 or more items in a single overlap region), or for crowded diagrams.
 }}
+
+\item{marquee_styles}{\code{list} with optional \code{marquee::style()} objects,
+with each entry named by the inline tag to use. For example,
+\code{list(cursive=marquee::style(family="Brush Script MT"))} would
+create a new inline style 'cursive' which could be used like this:
+\code{'{.cursive Some Cursive Text}'} to apply that style.
+
+When provided, \code{marquee::classic_style()} is used to create all
+basic HTML-like styles, then will be combined with additional
+styles present in \code{marquee_styles.}}
 
 \item{unicode}{\code{logical} (default TRUE) indicating whether to
 display Unicode arrows for signed overlaps. Passed to
@@ -534,12 +554,8 @@ vo <- venndir(setlist,
 }
 \seealso{
 Other venndir core: 
-\code{\link{make_venn_test}()},
-\code{\link{plot,Venndir,ANY-method}},
 \code{\link{render_venndir}()},
-\code{\link{signed_overlaps}()},
 \code{\link{textvenn}()},
-\code{\link{venn_meme}()},
-\code{\link{venndir_legender}()}
+\code{\link{venn_meme}()}
 }
 \concept{venndir core}

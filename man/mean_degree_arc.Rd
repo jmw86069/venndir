@@ -16,6 +16,8 @@ uses the first and last angular values.}
 \item{use_median}{\code{logical} indicating whether to use \code{median()}
 instead of \code{mean()}, included here for convenience.}
 
+\item{do_plot}{\code{logical} whether to plot the result, default FALSE.}
+
 \item{...}{additional arguments are ignored.}
 }
 \description{
@@ -27,6 +29,11 @@ the mean angle in degrees from angles along an arc, guaranteeing
 that the mean angle is along that numeric arc. It is intended
 that the arc does not cover more than 360 degrees, and for angles
 whose numeric values are increasing.
+
+The specific purpose is to enable supplying two angles like c(12, 45)
+to imply the arc "from 12 to 45 degrees", for which the mean is 28.5.
+Or one could supply c(45, 12) and imply "from 45, around 360,
+back to 12 degrees" and the mean of this large arc would be 208.5.
 }
 \examples{
 set.seed(1);

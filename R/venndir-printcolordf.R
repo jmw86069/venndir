@@ -166,9 +166,9 @@ print_color_df <- function
    }
 }
 
-#' Make color contrast
+#' Make color contrast with background colors
 #' 
-#' Make color contrast
+#' Make color contrast with background colors
 #' 
 #' This function provides a simple method to ensure a color
 #' has adequate visual contrast with a background color,
@@ -180,11 +180,35 @@ print_color_df <- function
 #' Similarly, pink on pink will return something close to
 #' red.
 #' 
-#' @family venndir internal
-#'
+#' @family venndir advanced
+#' 
+#' @param x `character` vector of text colors
+#' @param y `character` vector of fill colors for which the colors
+#'    in `x` should be adjusted for visual contrast.
+#' @param bg `character` background color, default 'white', used
+#'    when colors in `y` contain transparency.
+#' @param L_threshold `numeric` threshold Luminance (L) value which
+#'    defines the point where the background color should have
+#'    light or dark text for optimum visual contrast. The default `65`
+#'    is well-discussed in data visualization forums, however
+#'    may not be ideal for all viewing conditions.
+#' @param C_floor `numeric` to define the minimum Chroma (C) when
+#'    the adjusted color Chroma is below an internal threshold 20.
+#' @param L_hi,L_lo `numeric` value to define the Luminance (L) used
+#'    for 'hi' (bright) output colors, or 'lo' (dark) output
+#'    colors. The default 'L_hi=95' is fairly high, and 'L_lo=40'
+#'    is moderately dark. In future the recommended default may
+#'    become 'L_hi=85' to improve the resulting color hue.
 #' @param blend_preset `character` string passed as `preset` to
 #'    `colorjam::blend_colors()` to define the color wheel used
-#'    during color blending operations.
+#'    during color blending operations. Default 'ryb' uses the
+#'    red-yellow-blue color wheel. This adjustment only affects
+#'    layering 'y' together with 'bg'.
+#' @param do_plot `logical` whether to create a visual plot illustrating
+#'    the input and output colors, on top of the background.
+#' @param cex `numeric` text size adjustment used when `do_plot=TRUE`.
+#' @param ... additional arguments are passed to internal functions,
+#'    including `colorjam::blend_colors()`.
 #' 
 #' @examples
 #' x <- c("firebrick", "dodgerblue", "gold", "pink", "white");

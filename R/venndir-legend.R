@@ -1,15 +1,15 @@
 
-#' Add legend to venndir figure
+#' Add legend to a Venndir figure
 #' 
-#' Add legend to venndir figure
+#' Add legend to a Venndir figure
 #' 
-#' Note this function is experimental and is under active development. The
-#' implementation and arguments may change in future.
-#'  
-#' Limitations: Currently this function relies upon having the `setlist`
-#' used to produce the `venndir()` output, and the `venndir()` output.
-#' In future, the `setlist` could be derived from the `venndir()` output
-#' object directly. That step likely needs a new function.
+#' Add a Venndir legend to the perimeter of an existing Venndir figure.
+#' Note this function it typically called from `venndir()` via
+#' `render_venndir()` when argument `draw_legend=TRUE` (default).
+#' By using `draw_legend=FALSE` the returned `Venndir` object can be
+#' used as input to `venndir_legender()` to draw the legend in a custom
+#' location, for example using the overall figure viewport instead of
+#' being limited to the Venndir viewport.
 #' 
 #' When using arguments `legend_style="grid"` and `draw_legend=FALSE` the
 #' `grid` `grob` object is returned, so that it can be manipulated
@@ -19,12 +19,7 @@
 #' Total legend width is: `sum(legend_grob$widths)`, and
 #' total legend height is: `sum(legend_grob$heights)`.
 #' 
-#' Todo:
-#' 
-#' * Consider bottom-justifying text in each cell, left-justifying text
-#' labels, and right-justifying numeric values.
-#' 
-#' @family venndir core
+#' @family venndir support
 #' 
 #' @param venndir_output `Venndir` object, default NULL, or one of:
 #'    * `Venndir` object, also used to define `set_colors` when applicable
@@ -107,14 +102,17 @@
 #'    drawn with line width `lwd`.
 #' @param lwd `numeric`, default 1, cell border line width used
 #'    in the legend table, when `legend_style="grid"`.
-#' @param x_inset,y_inset `grid::unit`, default 2 lines each, used
+#' @param x_inset,y_inset `grid::unit`, default 1 line each, used
 #'    when `legend_style="grid"` to position the legend relative to `x`,
 #'    useful when positioning the legend near the edge `x="bottomleft"`.
-#'    The inset controls distance from the plot edge, along the x- and y-axes,
-#'    respectively. For example `x_inset=grid::unit(2, "lines")` will
+#'    
+#'    The inset controls distance from the plot edge along the x- and y-axes.
+#'    For example, `x_inset=grid::unit(2, "lines")` will
 #'    place the legend table 2 character lines (which are defined by
 #'    line height for typical character size) away from the left or
-#'    right edge of the plot. Any valid `grid::unit` can be used.
+#'    right edge of the plot.
+#'    
+#'    Any valid `grid::unit` can be used.
 #'    Note that the metric is "plot edge", and the plot is fixed 1:1 aspect,
 #'    so for wide plot devices a negative `x_inset` may be used to nudge
 #'    the legend outside the typical plot boundary.
@@ -168,6 +166,9 @@
 #'    provided.
 #' @param set_suffix `character` string (default `""`) used as optional
 #'    suffix, and previously used `":"` but was changed to `""`.
+#' @param curate_df `data.frame`, default NULL will use the metadata
+#'    of `venndir_output` to retrieve any custom `curate_df` already
+#'    in use for the Venndir object.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param ... additional arguments are passed to internal functions.
 #'    Notably `curate_venn_labels()` may accept the `curate_df` argument,
@@ -313,8 +314,8 @@ venndir_legender <- function
  header_bg="#FFFFFF00",
  header_border="#FFFFFF00",
  lwd=1,
- x_inset=grid::unit(2, "lines"),
- y_inset=grid::unit(2, "lines"),
+ x_inset=grid::unit(0.5, "lines"),
+ y_inset=grid::unit(0.5, "lines"),
  font_cex=1,
  fontfamily="Arial",
  fontfamilies=list(signed=fontfamily,
@@ -327,6 +328,7 @@ venndir_legender <- function
  labels=NULL,
  legend_padding=2,
  set_suffix="",
+ curate_df=NULL,
  vp=NULL,
  fg_fun=marquee_text_grob,
  verbose=FALSE,
@@ -367,6 +369,11 @@ venndir_legender <- function
       } else if (inherits(venndir_output, "Venndir")) {
          if (length(setlist) > 0) {
             # consider warning that it will be overwritten
+         }
+         marquee_styles <- venndir_output@metadata[["marquee_styles"]];
+         if (length(curate_df) == 0 &&
+            "curate_df" %in% names(venndir_output@metadata)) {
+            curate_df <- venndir_output@metadata[["curate_df"]];
          }
          setlist <- venndir_output@setlist;
          if (length(legend_signed) == 0) {
@@ -715,13 +722,14 @@ venndir_legender <- function
          x=names(unlist(unname(gCounts))),
          unicode=unicode,
          type="sign",
+         curate_df=curate_df,
          ...)
       gbase_colors <- curate_venn_labels(
          x=names(unlist(unname(gCounts))),
          unicode=unicode,
          type="color",
+         curate_df=curate_df,
          ...)
-         # curate_df=curate_df);
       big.mark <- ",";
       use_sign_count_delim <- sub(" ", "", sign_count_delim);
       gcount_labels <- sapply(seq_along(unlist(gCounts)), function(i){
@@ -1008,8 +1016,17 @@ venndir_legender <- function
 
       # create the tableGrob
       if (length(fg_fun) > 0 && inherits(fg_fun, "function")) {
-         table_theme$core$fg_fun <- fg_fun;
-         table_theme$colhead$fg_fun <- fg_fun;
+         if (length(marquee_styles) > 0) {
+            # 0.0.56.900 - add marquee_styles if defined
+            use_fg_fun <- function(...){
+               fg_fun(..., marquee_styles=marquee_styles);
+            }
+            table_theme$core$fg_fun <- use_fg_fun;
+            table_theme$colhead$fg_fun <- use_fg_fun;
+         } else {
+            table_theme$core$fg_fun <- fg_fun;
+            table_theme$colhead$fg_fun <- fg_fun;
+         }
       }
       # legend_grob <- jamba::call_fn_ellipsis(gridExtra::tableGrob,
       legend_grob <- gridExtra::tableGrob(

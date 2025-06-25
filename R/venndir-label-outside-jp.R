@@ -3,6 +3,42 @@
 #' 
 #' Position labels outside JamPolygon
 #' 
+#' The purpose is to arrange labels outside a `JamPolygon` that
+#' contains one or more parts. In general, it works best to supply
+#' the entire `JamPolygon` even when labeling a subset of parts,
+#' using `which_jp` to select the parts to label,
+#' since it defines many coordinates relative to the overall
+#' geometry.
+#' 
+#' There are several strategies used, from experiences trying
+#' to label Euler diagrams in automated way. The general steps:
+#' 
+#' 1. Define **center**.
+#' 
+#'    * The default uses the center of the bounding box.
+#'    * An alternative is the mean position of each polygon internal
+#'    label, which is effective when most labels are skewed to one side.
+#' 
+#' 2. Draw lines from center, through the polygon to label,
+#' outside some distance.
+#' 
+#'    * The default chooses the farthest point from center for each
+#'    polygon.
+#'    * An alternative is to use the polygon internal label position.
+#' 
+#' 3. Define a line segment from the outside point back to the polygon,
+#' inside by some distance.
+#' 
+#'    * The default uses the nearest point on the polygon to the outside point.
+#'    * An alternative directs the line segment toward the internal
+#'    label for each polygon.
+#' 
+#' The defaults are quite effective, however some unusual arrangements or
+#' shapes may warrant trying the other options.
+#' 
+#' When calling `venndir()`, the ellipses `'...'` are passed through to
+#' this function `label_outside_JamPolygon()` to customize these options.
+#' 
 #' @family JamPolygon
 #'
 #' @param jp `JamPolygon`
@@ -11,8 +47,16 @@
 #'    each will be analyzed in sequence. When `which_jp=NULL` then
 #'    all the polygons in `jp` will be analyzed in sequence.
 #' @param center `numeric` vector or matrix with two values indicating
-#'    the center position. When `center=NULL` then the center is
-#'    determined using a method defined by `center_method`.
+#'    the center position.
+#'    * In all cases, the overall center is defined using
+#'    `center_method`, then it is adjusted by `center` when defined.
+#'    * When `center=NULL` the `center_method` value is used.
+#'    * When `center` is provided and `relative=TRUE`
+#'    (default), the overall center position is adjusted using
+#'    `center` interpreted as relative values.
+#'    * When `relative=FALSE` the values `center` are added to the
+#'    overall center position. To use `center` as absolute coordinates,
+#'    select `center_method="none"`.
 #' @param buffer `numeric` buffer, default -0.1, inside the polygon
 #'    used to draw a line segment connecting the label to the appropriate
 #'    polygon.
@@ -25,13 +69,25 @@
 #'    of all the polygon label positions;
 #'    * `"bbox"` uses the mean x,y
 #'    coordinate of the bounding box that encompasses the polygons.
-#' 
+#'    * `"none"` uses the origin 0,0 and is intended mainly to allow
+#'    `center` to be used as absolute coordinates.
+#'    
 #'    The effect
 #'    is to extend outer labels radially around this center point.
 #'    Using the mean label position with `center_method="label"`
 #'    is helpful because it ensures labels are extended in all directions
 #'    even when most labels are in one upper or lower section of
-#'    the `sp` polygons.
+#'    the polygons.
+#' @param vector_method `character` string indicating the vector from
+#'    `center` outward, to define the position outside the polygons.
+#'    * `'farthest'` (default) aims to the farthest point from center.
+#'    * `'label'` aims through the default label position in each polygon.
+#' @param segment_method `character` string indicating how to connect
+#'    a line segment from the outside label, back to the polygon.
+#'    The line segment ends inside the polygon, defined by `buffer`.
+#'    * `'nearest'` (default) points to the nearest border.
+#'    * `'label'` points toward the default label position inside the
+#'    polygon.
 #' @param min_degrees `numeric`, default 15, minimum degrees spacing
 #'    to impose between label positions, oriented around the center.
 #'    When there are more labels than can be divided, the threshold
@@ -68,10 +124,13 @@ label_outside_JamPolygon <- function
  buffer=-0.1,
  distance=0.1,
  center_method=c("bbox",
+    "label",
+    "none"),
+ vector_method=c(
+    "farthest",
     "label"),
- vector_method=c("label",
-    "farthest"),
- segment_method=c("nearest",
+ segment_method=c(
+    "nearest",
     "vector"),
  min_degrees=15,
  relative=TRUE,
@@ -84,6 +143,8 @@ label_outside_JamPolygon <- function
 {
    # validate input
    center_method <- match.arg(center_method);
+   vector_method <- match.arg(vector_method);
+   segment_method <- match.arg(segment_method);
    if (length(which_jp) == 0) {
       ## use only those entries with polygon coordinates
       # which_jp <- which(sapply(seq_len(nrow(jp@polygons)), function(ijp){
@@ -140,6 +201,7 @@ label_outside_JamPolygon <- function
    # get center
    set.seed(seed);
    # calculate plot center
+   new_center <- cbind(x=0, y=0);
    if ("bbox" %in% center_method || length(which_jp) == 1) {
       new_center <- matrix(ncol=2,
          rowMeans(jpbox)) + (rnorm(2) / 1000);
@@ -210,7 +272,9 @@ label_outside_JamPolygon <- function
       xymax;
    }));
    rownames(polyref_xy) <- names(jp)[which_jp];
-   # jamba::printDebug("polyref_xy:");print(polyref_xy);# debug
+   if (verbose > 1) {
+      jamba::printDebug("polyref_xy:");print(polyref_xy);# debug
+   }
 
    # iterate multiple polygons to find angles
    angles_df <- jamba::rbindList(lapply(which_jp, function(iwhich){
@@ -241,14 +305,18 @@ label_outside_JamPolygon <- function
    }));
    angles_df <- jamba::mixedSortDF(angles_df,
       byCols=c("-ydiff", "-angle", "iname"))
-   # jamba::printDebug("angles_df:");print(angles_df);# debug
+   if (verbose > 1) {
+      jamba::printDebug("angles_df:");print(angles_df);# debug
+   }
    angles1 <- jamba::nameVector(angles_df[, c("angle", "iname"), drop=FALSE]);
 
    # logic here to spread out angles too close to each other
    angles <- angles1;
    not_na <- !is.na(angles1);
+
    angles[not_na] <- spread_degrees(angles1[not_na],
       min_degrees=min_degrees);
+   
    # names(angles) <- names(jp)[which_jp];
    angles_df$new_angle <- angles;
    # jamba::printDebug("angles_df:");print(angles_df);# debug

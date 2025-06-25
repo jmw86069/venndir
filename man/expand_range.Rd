@@ -83,13 +83,14 @@ expand_range(list(xlim=xlim, ylim=ylim))
 \seealso{
 Other venndir internal: 
 \code{\link{assemble_venndir_label}()},
+\code{\link{assign_degree_groups}()},
 \code{\link{check_systemfonts_family}()},
 \code{\link{get_venn_polygon_shapes}()},
-\code{\link{hexsticker_venndir}()},
-\code{\link{make_color_contrast}()},
+\code{\link{make_degrees_clockwise}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{match_list}()},
 \code{\link{print_color_df}()},
+\code{\link{render_venndir_footnotes}()},
 \code{\link{shrink_df}()},
 \code{\link{simple_ellipse}()},
 \code{\link{subset_systemfonts}()},

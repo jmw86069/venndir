@@ -1,8 +1,8 @@
 
-#' Convert venndir output to data.frame
+#' Convert venndir output to data.frame (experimental)
 #' 
 #' Convert venndir output to data.frame or kable format
-#' for visual review.
+#' for visual review, experimental.
 #' 
 #' ## Todo:
 #' 

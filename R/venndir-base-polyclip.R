@@ -110,6 +110,13 @@
 #'    overlaps. Proportional circles are determined by calling
 #'    `eulerr::eulerr()`.
 #'    Use `shape="ellipse"` for `eulerr()` to provide elliptical shapes.
+#' @param draw_footnotes `logical` passed to `render_venndir_footnotes()`,
+#'    default TRUE, and stored in the `Venndir` metadata.
+#'    When TRUE, footnotes will be drawn if the exist in the 'metadata'
+#'    slot of the Venndir object, which occurs only when there are
+#'    overlaps which cannot be displayed due to the polygon geometry.
+#'    Note that '...' ellipses are passed to `render_venndir_footnotes()`
+#'    for arguments such as `footnote_style` and other customizations.
 #' @param show_labels `character` string to define the labels to display,
 #'    and where they should be displayed.
 #'    The definition uses a single letter to indicate each type of label
@@ -230,6 +237,15 @@
 #'    counts, center-justified.
 #'    This option is recommended for large numbers (where there are 1000
 #'    or more items in a single overlap region), or for crowded diagrams.
+#' @param marquee_styles `list` with optional `marquee::style()` objects,
+#'    with each entry named by the inline tag to use. For example,
+#'    `list(cursive=marquee::style(family="Brush Script MT"))` would
+#'    create a new inline style 'cursive' which could be used like this:
+#'    `'{.cursive Some Cursive Text}'` to apply that style.
+#'    
+#'    When provided, `marquee::classic_style()` is used to create all
+#'    basic HTML-like styles, then will be combined with additional
+#'    styles present in `marquee_styles.`
 #' @param unicode `logical` (default TRUE) indicating whether to 
 #'    display Unicode arrows for signed overlaps. Passed to
 #'    `curate_venn_labels()`.
@@ -401,6 +417,7 @@ venndir <- function
  legend_signed=NULL,
  legend_font_cex=1,
  proportional=FALSE,
+ draw_footnotes=TRUE,
  show_labels="Ncs",
  main=NULL,
  return_items=TRUE,
@@ -427,6 +444,7 @@ venndir <- function
  label_preset="none",
  template=c("wide",
     "tall"),
+ marquee_styles=NULL,
  unicode=TRUE,
  big.mark=",",
  curate_df=NULL,
@@ -728,9 +746,14 @@ venndir <- function
       length(unique(jamba::rmNA(ix1))) == 0
    }) * 1;
    whichset <- sapply(unique(venn_jps@polygons$label), function(ilab){
+      # 0.0.56.900 - escape {} used for inline style '{.style text}'
+      # ilab <- "{.style ^*text*}"
+      esc_ilab <- gsub("([\\^*])", "\\\\\\1", ilab)
+      esc_ilab <- gsub("([(){}.+$])", "[\\1]", esc_ilab)
       ilabdf <- subset(venn_jps@polygons,
          # non-overlap single set can point to overlap if necessary
-         (!grepl("&", ilab) & grepl(paste0("(^|&)", ilab, "($|&)"), label)) |
+         (!grepl("&", esc_ilab) &
+            grepl(paste0("(^|&)", esc_ilab, "($|&)"), label)) |
          # however a multi-set overlap must only point to itself
          ilab == name)
       if (nrow(ilabdf) == 0) {
@@ -805,13 +828,11 @@ venndir <- function
          jp=use_jps,
          distance=segment_distance,
          center=center,
-         # center_method="bbox",
          verbose=verbose,
          # do_plot=TRUE,
-         # buffer=-0.6,
          ...)
-      # jamba::printDebug("names(ploxy):");print(names(ploxy));# debug
-      # jamba::printDebug("(ploxy)[c(1, 3, 5)]:");print((ploxy)[c(1, 3, 5)]);# debug
+      # jamba::printDebug("venndir():", "names(use_jps):", names(use_jps));# debug
+      # jamba::printDebug("ploxy:");print(ploxy);# debug
       kc <- c("name", "venn_name", "label",
          "label_x", "label_y", "x_label", "y_label",
          "x_outside", "y_outside",
@@ -1179,12 +1200,14 @@ venndir <- function
       draw_legend=draw_legend,
       legend_signed=legend_signed,
       legend_font_cex=legend_font_cex,
+      draw_footnotes=draw_footnotes,
       sign_count_delim=sign_count_delim,
       item_buffer=item_buffer,
       item_cex=item_cex,
       item_style=item_style,
       item_degrees=item_degrees,
       unicode=unicode,
+      marquee_styles=marquee_styles,
       curate_df=curate_df,
       segment_buffer=segment_buffer)
    
@@ -1196,7 +1219,8 @@ venndir <- function
       metadata=metadata)
 
    # Add warning_list to vo
-   vo <- get_venndir_label_warning_list(vo);
+   vo <- get_venndir_label_warning_list(vo,
+      ...);
    # Consider printing the warning here
    if (FALSE) {
       warn_df <- metadata(vo)$warn_df;
@@ -1349,15 +1373,50 @@ venndir <- function
 #' 
 #' Internal function to define warning label for missing Venn overlaps
 #' 
-#' @returns `data.frame` when input is `data.frame`, or `Venndir` with
-#'    metadata entry `"warn_df"` with input `Venndir`.
-#'    The `data.frame` has columns 'overlap_set' and 'venn_counts',
-#'    for each Venn overlap that is not displayed, and the Venn count
-#'    for each overlap.
+#' For `Venndir` input, it updates the 'metadata' slot with two entries:
+#' 
+#' * warn_df: `data.frame` with each hidden overlap on a new row, and two
+#'.columns:
+#'
+#'    * 'overlap_set': overlap names that cannot be displayed, and
+#'    * 'venn_counts': the number of items.
+#' 
+#' * footnote: `data.frame` with one summary row and three columns:
+#' 
+#'    1. 'symbol' - the footnote symbol
+#'    2. 'type' - the type of footnote: "hidden overlap"
+#'    3. 'note' - a summary comment indicating how many overlaps cannot
+#'    be displayed.
+#' 
+#' If 'footnotes' already exists in the 'metadata' slot, any rows
+#' with type='hidden overlap' are removed and replaced with the new
+#' warning. Any other rows are kept as-is.
+#' 
+#' @returns `data.frame` referred to as 'warn_df' when input is `data.frame`.
+#'    The 'warn_df' `data.frame` has columns:
+#'    * 'overlap_set': overlap names that cannot be displayed, and
+#'    * 'venn_counts': the number of items.
+#'
+#'    With input `Venndir`, it returns `Venndir` with 'metadata' slot updated
+#'    with two entries:
+#'    1. 'warn_df': the 'warn_df' `data.frame` described above, and
+#'    2. 'footnotes': a `data.frame` with one row for each footnote, with
+#'    an entry type='hidden overlap' indicating the number of hidden overlaps.
+#' 
+#' @param label_df `data.frame` or `Venndir` object
+#' @param footnote_symbols `character` vector of footnote symbols, or NULL
+#'    (default) to use a pre-defined set of footnote symbols.
+#'    Footnotes are only relevant with `Venndir` input data.
+#'    These symbols are used in order after subtracting any footnote symbols
+#'    that may already exist in existing footnotes, stored in the 'metadata'
+#'    slot, in a list element names 'footnotes'. If no footnote symbols
+#'    remain, it uses 'X'. (There should never be this many footnotes.)
+#' @param ... additional arguments are ignored.
 #' 
 #' @noRd
 get_venndir_label_warning_list <- function
 (label_df,
+ footnote_symbols=NULL,
  ...)
 {
    #
@@ -1390,9 +1449,37 @@ get_venndir_label_warning_list <- function
          venn_counts=label_df$venn_counts[warn_rows])
    }
    if (length(vo) > 0) {
+      # add warn_df to metadata
       metadata(vo)$warn_df <- warn_df;
+      
+      # Add footnotes to metadata
+      footnotes <- data.frame(symbol="A", type="", note="")[0, , drop=FALSE];
+      if (nrow(warn_df) > 0) {
+         if (length(footnote_symbols) == 0) {
+            footnote_symbols <- c("\u2020", "\u2021", "\u203B", 1:100);
+         }
+         if ("footnotes" %in% names(vo@metadata)) {
+            footnotes <- vo@metadata[["footnotes"]];
+            footnotes <- subset(footnotes, !type %in% "hidden overlap")
+            footnote_symbols <- setdiff(footnote_symbols, footnotes$symbol);
+            if (length(footnote_symbols) == 0) {
+               footnote_symbols <- "X";
+            }
+         }
+         new_note <- paste0(nrow(warn_df),
+            " overlap", ifelse(nrow(warn_df) > 1, "s", ""),
+            " cannot be displayed.")
+         new_footnote <- data.frame(
+            symbol=head(footnote_symbols, 1),
+            type="hidden overlap",
+            note=new_note)
+         footnotes <- rbind(footnotes, new_footnote);
+      }
+      metadata(vo)$footnotes <- footnotes;
+      
       return(vo);
    }
+   
    return(warn_df);
 }
 

@@ -27,6 +27,7 @@ assemble_venndir_label(
   frame_border = "#44444477",
   frame_fill = "#FDDD6644",
   text_grob_type = c("marquee", "textGrob", "gridtext", "richtext_grob"),
+  marquee_styles = NULL,
   use_devoid = getOption("use_devoid", TRUE),
   debug = FALSE,
   verbose = FALSE,
@@ -105,6 +106,18 @@ inconsistent spacing between words.
 alternative for markdown support, however some graphics devices show
 inconsistent spacing between words.
 }}
+
+\item{marquee_styles}{\code{marquee_style_set}, default is NULL.
+It is used when \code{text_grob_type="marquee"} which is default.
+When provided, it is combined
+with \code{marquee::classic_style()} generated using other arguments:
+fontsizes, fontfamily, fontfamilies, fontfaces, etc.
+
+It is mainly intended to define inline styles to
+use with inline labels. For example, syntax "{.tag Some Text}"
+would apply the inline style 'tag' to "Some Text".
+It can be used to change the font family, increase/decrease the
+font size.}
 
 \item{use_devoid}{\code{logical} whether to open temporary \code{devoid::void_dev()}
 device to prevent opening a new device or advancing the page of
@@ -239,14 +252,15 @@ grid::grid.points(x=grid::unit(c(0.25, 0.25), "snpc"),
 }
 \seealso{
 Other venndir internal: 
+\code{\link{assign_degree_groups}()},
 \code{\link{check_systemfonts_family}()},
 \code{\link{expand_range}()},
 \code{\link{get_venn_polygon_shapes}()},
-\code{\link{hexsticker_venndir}()},
-\code{\link{make_color_contrast}()},
+\code{\link{make_degrees_clockwise}()},
 \code{\link{make_venn_combn_df}()},
 \code{\link{match_list}()},
 \code{\link{print_color_df}()},
+\code{\link{render_venndir_footnotes}()},
 \code{\link{shrink_df}()},
 \code{\link{simple_ellipse}()},
 \code{\link{subset_systemfonts}()},

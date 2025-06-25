@@ -54,7 +54,7 @@
 #' converted to `sign()` before calling `signed_overlaps()`, for example:
 #' `signed_overlaps(lapply(setlist, sign))`
 #' 
-#' @family venndir core
+#' @family venndir support
 #' 
 #' @param setlist `list` of named vectors, whose names represent
 #'    set items, and whose values represent direction using 

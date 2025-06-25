@@ -10,8 +10,8 @@ label_outside_JamPolygon(
   center = NULL,
   buffer = -0.1,
   distance = 0.1,
-  center_method = c("bbox", "label"),
-  vector_method = c("label", "farthest"),
+  center_method = c("bbox", "label", "none"),
+  vector_method = c("farthest", "label"),
   segment_method = c("nearest", "vector"),
   min_degrees = 15,
   relative = TRUE,
@@ -32,8 +32,18 @@ each will be analyzed in sequence. When \code{which_jp=NULL} then
 all the polygons in \code{jp} will be analyzed in sequence.}
 
 \item{center}{\code{numeric} vector or matrix with two values indicating
-the center position. When \code{center=NULL} then the center is
-determined using a method defined by \code{center_method}.}
+the center position.
+\itemize{
+\item In all cases, the overall center is defined using
+\code{center_method}, then it is adjusted by \code{center} when defined.
+\item When \code{center=NULL} the \code{center_method} value is used.
+\item When \code{center} is provided and \code{relative=TRUE}
+(default), the overall center position is adjusted using
+\code{center} interpreted as relative values.
+\item When \code{relative=FALSE} the values \code{center} are added to the
+overall center position. To use \code{center} as absolute coordinates,
+select \code{center_method="none"}.
+}}
 
 \item{buffer}{\code{numeric} buffer, default -0.1, inside the polygon
 used to draw a line segment connecting the label to the appropriate
@@ -50,6 +60,8 @@ determine the \code{center}:
 of all the polygon label positions;
 \item \code{"bbox"} uses the mean x,y
 coordinate of the bounding box that encompasses the polygons.
+\item \code{"none"} uses the origin 0,0 and is intended mainly to allow
+\code{center} to be used as absolute coordinates.
 }
 
 The effect
@@ -57,7 +69,23 @@ is to extend outer labels radially around this center point.
 Using the mean label position with \code{center_method="label"}
 is helpful because it ensures labels are extended in all directions
 even when most labels are in one upper or lower section of
-the \code{sp} polygons.}
+the polygons.}
+
+\item{vector_method}{\code{character} string indicating the vector from
+\code{center} outward, to define the position outside the polygons.
+\itemize{
+\item \code{'farthest'} (default) aims to the farthest point from center.
+\item \code{'label'} aims through the default label position in each polygon.
+}}
+
+\item{segment_method}{\code{character} string indicating how to connect
+a line segment from the outside label, back to the polygon.
+The line segment ends inside the polygon, defined by \code{buffer}.
+\itemize{
+\item \code{'nearest'} (default) points to the nearest border.
+\item \code{'label'} points toward the default label position inside the
+polygon.
+}}
 
 \item{min_degrees}{\code{numeric}, default 15, minimum degrees spacing
 to impose between label positions, oriented around the center.
@@ -89,6 +117,45 @@ Default is FALSE.}
 \description{
 Position labels outside JamPolygon
 }
+\details{
+The purpose is to arrange labels outside a \code{JamPolygon} that
+contains one or more parts. In general, it works best to supply
+the entire \code{JamPolygon} even when labeling a subset of parts,
+using \code{which_jp} to select the parts to label,
+since it defines many coordinates relative to the overall
+geometry.
+
+There are several strategies used, from experiences trying
+to label Euler diagrams in automated way. The general steps:
+\enumerate{
+\item Define \strong{center}.
+\itemize{
+\item The default uses the center of the bounding box.
+\item An alternative is the mean position of each polygon internal
+label, which is effective when most labels are skewed to one side.
+}
+\item Draw lines from center, through the polygon to label,
+outside some distance.
+\itemize{
+\item The default chooses the farthest point from center for each
+polygon.
+\item An alternative is to use the polygon internal label position.
+}
+\item Define a line segment from the outside point back to the polygon,
+inside by some distance.
+\itemize{
+\item The default uses the nearest point on the polygon to the outside point.
+\item An alternative directs the line segment toward the internal
+label for each polygon.
+}
+}
+
+The defaults are quite effective, however some unusual arrangements or
+shapes may warrant trying the other options.
+
+When calling \code{venndir()}, the ellipses \code{'...'} are passed through to
+this function \code{label_outside_JamPolygon()} to customize these options.
+}
 \examples{
 v <- venndir(make_venn_test(n_sets=3), do_plot=FALSE)
 jps <- v@jps
@@ -106,7 +173,6 @@ Other JamPolygon:
 \code{\link{bbox_JamPolygon}()},
 \code{\link{buffer_JamPolygon}()},
 \code{\link{check_JamPolygon}()},
-\code{\link{check_Venndir}()},
 \code{\link{eulerr_to_JamPolygon}()},
 \code{\link{farthest_point_JamPolygon}()},
 \code{\link{find_venn_overlaps_JamPolygon}()},

@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2024 James M. Ward
+Copyright (c) 2025 James M. Ward
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

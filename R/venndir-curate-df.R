@@ -1,13 +1,13 @@
 
-#' Define venndir curate data.frame
+#' Define Venndir sign and symbol curation
 #' 
-#' Define venndir curate data.frame
+#' Define Venndir 'curate_df' data for custom signs and symbols
 #' 
 #' This function defines the `data.frame` used for the argument
 #' `curate_df` in `venndir()`. The purpose is to make it more
 #' convenient to review and potentially modify the default values.
 #' 
-#' @family venndir advanced
+#' @family venndir signs
 #' 
 #' @returns `data.frame` with colnames:
 #'    * 'from' - `character` sign to match

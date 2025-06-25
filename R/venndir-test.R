@@ -1,7 +1,7 @@
 
-#' Generate test sets for venndir
+#' Generate setlist data for testing
 #' 
-#' Generate test sets for venndir
+#' Generate setlist data for testing
 #' 
 #' This function generates data to use as test input to
 #' Venn diagram functions. It can generate sets of items,
@@ -25,7 +25,7 @@
 #' argument `sizes`, which takes priority over `min_size`, and
 #' `max_size`.
 #' 
-#' @family venndir core
+#' @family venndir support
 #' 
 #' @return `list` of items, either as a list of item vectors,
 #' or when `do_signed=TRUE` the list of vectors, where vector

@@ -68,7 +68,6 @@ Other JamPolygon:
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},
 \code{\link{check_JamPolygon}()},
-\code{\link{check_Venndir}()},
 \code{\link{eulerr_to_JamPolygon}()},
 \code{\link{farthest_point_JamPolygon}()},
 \code{\link{find_venn_overlaps_JamPolygon}()},

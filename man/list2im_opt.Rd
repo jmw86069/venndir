@@ -56,7 +56,6 @@ list2im_opt(setlist, do_sparse=TRUE);
 }
 \seealso{
 Other venndir conversion: 
-\code{\link{collapse_im}()},
 \code{\link{counts2setlist}()},
 \code{\link{im2list}()},
 \code{\link{im_value2list}()},

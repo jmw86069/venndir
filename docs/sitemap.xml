@@ -15,12 +15,14 @@
 <url><loc>https://jmw86069.github.io/venndir/reference/add_orientation_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/area_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/assemble_venndir_label.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/assign_degree_groups.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/bbox_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/buffer_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/check_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/check_Venndir.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/check_systemfonts_family.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/collapse_im.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/combine_marquee_styles.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/counts2setlist.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/curate_venn_labels.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/degrees_to_adj.html</loc></url>
@@ -45,6 +47,7 @@
 <url><loc>https://jmw86069.github.io/venndir/reference/list2im_opt.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/list2im_value.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/make_color_contrast.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/make_degrees_clockwise.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/make_venn_combn_df.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/make_venn_test.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/match_list.html</loc></url>
@@ -63,6 +66,7 @@
 <url><loc>https://jmw86069.github.io/venndir/reference/polygon_ellipses.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/print_color_df.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/render_venndir.html</loc></url>
+<url><loc>https://jmw86069.github.io/venndir/reference/render_venndir_footnotes.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/rescale_coordinates.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/sample_JamPolygon.html</loc></url>
 <url><loc>https://jmw86069.github.io/venndir/reference/shrink_df.html</loc></url>

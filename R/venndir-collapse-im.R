@@ -23,7 +23,7 @@
 #' 
 #' @returns `numeric` matrix
 #' 
-#' @family venndir conversion
+#' @family venndir advanced
 #' 
 #' @param im `numeric` matrix with columns for each set
 #' @param row_groups `character` or `factor` with row groupings.

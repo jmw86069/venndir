@@ -141,12 +141,8 @@ venndir_legender(textvenn(setlist, sets=c(1,2,4), overlap_type="overlap"),
 }
 \seealso{
 Other venndir core: 
-\code{\link{make_venn_test}()},
-\code{\link{plot,Venndir,ANY-method}},
 \code{\link{render_venndir}()},
-\code{\link{signed_overlaps}()},
 \code{\link{venn_meme}()},
-\code{\link{venndir}()},
-\code{\link{venndir_legender}()}
+\code{\link{venndir}()}
 }
 \concept{venndir core}

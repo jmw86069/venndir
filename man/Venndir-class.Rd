@@ -117,10 +117,8 @@ as.numeric(names(warnings(v3)))
 
 }
 \seealso{
-Other venndir advanced: 
-\code{\link{curate_venn_labels}()},
-\code{\link{get_venndir_curate_df}()},
-\code{\link{modify_venndir_overlap}()},
-\code{\link{nudge_venndir_label}()}
+Other venndir s4: 
+\code{\link{check_Venndir}()},
+\code{\link{plot,Venndir,ANY-method}}
 }
-\concept{venndir advanced}
+\concept{venndir s4}

@@ -9,7 +9,7 @@
 #' 
 #' @export
 #' 
-#' @family JamPolygon
+#' @family venndir s4
 #'
 #' @param object `Venndir` object
 #' 
@@ -119,7 +119,7 @@ check_Venndir <- function
 #' * **metadata**: `list` with optional metadata, intended for future
 #'    expansion, such as plot title.
 #' 
-#' @family venndir advanced
+#' @family venndir s4
 #' 
 #' @examples
 #' v <- venndir(make_venn_test(100, 2, do_signed=TRUE), do_plot=FALSE)
@@ -172,7 +172,7 @@ setClass("Venndir",
 #' 
 #' @docType methods
 #' @rdname Venndir-methods
-#' @family venndir core
+#' @family venndir s4
 #' 
 #' @export
 setMethod("plot",
@@ -282,7 +282,8 @@ setMethod("show", "Venndir",
             k <- seq_len(nrow(warn_df))
          }
          use_warning_text <- paste0(
-            paste0(nrow(warn_df), " overlap", ifelse(nrow(warn_df) > 1, "s", ""),
+            paste0(nrow(warn_df),
+               " overlap", ifelse(nrow(warn_df) > 1, "s", ""),
                " cannot be displayed:"),
             paste0(collapse="",
                paste0("\n* `", warn_df$overlap_set[k],
@@ -562,3 +563,43 @@ setMethod("warnings",
       return(warn_struct)
    }
 )
+
+setGeneric("footnotes", function(x) standardGeneric("footnotes"))
+
+#' Extract footnotes from a Venndir object
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("footnotes",
+   signature(x="Venndir"),
+   function(x) {
+      if (!"footnotes" %in% names(x@metadata)) {
+         footnotes <- data.frame(symbol="A", type="", note="")[0, , drop=FALSE];
+      } else {
+         footnotes <- x@metadata[["footnotes"]];
+      }
+      footnotes
+   })
+
+setGeneric("has_footnotes", function(x) standardGeneric("has_footnotes"))
+
+#' Return whether Venndir object contains footnotes
+#' 
+#' @docType methods
+#' @rdname Venndir-methods
+#' 
+#' @export
+setMethod("has_footnotes",
+   signature(x="Venndir"),
+   function(x) {
+      if (!"footnotes" %in% names(x@metadata)) {
+         FALSE
+      } else {
+         x_footnotes <- x@metadata[["footnotes"]];
+         (length(x_footnotes) > 0 &&
+               inherits(x_footnotes, "data.frame") &&
+               nrow(x_footnotes) > 0)
+      }
+   })

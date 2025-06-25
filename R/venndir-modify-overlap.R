@@ -8,7 +8,7 @@
 #   fill,alpha,innerborder,outerborder,border
 #   
 
-#' Modify Venndir by overlap
+#' Modify or Highlight Venndir overlaps
 #' 
 #' Modify Venndir visual components by overlap name
 #' 
@@ -67,7 +67,7 @@
 #' When customizing the overlap set label fontsize, and border, it may
 #' be useful to move the labels to minimize overlaps.
 #' 
-#' @family venndir advanced
+#' @family venndir support
 #' 
 #' @examples
 #' testlist <- make_venn_test(n_sets=3, do_signed=TRUE);
@@ -310,9 +310,9 @@ modify_venndir_overlap <- function
    return(invisible(venndir_output));
 }
 
-#' Highlight Venndir by overlap
+#' Highlight or Modify Venndir overlap
 #' 
-#' Highlight Venndir visual components by overlap name by calling
+#' Highlight Venndir visual components by overlap name using
 #' `modify_venndir_overlap()`
 #' 
 #' @rdname modify_venndir_overlap
@@ -325,7 +325,7 @@ modify_venndir_overlap <- function
 #'    to be visible between adjacent border lines.
 #'    To show the outerborder, use `outerborder.lwd=2` or higher.
 #' 
-#' @family venndir advanced
+#' @family venndir support
 #' 
 #' @examples
 #' testlist4 <- make_venn_test(n_sets=4, do_signed=FALSE)

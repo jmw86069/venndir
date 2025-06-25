@@ -1,3 +1,85 @@
+# venndir 0.0.56.900
+
+* Exciting new venndir logo! Courtesy of Christina Ward @csward70,
+the real artiste!
+* New favicon as well.
+* Added svglite; removed hexSticker,ggplot2.
+
+## Bug fixes
+
+* Fixed `spread_degrees()` not correct when wrapping around c(0, 359).
+Edit: Still needs work.
+* Fixed `label_outside_JamPolygon()` for labels at degrees crossing c(0, 359),
+iterative spreading where spreading certain angles interferes with others.
+* Added tests for `spread_degrees()`, `mean_degree_arc()`, and
+`label_outside_JamPolygon()`.
+* `render_venndir()` now properly passes `'...'` ellipses to
+`make_color_contrast()` for item label color adjustment, for example:
+L_lo, L_hi, C_floor, L_threshold.
+
+## Notable changes in behavior
+
+* `venndir_legender()` args `x_inset`,`y_inset` reduced to **0.5 line**,
+from 2 character lines previously. Change was driven by venndir-book where too
+many signed Venndir labels overlapped the legend and needed to be nudged.
+* New `render_venndir_footnotes()` which also uses `footnote_x_inset`,
+`footnote_y_inset` similar to the legend. It displays a single footnote
+style character when the diagram cannot display all overlaps.
+* New argument `marquee_styles` supports inline styles in markdown text.
+* Added examples with custom fonts, and inline image.
+
+## updates to existing functions
+
+* `Venndir-object`
+
+   * New 'metadata' slot entry 'footnotes' with `data.frame` of footnotes,
+   the preferred method of indicating "hidden overlaps" that cannot be
+   displayed, usually in a Euler diagram with 3 or more sets.
+
+* `venndir()`, `render_venndir()`, `plot()`
+
+   * New argument `draw_footnotes` which calls `render_venndir_footnotes()`
+   to render a small footnote symbol in the bottom corner.
+   * New argument `marquee_styles` stored inside Venndir metadata, adds
+   custom marquee markdown inline styles: `'{.mystyle My Style!}'`.
+   Convenient to use custom font, or resize a font, make it bold, etc etc.
+   
+* `label_outside_JamPolygon()`
+
+   * now enforces default values for `vector_method`, `segment_method`.
+   * new argument value `center_method="none"` to use `center` as absolute
+   coordinates.
+   * Expanded the help docs.
+
+* Removed `hexsticker_venndir()` as a short-lived option, no longer useful.
+
+## new internal functions
+
+* `assign_degree_groups()`, `make_degrees_clockwise()` - used to help
+space out degree angles used for outside labels.
+
+   * Previously labels would sometimes criss-cross when spacing out one group
+   of angles near another angle, flipping the order of angles.
+   Now the order is preserved.
+   * Improved the logic of recognizing arcs, so any angles inside the arc
+   could be treated with the group.
+   * Still one bug with multi-part polygons and outside labels, sometimes
+   the label points to the wrong part. It currently draws a line to the
+   largest part, but sometimes the label is right beside a smaller part.
+   Leaving it TODO against my every instinct.
+
+* `render_venndir_footnotes()`
+
+   * Simple wrapper to draw a footnote symbol onto a Venndir figure when
+   footnotes exist. Currently footnotes are only created when overlaps
+   cannot be displayed, for example with Euler diagrams where not
+   every overlap can be shown. The footnote is a subtle visual cue that
+   there is informatio to be reviewed.
+
+* `footnotes()`
+
+   * Function returns a `data.frame` with footnotes.
+
 # venndir 0.0.55.900
 
 Work in progress through 04jun2025, most updates were discovered
@@ -17,14 +99,17 @@ while writing the detailed Venndir E-book.
 
 ## Bug fixes
 
+* Fixed `spread_degrees()` not correct when wrapping around c(0, 359).
 * `plot.JamPolygon()`
 
    * `'label.color'` is properly recognized for label colors.
 
 * `venndir_legender()`
 
-   * fixed bug that did not utilize metadata
-   * changed default `x="bottomright"` to be consistent with `venndir()`
+   * Fixed bug that did not utilize metadata.
+   * Fixed bug that did not use internal `curate_df` when present.
+   * Added argument `curate_df` to make this customization more convenient.
+   * Changed default `x="bottomright"` to be consistent with `venndir()`
 
 `legend_signed` to persist this option from the Venndir object.
 * `render_venndir()`
@@ -68,6 +153,7 @@ hanging character "g".
 * `get_venn_polygon_shapes()` new argument `seed` to help `eulerr::euler()`
 output be consistent. Use `seed=NULL` for randomness.
 It can be passed via `venndir()` using `'...'` ellipses.
+* `make_color_contrast()` - added param help text.
 
 # venndir 0.0.54.900
 

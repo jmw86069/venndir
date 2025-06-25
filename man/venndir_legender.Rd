@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-legend.R
 \name{venndir_legender}
 \alias{venndir_legender}
-\title{Add legend to venndir figure}
+\title{Add legend to a Venndir figure}
 \usage{
 venndir_legender(
   venndir_output = NULL,
@@ -27,8 +27,8 @@ venndir_legender(
   header_bg = "#FFFFFF00",
   header_border = "#FFFFFF00",
   lwd = 1,
-  x_inset = grid::unit(2, "lines"),
-  y_inset = grid::unit(2, "lines"),
+  x_inset = grid::unit(0.5, "lines"),
+  y_inset = grid::unit(0.5, "lines"),
   font_cex = 1,
   fontfamily = "Arial",
   fontfamilies = list(signed = fontfamily, count = fontfamily, overlap = fontfamily),
@@ -39,6 +39,7 @@ venndir_legender(
   labels = NULL,
   legend_padding = 2,
   set_suffix = "",
+  curate_df = NULL,
   vp = NULL,
   fg_fun = marquee_text_grob,
   verbose = FALSE,
@@ -161,14 +162,17 @@ drawn with line width \code{lwd}.
 \item{lwd}{\code{numeric}, default 1, cell border line width used
 in the legend table, when \code{legend_style="grid"}.}
 
-\item{x_inset, y_inset}{\code{grid::unit}, default 2 lines each, used
+\item{x_inset, y_inset}{\code{grid::unit}, default 1 line each, used
 when \code{legend_style="grid"} to position the legend relative to \code{x},
 useful when positioning the legend near the edge \code{x="bottomleft"}.
-The inset controls distance from the plot edge, along the x- and y-axes,
-respectively. For example \code{x_inset=grid::unit(2, "lines")} will
+
+The inset controls distance from the plot edge along the x- and y-axes.
+For example, \code{x_inset=grid::unit(2, "lines")} will
 place the legend table 2 character lines (which are defined by
 line height for typical character size) away from the left or
-right edge of the plot. Any valid \code{grid::unit} can be used.
+right edge of the plot.
+
+Any valid \code{grid::unit} can be used.
 Note that the metric is "plot edge", and the plot is fixed 1:1 aspect,
 so for wide plot devices a negative \code{x_inset} may be used to nudge
 the legend outside the typical plot boundary.}
@@ -236,6 +240,10 @@ provided.}
 \item{set_suffix}{\code{character} string (default \code{""}) used as optional
 suffix, and previously used \code{":"} but was changed to \code{""}.}
 
+\item{curate_df}{\code{data.frame}, default NULL will use the metadata
+of \code{venndir_output} to retrieve any custom \code{curate_df} already
+in use for the Venndir object.}
+
 \item{verbose}{\code{logical} indicating whether to print verbose output.}
 
 \item{...}{additional arguments are passed to internal functions.
@@ -249,16 +257,16 @@ legend \code{grob} object is returned which can then be manipulated
 before rendering.
 }
 \description{
-Add legend to venndir figure
+Add legend to a Venndir figure
 }
 \details{
-Note this function is experimental and is under active development. The
-implementation and arguments may change in future.
-
-Limitations: Currently this function relies upon having the \code{setlist}
-used to produce the \code{venndir()} output, and the \code{venndir()} output.
-In future, the \code{setlist} could be derived from the \code{venndir()} output
-object directly. That step likely needs a new function.
+Add a Venndir legend to the perimeter of an existing Venndir figure.
+Note this function it typically called from \code{venndir()} via
+\code{render_venndir()} when argument \code{draw_legend=TRUE} (default).
+By using \code{draw_legend=FALSE} the returned \code{Venndir} object can be
+used as input to \code{venndir_legender()} to draw the legend in a custom
+location, for example using the overall figure viewport instead of
+being limited to the Venndir viewport.
 
 When using arguments \code{legend_style="grid"} and \code{draw_legend=FALSE} the
 \code{grid} \code{grob} object is returned, so that it can be manipulated
@@ -267,12 +275,6 @@ will have already been defined and stored into \code{legend_grob$vp}
 with x position \code{legend_grob$vp$x} and y position \code{legend_grob$vp$y}.
 Total legend width is: \code{sum(legend_grob$widths)}, and
 total legend height is: \code{sum(legend_grob$heights)}.
-
-Todo:
-\itemize{
-\item Consider bottom-justifying text in each cell, left-justifying text
-labels, and right-justifying numeric values.
-}
 }
 \examples{
 setlist <- make_venn_test(100, 3, do_signed=TRUE);
@@ -383,13 +385,9 @@ venndir_legender(venndir_output=vo,
 
 }
 \seealso{
-Other venndir core: 
+Other venndir support: 
 \code{\link{make_venn_test}()},
-\code{\link{plot,Venndir,ANY-method}},
-\code{\link{render_venndir}()},
-\code{\link{signed_overlaps}()},
-\code{\link{textvenn}()},
-\code{\link{venn_meme}()},
-\code{\link{venndir}()}
+\code{\link{modify_venndir_overlap}()},
+\code{\link{signed_overlaps}()}
 }
-\concept{venndir core}
+\concept{venndir support}

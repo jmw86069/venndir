@@ -203,13 +203,9 @@ signed_overlaps(inputlist, return_items=TRUE)
 
 }
 \seealso{
-Other venndir core: 
+Other venndir support: 
 \code{\link{make_venn_test}()},
-\code{\link{plot,Venndir,ANY-method}},
-\code{\link{render_venndir}()},
-\code{\link{textvenn}()},
-\code{\link{venn_meme}()},
-\code{\link{venndir}()},
+\code{\link{modify_venndir_overlap}()},
 \code{\link{venndir_legender}()}
 }
-\concept{venndir core}
+\concept{venndir support}

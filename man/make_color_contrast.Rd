@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-printcolordf.R
 \name{make_color_contrast}
 \alias{make_color_contrast}
-\title{Make color contrast}
+\title{Make color contrast with background colors}
 \usage{
 make_color_contrast(
   x,
@@ -19,12 +19,45 @@ make_color_contrast(
 )
 }
 \arguments{
+\item{x}{\code{character} vector of text colors}
+
+\item{y}{\code{character} vector of fill colors for which the colors
+in \code{x} should be adjusted for visual contrast.}
+
+\item{bg}{\code{character} background color, default 'white', used
+when colors in \code{y} contain transparency.}
+
+\item{L_threshold}{\code{numeric} threshold Luminance (L) value which
+defines the point where the background color should have
+light or dark text for optimum visual contrast. The default \code{65}
+is well-discussed in data visualization forums, however
+may not be ideal for all viewing conditions.}
+
+\item{C_floor}{\code{numeric} to define the minimum Chroma (C) when
+the adjusted color Chroma is below an internal threshold 20.}
+
+\item{L_hi, L_lo}{\code{numeric} value to define the Luminance (L) used
+for 'hi' (bright) output colors, or 'lo' (dark) output
+colors. The default 'L_hi=95' is fairly high, and 'L_lo=40'
+is moderately dark. In future the recommended default may
+become 'L_hi=85' to improve the resulting color hue.}
+
 \item{blend_preset}{\code{character} string passed as \code{preset} to
 \code{colorjam::blend_colors()} to define the color wheel used
-during color blending operations.}
+during color blending operations. Default 'ryb' uses the
+red-yellow-blue color wheel. This adjustment only affects
+layering 'y' together with 'bg'.}
+
+\item{do_plot}{\code{logical} whether to create a visual plot illustrating
+the input and output colors, on top of the background.}
+
+\item{cex}{\code{numeric} text size adjustment used when \code{do_plot=TRUE}.}
+
+\item{...}{additional arguments are passed to internal functions,
+including \code{colorjam::blend_colors()}.}
 }
 \description{
-Make color contrast
+Make color contrast with background colors
 }
 \details{
 This function provides a simple method to ensure a color
@@ -53,19 +86,9 @@ make_color_contrast(x, y, do_plot=TRUE, C_floor=140);
 
 }
 \seealso{
-Other venndir internal: 
-\code{\link{assemble_venndir_label}()},
-\code{\link{check_systemfonts_family}()},
-\code{\link{expand_range}()},
-\code{\link{get_venn_polygon_shapes}()},
-\code{\link{hexsticker_venndir}()},
-\code{\link{make_venn_combn_df}()},
-\code{\link{match_list}()},
-\code{\link{print_color_df}()},
-\code{\link{shrink_df}()},
-\code{\link{simple_ellipse}()},
-\code{\link{subset_systemfonts}()},
-\code{\link{venndir_label_style}()},
-\code{\link{venndir_to_df}()}
+Other venndir advanced: 
+\code{\link{collapse_im}()},
+\code{\link{combine_marquee_styles}()},
+\code{\link{nudge_venndir_label}()}
 }
-\concept{venndir internal}
+\concept{venndir advanced}

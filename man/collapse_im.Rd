@@ -67,13 +67,9 @@ imdf <- data.frame(im, row_groups,
 split(imdf, imdf$row_groups)
 }
 \seealso{
-Other venndir conversion: 
-\code{\link{counts2setlist}()},
-\code{\link{im2list}()},
-\code{\link{im_value2list}()},
-\code{\link{list2im_opt}()},
-\code{\link{list2im_value}()},
-\code{\link{overlaplist2setlist}()},
-\code{\link{signed_counts2setlist}()}
+Other venndir advanced: 
+\code{\link{combine_marquee_styles}()},
+\code{\link{make_color_contrast}()},
+\code{\link{nudge_venndir_label}()}
 }
-\concept{venndir conversion}
+\concept{venndir advanced}

@@ -21,7 +21,6 @@ Other JamPolygon:
 \code{\link{bbox_JamPolygon}()},
 \code{\link{buffer_JamPolygon}()},
 \code{\link{check_JamPolygon}()},
-\code{\link{check_Venndir}()},
 \code{\link{farthest_point_JamPolygon}()},
 \code{\link{find_venn_overlaps_JamPolygon}()},
 \code{\link{has_point_in_JamPolygon}()},

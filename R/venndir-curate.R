@@ -1,7 +1,7 @@
 
-#' Curate Venn labels
+#' Curate Venn signs and symbols
 #' 
-#' Curate Venn labels
+#' Curate Venn signs and symbols
 #' 
 #' This venndir utility function is used to convert a basic
 #' directional label such as `"0 1 0 -1"` suitable for display.
@@ -40,7 +40,7 @@
 #'    or when `type="all"` it returns `data.frame` with rows for each
 #'    entry in `x`.
 #' 
-#' @family venndir advanced
+#' @family venndir signs
 #' 
 #' @param x `vector` of overlap labels.
 #' @param type `character` string, default 'type'.

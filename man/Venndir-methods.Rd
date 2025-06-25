@@ -14,6 +14,8 @@
 \alias{signed_counts,Venndir-method}
 \alias{im,Venndir-method}
 \alias{warnings,Venndir-method}
+\alias{footnotes,Venndir-method}
+\alias{has_footnotes,Venndir-method}
 \title{Plot Venndir object}
 \usage{
 \S4method{plot}{Venndir,ANY}(x, y, ...)
@@ -39,6 +41,10 @@
 \S4method{im}{Venndir}(x)
 
 \S4method{warnings}{Venndir}(...)
+
+\S4method{footnotes}{Venndir}(x)
+
+\S4method{has_footnotes}{Venndir}(x)
 }
 \value{
 \code{Venndir} object, invisibly.
@@ -47,13 +53,8 @@
 Plot Venndir object
 }
 \seealso{
-Other venndir core: 
-\code{\link{make_venn_test}()},
-\code{\link{render_venndir}()},
-\code{\link{signed_overlaps}()},
-\code{\link{textvenn}()},
-\code{\link{venn_meme}()},
-\code{\link{venndir}()},
-\code{\link{venndir_legender}()}
+Other venndir s4: 
+\code{\link{Venndir-class}},
+\code{\link{check_Venndir}()}
 }
-\concept{venndir core}
+\concept{venndir s4}

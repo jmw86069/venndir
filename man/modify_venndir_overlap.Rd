@@ -3,7 +3,7 @@
 \name{modify_venndir_overlap}
 \alias{modify_venndir_overlap}
 \alias{highlight_venndir_overlap}
-\title{Modify Venndir by overlap}
+\title{Modify or Highlight Venndir overlaps}
 \usage{
 modify_venndir_overlap(
   venndir_output,
@@ -97,7 +97,7 @@ way to specify both \code{innerborder} and \code{outerborder} in
 \description{
 Modify Venndir visual components by overlap name
 
-Highlight Venndir visual components by overlap name by calling
+Highlight Venndir visual components by overlap name using
 \code{modify_venndir_overlap()}
 }
 \details{
@@ -250,16 +250,14 @@ render_venndir(vo4h2way, main="Two-way overlaps only")
 
 }
 \seealso{
-Other venndir advanced: 
-\code{\link{Venndir-class}},
-\code{\link{curate_venn_labels}()},
-\code{\link{get_venndir_curate_df}()},
-\code{\link{nudge_venndir_label}()}
+Other venndir support: 
+\code{\link{make_venn_test}()},
+\code{\link{signed_overlaps}()},
+\code{\link{venndir_legender}()}
 
-Other venndir advanced: 
-\code{\link{Venndir-class}},
-\code{\link{curate_venn_labels}()},
-\code{\link{get_venndir_curate_df}()},
-\code{\link{nudge_venndir_label}()}
+Other venndir support: 
+\code{\link{make_venn_test}()},
+\code{\link{signed_overlaps}()},
+\code{\link{venndir_legender}()}
 }
-\concept{venndir advanced}
+\concept{venndir support}

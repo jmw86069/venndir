@@ -31,13 +31,15 @@ test_that("marquee_no_crashy", {
    })
    gglist <- lapply(seq_along(test_fonts), function(i){
       ifont <- test_fonts[i];
-      mg <- grid::textGrob(
-         label=paste0(
-            "\u2191\u2193 Set \u2191\u2193Label Here (", ifont, ") textGrob"),
-         x=0.3,
-         y=test_y[i],
-         hjust=0, vjust=0,
-         gp=grid::gpar(fontfamily=ifont));
+      withr::with_options(list(warn=FALSE),{
+         mg <- grid::textGrob(
+            label=paste0(
+               "\u2191\u2193 Set \u2191\u2193Label Here (", ifont, ") textGrob"),
+            x=0.3,
+            y=test_y[i],
+            hjust=0, vjust=0,
+            gp=grid::gpar(fontfamily=ifont))
+      })
       pg <- grid::pointsGrob(x=0.3,
          default.units="npc",
          y=test_y[i],
@@ -51,6 +53,7 @@ test_that("marquee_no_crashy", {
       grid::grid.newpage();
       grid::grid.draw(test_grobs);
    })
+   # writer=write_svg_with_svglite)
 })
    
 
@@ -103,30 +106,6 @@ test_that("assemble_textGrob", {
          test_assembly("textGrob", TRUE, 4)
       })
 })
-
-## gridtext is deprecated, no testing
-# test_that("assemble_gridtext", {
-#    vdiffr::expect_doppelganger(
-#       "assemble_venndir_label() using gridtext", {
-#          test_assembly("gridtext", FALSE, 1)
-#       })
-#    vdiffr::expect_doppelganger(
-#       "assemble_venndir_label() using gridtext larger", {
-#          test_assembly("gridtext", FALSE, 2)
-#       })
-#    vdiffr::expect_doppelganger(
-#       "assemble_venndir_label() using gridtext, title", {
-#          test_assembly("gridtext", TRUE, 1)
-#       })
-#    vdiffr::expect_doppelganger(
-#       "assemble_venndir_label() using gridtext, title larger", {
-#          test_assembly("gridtext", TRUE, 2)
-#       })
-#    vdiffr::expect_doppelganger(
-#       "assemble_venndir_label() using gridtext, title giant", {
-#          test_assembly("gridtext", TRUE, 4)
-#       })
-# })
 
 test_that("assemble_marquee", {
    vdiffr::expect_doppelganger(

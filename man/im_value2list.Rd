@@ -47,7 +47,6 @@ im_value2list(imv);
 }
 \seealso{
 Other venndir conversion: 
-\code{\link{collapse_im}()},
 \code{\link{counts2setlist}()},
 \code{\link{im2list}()},
 \code{\link{list2im_opt}()},

@@ -9,6 +9,8 @@ spread_degrees(
   min_degrees = 10,
   iteration = 1,
   max_iterations = 20,
+  use_colors = NULL,
+  do_plot = FALSE,
   verbose = FALSE,
   ...
 )
@@ -20,6 +22,19 @@ using \code{degrees \%\% 360}.}
 
 \item{min_degrees}{\code{numeric} indicating the minimum angle in degrees
 to allow between adjacent angles.}
+
+\item{iteration, max_iterations}{\code{numeric} used internally to iteratively
+confirm that angles are spread by \code{min_degrees}.}
+
+\item{use_colors}{\code{character} optional colors to use when \code{do_plot=TRUE},
+default NULL assigns color by groups of angles, the applies a
+light-to-dark color gradient.}
+
+\item{do_plot}{\code{logical} whether to plot a visual with the output,
+default FALSE.}
+
+\item{verbose}{\code{logical} indicating whether to print verbose output.
+Values 2 or 3 will print progressively more information.}
 
 \item{...}{additional arguments are ignored.}
 }
@@ -41,14 +56,38 @@ spaced around 360 degrees.
 \examples{
 degrees <- c(5, 10, 15, 100, 105, 110, 200, 300, 358);
 degrees
-spread_degrees(degrees);
+use_colors <- colorjam::rainbowJam(length(degrees))
+withr::with_par(list(mfrow=c(2, 2)), {
+spread_degrees(degrees, min_degrees=0,
+   do_plot=TRUE, use_colors=use_colors)
+spread_degrees(degrees,
+   do_plot=TRUE, use_colors=use_colors)
+spread_degrees(degrees, min_degrees=20,
+   do_plot=TRUE, use_colors=use_colors)
+spread_degrees(degrees, min_degrees=30,
+   do_plot=TRUE, use_colors=use_colors)
+})
 
 degrees2 <- sample(degrees);
 degrees2
 spread_degrees(degrees2);
 
-degrees3 <- c(0, 5, 10, 15)
-spread_degrees(degrees3, min_degrees=25)
+degrees3 <- c(0, 5, 6, 10, 15, 50)
+names(degrees3) <- LETTERS[1:6];
+colors3 <- colorjam::rainbowJam(6)
+withr::with_par(list(mfrow=c(2, 2)), {
+spread_degrees(degrees3, min_degrees=2,
+   use_colors=colors3, do_plot=TRUE)
+
+spread_degrees(degrees3, min_degrees=6,
+   use_colors=colors3, do_plot=TRUE)
+
+spread_degrees(degrees3, min_degrees=25,
+   use_colors=colors3, do_plot=TRUE)
+
+spread_degrees(degrees3, min_degrees=45,
+   use_colors=colors3, do_plot=TRUE)
+})
 
 }
 \seealso{

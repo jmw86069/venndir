@@ -41,6 +41,7 @@ marquee_text_grob <- function
  vjust=0.5,
  x=0.5,
  y=0.5,
+ marquee_styles=NULL,
  default.units="npc",
  use_devoid=getOption("use_devoid", TRUE),
  ...)
@@ -77,8 +78,13 @@ marquee_text_grob <- function
          grid::unit(-2*kk, "pt"),
          grid::unit(2*kk, "pt")),
       align=use_align)
-      # ...)
-      # align="left")
+   # optional user-defined inline styles
+   if (length(marquee_styles) > 0) {
+      use_style <- combine_marquee_styles(
+         mss=use_style,
+         msl=marquee_styles,
+         ...)
+   }
    
    #################################################################
    # Temporary devoid device so width=NA works with marquee_grob()
@@ -86,7 +92,8 @@ marquee_text_grob <- function
       devVOID <- NULL;
       if (requireNamespace("devoid", quietly=TRUE)) {
          dev1 <- dev.list();
-         devoid::void_dev();
+         # devoid::void_dev();
+         pdf(NULL); # attempt pdf(NULL) as drop-in replacement
          dev2 <- dev.list();
          devVOID <- setdiff(dev2, dev1)
          on.exit(expr={

@@ -2,7 +2,7 @@
 % Please edit documentation in R/venndir-test.R
 \name{make_venn_test}
 \alias{make_venn_test}
-\title{Generate test sets for venndir}
+\title{Generate setlist data for testing}
 \usage{
 make_venn_test(
   n_items = 200,
@@ -66,7 +66,7 @@ names contain the items, and vector values are signed values
 from \code{c(-1, 1)}.
 }
 \description{
-Generate test sets for venndir
+Generate setlist data for testing
 }
 \details{
 This function generates data to use as test input to
@@ -134,13 +134,9 @@ textvenn(setlist, overlap_type="each")
 
 }
 \seealso{
-Other venndir core: 
-\code{\link{plot,Venndir,ANY-method}},
-\code{\link{render_venndir}()},
+Other venndir support: 
+\code{\link{modify_venndir_overlap}()},
 \code{\link{signed_overlaps}()},
-\code{\link{textvenn}()},
-\code{\link{venn_meme}()},
-\code{\link{venndir}()},
 \code{\link{venndir_legender}()}
 }
-\concept{venndir core}
+\concept{venndir support}
