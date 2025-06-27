@@ -83,14 +83,28 @@
 #' @param venndir_output `Venndir` output from `venndir()`, or
 #'    `list` with element `"vo"` as a `Venndir` object.
 #' @param expand_fraction `numeric` value, default `NULL` to use automated
-#'    settings. It defines the figure margin fraction on each side in order:
+#'    settings. It defines the figure margin fraction on each side in order
+#'    clockwise from the bottom:
 #'    bottom, left, top, right.
-#'    The default settings:
-#'    * When `draw_legend=FALSE` it uses `c(0, 0, 0, 0)`.
-#'    * When `draw_legend=TRUE` it uses `c(0.18, 0, 0, 0)`, in order
-#'    to help prevent the Venn diagram from overlapping the legend.
-#'    * When `expand_fraction` is defined, it is used without any
-#'    adjustment.
+#'    
+#'    The default behavior:
+#'    * When `expand_fraction` is defined in the call to `render_venndir()`
+#'    or `plot()`, or is defined in the metadata of the `Venndir` object,
+#'    it is used as-is with no further adjustments. The function argument
+#'    takes priority if defined.
+#'    * If `expand_fraction` is not defined, and is not present in
+#'    `Venndir` metadata, it is adjusted as described below.
+#'    * The final, adjusted `expand_fraction` is stored in the
+#'    `Venndir` object metadata returned by this function.
+#'    
+#'    Adjustments, when applied:
+#'    * When the legend will be drawn, due to `draw_legend=TRUE`, and
+#'    the position `legend_x` includes 'top' or 'bottom', the corresponding
+#'    margin is increased `0.2` to reduce overlap between figure and legend.
+#'    For example, `legend_x='bottom'` adds `c(0.2, 0, 0, 0)`, and
+#'    `legend_x='top'` adds `c(0, 0, 0.2, 0)`.
+#'    * When `main` title is defined, the top margin is increased
+#'    `0.07` for each line of text.
 #' @param font_cex `numeric` scalar to adjust font sizes.
 #' @param item_cex `numeric` default NULL, used to define baseline font size
 #'    (single value), or exact font `cex` values (multiple values).
@@ -236,7 +250,7 @@ render_venndir <- function
       label_df <- venndir_output@label_df;
       setlist <- venndir_output@setlist;
       metadata <- tryCatch({
-         venndir_output@metadata
+         metadata(venndir_output)
       }, error=function(e){
          list()
       })
@@ -403,16 +417,25 @@ render_venndir <- function
       if ("expand_fraction" %in% names(metadata(venndir_output))) {
          expand_fraction <- metadata(venndir_output)$expand_fraction;
       }
-      if (length(expand_fraction) == 0) {
-         expand_fraction <- c(-0.05, 0, -0.06, 0)
-         if (TRUE %in% draw_legend) {
+   }
+   if (length(expand_fraction) == 0) {
+      expand_fraction <- c(-0.05, 0, -0.06, 0)
+      if (TRUE %in% draw_legend) {
+         if (grepl("bottom", legend_x)) {
             expand_fraction <- expand_fraction + c(0.20, 0, 0, 0)
-         }
-         if (length(main) > 0 && nchar(main) > 0) {
-            expand_fraction <- expand_fraction + c(0, 0, 0.07, 0);
+         } else if (grepl("top", legend_x)) {
+            expand_fraction <- expand_fraction + c(0, 0, 0.20, 0)
          }
       }
+      if (length(main) > 0 && nchar(main) > 0) {
+         main_nlines <- length(unlist(strsplit(main, "(\n|<br>)")))
+         expand_fraction <- expand_fraction + c(0, 0, main_nlines * 0.07, 0);
+      }
+   } else {
+      expand_fraction <- rep(expand_fraction, length.out=4);
    }
+   # Store back into Venndir
+   metadata$expand_fraction <- expand_fraction;
 
    # Apply label_style
    # - only if label_style is something other than "custom"
@@ -728,28 +751,6 @@ render_venndir <- function
          label_df$ref_polygon <- venn_jp@polygons$ref_polygon[matchjps];
       }
       
-      # jamba::printDebug("label_df:");print(label_df);# debug
-
-      # warn about hidden non-zero labels
-      # - venn_counts are not zero; label_type is "main" AND EITHER:
-      #    - x,y are NA
-      #    OR
-      #    - overlap_set != ref_polygon;
-      if (TRUE %in% verbose) {
-         jamba::printDebug("render_venndir): ",
-            "Detecting warnings.");
-      }
-      warning_list <- get_venndir_label_warning_list(label_df);
-      warning_text <- warning_list$warning_text;
-      warning_label <- warning_list$warning_label;
-      if (length(warning_text) > 0) {
-         #
-         # if (TRUE %in% plot_warning) {
-         #    warning(warning_text);
-         # }
-      }
-      metadata$warning_list <- warning_list;
-
       # prepare line segments for labels outside their respective polygons
       g_labels <- NULL;
       segment_df <- NULL;
@@ -1465,11 +1466,6 @@ render_venndir <- function
    }
    
    ############################################
-   ## Todo:
-   # - draw label line segments (if needed)
-   # - draw the warning text label (if needed)
-   # - display items (if needed)
-
    # - display the counts / setlabels
    g_labels <- NULL;
    if (any(show_label)) {
@@ -1701,7 +1697,6 @@ render_venndir <- function
    if (length(warn_df) > 0 &&
          inherits(warn_df, "data.frame") &&
          nrow(warn_df) > 0) {
-      # jamba::printDebug("warning_label exists");
       nhid <- nrow(warn_df);
       if (TRUE %in% plot_warning) {
          jamba::printDebug("Warning: ",

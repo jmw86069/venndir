@@ -47,15 +47,31 @@ render_venndir(
 \code{list} with element \code{"vo"} as a \code{Venndir} object.}
 
 \item{expand_fraction}{\code{numeric} value, default \code{NULL} to use automated
-settings. It defines the figure margin fraction on each side in order:
+settings. It defines the figure margin fraction on each side in order
+clockwise from the bottom:
 bottom, left, top, right.
-The default settings:
+
+The default behavior:
 \itemize{
-\item When \code{draw_legend=FALSE} it uses \code{c(0, 0, 0, 0)}.
-\item When \code{draw_legend=TRUE} it uses \code{c(0.18, 0, 0, 0)}, in order
-to help prevent the Venn diagram from overlapping the legend.
-\item When \code{expand_fraction} is defined, it is used without any
-adjustment.
+\item When \code{expand_fraction} is defined in the call to \code{render_venndir()}
+or \code{plot()}, or is defined in the metadata of the \code{Venndir} object,
+it is used as-is with no further adjustments. The function argument
+takes priority if defined.
+\item If \code{expand_fraction} is not defined, and is not present in
+\code{Venndir} metadata, it is adjusted as described below.
+\item The final, adjusted \code{expand_fraction} is stored in the
+\code{Venndir} object metadata returned by this function.
+}
+
+Adjustments, when applied:
+\itemize{
+\item When the legend will be drawn, due to \code{draw_legend=TRUE}, and
+the position \code{legend_x} includes 'top' or 'bottom', the corresponding
+margin is increased \code{0.2} to reduce overlap between figure and legend.
+For example, \code{legend_x='bottom'} adds \code{c(0.2, 0, 0, 0)}, and
+\code{legend_x='top'} adds \code{c(0, 0, 0.2, 0)}.
+\item When \code{main} title is defined, the top margin is increased
+\code{0.07} for each line of text.
 }}
 
 \item{font_cex}{\code{numeric} scalar to adjust font sizes.}

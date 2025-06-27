@@ -502,23 +502,49 @@ adjusting all fonts consistently.
 \item Multiple values will be recycled across the total number of overlap
 regions, applying font size to each region as drawn in order.
 }
-\item Items can be rendered using \code{marquee::marquee_grob()} (default) or
+\item Items are rendered using \code{marquee::marquee_grob()} (default) or
 \code{grid::grid.text()}.
 \itemize{
 \item The default marquee interprets items as markdown, which enables
-text styling, line wrap, and potentially embedded images. Mostly,
-marquee offers the best support for Unicode arrows using whichever
+text styling, line wrap, inline styles '{.style text}', and
+embedded images or R graphics objects '\figure{path/to/image}'.
+Marquee offers robust support for Unicode arrows using whichever
 font is requested.
-Note that items use commonmark syntax, so to force line wrap, one
-must end a line with two spaces, then newline, for example:
-\code{"one line[space][space]\\nsecond line"}
-\item The potential benefit of \code{grid::grid.text()} is speed, and that
-it displays items exactly as provided with no markdown interpretation.
-This function will not display all Unicode characters for all fonts,
-due to inconsistencies in how R fonts are supported.
-(It's a long history.)
+By default, labels convert newline '\n' to a forced markdown newline
+'one line\link{space}\nnext line', but only when newline
+does not have whitespace immediately before it.
+Thus, to avoid this behavior, use '\link{space}\n'.
+\item The alternative \code{grid::grid.text()} might be faster for large number
+of labels. It does not support markdown and will render text exactly
+as provided. It also does not font substitution, which means any
+missing character glyphs, or uninterpreted system locale, will
+render problem characters using something like an empty box '[]'.
 }
 }
+}
+
+\subsection{Metadata}{
+
+A number of arguments are also stored in \code{metadata()} of the
+\code{Venndir-class} object. When also provided as a specific argument
+to \code{render_venndir()} or \code{plot()}, the argument value takes
+priority over the internal metadata.
+
+Further, new values defined or updated by \code{render_venndir()}
+are updated in the returned \code{Venndir-class} object metadata,
+for persistence. Notably, calling \code{venndir()} which passes
+extra arguments in ellipses \code{'...'}. These arguments are passed to
+\code{render_venndir()} when \code{do_plot=TRUE}, and corresponding
+metadata values will be updated
+in the \code{Venndir-class} object returned by \code{venndir()}.
+
+Notable example is \code{expand_fraction} whose default values are \code{NULL},
+but are defined in \code{render_venndir()} based upon the \code{draw_legend},
+\code{legend_x} and \code{main} arguments. See the \code{expand_fraction}
+argument help text for detailed rules. Changing \code{legend_x} later
+in a separate call to \code{render_venndir()} or \code{plot()} will not
+automatically update \code{expand_fraction} since it will have been stored
+once already.
 }
 }
 \examples{

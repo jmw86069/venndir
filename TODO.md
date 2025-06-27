@@ -1,5 +1,26 @@
 # TODO for venndir
 
+## 26jun2025
+
+* Consider improving how the default Venndir `grid` figure is created.
+
+   * Improve placement in non-square graphics device, with non-square Venndir.
+   Two-way Venn is usually short-wide - it is shrunk to fit a
+   square bounding box due to 'snpc' units.
+   * Potential workaround: Define viewport using independent x-/y-ranges,
+   then fix the aspect ratio using the ggplot2 method `respect=TRUE`.
+
+* When v@jps are re-ordered with sets last, it changes the ref_polygon
+result used when placing items, potentially other labels. Ideally,
+use better logic to choose from c("set_A|set", "set_A"), currently chooses
+the last polygon (overlap), but when order is c("set_A", "set_A|set") after
+manual re-ordering, the last polygon is the full set, which is incorrect.
+
+   * When finding jps@ref_polygon, and there are multiple entries, prioritize
+   the one without suffix '|set' if possible.
+
+* Check `plot.JamPolygon()` to make sure fill is applied before border? Surely.
+
 ## 12jun2025
 
 * Add labels to `display_angles()` output?

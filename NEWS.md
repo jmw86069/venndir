@@ -1,3 +1,19 @@
+# venndir 0.0.57.900
+
+## Changes to existing functions
+
+* `render_venndir()`
+
+   * `expand_fraction` help docs are expanded. When legend is drawn,
+   the margin is expanded on the top or bottom using `legend_x`,
+   only when it contains either 'top' or 'bottom'.
+   * `expand_fraction` is explicitly stored into the Venndir metadata
+   when returned.
+
+* `venndir()`
+
+   * Now inherits `metadata()` from `render_venndir()` when `do_plot=TRUE`.
+
 # venndir 0.0.56.900
 
 * Exciting new venndir logo! Courtesy of Christina Ward @csward70,

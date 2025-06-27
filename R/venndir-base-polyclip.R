@@ -64,21 +64,46 @@
 #'    * Multiple values will be recycled across the total number of overlap
 #'    regions, applying font size to each region as drawn in order.
 #' 
-#' * Items can be rendered using `marquee::marquee_grob()` (default) or
+#' * Items are rendered using `marquee::marquee_grob()` (default) or
 #' `grid::grid.text()`.
 #' 
 #'    * The default marquee interprets items as markdown, which enables
-#'    text styling, line wrap, and potentially embedded images. Mostly,
-#'    marquee offers the best support for Unicode arrows using whichever
+#'    text styling, line wrap, inline styles '{.style text}', and
+#'    embedded images or R graphics objects '![name](path/to/image)'.
+#'    Marquee offers robust support for Unicode arrows using whichever
 #'    font is requested.  
-#'    Note that items use commonmark syntax, so to force line wrap, one
-#'    must end a line with two spaces, then newline, for example:
-#'    `"one line[space][space]\nsecond line"`
-#'    * The potential benefit of `grid::grid.text()` is speed, and that
-#'    it displays items exactly as provided with no markdown interpretation.
-#'    This function will not display all Unicode characters for all fonts,
-#'    due to inconsistencies in how R fonts are supported.
-#'    (It's a long history.)
+#'    By default, labels convert newline '\n' to a forced markdown newline
+#'    'one line[space][space]\nnext line', but only when newline
+#'    does not have whitespace immediately before it.
+#'    Thus, to avoid this behavior, use '[space]\n'.
+#'    * The alternative `grid::grid.text()` might be faster for large number
+#'    of labels. It does not support markdown and will render text exactly
+#'    as provided. It also does not font substitution, which means any
+#'    missing character glyphs, or uninterpreted system locale, will
+#'    render problem characters using something like an empty box '[]'.
+#' 
+#' ## Metadata
+#' 
+#' A number of arguments are also stored in `metadata()` of the
+#' `Venndir-class` object. When also provided as a specific argument
+#' to `render_venndir()` or `plot()`, the argument value takes
+#' priority over the internal metadata.
+#' 
+#' Further, new values defined or updated by `render_venndir()`
+#' are updated in the returned `Venndir-class` object metadata,
+#' for persistence. Notably, calling `venndir()` which passes
+#' extra arguments in ellipses `'...'`. These arguments are passed to
+#' `render_venndir()` when `do_plot=TRUE`, and corresponding
+#' metadata values will be updated
+#' in the `Venndir-class` object returned by `venndir()`.
+#' 
+#' Notable example is `expand_fraction` whose default values are `NULL`,
+#' but are defined in `render_venndir()` based upon the `draw_legend`,
+#' `legend_x` and `main` arguments. See the `expand_fraction`
+#' argument help text for detailed rules. Changing `legend_x` later
+#' in a separate call to `render_venndir()` or `plot()` will not
+#' automatically update `expand_fraction` since it will have been stored
+#' once already.
 #' 
 #' @inheritParams signed_overlaps
 #' @param sets `integer` index with optional subset of sets in `setlist`
@@ -1237,11 +1262,11 @@ venndir <- function
    # Todo: use real x_outside
    #
    if (TRUE) {
-      # jamba::printDebug("venn_jps@polygons (before venndir_label_style)");print(venn_jps@polygons);# debug
-      # jamba::printDebug("label_df (before venndir_label_style)");print(label_df);# debug
       ## 0.0.32.900 - ensure show_items is non-empty when "i" or "item" defined
-      if ((length(show_labels) > 0 && any(grepl("[iIsS]", show_labels))) ||
-         (length(label_preset) > 0 && any(grepl("item", ignore.case=TRUE, label_preset)))) {
+      if ((length(show_labels) > 0 &&
+            any(grepl("[iIsS]", show_labels))) ||
+         (length(label_preset) > 0 &&
+               any(grepl("item", ignore.case=TRUE, label_preset)))) {
          if (any(show_items %in% c(NA, "none", "FALSE"))) {
             if ("overlap" %in% overlap_type) {
                show_items <- "item";
@@ -1249,12 +1274,10 @@ venndir <- function
                show_items <- "sign item";
             }
             metadata(vo)$show_items <- show_items;
-            # jamba::printDebug("venndir(): ", "show_items:", show_items);# debug
          }
       }
       
       ## Update Venndir object in place
-      # jamba::printDebug("venndir() before venndir_label_style() vo@label_df:");print(vo@label_df);# debug
       vo <- venndir_label_style(
          venndir_output=vo,
          show_labels=show_labels,
@@ -1266,16 +1289,8 @@ venndir <- function
          inside_percent_threshold=inside_percent_threshold,
          verbose=verbose,
          ...);
-      # jamba::printDebug("venndir() after venndir_label_style() vo@label_df:");print(vo@label_df);# debug
-      # vo@label_df <- vls$label_df;
-      # venn_jps@polygons <- vls$venn_spdf;
-      # jamba::printDebug("venn_jps@polygons (after venndir_label_style)");print(venn_jps@polygons);# debug
-      # jamba::printDebug("label_df (after venndir_label_style)");print(label_df);# debug
    }
 
-   # jamba::printDebug("venndir(): ", "vo@label_df:");print(vo@label_df);# debug
-   # jamba::printDebug("venndir(): ", "venn_jps@polygons:");print(venn_jps@polygons);# debug
-   
    ## 0.0.30.900 - assume this check already happened in venndir_label_style()
    # update show_items based upon max_items
    if (FALSE) {
@@ -1313,24 +1328,19 @@ venndir <- function
    if (do_plot) {
       gg <- render_venndir(
          venndir_output=vo,
-         # venn_jp=venn_jps,
-         # label_df=label_df,
          show_label=show_label,
          show_items=show_items,
          show_zero=show_zero,
          display_counts=display_counts,
-         # label_preset=label_preset,
-         # show_labels=show_labels,
-         # label_style="custom",
-         # item_cex=item_cex,
-         # item_style=item_style,
-         # item_buffer=item_buffer,
          max_items=max_items,
          inside_percent_threshold=inside_percent_threshold,
          ...);
       #label_df <- gg@label_df;
       # retlist$rv_label_df <- gg@label_df;
       # retlist$gg <- gg;
+      
+      # inherit the updated metadata for persistence
+      metadata(vo) <- metadata(gg);
       
       # carry over some useful grid plot components
       keep_attrs <- c("gtree",
