@@ -7,10 +7,14 @@
 
 <!-- badges: end -->
 
-The `venndir` package provides Venn directional diagrams, that can
-optionally display item labels inside the overlap regions.
+The `venndir` package creates Venn directional diagrams that can display
+item labels inside the overlap regions.
 
-The `pkgdown` reference:
+![Venndir Book](docs/venndir-cover-10.png) [Venndir
+Book](https://jmw86069.github.io/venndir-book/) - The complete online
+guide to Venndir, also available in EPUB and PDF formats.
+
+The `pkgdown` complete function reference:
 [jmw86069.github.io/venndir](https://jmw86069.github.io/venndir)
 
 ## Installation

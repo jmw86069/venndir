@@ -1237,16 +1237,30 @@ render_venndir <- function
    
    #############################################
    # grid graphics from here on
-   jp_xrange <- expand_range(expand_fraction=0.2,
-      range(c(
-         unlist(venn_jp@polygons$x),
-         gdf$x),
-         na.rm=TRUE));
-   jp_yrange <- expand_range(expand_fraction=0.2,
-      range(c(
-         unlist(venn_jp@polygons$x),
-         gdf$y),
-         na.rm=TRUE));
+   if (TRUE){
+      # experimental do_plot_scale=FALSE
+      jp_xrange <- expand_range(expand_fraction=0.2,
+         range(c(
+            unlist(venn_jp@polygons$x),
+            gdf$x),
+            na.rm=TRUE));
+      jp_yrange <- expand_range(expand_fraction=0.2,
+         range(c(
+            unlist(venn_jp@polygons$y),
+            gdf$y),
+            na.rm=TRUE));
+   } else {
+      jp_xrange <- expand_range(expand_fraction=0.2,
+         range(c(
+            unlist(venn_jp@polygons$x),
+            gdf$x),
+            na.rm=TRUE));
+      jp_yrange <- expand_range(expand_fraction=0.2,
+         range(c(
+            unlist(venn_jp@polygons$x),
+            gdf$y),
+            na.rm=TRUE));
+   }
    jp <- plot(venn_jp,
       buffer=expand_fraction + 0.1,
       xlim=jp_xrange,
@@ -1261,6 +1275,10 @@ render_venndir <- function
    adjx <- attr(jp, "adjx");
    adjy <- attr(jp, "adjy");
    jp_viewport <- attr(jp, "viewport");
+   default.units <- "snpc";
+   if (inherits(jp_viewport, "vpTree")) {
+      default.units <- "native";
+   }
    # jp_gTree has the polygon grobs
    jp_gTree <- attr(jp, "grob_tree");
    jp_grobList <- list()
@@ -1400,7 +1418,8 @@ render_venndir <- function
             name="venndir_items",
             x=adjx(itemlabels_df$x),
             y=adjy(itemlabels_df$y),
-            default.units="snpc",
+            # default.units="snpc",
+            default.units=default.units,
             angle=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
             style=item_mstyle,
             vp=jp_viewport,
@@ -1414,7 +1433,8 @@ render_venndir <- function
             label=itemlabels_df$text,
             rot=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
             check.overlap=FALSE,
-            default.units="snpc",
+            # default.units="snpc",
+            default.units=default.units,
             gp=grid::gpar(
                col=itemlabels_df$color,
                fontfamily=fontfamily,
@@ -1430,7 +1450,8 @@ render_venndir <- function
             y=adjy(itemlabels_df$y),
             rot=jamba::rmNULL(nullValue=0, itemlabels_df$rot),
             # check.overlap=FALSE,
-            default.units="snpc",
+            # default.units="snpc",
+            default.units=default.units,
             gp=grid::gpar(
                col=itemlabels_df$color,
                fontfamily=fontfamily,
@@ -1598,12 +1619,13 @@ render_venndir <- function
             
             # assemble_venndir_label
             g_label <- assemble_venndir_label(
-               x=grid::unit(adjx(head(igdf$x, 1)), "snpc"),
-               y=grid::unit(adjy(head(igdf$y, 1)), "snpc"),
+               x=grid::unit(adjx(head(igdf$x, 1)), default.units),
+               y=grid::unit(adjy(head(igdf$y, 1)), default.units),
                overlap_labels=overlap_labels,
                count_labels=count_labels,
                signed_labels=signed_labels,
                # debug="overlap",
+               default.units=default.units,
                just=use_just,
                fontfamily=fontfamily,
                fontcolors=use_fontcolors,
@@ -1667,7 +1689,8 @@ render_venndir <- function
          x1=adjx(segment_wide$x1),
          y0=adjy(segment_wide$y0),
          y1=adjy(segment_wide$y1),
-         default.units="snpc",
+         # default.units="snpc",
+         default.units=default.units,
          gp=grid::gpar(col=segment_wide$color,
             lwd=ceiling(segment_wide$lwd)),
          vp=jp_viewport);
@@ -1747,6 +1770,7 @@ render_venndir <- function
    # Plot title
    if (length(main) > 0 && any(nchar(main) > 0)) {
       # main <- gsub("\n", "<br>", main);
+      main <- gsub("([^ ])\n", "\\1  \n", main);
       main <- gsub("<br>", "  \n", main);
       main <- jamba::cPaste(main, sep="  \n");
       nlines <- length(strsplit(main, "\n")[[1]])
@@ -1771,7 +1795,7 @@ render_venndir <- function
             base_size=16 * font_cex[1],
             body_font=fontfamily,
             # weight="bold",
-            align="center"
+            align="justified-center"
          );
          # optional user-defined inline styles
          marquee_styles <- venndir_output@metadata[["marquee_styles"]];
@@ -1787,8 +1811,8 @@ render_venndir <- function
             name="venndir_main",
             x=0.5,
             # width=NA, # necessary if border,fill are applied, also devoid
-            y=grid::unit(1, "snpc") - grid::unit(0.75, "char"),
-            default.units="snpc",
+            y=grid::unit(1, "npc") - grid::unit(0.75, "char"),
+            default.units="npc",
             style=main_style,
             vp=jp_viewport,
             hjust="center",

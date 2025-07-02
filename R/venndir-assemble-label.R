@@ -183,6 +183,11 @@
 #'    device to prevent opening a new device or advancing the page of
 #'    an existing open device. Default `getOption("use_devoid", TRUE)`.
 #'    This option is experimental in 0.0.55.900 under testing.
+#' @param default.units `character` string used with `grid` objects to
+#'    define the default unit type for coordinates. This argument is
+#'    passed by `render_venndir()` to support scaled or non-scaled
+#'    coordinates, where scaled uses 'snpc' and non-scaled uses
+#'    'native'. The 'snpc' imposes a square viewport.
 #' @param debug `character` default FALSE, indicating whether to run
 #'    one of the debug modes used for testing:
 #'    * `"overlap"` will display the label at the center of the plot.
@@ -235,6 +240,7 @@ assemble_venndir_label <- function
     "richtext_grob"),
  marquee_styles=NULL,
  use_devoid=getOption("use_devoid", TRUE),
+ default.units="snpc",
  debug=FALSE,
  verbose=FALSE,
  ...)
@@ -420,7 +426,8 @@ assemble_venndir_label <- function
                width=NA,
                y=grid::unit(0.5, "npc"),
                x=grid::unit(signed_x, "npc"),
-               default.units="snpc",
+               # default.units="snpc",
+               default.units=default.units,
                force_body_margin=TRUE,
                style=signed_style,
                hjust=signed_hjust,
@@ -518,7 +525,8 @@ assemble_venndir_label <- function
                width=NA,
                y=grid::unit(0.5, "npc"),
                x=grid::unit(0.5, "npc"),
-               default.units="snpc",
+               # default.units="snpc",
+               default.units=default.units,
                force_body_margin=TRUE,
                style=count_style,
                hjust="center-ink",
@@ -622,7 +630,8 @@ assemble_venndir_label <- function
                # y=grid::unit(1, "snpc") - grid::unit(0.25, "char"),
                y=grid::unit(0.5, "npc"),
                x=grid::unit(0.5, "npc"),
-               default.units="snpc",
+               # default.units="snpc",
+               default.units=default.units,
                force_body_margin=TRUE,
                style=overlap_style,
                hjust="center-ink",
@@ -954,7 +963,8 @@ assemble_venndir_label <- function
             y <- y + gh * 0.5;
          }
       }
-      xy_vp <- grid::viewport(x=x, y=y)
+      xy_vp <- grid::viewport(x=x, y=y,
+         default.units=default.units)
       
       # hard-set the viewport into the object
       overlap_frame$vp <- xy_vp;

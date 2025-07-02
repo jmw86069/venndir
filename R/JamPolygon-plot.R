@@ -202,6 +202,13 @@
 #'    `grid::grid.draw()` for each graphical object.
 #'    When `do_draw=FALSE`, it also forces `do_newpage=FALSE`,
 #'    `do_viewport=FALSE`, and `do_pop_viewport=FALSE`.
+#' @param do_plot_scale `logical` (default FALSE) whether to apply scaling
+#'    so the effective x,y ranges are (0, 1). The default changed 0.0.57.900
+#'    for more intuitive use of grid coordinates.
+#'    
+#'    Use TRUE for grobs to use 'snpc' units, at the expense
+#'    of always keeping a square viewport open even when data
+#'    may have a non-square 1:1 aspect ratio.
 #' @param verbose `logical` indicating whether to print verbose output.
 #' @param debug `logical` (default FALSE) indicating whether to enable
 #'    debug operations. When `debug=TRUE` it is also passed to `grid`
@@ -229,6 +236,7 @@ plot.JamPolygon <- function
  do_viewport=TRUE,
  do_pop_viewport=TRUE,
  do_draw=TRUE,
+ do_plot_scale=FALSE,
  verbose=FALSE,
  debug=FALSE,
  ...)
@@ -437,11 +445,21 @@ plot.JamPolygon <- function
       xspan1 <- xspan * (1 + buffer[2] + buffer[4]);
       yspan1 <- yspan * (1 + buffer[1] + buffer[3]);
       maxspan <- max(c(xspan1, yspan1));
-      adjx <- function(x){
-         (x - xmid) / (maxspan) + 0.5 + (buffer[2] - buffer[4]) / 2;
-      }
-      adjy <- function(y){
-         (y - ymid) / (maxspan) + 0.5 + (buffer[1] - buffer[3]) / 2
+      if (TRUE %in% do_plot_scale) {
+         adjx <- function(x){
+            (x - xmid) / (maxspan) + 0.5 + (buffer[2] - buffer[4]) / 2;
+         }
+         adjy <- function(y){
+            (y - ymid) / (maxspan) + 0.5 + (buffer[1] - buffer[3]) / 2
+         }
+      } else {
+         # aspect1 <- xspan1 / yspan1;
+         xspan1a <- xspan * (buffer[2]);
+         xspan1b <- xspan * (buffer[4]);
+         yspan1a <- yspan * (buffer[1]);
+         yspan1b <- yspan * (buffer[3]);
+         adjx <- function(x)x;
+         adjy <- function(x)x;
       }
    } else {
       ## fix to buffer to use only one value
@@ -466,11 +484,35 @@ plot.JamPolygon <- function
       grid::grid.newpage();
    }
    
-   use_vp <- grid::viewport(
-      width=grid::unit(1, "snpc"),
-      height=grid::unit(1, "snpc"),
-      xscale=c(0, 1),
-      yscale=c(0, 1));
+   use_units <- "npc";
+   if (TRUE %in% do_plot_scale) {
+      use_vp <- grid::viewport(
+         width=grid::unit(1, "snpc"),
+         height=grid::unit(1, "snpc"),
+         xscale=c(0, 1),
+         yscale=c(0, 1));
+   } else {
+      # experimental option using respect=TRUE to maintain aspect ratio
+      new_xscale <- c(-1, 1) * (xspan1 / 2) + mean(xrange);
+      new_yscale <- c(-1, 1) * (yspan1 / 2) + mean(yrange);
+      new_xscale <- xrange + c(-xspan1a, xspan1b);
+      new_yscale <- yrange + c(-yspan1a, yspan1b);
+      vl1 <- grid::grid.layout(nrow=1, ncol=1,
+         just="center",
+         widths=diff(new_xscale),
+         heights=diff(new_yscale),
+         respect=TRUE);
+      vp1 <- grid::viewport(layout=vl1)
+      vp2 <- grid::viewport(
+         layout=vl1,
+         layout.pos.row=1,
+         layout.pos.col=1,
+         width=1, height=1,
+         xscale=new_xscale,
+         yscale=new_yscale)
+      use_vp <- grid::vpTree(parent=vp1, children=grid::vpList(vp2))
+      use_units <- "native";
+   }
    
    ## Note the viewport is included even when not used here
    attr(x, "viewport") <- use_vp;
@@ -491,6 +533,7 @@ plot.JamPolygon <- function
          id=coords_df$id,
          name=grobname,
          vp=use_vp,
+         default.units=use_units, # 0.0.57.900
          gp=grid::gpar(
             fill=rep(df$fill, polygon_defined),
             lwd=rep(df$border.lwd, polygon_defined),
@@ -593,6 +636,7 @@ plot.JamPolygon <- function
                   id=use_coords_df$id,
                   name=grobname,
                   vp=use_vp,
+                  default.units=use_units, # 0.0.57.900
                   gp=grid::gpar(
                      fill=NA,
                      lwd=bw,
@@ -609,6 +653,7 @@ plot.JamPolygon <- function
                   id=use_coords_df$id,
                   name=grobname,
                   vp=use_vp,
+                  default.units=use_units, # 0.0.57.900
                   gp=grid::gpar(
                      fill=fc,
                      lwd=bw,
@@ -715,6 +760,7 @@ plot.JamPolygon <- function
                   id=use_coords_df$id,
                   name=grobname,
                   vp=use_vp,
+                  default.units=use_units, # 0.0.57.900
                   gp=grid::gpar(
                      fill=df$fill[irow],
                      lwd=df$border.lwd[irow],
@@ -792,6 +838,7 @@ plot.JamPolygon <- function
                label=df$label[which_label],
                name=grobname,
                vp=use_vp,
+               default.units=use_units, # 0.0.57.900
                gp=use_gp)
             if (TRUE %in% do_draw) {
                grid::grid.draw(text_grob);

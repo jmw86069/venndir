@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.56.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.57.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,39 @@
       <small>Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.57.900" id="venndir-0057900">venndir 0.0.57.900<a class="anchor" aria-label="anchor" href="#venndir-0057900"></a></h2>
+<div class="section level3">
+<h3 id="major-changes-0-0-57-900">major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-0-57-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
+<ul><li>Plot now uses ‘native’ units by default, controlled with argument <code>do_plot_scale=FALSE</code>. Previous plots uses ‘snpc’ units which maintained 1:1 aspect ratio but imposed a square viewport, creating whitespace when the graphics device was not also square.</li>
+<li>New plots may be subtly different, but figures generally appear larger by virtue of using available space more effectively.</li>
+<li>Major benefit is that grid objects can be drawn in the viewport without first transforming coordinates using ‘adjx’, ‘adjy’ functions. It was always the goal, I finally worked out a solid approach.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code>, <code><a href="../reference/render_venndir.html">render_venndir()</a></code> are affected by <code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code></p>
+<ul><li>default Venn diagrams fill the whitespace more effectively, especially 2-way Venn diagrams which were naturally wider than they were tall. The goal is always to minimize use of <code>expand_fraction</code> to adjust the Venn figure in the default case.</li>
+<li>New argument <code>do_plot_scale=FALSE</code> can be passed via <code>'...'</code> to <code><a href="../reference/plot.JamPolygon.html">plot.JamPolygon()</a></code> to control coordinate units. Revert to previous behavior with <code>do_plot_scale=TRUE</code>.</li>
+<li>
+<code>main</code> now recognizes newline ‘’ and converts to ’ ’ to force linebreak for markdown, only when non-whitespace occurs beforehand. To avoid linebreak, leave one space before the newline: ’ ’.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-to-existing-functions-0-0-57-900">Changes to existing functions<a class="anchor" aria-label="anchor" href="#changes-to-existing-functions-0-0-57-900"></a></h3>
+<ul><li>
+<p><code><a href="../reference/render_venndir.html">render_venndir()</a></code></p>
+<ul><li>
+<code>expand_fraction</code> help docs are expanded. When legend is drawn, the margin is expanded on the top or bottom using <code>legend_x</code>, only when it contains either ‘top’ or ‘bottom’.</li>
+<li>
+<code>expand_fraction</code> is explicitly stored into the Venndir metadata when returned.</li>
+</ul></li>
+<li>
+<p><code><a href="../reference/venndir.html">venndir()</a></code></p>
+<ul><li>Now inherits <code><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata()</a></code> from <code><a href="../reference/render_venndir.html">render_venndir()</a></code> when <code>do_plot=TRUE</code>.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.56.900" id="venndir-0056900">venndir 0.0.56.900<a class="anchor" aria-label="anchor" href="#venndir-0056900"></a></h2>
 <ul><li>Exciting new venndir logo! Courtesy of Christina Ward <a href="https://github.com/csward70" class="external-link">@csward70</a>, the real artiste!</li>
@@ -459,7 +492,7 @@ The exception is when displaying items with only the “sign”, in that case th
 <ul><li>
 <code>show()</code> to summarize the contents</li>
 <li>
-<code>metadata()</code> and <code>metadata&lt;-</code>
+<code><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata()</a></code> and <code>metadata&lt;-</code>
 </li>
 <li>
 <code>setlist()</code> - returns the original setlist</li>

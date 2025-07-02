@@ -29,6 +29,7 @@ assemble_venndir_label(
   text_grob_type = c("marquee", "textGrob", "gridtext", "richtext_grob"),
   marquee_styles = NULL,
   use_devoid = getOption("use_devoid", TRUE),
+  default.units = "snpc",
   debug = FALSE,
   verbose = FALSE,
   ...
@@ -123,6 +124,12 @@ font size.}
 device to prevent opening a new device or advancing the page of
 an existing open device. Default \code{getOption("use_devoid", TRUE)}.
 This option is experimental in 0.0.55.900 under testing.}
+
+\item{default.units}{\code{character} string used with \code{grid} objects to
+define the default unit type for coordinates. This argument is
+passed by \code{render_venndir()} to support scaled or non-scaled
+coordinates, where scaled uses 'snpc' and non-scaled uses
+'native'. The 'snpc' imposes a square viewport.}
 
 \item{debug}{\code{character} default FALSE, indicating whether to run
 one of the debug modes used for testing:

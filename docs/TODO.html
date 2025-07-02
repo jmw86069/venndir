@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.56.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.57.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,9 +38,27 @@
 <div id="todo-for-venndir" class="section level1">
 
 <div class="section level2">
+<h2 id="id_26jun2025">26jun2025<a class="anchor" aria-label="anchor" href="#id_26jun2025"></a></h2>
+<ul><li>
+<p>DONE. Consider improving how the default Venndir <code>grid</code> figure is created.</p>
+<ul><li>DONE. Improve placement in non-square graphics device, with non-square Venndir. Two-way Venn is usually short-wide - it is shrunk to fit a square bounding box due to ‘snpc’ units.</li>
+<li>DONE. Potential workaround: Define viewport using independent x-/y-ranges, then fix the aspect ratio using the ggplot2 method <code>respect=TRUE</code>.</li>
+</ul></li>
+<li>
+<p>When <a href="mailto:v@jps" class="email">v@jps</a> are re-ordered with sets last, it changes the ref_polygon result used when placing items, potentially other labels. Ideally, use better logic to choose from c(“set_A|set”, “set_A”), currently chooses the last polygon (overlap), but when order is c(“set_A”, “set_A|set”) after manual re-ordering, the last polygon is the full set, which is incorrect.</p>
+<ul><li>When finding <a href="mailto:jps@ref" class="email">jps@ref</a>_polygon, and there are multiple entries, prioritize the one without suffix ‘|set’ if possible.</li>
+</ul></li>
+<li><p>DONE. Check <code><a href="reference/plot.JamPolygon.html">plot.JamPolygon()</a></code> to make sure fill is applied before border? Yes it is.</p></li>
+</ul></div>
+<div class="section level2">
 <h2 id="id_12jun2025">12jun2025<a class="anchor" aria-label="anchor" href="#id_12jun2025"></a></h2>
 <ul><li><p>Add labels to <code><a href="reference/display_angles.html">display_angles()</a></code> output?</p></li>
-<li><p>Consider options for item labels: outline text, fill/border around labels. Older versions of venndir used “lite box” style item labels for clarity.</p></li>
+<li>
+<p>PARTIAL. Consider options for item labels: outline text, fill/border around labels.</p>
+<ul><li>Older versions of venndir used “lite box” style item labels for clarity.</li>
+<li>Features are possible by using inline markdown <code>marquee_styles</code> argument. They do require wrapping items inside ‘{.style item}’ blocks.</li>
+<li>Needs testing to see how it works with sign-item format.</li>
+</ul></li>
 <li>
 <p>DONE. Consider how to handle “Hidden overlaps”</p>
 <ul><li>DONE. Indicate with footnote-style icon? warning: “6A0”, footnote dagger “020”, double-dagger “021”, info sign “4D8”, reference mark “03B”.</li>

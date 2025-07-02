@@ -1,5 +1,33 @@
 # venndir 0.0.57.900
 
+## major changes
+
+* `plot.JamPolygon()`
+
+   * Plot now uses 'native' units by default, controlled with
+   argument `do_plot_scale=FALSE`. Previous plots uses 'snpc' units
+   which maintained 1:1 aspect ratio but imposed a square viewport,
+   creating whitespace when the graphics device was not also square.
+   * New plots may be subtly different, but figures generally appear
+   larger by virtue of using available space more effectively.
+   * Major benefit is that grid objects can be drawn in the viewport
+   without first transforming coordinates using 'adjx', 'adjy' functions.
+   It was always the goal, I finally worked out a solid approach.
+
+* `venndir()`, `render_venndir()` are affected by `plot.JamPolygon()`
+
+   * default Venn diagrams fill the whitespace more effectively, especially
+   2-way Venn diagrams which were naturally wider than they were tall.
+   The goal is always to minimize use of `expand_fraction` to adjust the
+   Venn figure in the default case.
+   * New argument `do_plot_scale=FALSE` can be passed via `'...'` to
+   `plot.JamPolygon()` to control coordinate units.
+   Revert to previous behavior with `do_plot_scale=TRUE`.
+   * `main` now recognizes newline '\n' and converts to '  \n' to force
+   linebreak for markdown, only when non-whitespace occurs beforehand.
+   To avoid linebreak, leave one space before the newline: ' \n'.
+
+
 ## Changes to existing functions
 
 * `render_venndir()`

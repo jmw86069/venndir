@@ -468,6 +468,11 @@ label_outside_JamPolygon <- function
       vp <- attr(j6, "viewport");
       adjx <- attr(j6, "adjx");
       adjy <- attr(j6, "adjy");
+      default.units <- "snpc";
+      if (inherits(vp, "vpTree")) {
+         default.units <- "native";
+      }
+      
       for (i in seq_along(segmentxy_list)) {
          xy <- segmentxy_list[[i]];
          pchv <- c(border=20, label=4)
@@ -475,21 +480,21 @@ label_outside_JamPolygon <- function
             gp <- grid::pointsGrob(
                x=adjx(xy[,"x"]),
                y=adjy(xy[,"y"]),
-               default.units="snpc", vp=vp,
+               default.units=default.units, vp=vp,
                pch=pchv[rownames(xy)],
                gp=grid::gpar(col="red", cex=0.3))
             grid::grid.draw(gp)
             gl <- grid::linesGrob(
                x=adjx(xy[,"x"]),
                y=adjy(xy[,"y"]),
-               default.units="snpc", vp=vp,
+               default.units=default.units, vp=vp,
                gp=grid::gpar(col="indianred1"))
             grid::grid.draw(gl)
             gt <- grid::textGrob(
                x=adjx(xy["label", "x"]),
                y=adjy(xy["label", "y"]),
                label=names(segmentxy_list)[i],
-               default.units="snpc", vp=vp,
+               default.units=default.units, vp=vp,
                gp=grid::gpar(col="red3"))
             grid::grid.draw(gt)
          }
@@ -498,7 +503,7 @@ label_outside_JamPolygon <- function
       gc <- grid::pointsGrob(
          x=adjx(center[1]),
          y=adjy(center[2]),
-         default.units="snpc", vp=vp,
+         default.units=default.units, vp=vp,
          pch=5,
          gp=grid::gpar(col="red", cex=0.3))
       grid::grid.draw(gc)

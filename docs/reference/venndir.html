@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.56.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.57.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -583,21 +583,47 @@ adjusting all fonts consistently.</p></li>
 <li><p>Multiple values will be recycled across the total number of overlap
 regions, applying font size to each region as drawn in order.</p></li>
 </ul></li>
-<li><p>Items can be rendered using <code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> (default) or
+<li><p>Items are rendered using <code><a href="https://marquee.r-lib.org/reference/marquee_grob.html" class="external-link">marquee::marquee_grob()</a></code> (default) or
 <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code>.</p><ul><li><p>The default marquee interprets items as markdown, which enables
-text styling, line wrap, and potentially embedded images. Mostly,
-marquee offers the best support for Unicode arrows using whichever
+text styling, line wrap, inline styles '.style text', and
+embedded images or R graphics objects '<img src="figures/path/to/image" alt="">'.
+Marquee offers robust support for Unicode arrows using whichever
 font is requested.
-Note that items use commonmark syntax, so to force line wrap, one
-must end a line with two spaces, then newline, for example:
-<code>"one line[space][space]\nsecond line"</code></p></li>
-<li><p>The potential benefit of <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code> is speed, and that
-it displays items exactly as provided with no markdown interpretation.
-This function will not display all Unicode characters for all fonts,
-due to inconsistencies in how R fonts are supported.
-(It's a long history.)</p></li>
+By default, labels convert newline '' to a forced markdown newline
+'one linespace line', but only when newline
+does not have whitespace immediately before it.
+Thus, to avoid this behavior, use 'space'.</p></li>
+<li><p>The alternative <code><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">grid::grid.text()</a></code> might be faster for large number
+of labels. It does not support markdown and will render text exactly
+as provided. It also does not font substitution, which means any
+missing character glyphs, or uninterpreted system locale, will
+render problem characters using something like an empty box '[]'.</p></li>
 </ul></li>
 </ul></div>
+
+<div class="section">
+<h3 id="metadata">Metadata<a class="anchor" aria-label="anchor" href="#metadata"></a></h3>
+
+
+<p>A number of arguments are also stored in <code>metadata()</code> of the
+<code>Venndir-class</code> object. When also provided as a specific argument
+to <code><a href="render_venndir.html">render_venndir()</a></code> or <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, the argument value takes
+priority over the internal metadata.</p>
+<p>Further, new values defined or updated by <code><a href="render_venndir.html">render_venndir()</a></code>
+are updated in the returned <code>Venndir-class</code> object metadata,
+for persistence. Notably, calling <code>venndir()</code> which passes
+extra arguments in ellipses <code>'...'</code>. These arguments are passed to
+<code><a href="render_venndir.html">render_venndir()</a></code> when <code>do_plot=TRUE</code>, and corresponding
+metadata values will be updated
+in the <code>Venndir-class</code> object returned by <code>venndir()</code>.</p>
+<p>Notable example is <code>expand_fraction</code> whose default values are <code>NULL</code>,
+but are defined in <code><a href="render_venndir.html">render_venndir()</a></code> based upon the <code>draw_legend</code>,
+<code>legend_x</code> and <code>main</code> arguments. See the <code>expand_fraction</code>
+argument help text for detailed rules. Changing <code>legend_x</code> later
+in a separate call to <code><a href="render_venndir.html">render_venndir()</a></code> or <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> will not
+automatically update <code>expand_fraction</code> since it will have been stored
+once already.</p>
+</div>
 
     </div>
     <div class="section level2">
@@ -620,7 +646,7 @@ due to inconsistencies in how R fonts are supported.
 <span class="r-out co"><span class="r-pr">#&gt;</span> jps        10      JamPolygon</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> label_df   21   32 data.frame</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> setlist     3            list</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> metadata   21            list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> metadata   22            list</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># custom set labels</span></span></span>
 <span class="r-in"><span><span class="va">vo</span> <span class="op">&lt;-</span> <span class="fu">venndir</span><span class="op">(</span><span class="va">setlist</span>,</span></span>

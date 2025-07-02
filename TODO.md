@@ -2,12 +2,12 @@
 
 ## 26jun2025
 
-* Consider improving how the default Venndir `grid` figure is created.
+* DONE. Consider improving how the default Venndir `grid` figure is created.
 
-   * Improve placement in non-square graphics device, with non-square Venndir.
+   * DONE. Improve placement in non-square graphics device, with non-square Venndir.
    Two-way Venn is usually short-wide - it is shrunk to fit a
    square bounding box due to 'snpc' units.
-   * Potential workaround: Define viewport using independent x-/y-ranges,
+   * DONE. Potential workaround: Define viewport using independent x-/y-ranges,
    then fix the aspect ratio using the ggplot2 method `respect=TRUE`.
 
 * When v@jps are re-ordered with sets last, it changes the ref_polygon
@@ -19,13 +19,20 @@ manual re-ordering, the last polygon is the full set, which is incorrect.
    * When finding jps@ref_polygon, and there are multiple entries, prioritize
    the one without suffix '|set' if possible.
 
-* Check `plot.JamPolygon()` to make sure fill is applied before border? Surely.
+* DONE. Check `plot.JamPolygon()` to make sure fill is applied before border?
+Yes it is.
 
 ## 12jun2025
 
 * Add labels to `display_angles()` output?
-* Consider options for item labels: outline text, fill/border around labels.
-Older versions of venndir used "lite box" style item labels for clarity.
+* PARTIAL. Consider options for item labels: outline text,
+fill/border around labels.
+
+   * Older versions of venndir used "lite box" style item labels for clarity.
+   * Features are possible by using inline markdown `marquee_styles`
+   argument. They do require wrapping items inside '{.style item}' blocks.
+   * Needs testing to see how it works with sign-item format.
+
 * DONE. Consider how to handle "Hidden overlaps"
 
    * DONE. Indicate with footnote-style icon? warning: "\u26A0", footnote

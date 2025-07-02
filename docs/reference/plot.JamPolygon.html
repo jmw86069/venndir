@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.56.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.57.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Plot JamPolygon object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/R/JamPolygon.R" class="external-link"><code>R/JamPolygon.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/R/JamPolygon-plot.R" class="external-link"><code>R/JamPolygon-plot.R</code></a></small>
       <div class="d-none name"><code>plot.JamPolygon.Rd</code></div>
     </div>
 
@@ -58,6 +58,7 @@
 <span>  do_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_pop_viewport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_draw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  do_plot_scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -155,6 +156,15 @@ or other <code>grid</code> functions.</p></dd>
 <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> for each graphical object.
 When <code>do_draw=FALSE</code>, it also forces <code>do_newpage=FALSE</code>,
 <code>do_viewport=FALSE</code>, and <code>do_pop_viewport=FALSE</code>.</p></dd>
+
+
+<dt id="arg-do-plot-scale">do_plot_scale<a class="anchor" aria-label="anchor" href="#arg-do-plot-scale"></a></dt>
+<dd><p><code>logical</code> (default FALSE) whether to apply scaling
+so the effective x,y ranges are (0, 1). The default changed 0.0.57.900
+for more intuitive use of grid coordinates.</p>
+<p>Use TRUE for grobs to use 'snpc' units, at the expense
+of always keeping a square viewport open even when data
+may have a non-square 1:1 aspect ratio.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
