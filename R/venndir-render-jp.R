@@ -1216,6 +1216,9 @@ render_venndir <- function
       gdf$final_fill <- colorjam::blend_colors(todo_color_list);
 
       # adjust label color to contrast with the polygon fill color
+      # 0.0.57.950 - this step should be done in venndir_label_style()
+      # - except that it distinguishes inside and outside "main" labels
+      # - and is done here as a final polishing step
       if (TRUE) {
          # assume signed labels were already adjusted, but not main labels
          # Todo: adjust them all, consistently, in venndir_label_style()

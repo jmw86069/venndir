@@ -1,3 +1,19 @@
+# venndir 0.0.57.950
+
+## Hotfix
+
+* `venndir_label_style()`
+
+   * It was not consistently passing '...' ellipses to
+   `make_color_contrast()` - a rarely used feature to allow custom
+   values `L_threshold`, `L_lo`, `L_hi` to control the luminance (brightness)
+   of text on light or dark background. Adjustments can allow colors such
+   as orange to be more visible.
+   * Label colors "main" are adjusted using `make_color_contrast()` here
+   instead of using `jamba::setTextContrastColor()`, so that '...' are
+   applied consistent with other labels.
+
+
 # venndir 0.0.57.900
 
 ## major changes

@@ -719,67 +719,78 @@ venndir_label_style <- function
          )
       )
    )[toupdate];
-   
+
+   ## previous shaded background calculation - not necessary   
+   # shaded_bg <- jamba::alpha2col(color_sp_index,
+   #    alpha=venndir_output$venn_spdf$alpha[sp_index]);
+
    # label color
    venndir_output$label_df$color[toupdate] <- ifelse(
-      grepl("fill", label_style),
+      grepl("fill", label_style[toupdate]),
       ifelse(
-         venndir_output$label_df$type %in% "main",
+         venndir_output$label_df$type[toupdate] %in% "main",
          jamba::rmNA(naValue="black",
-            jamba::setTextContrastColor(
-               jamba::alpha2col(color_sp_index,
-                  alpha=venndir_output$venn_spdf$alpha[sp_index]),
-               useGrey=useGrey)),
+            make_color_contrast(
+               x="black",
+               y=venndir_output$label_df$fill[toupdate],
+               bg=label_bg[toupdate],
+               ...)),
          make_color_contrast(
-            x=venndir_output$label_df$color,
-            y=venndir_output$label_df$fill,
-            bg=label_bg,
+            x=venndir_output$label_df$color[toupdate],
+            y=venndir_output$label_df$fill[toupdate],
+            bg=label_bg[toupdate],
             ...)),
       ifelse(
-         grepl("shaded", label_style),
+         grepl("shaded", label_style[toupdate]),
          ifelse(
-            venndir_output$label_df$type %in% "main",
+            venndir_output$label_df$type[toupdate] %in% "main",
             jamba::rmNA(naValue="black",
-               make_color_contrast("black",
-                  venndir_output$label_df$fill,
-                  bg=jamba::alpha2col(color_sp_index,
-                     alpha=venndir_output$venn_spdf$alpha[sp_index])),
-               #jamba::setTextContrastColor(venndir_output$label_df$fill,
-               #   useGrey=useGrey)
+               make_color_contrast(x="black",
+                  y=label_bg[toupdate],
+                  bg=venndir_output$label_df$fill[toupdate],
+                  ...)
             ),
             make_color_contrast(
-               x=venndir_output$label_df$color,
-               y=venndir_output$label_df$fill,
-               bg=label_bg,
+               x=venndir_output$label_df$color[toupdate],
+               y=venndir_output$label_df$fill[toupdate],
+               bg=label_bg[toupdate],
                ...)),
          ifelse(
-            grepl("lite", label_style),
+            grepl("lite", label_style[toupdate]),
             ifelse(
-               venndir_output$label_df$type %in% "main",
+               venndir_output$label_df$type[toupdate] %in% "main",
                jamba::rmNA(naValue="black",
-                  jamba::setTextContrastColor(venndir_output$label_df$fill,
-                     useGrey=useGrey)),
+                  make_color_contrast(
+                     x="black",
+                     y=venndir_output$label_df$fill[toupdate],
+                     bg=label_bg[toupdate],
+                     ...)),
                make_color_contrast(
-                  x=venndir_output$label_df$color,
-                  y=venndir_output$label_df$fill,
-                  bg=label_bg,
+                  x=venndir_output$label_df$color[toupdate],
+                  y=venndir_output$label_df$fill[toupdate],
+                  bg=label_bg[toupdate],
                   ...)),
             ifelse(
-               grepl("none|basic|box", label_style),
+               grepl("none|basic|box", label_style[toupdate]),
                ifelse(
-                  venndir_output$label_df$type %in% "main",
+                  venndir_output$label_df$type[toupdate] %in% "main",
                   jamba::rmNA(naValue="black",
-                     jamba::setTextContrastColor(label_bg,
-                        useGrey=useGrey)),
+                     make_color_contrast(
+                        x="black",
+                        y=label_bg[toupdate],
+                        bg=bg,
+                        ...)),
                   make_color_contrast(
-                     x=venndir_output$label_df$color,
-                     y=label_bg,
-                     bg=bg)#,...)
+                     x=venndir_output$label_df$color[toupdate],
+                     y=label_bg[toupdate],
+                     bg=bg,
+                     ...)
                ),
-               venndir_output$label_df$color)
+               venndir_output$label_df$color[toupdate])
          )
       )
-   )[toupdate];
+   );
+
    vo@label_df <- venndir_output$label_df;
    
    # add attribute to help persist the default show_labels

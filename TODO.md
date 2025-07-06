@@ -1,5 +1,13 @@
 # TODO for venndir
 
+## 05jul2025
+
+* Consider dynamic `L_lo`, `L_hi` values based upon the background color.
+For example, test something like `L_diff=0.4` to make sure the L value is
+at least 0.4 darker or lighter (as the case may be).
+Driving use case is something like 'darkorange' which is much improved on white
+background with `L_lo=55`, but on medium-color background is not visible.
+
 ## 26jun2025
 
 * DONE. Consider improving how the default Venndir `grid` figure is created.
