@@ -134,8 +134,9 @@ used, \code{c("fill", "border")} are default:
 \item \code{"fill"}: will use the Venn fill color
 \item \code{"border"}: will use the Venn border color
 \item \code{"nofill"}: will remove the Venn fill color
-\item \code{"noborder"}: will remove the Venn border color
 \item \code{"greyfill"}: will use \code{"F4F4f4"} grey fill color, matching the Total.
+\item \code{"noborder"}: will remove the Venn border color
+\item \code{"whiteborder"}: will use \code{"#FFFFFF"} border color, matching the Total.
 \item \code{"greyborder"}: will use \code{"#999999"} border color, matching the Total.
 \item \code{"blackborder"}: will use \code{"#000000"} border color, matching the Total.
 }}

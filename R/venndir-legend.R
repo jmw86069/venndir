@@ -82,8 +82,9 @@
 #'    * `"fill"`: will use the Venn fill color
 #'    * `"border"`: will use the Venn border color
 #'    * `"nofill"`: will remove the Venn fill color
-#'    * `"noborder"`: will remove the Venn border color
 #'    * `"greyfill"`: will use `"F4F4f4"` grey fill color, matching the Total.
+#'    * `"noborder"`: will remove the Venn border color
+#'    * `"whiteborder"`: will use `"#FFFFFF"` border color, matching the Total.
 #'    * `"greyborder"`: will use `"#999999"` border color, matching the Total.
 #'    * `"blackborder"`: will use `"#000000"` border color, matching the Total.
 #' @param box.lwd `numeric` used to define the box line width,
@@ -855,6 +856,9 @@ venndir_legender <- function
    }
    if ("greyborder" %in% legend_color_style) {
       legend_df$border[] <- "#999999";
+   }
+   if ("whiteborder" %in% legend_color_style) {
+      legend_df$border[] <- "#FFFFFF";
    }
    if ("blackborder" %in% legend_color_style) {
       legend_df$border[] <- "#000000";

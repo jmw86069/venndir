@@ -14,6 +14,7 @@
    applied consistent with other labels.
 
 * `venndir()` - removed annoying inline newlines in help docs, caused issues.
+* `venndir_legender()` - added "whiteborder" to `legend_color_style`.
 
 # venndir 0.0.57.900
 
