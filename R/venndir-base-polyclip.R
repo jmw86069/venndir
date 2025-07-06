@@ -72,10 +72,10 @@
 #'    embedded images or R graphics objects '![name](path/to/image)'.
 #'    Marquee offers robust support for Unicode arrows using whichever
 #'    font is requested.  
-#'    By default, labels convert newline '\n' to a forced markdown newline
-#'    'one line[space][space]\nnext line', but only when newline
-#'    does not have whitespace immediately before it.
-#'    Thus, to avoid this behavior, use '[space]\n'.
+#'    By default, labels convert newline to a forced markdown newline,
+#'    which uses two spaces at the end of the line. This change is only
+#'    performed when newline  does not have whitespace immediately before it.
+#'    Thus, to avoid this behavior, use one space before a newline.
 #'    * The alternative `grid::grid.text()` might be faster for large number
 #'    of labels. It does not support markdown and will render text exactly
 #'    as provided. It also does not font substitution, which means any

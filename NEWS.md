@@ -13,6 +13,7 @@
    instead of using `jamba::setTextContrastColor()`, so that '...' are
    applied consistent with other labels.
 
+* `venndir()` - removed annoying inline newlines in help docs, caused issues.
 
 # venndir 0.0.57.900
 
