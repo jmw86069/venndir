@@ -94,7 +94,7 @@ plot_jpdiff(DEjp, DEjp_rotated)
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
-\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
+\code{\link{[,JamPolygon-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.57.950
+Version: 0.0.58.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -26,7 +26,8 @@ Imports: jamba(>= 1.0.4),
     marquee(>= 1.0.0),
     methods,
     data.table,
-    withr
+    withr,
+    devoid
 Suggests:
     Matrix,
     knitr,

@@ -92,8 +92,8 @@ marquee_text_grob <- function
       devVOID <- NULL;
       if (requireNamespace("devoid", quietly=TRUE)) {
          dev1 <- dev.list();
-         # devoid::void_dev();
-         pdf(NULL); # attempt pdf(NULL) as drop-in replacement
+         devoid::void_dev(); # might be more stable than pdf(NULL) in RStudio
+         # pdf(NULL); # attempt pdf(NULL) as drop-in replacement
          dev2 <- dev.list();
          devVOID <- setdiff(dev2, dev1)
          on.exit(expr={

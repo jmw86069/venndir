@@ -1,3 +1,18 @@
+# venndir 0.0.58.900
+
+## Hotfix / Bug Fix
+
+* Specific R crash during bookdown rendering in RStudio, fixed by converting
+`pdf(NULL)` to `devoid::void_dev()`.
+
+   * Crash was caused by marquee/textshaping, specifically inside RStudio
+   when rendering bookdown to HTML (bookdown::gitbook or bookdown::epub_book).
+   * No crash rendering from R console. Might be caused by Unicode character
+   substitution, since it happens in a chunk demonstrating use of rare
+   Unicode symbols.
+   * No crash after switching `pdf(NULL)` to `devoid:void_dev()`.
+   * See r-lib/marquee#75 for related discussion.
+
 # venndir 0.0.57.950
 
 ## Hotfix
