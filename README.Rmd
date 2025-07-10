@@ -28,16 +28,25 @@ options(warn=FALSE)
 <!-- badges: start -->
 <!-- badges: end -->
 
-The `venndir` package creates Venn directional
-diagrams that can display item labels inside the overlap regions.
+The `venndir` R package creates publication-ready Venn diagrams
+with support for directionality, embedded item labels, and
+extensive options for customization.
 
-![Venndir Book](docs/venndir-cover-10.png)
-[Venndir Book](https://jmw86069.github.io/venndir-book/) -
-The complete online guide to Venndir, also available in EPUB and
-PDF formats.
-
-The `pkgdown` complete function reference:
-[jmw86069.github.io/venndir](https://jmw86069.github.io/venndir)
+<table style="width:65vw; max-width:450px;">
+<tr><td>
+<a href="https://jmw86069.github.io/venndir-book/">
+<img src="https://jmw86069.github.io/venndir-book/images/venndir-cover.png" style="width:30vw; max-width:125px; float:left; margin:0 0 1em 1em;" align="left" alt="Venndir Book Cover" class="cover" />
+</a></td>
+<td style="vertical-align: middle; padding-left: 16px;">
+[Venndir Book](https://jmw86069.github.io/venndir-book/)  
+Explore the online book to learn how to design elegant set
+diagrams using R.  
+Available in HTML, PDF, and EPUB formats.
+<p>
+<p>
+[Venndir R Package Reference](https://jmw86069.github.io/venndir)  
+Explore the `pkgdown` complete function reference.
+</td></tr></table>
 
 
 ## Installation

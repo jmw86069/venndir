@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">venndir</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.57.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.58.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,32 @@
       <small>Source: <a href="https://github.com/jmw86069/venndir/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.58.900" id="venndir-0058900">venndir 0.0.58.900<a class="anchor" aria-label="anchor" href="#venndir-0058900"></a></h2>
+<div class="section level3">
+<h3 id="hotfix--bug-fix-0-0-58-900">Hotfix / Bug Fix<a class="anchor" aria-label="anchor" href="#hotfix--bug-fix-0-0-58-900"></a></h3>
+<ul><li>
+<p>Specific R crash during bookdown rendering in RStudio, fixed by converting <code>pdf(NULL)</code> to <code><a href="https://rdrr.io/pkg/devoid/man/void_dev.html" class="external-link">devoid::void_dev()</a></code>.</p>
+<ul><li>Crash was caused by marquee/textshaping, specifically inside RStudio when rendering bookdown to HTML (bookdown::gitbook or bookdown::epub_book).</li>
+<li>No crash rendering from R console. Might be caused by Unicode character substitution, since it happens in a chunk demonstrating use of rare Unicode symbols.</li>
+<li>No crash after switching <code>pdf(NULL)</code> to <code>devoid:void_dev()</code>.</li>
+<li>See r-lib/marquee#75 for related discussion.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.57.950" id="venndir-0057950">venndir 0.0.57.950<a class="anchor" aria-label="anchor" href="#venndir-0057950"></a></h2>
+<div class="section level3">
+<h3 id="hotfix-0-0-57-950">Hotfix<a class="anchor" aria-label="anchor" href="#hotfix-0-0-57-950"></a></h3>
+<ul><li>
+<p><code><a href="../reference/venndir_label_style.html">venndir_label_style()</a></code></p>
+<ul><li>It was not consistently passing ‘…’ ellipses to <code><a href="../reference/make_color_contrast.html">make_color_contrast()</a></code> - a rarely used feature to allow custom values <code>L_threshold</code>, <code>L_lo</code>, <code>L_hi</code> to control the luminance (brightness) of text on light or dark background. Adjustments can allow colors such as orange to be more visible.</li>
+<li>Label colors “main” are adjusted using <code><a href="../reference/make_color_contrast.html">make_color_contrast()</a></code> here instead of using <code><a href="https://jmw86069.github.io/jamba/reference/setTextContrastColor.html" class="external-link">jamba::setTextContrastColor()</a></code>, so that ‘…’ are applied consistent with other labels.</li>
+</ul></li>
+<li><p><code><a href="../reference/venndir.html">venndir()</a></code> - removed annoying inline newlines in help docs, caused issues.</p></li>
+<li><p><code><a href="../reference/venndir_legender.html">venndir_legender()</a></code> - added “whiteborder” to <code>legend_color_style</code>.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.57.900" id="venndir-0057900">venndir 0.0.57.900<a class="anchor" aria-label="anchor" href="#venndir-0057900"></a></h2>
 <div class="section level3">

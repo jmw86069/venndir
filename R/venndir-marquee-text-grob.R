@@ -92,6 +92,7 @@ marquee_text_grob <- function
       devVOID <- NULL;
       if (requireNamespace("devoid", quietly=TRUE)) {
          dev1 <- dev.list();
+         # ragg::agg_record(); # mimics the effect of devoid without pkg dep
          devoid::void_dev(); # might be more stable than pdf(NULL) in RStudio
          # pdf(NULL); # attempt pdf(NULL) as drop-in replacement
          dev2 <- dev.list();
