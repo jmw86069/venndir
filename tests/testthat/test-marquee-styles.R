@@ -1,18 +1,37 @@
 
 test_that("venndir-marquee-styles", {
+   # determine script font
+   font_chalk <- head(jamba::provigrep(
+      c("chalk", "felt", "pen", "roman"),
+      subset_systemfonts(grepl("normal", weight) &
+            grepl("normal", width) & 
+            grepl("Regular|Plain", style))$name), 1)
+   font_script <- head(jamba::provigrep(
+      c("above", "freestyle", "script"),
+      subset_systemfonts(grepl("normal", weight) &
+            grepl("normal", width) & 
+            grepl("Regular|Plain", style))$name), 1)
+   font_gothic <- head(jamba::provigrep(
+      c("academyengraved", "oldeng", "goth"),
+      subset_systemfonts(grepl("normal", weight) &
+            grepl("normal", width) & 
+            grepl("Regular|Plain", style))$name), 1)
+   
    run_venndir_styles <- function(){
       #
       ms <- list(
          chalk=marquee::style(
-            family="Chalkduster",
+            family=font_chalk,
             weight="normal", width="normal",
             size=marquee::relative(1.5)),
          cursive=marquee::style(
-            family="Above The Sky",
+            # family="Above The Sky",
+            family=font_script,
             weight="normal", width="normal",
             size=marquee::relative(1.5)),
          gothic=marquee::style(
-            family="AcademyEngravedLetPlain",
+            # family="AcademyEngravedLetPlain",
+            family=font_gothic,
             weight="normal", width="normal",
             size=marquee::relative(1.5)))
       il <- split(LETTERS, rep(letters[1:3], c(10, 10, 6)))

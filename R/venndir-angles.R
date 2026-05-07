@@ -76,9 +76,11 @@ spread_degrees <- function
  max_iterations=20,
  use_colors=NULL,
  do_plot=FALSE,
+ return_type=c("numeric", "df"),
  verbose=FALSE,
  ...)
 {
+   return_type <- match.arg(return_type);
    if (verbose) {
       jamba::printDebug("spread_degrees(): ",
          "iteration:", iteration);
@@ -87,6 +89,17 @@ spread_degrees <- function
    if (inherits(degrees, "data.frame")) {
       input_was_df <- TRUE;
       ddf <- degrees;
+      # jamba::printDebug("ddf:");print(ddf);# debug
+      # # update group order?
+      # for (igroup in unique(ddf$group)) {
+      #    k <- which(ddf$group %in% igroup);
+      #    if (length(k) == 1) {
+      #       ddf$order[k] <- 1;
+      #    } else {
+      #       ddf$order[k] <- make_degrees_clockwise(ddf$degrees[k])$idx;
+      #    }
+      # }
+      # jamba::printDebug("ddf:");print(ddf);# debug
       degrees <- ddf$degrees;
    } else {
       # idx is the input order
@@ -97,21 +110,27 @@ spread_degrees <- function
          min_degrees=min_degrees);
       ddf$group <- ddfg$group;
       ddf$order <- 0;
+      # jamba::printDebug("ddf:");print(ddf);# debug
       for (igroup in unique(ddf$group)) {
          k <- which(ddf$group %in% igroup);
          if (length(k) == 1) {
             ddf$order[k] <- 1;
          } else {
-            ddf$order[k] <- make_degrees_clockwise(ddf$degrees[k])$idx;
+            # ddf$order[k] <- make_degrees_clockwise(ddf$degrees[k])$idx;
+            mdc <- make_degrees_clockwise(ddf$degrees[k]);
+            ddf$order[k[mdc$idx]] <- seq_along(mdc$idx);
          }
       }
       ddf2 <- jamba::mixedSortDF(ddf, byCols=c("group", "order", "idx"));
+      if (verbose > 3) {
+         jamba::printDebug("ddf2:");print(ddf2);# debug
+      }
       ddf2$order <- seq_len(nrow(ddf2));
       ddf <- jamba::mixedSortDF(ddf2, byCols=c("idx"));
    }
    
    # debug plot function
-   spread_plot <- function() {
+   spread_plot <- function(ddf=ddf3) {
       if (length(use_colors) >= length(degrees)) {
          use_colors <- head(use_colors, length(degrees))
       } else {
@@ -133,7 +152,7 @@ spread_degrees <- function
    
    if (length(degrees) == 1) {
       if (TRUE %in% do_plot && iteration == 1) {
-         spread_plot()
+         spread_plot(ddf)
       }
       if (input_was_df) {
          return(ddf)
@@ -147,7 +166,7 @@ spread_degrees <- function
             "Hit max_iterations:", max_iterations);
       }
       if (TRUE %in% do_plot && iteration == 1) {
-         spread_plot()
+         spread_plot(ddf)
       }
       if (input_was_df) {
          return(ddf)
@@ -169,9 +188,15 @@ spread_degrees <- function
    # min_degrees <- round(min_degrees, digits=digits);
    
    # 0.0.56.900 - repair large gaps
-   new_ddf <- assign_degree_groups(ddf$degrees,
+   new_ddf <- assign_degree_groups(
+      jamba::nameVector(ddf$degrees, rownames(ddf)),
       min_degrees=min_degrees);
-   new_cols <- c("degrees", "diff", "diff_pre", "diff_post", "group")
+   if (verbose > 3) {
+      jamba::printDebug("ddf:");print(ddf);# debug
+      jamba::printDebug("new_ddf:");print(new_ddf);# debug
+   }
+   new_cols <- c("degrees", "diff", "diff_pre",
+      "diff_post", "group", "group_rank")
    ddf[, new_cols] <- new_ddf[, new_cols, drop=FALSE];
    if (verbose > 2) {
       jamba::printDebug("spread_degrees(): ",
@@ -186,7 +211,7 @@ spread_degrees <- function
             "all angles meet min_degrees=", min_degrees);
       }
       if (TRUE %in% do_plot && iteration == 1) {
-         spread_plot()
+         spread_plot(ddf)
       }
       if (input_was_df) {
          return(ddf)
@@ -214,7 +239,7 @@ spread_degrees <- function
       ddf <- jamba::mixedSortDF(ddf,
          byCols=c("order"));
       if (TRUE %in% do_plot && iteration == 1) {
-         spread_plot()
+         spread_plot(ddf)
       }
       if (input_was_df) {
          return(ddf)
@@ -232,27 +257,35 @@ spread_degrees <- function
    max_iterations <- 2;
    ddf$degrees1 <- ddf$degrees;
    for (igroup in group_use) {
-      idf <- subset(ddf, group %in% igroup);
+      idf <- jamba::mixedSortDF(
+         subset(ddf, group %in% igroup),
+         byCols=c("group_rank"));
       if (verbose > 1) {
          jamba::printDebug("spread_degrees(): ",
             "igroup: ", igroup,
             ", idf:");
          print(idf);
       }
+      # idf$diff_degrees <- diff_degrees(c(
+      #    tail(idf$degrees, 1),
+      #    idf$degrees));
       idf$diff_degrees <- diff_degrees(c(
-         tail(idf$degrees, 1),
-         idf$degrees));
+         idf$degrees,
+         head(idf$degrees, 1)));
       idf$diff_sign <- sign(idf$diff_degrees);
-      idf <- jamba::mixedSortDF(idf,
-         byCols=c("diff_sign", "degrees"))
+      # jamba::printDebug("idf (input):");print(idf);# debug
+      # idf <- jamba::mixedSortDF(idf,
+      #    byCols=c("diff_sign", "degrees"))
+      # jamba::printDebug("idf (sorted):");print(idf);# debug
       # 0.0.56.900 - improve arc calculation
       clockwise_degrees <- make_degrees_clockwise(idf$degrees)
       meandegree <- mean_degree_arc(clockwise_degrees$x,
          use_median=FALSE,
          use_range=FALSE);
-      idf <- jamba::mixedSortDF(idf,
-         byCols=c("diff_sign", "degree_order", "degrees"))
-      if (verbose > 2) {
+      # idf <- jamba::mixedSortDF(idf,
+      #    byCols=c("diff_sign", "degree_order", "degrees"))
+      # jamba::printDebug("idf (sorted):");print(idf);# debug
+      if (verbose > 3) {
          jamba::printDebug("spread_degrees(): ",
             "idf$degrees:", idf$degrees);
          jamba::printDebug("spread_degrees(): ",
@@ -262,17 +295,23 @@ spread_degrees <- function
       seqdegree <- seq(startoffset,
          by=min_degrees * 1.00,
          length=nrow(idf));
+      idf$degrees <- seqdegree;
+      # jamba::printDebug("idf (updated):");print(idf);# debug
+      idf <- jamba::mixedSortDF(idf, byCols="idx");
+      # jamba::printDebug("idf (sorted):");print(idf);# debug
       #seqdegree <- sort(seqdegree %% 360);
-      ddf[match(idf$order, ddf$order), "degrees"] <- seqdegree;
+      # assign angles using order
+      # ddf[match(idf$order, ddf$order), "degrees"] <- seqdegree;
+      ddf[ddf$group %in% igroup, "degrees"] <-idf$degrees;
       if (verbose > 2) {
          jamba::printDebug("spread_degrees(): ",
             "new ddfsub:");
-         print(ddf[match(idf$order, ddf$order),,drop=FALSE]);
+         print(ddf[ddf$group %in% igroup, , drop=FALSE]);
       }
    }
    ddf <- jamba::mixedSortDF(ddf, byCols=c("degrees", "order"));
    ddf$new_diff <- diff_degrees(c(tail(ddf$degrees, 1), ddf$degrees));
-   ddf <- jamba::mixedSortDF(ddf, byCols="order");
+   ddf <- jamba::mixedSortDF(ddf, byCols="idx");
    
    # repeat as needed
    if (verbose > 2) {
@@ -281,20 +320,21 @@ spread_degrees <- function
       print(ddf);
    }
 
-   # repair group order
-   # - within group, sort by order (the arc order)
-   # - then sort by idx which is the original input order
-   new_ddf <- ddf;
-   dupe_groups <- names(jamba::tcount(new_ddf$group,2));
-   for (dupe_group in dupe_groups) {
-      k <- which(new_ddf$group %in% dupe_group);
-      new_ddf[k, ]
-      new_ddf$degrees[k] <- make_degrees_clockwise(new_ddf$degrees[k])$x;
-   }
-   ddf <- jamba::mixedSortDF(new_ddf, byCols=c("idx"))
+   ## repair group order
+   ## - within group, sort by order (the arc order)
+   ## - then sort by idx which is the original input order
+   # new_ddf <- ddf;
+   # dupe_groups <- names(jamba::tcount(new_ddf$group,2));
+   # for (dupe_group in dupe_groups) {
+   #    k <- which(new_ddf$group %in% dupe_group);
+   #    new_ddf[k, ]
+   #    new_ddf$degrees[k] <- make_degrees_clockwise(new_ddf$degrees[k])$x;
+   # }
+   # ddf <- jamba::mixedSortDF(new_ddf, byCols=c("idx"))
 
-   if (iteration < (max_iterations + 1) &&
-         any(round(ddf$new_diff, digits=1) < round(min_degrees / 1.02, digits=1))) {
+   abs_diff <- round(abs(ddf$new_diff), digits=1);
+   abs_diff_edge <- round(min_degrees / 1.02, digits=1);
+   if (iteration < (max_iterations + 1) && any(abs_diff < abs_diff_edge)) {
       if (verbose > 2) {
          jamba::printDebug("spread_degrees(): ",
             "next iteration: ", iteration + 1);
@@ -305,30 +345,36 @@ spread_degrees <- function
          iteration=iteration + 1,
          max_iterations=max_iterations,
          verbose=verbose)
-      
-      # repair group order
-      new_ddf <- jamba::mixedSortDF(new_ddf, byCols=c("order"))
-
-      dupe_groups <- names(jamba::tcount(new_ddf$group,2));
-      for (dupe_group in dupe_groups) {
-         k <- which(new_ddf$group %in% dupe_group);
-         new_ddf[k, ]
-         new_ddf$degrees[k] <- make_degrees_clockwise(new_ddf$degrees[k])$x;
-      }
       ddf <- jamba::mixedSortDF(new_ddf, byCols=c("idx"))
    } else {
-      # new_degrees <- ddf$degrees %% 360;
-      ddf$degrees <- ddf$degrees %% 360;
+      if (any(ddf$degrees < 0 | ddf$degrees > 360)) {
+         ddf$degrees <- ddf$degrees %% 360;
+      }
    }
    
-   if (TRUE %in% do_plot && iteration == 1) {
-      spread_plot()
-   }
    if (input_was_df) {
       return(ddf)
    }
    ddf3 <- data.frame(input=degrees, jamba::mixedSortDF(ddf, byCols="idx"))
-   # jamba::printDebug("ddf3:");print(ddf3);# debug
+   # one last polish
+   ddf4 <- jamba::rbindList(unname(
+      lapply(split(ddf3, ddf3$group), function(idf){
+         if (nrow(idf) == 1) {
+            return(idf)
+         }
+         # sort by original input degrees
+         mdc <- make_degrees_clockwise(idf$input);
+         mdc2 <- make_degrees_clockwise(idf$degrees);
+         idf$degrees[mdc$idx] <- mdc2$x;
+         idf
+      })))
+   ddf <- jamba::mixedSortDF(ddf4, byCols="idx");
+   if (TRUE %in% do_plot && iteration == 1) {
+      spread_plot(ddf)
+   }
+   if ("df" %in% return_type) {
+      return(ddf)
+   }
    return(ddf$degrees);
 }
 

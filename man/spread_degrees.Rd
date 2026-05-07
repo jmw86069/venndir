@@ -11,6 +11,7 @@ spread_degrees(
   max_iterations = 20,
   use_colors = NULL,
   do_plot = FALSE,
+  return_type = c("numeric", "df"),
   verbose = FALSE,
   ...
 )

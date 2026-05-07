@@ -13,6 +13,7 @@
 #'
 #' @examples
 #' assign_degree_groups(c(5, 10, 355, 350))
+#' assign_degree_groups(c(5, 10, 120, 355, 350, 115))
 #' 
 #' assign_degree_groups(c(5, 10, 355, 180, 350, 340, 174))
 #' @export
@@ -25,7 +26,8 @@ assign_degree_groups <- function
    ddf <- data.frame(degrees=degrees %% 360,
       order=seq_along(degrees));
    # order by increasing angle in degrees
-   ddf <- ddf[order(ddf$degrees), , drop=FALSE]
+   # ddf <- ddf[order(ddf$degrees), , drop=FALSE]
+   ddf <- jamba::mixedSortDF(ddf, byCols="degrees");
    
    ddf$diff <- diff(c(tail(ddf$degrees, 1), ddf$degrees));
    ddf$diff_pre <- diff_degrees(c(tail(ddf$degrees, 1), ddf$degrees));
@@ -53,6 +55,17 @@ assign_degree_groups <- function
          }
       }
    }
+   # assign group_rank
+   ddf$group_rank <- 1;
+   for (igroup in unique(ddf$group)) {
+      idf <- subset(ddf, group %in% igroup)
+      if (nrow(idf) > 1) {
+         mdc <- make_degrees_clockwise(idf$degrees)
+         idf[mdc$idx, "group_rank"] <- seq_along(mdc$idx);
+         ddf[ddf$group %in% igroup, "group_rank"] <- idf$group_rank;
+      }
+   }
+   
    ddf <- jamba::mixedSortDF(ddf, byCols="order")
    return(ddf)
 }

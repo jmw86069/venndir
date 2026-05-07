@@ -23,6 +23,7 @@ Assign groups to a vector of degree angles
 }
 \examples{
 assign_degree_groups(c(5, 10, 355, 350))
+assign_degree_groups(c(5, 10, 120, 355, 350, 115))
 
 assign_degree_groups(c(5, 10, 355, 180, 350, 340, 174))
 }

@@ -27,7 +27,8 @@ test_that("area labelr JamPolygon", {
    # confirm label coordinates
    expect_setequal(
       round(labelr_JamPolygon(jp3), digits=3),
-      matrix(c(1.625, 9.35, 1.625, 2.75), ncol=2))
+      matrix(c(5.375, 9.35, 5.375, 2.75), ncol=2))
+      # matrix(c(1.625, 9.35, 1.625, 2.75), ncol=2))
    
    # combine into one JamPolygon
    jp3u <- union_JamPolygon(jp3)

@@ -1,5 +1,105 @@
 # TODO for venndir
 
+## 06may2026
+
+* `label_outside_JamPolygon()`: Fix bug with `vector_method="farthest"`
+causing labels to be mis-assigned.
+* Add more capability to JamPolygons manipulations
+
+   * column subsetting
+
+* Need a way to change label assignment inside-to-outside.
+Manually editing an entry is not working for all labels.
+* Consider method to apply horizontal "snap" alignment for
+count labels. E.g. in a typical two-way Venn, the labels could
+just always be horizontal, not offset on the y-axis.
+
+## 13apr2026
+
+* Big picture future: Upset-dir.
+
+   * Consider integrating with one (or other) Upset R packages
+   to show the equivalent of venndir overlaps except using Upset.
+   * Ideal would be to show colored bars (left side) with up/down;
+   colored bars (top side) with up/down/concordant/discordant.
+   * Perfect world, interactive with more details on mouseover.
+   * ComplexUpset: It has nice `geom_venn_region()` with symbol fill.
+   It has examples showing how to add plots aligned with overlaps,
+   could be a natural way to show the direction/concordance.
+   * UpSetR: Another alternative. Updated 2019.
+
+* Make it easier to combine with other plots using patchwork.
+* Simplify the verbs/functions.
+
+## 09feb2026
+
+* Review bug when setlist is different order than setlist_labels,
+and legend_labels.
+Confirm it matches with names(setlist_labels) if defined, or
+names(legend_labels).
+Note it does not affect set_colors.
+* Clarify how to customize the font styles for counts, percentages,
+e.g. Bold counts, italic non-bold percentages inside parentheses.
+
+## 15dec2025
+
+* Bug: label positions with proportional=TRUE. Looks like mismatched rows.
+
+```
+vm <- venn_meme(LETTERS[1:13], do_plot=FALSE)
+setlist <- counts2setlist(
+	setNames(c(9, 2, 3, 2, 3, 0, 0, 0, 1, 0, 2, 0, 6),
+		names(overlaplist(vm))))
+venndir(setlist, proportional=TRUE)
+venndir(setlist, proportional=TRUE, show_labels="NC")
+```
+
+* Consider more user-friendly converter function names:
+`setlist_from_` style, similar to `igraph::graph_from_`
+
+## 10dec2025
+
+* Fix `show_zero=TRUE` not showing zeros.
+* `textvenn()` consider supporting `show_labels="Ncp"` to include percentage
+in the text labels.
+* Consider `alpha_by_percentage` to set max alpha at 100% or fixed value?
+Probably needs to use non-linear transform across the range.
+Intention is to "see" whether overlaps are disproportionate.
+* Add label option to summarize concordance as a score, display
+similar to percentage: E.g. K
+
+   * `'k'` Kruskal concordance, bounded [-1..+1], `(nA-nD)/n`
+   * `'z'` IPA z-score, un-bounded but decent threshold: `(nA-nD)/sqrt(n)`
+
+## 05dec2025
+
+* Debug Rmarkdown rendering bug, sometimes plots go to RStudio graphics
+device and not to the Rmarkdown output, causing empty/blank Rmd plots.
+
+   * Seems related to the decision to open a graphics device for font
+   support, if a graphics device is not already present.
+   * Consider whether to detect running inside rmarkdown knit process,
+   then handling the graphics decision specific so that Rmarkdown render
+   is successful. Otherwise, use previous logic.
+
+## 18nov2025
+
+* Debug textvenn() with setlist having name "sets" for one list element.
+Looks like `unique(sv$sets)` conflicts, suggesting there may be names
+to be protected; or should be alternate syntax than: `sv$sets`.
+
+## 18aug2025
+
+* Consider helper function `hitdf2setlist()` for `data.frame` where the
+first column is the identifier.
+* Consider method to take `list` of stat `data.frame` objects, or equivalent,
+and "port" them into `SEStats` format. Probably want S4 `SEStats`.
+
+## 13aug2025
+
+* `textvenn()` with signed data causes an error when farver is not available,
+perhaps a bug with `jamba::col2hsl()` but currently an optional package.
+
 ## 05jul2025
 
 * Consider dynamic `L_lo`, `L_hi` values based upon the background color.

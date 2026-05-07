@@ -10,8 +10,8 @@ label_outside_JamPolygon(
   center = NULL,
   buffer = -0.1,
   distance = 0.1,
-  center_method = c("bbox", "label", "none"),
-  vector_method = c("farthest", "label"),
+  center_method = c("label", "bbox", "none"),
+  vector_method = c("label", "farthest"),
   segment_method = c("nearest", "vector"),
   min_degrees = 15,
   relative = TRUE,
@@ -54,12 +54,19 @@ distance from the perimiter of \code{jp} to place labels.
 This value is the \code{buffer} for \code{buffer_JamPolygon()}.}
 
 \item{center_method}{\code{character} string indicating the method to
-determine the \code{center}:
+determine the \code{center}, default 'label'.
+The difference is sometimes subtle, when labels are polygons
+are uniformly spaced. When there are many smaller polygons,
+using 'label' may be preferred.
 \itemize{
 \item \code{"label"} uses the mean x,y coordinate
-of all the polygon label positions;
+of all the polygon label positions, which is effective
+at having labels "radiate" from closer to the center of where
+most polygons are located.
 \item \code{"bbox"} uses the mean x,y
-coordinate of the bounding box that encompasses the polygons.
+coordinate of the bounding box that encompasses the polygons,
+which is effective at positioning labels around the overall
+polygon.
 \item \code{"none"} uses the origin 0,0 and is intended mainly to allow
 \code{center} to be used as absolute coordinates.
 }
@@ -74,8 +81,12 @@ the polygons.}
 \item{vector_method}{\code{character} string indicating the vector from
 \code{center} outward, to define the position outside the polygons.
 \itemize{
-\item \code{'farthest'} (default) aims to the farthest point from center.
-\item \code{'label'} aims through the default label position in each polygon.
+\item \code{'label'} (default) aims through the default label position
+in each polygon.
+\item \code{'farthest'} aims to the farthest point on each polygon border
+from the center. Currently this approach is in development,
+since the corresponding line segment is not optimally drawn
+when there may be multiple sub-polygons for a given polygon group.
 }}
 
 \item{segment_method}{\code{character} string indicating how to connect
@@ -83,26 +94,37 @@ a line segment from the outside label, back to the polygon.
 The line segment ends inside the polygon, defined by \code{buffer}.
 \itemize{
 \item \code{'nearest'} (default) points to the nearest border.
-\item \code{'label'} points toward the default label position inside the
-polygon.
+\item \code{'vector'} uses a line drawn from the polygon label position,
+which is cut just inside the polygon boundary.
 }}
 
-\item{min_degrees}{\code{numeric}, default 15, minimum degrees spacing
-to impose between label positions, oriented around the center.
+\item{min_degrees}{\code{numeric}, default 15, minimum angle in degrees
+to impose spacing between adjacent labels when arrayed around
+the center point.
+This angle is used to help reduce overlapping labels, and to
+provide a unique location for each individual label that may
+be positioned either inside, or outside the Venn overlap region.
 When there are more labels than can be divided, the threshold
 is automatically lowered proportionally.}
 
-\item{relative}{\code{logical} whether distance and buffer are relative
-to plot dimensions, default TRUE.}
+\item{relative}{\code{logical} whether distance and buffer units
+are interpreted relative to plot dimensions, default TRUE.
+For these units, the larger of the x- and y-axis ranges is used
+to define 1.0 plot units.}
 
 \item{y_snap_percent}{\code{numeric} percent of the plot dimensions
 used to decide whether to "snap" two labels to the same y-axis value.
 Default 5 means any labels within 5 percent of the plot dimensions
 of one or more other labels will use the mean y-axis value,
-thereby helping align labels by height where appropriate.}
+thereby helping align labels by height where appropriate.
+When drawing a proportional Euler diagram, it may be helpful
+to increase this value as a quick way to align labels
+horizontally, in height on the figure.}
 
 \item{seed}{\code{numeric} used to set the random seed for reproducibility,
-via \code{set.seed()}. Default is 123.}
+via \code{set.seed()}. The default is 123, and is used as default
+to ensure reproducibility for common usage. Use NULL to
+avoid setting a fixed random seed.}
 
 \item{debug}{\code{logical} whether to print detailed debug information.}
 
@@ -167,7 +189,7 @@ label_outside_JamPolygon(jps, do_plot=TRUE)
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

@@ -1,6 +1,6 @@
 Package: venndir
 Title: Directional Venn diagrams
-Version: 0.0.58.900
+Version: 0.0.59.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -46,5 +46,5 @@ Remotes: github::jmw86069/colorjam,
 URL: https://jmw86069.github.io/venndir
 BugReports: https://github.com/jmw86069/venndir/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr

@@ -1,3 +1,47 @@
+# venndir 0.0.59.900
+
+* Default label placement outside the Venn overlap region
+was updated from the previous default, causing default positions
+to be slightly different. In general, slightly wider positioning
+along the x-axis.
+
+## Updates to existing functions
+
+* `label_outside_JamPolygon()`
+
+   * New argument default: `vector_method="label"` which sidesteps
+   a bug with `'farthest'` which appeared to mis-orient labels in some
+   proportional Euler diagrams, specific to multi-polygon sub-parts
+   within the same Venn overlap region.
+   * New argument default: `center_method="label"` instead of 'bbox',
+   which arrays labels around the center of existing polygon labels.
+   * Fixed bug where missing/hidden labels caused mis-alignment of
+   label positions for existing non-hidden labels.
+   * Input names in 'which_jp' are retained. If no names are provided,
+   it uses internal names. Fixed bug when `which_jp` contained duplicate
+   names, causing output to be mis-aligned.
+
+* `spread_degrees()`
+
+   * Fixed bug that sometimes altered the original order of labels,
+   particularly when labels were spread too wide in one iteration,
+   causing the order to be incorrect when the bundle of labels
+   overlapped another neighboring bundle of labels.
+
+* `assign_degree_groups()`
+
+   * Internal logic was updated to help reinforce original label order,
+   and to assign "clockwise" ordered labels even as they cross
+   the 0/360 degree threshold.
+
+* `venndir()`
+
+   * Now calls `label_outside_JamPolygon()` using the full 'jps'
+   and identifying the subset to use for labels.
+
+* Updated tests for marquee fonts, so it does better at detecting
+available fonts.
+
 # venndir 0.0.58.900
 
 ## Hotfix / Bug Fix

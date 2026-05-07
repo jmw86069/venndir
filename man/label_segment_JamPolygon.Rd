@@ -18,13 +18,48 @@ label_segment_JamPolygon(
   ...
 )
 }
+\arguments{
+\item{x0, y0}{\code{numeric} coordinate of starting point, assumed to be
+outside the polygon \code{jp}.}
+
+\item{x1, y1}{\code{numeric} coordinate of end point, assumed to be
+inside the polygon \code{jp}. If not inside the polygon, the nearest
+polygon point is used.}
+
+\item{buffer}{\code{numeric} buffer applied to the polygon, where negative
+would shrink the polygon, and positive would enlarge it. Default 0.
+Negative values are useful to have the line segment end
+just inside the polygon, by shrink the polygon, drawing a line to
+the edge of the smaller polygon.}
+
+\item{plot_debug}{\code{logical} default FALSE, whether to plot debug
+information for visual review. Not implemented.}
+
+\item{relative}{\code{logical} default TRUE, whether the \code{buffer} is fraction
+of max plot dimensions.}
+
+\item{verbose}{\code{logical} whether to print verbose output.}
+}
+\value{
+\code{numeric} matrix with columns
+\itemize{
+\item x,y \code{numeric} with x,y coordinates of the end point, where
+the input x0,y0 are expected to represent the starting coordinates.
+\item adjx,adjy \code{numeric} values used to orient text relative to the
+line, assuming the text would be positioned at the x0,y0
+coordinates.
+\item When \code{return_class='matrix'} the output contains two rows, the first
+row is the starting point (given as x0, y0) and the second row is the
+point inside the \code{jp} polygon.
+}
+}
 \description{
 Define a label segment for JamPolygon
 }
 \seealso{
 Other JamPolygon: 
 \code{\link{JamPolygon-class}},
-\code{\link{[,JamPolygon-method}},
+\code{\link{[,JamPolygon,ANY,ANY,ANY-method}},
 \code{\link{add_orientation_JamPolygon}()},
 \code{\link{area_JamPolygon}()},
 \code{\link{bbox_JamPolygon}()},

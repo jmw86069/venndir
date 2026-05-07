@@ -32,14 +32,25 @@ test_that("venn_fonts_svglite", {
 
 test_that("venn_fontfamilies_svglite", {
    set.seed(123)
+   font_chalk <- head(jamba::provigrep(
+      c("chalk", "felt", "pen", "roman"),
+      subset_systemfonts(grepl("normal", weight) &
+            grepl("normal", width) & 
+            grepl("Regular|Plain", style))$name), 1)
+   font_roman <- head(jamba::provigrep(
+      c("roman", "times"),
+      subset_systemfonts(grepl("normal", weight) &
+            grepl("normal", width) & 
+            grepl("Regular|Plain", style))$name), 1)
+   
    run_venndir3_font <- function() {
       vo5p <- venndir(
          setlist=list(set_A=LETTERS,
             set_B=LETTERS[1:10],
             set_C=LETTERS[6:7]),
          fontfamilies=list(signed="ArialBlack",
-            count="Times",
-            overlap="Marker Felt"),
+            count=font_roman,
+            overlap=font_chalk),
          fontfamily="Optima", font_cex=2, legend_font_cex=1.5,
          proportional=FALSE, do_plot=TRUE, center_method="label")
    }

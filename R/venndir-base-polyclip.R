@@ -846,18 +846,19 @@ venndir <- function
          center <- c(0, -0.2);
       }
       
+      # jamba::printDebug("venndir() get_outside_labels:");print(get_outside_labels);# debug
       use_jps <- venn_jps[get_outside_labels];
       names(use_jps) <- names(get_outside_labels);
       ploxy <- label_outside_JamPolygon(
          # jp=venn_jps[get_outside_labels],
-         jp=use_jps,
+         # jp=use_jps,
+         jp=venn_jps,
+         which_jp=get_outside_labels,
          distance=segment_distance,
          center=center,
          verbose=verbose,
          # do_plot=TRUE,
          ...)
-      # jamba::printDebug("venndir():", "names(use_jps):", names(use_jps));# debug
-      # jamba::printDebug("ploxy:");print(ploxy);# debug
       kc <- c("name", "venn_name", "label",
          "label_x", "label_y", "x_label", "y_label",
          "x_outside", "y_outside",
